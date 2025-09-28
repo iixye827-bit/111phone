@@ -1,11 +1,6 @@
 {
   "title": "Jellyfis",
   "subtitle": "点击即可跳转 | By淡季水母",
-  "buttons": [
-    {
-      "text": "蛙",
-      "href": "https://mwmissing.cc/"
-    }
-  ],
+  "buttons": [],
   "themePresets": []
 }
