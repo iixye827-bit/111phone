@@ -7,64 +7,85 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Jellyfish导航</title>
     <style>
-        /* [核心CSS - 已根据新设计重构] */
+        /* [CSS样式 - 无需改动] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root { --day-color1: #f5f7fa; --day-color2: #e4eaf5; --night-color1: #1a1a2e; --night-color2: #16213e; --hold-border: #4299e1; --text-day: #2d3748; --text-night: #f0f2f5; --bg-day: #eef2f9; --bg-night: #1a1a2e; --shadow-light-day: rgba(255, 255, 255, 0.9); --shadow-dark-day: rgba(174, 190, 212, 0.4); --shadow-light-night: rgba(40, 45, 65, 0.9); --shadow-dark-night: rgba(0, 0, 0, 0.3); }
         body { min-height: 100vh; background: linear-gradient(135deg, var(--day-color1) 0%, var(--day-color2) 100%); padding: 20px; display: flex; flex-direction: column; align-items: center; transition: background 0.5s ease; touch-action: manipulation; overflow-x: hidden; }
         body.dark-mode { background: linear-gradient(135deg, var(--night-color1) 0%, var(--night-color2) 100%); --hold-border: #63b3ed; color: var(--text-night); }
-        .title-card { width: 100%; max-width: 800px; padding: 35px 20px; /* ✨ 修改：减少内边距 */ border-radius: 16px; box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); text-align: center; transition: all 0.5s ease; /* ✨ 修改：移除 margin-bottom */ margin: 20px 0 0 0; }
+        .title-card { width: 100%; max-width: 800px; padding: 40px 20px; margin: 20px 0; border-radius: 16px; box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); text-align: center; transition: all 0.5s ease; }
         body.dark-mode .title-card { box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night); background-color: rgba(30, 35, 55, 0.9); }
-        .editable-title, .editable-subtitle { cursor: pointer; padding: 6px 12px; border-radius: 8px; transition: all 0.3s ease; display: block; width: fit-content; margin: 0 auto; user-select: none; }
-        .editable-title { font-size: 32px; color: var(--text-day); margin-bottom: 15px; /* ✨ 修改：减少间距 */ }
-        .editable-subtitle { font-size: 16px; color: #5a6778; line-height: 1.5; }
+        .editable-title { font-size: 32px; color: var(--text-day); margin-bottom: 20px; cursor: pointer; padding: 6px 12px; border-radius: 8px; transition: all 0.3s ease; display: block; width: fit-content; margin: 0 auto 20px auto; user-select: none; }
         body.dark-mode .editable-title { color: var(--text-night); }
+        .editable-title:hover { background-color: rgba(255, 255, 255, 0.8); }
+        body.dark-mode .editable-title:hover { background-color: rgba(50, 55, 75, 0.8); }
+        .editable-subtitle { font-size: 16px; color: #5a6778; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.3s ease; display: block; width: fit-content; margin: 0 auto; line-height: 1.5; user-select: none; }
         body.dark-mode .editable-subtitle { color: #c0c6cc; }
-        .editable-title:hover, .editable-subtitle:hover { background-color: rgba(255, 255, 255, 0.8); }
-        body.dark-mode .editable-title:hover, body.dark-mode .editable-subtitle:hover { background-color: rgba(50, 55, 75, 0.8); }
-        
-        /* ✨ 新增: 功能按钮栏样式 */
-        .function-bar { display: flex; justify-content: center; align-items: center; gap: 20px; padding: 30px 0; }
-        .function-btn { width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s ease; box-shadow: 6px 6px 12px var(--shadow-dark-day), -6px -6px 12px var(--shadow-light-day); background-color: var(--bg-day); color: var(--text-day); font-size: 22px; display: flex; align-items: center; justify-content: center; z-index: 10; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body.dark-mode .function-btn { box-shadow: 6px 6px 12px var(--shadow-dark-night), -6px -6px 12px var(--shadow-light-night); background-color: var(--bg-night); color: var(--text-night); }
-        .function-btn:active { transform: scale(0.95); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
-        body.dark-mode .function-btn:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
-
-        .nav-container { width: 100%; max-width: 1200px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; padding: 20px; /* ✨ 修改：移除 margin-top */ }
+        .editable-subtitle:hover { background-color: rgba(255, 255, 255, 0.8); color: var(--text-day); }
+        body.dark-mode .editable-subtitle:hover { background-color: rgba(50, 55, 75, 0.8); color: var(--text-night); }
+        .nav-container { width: 100%; max-width: 1200px; margin: 20px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; padding: 20px; }
         .nav-btn { padding: 22px 16px; border: none; border-radius: 14px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); font-size: 17px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent; }
-        .nav-btn.hold { border: 2px solid var(--hold-border); transform: scale(1.02); z-index: 5; }
+        .nav-btn.hold { border: 2px solid var(--hold-border); transform: scale(1.02); z-index: 5; box-shadow: 8px 8px 16px rgba(174, 190, 212, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(66, 153, 225, 0.3); }
         body.dark-mode .nav-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background-color: rgba(30, 35, 55, 0.9); color: var(--text-night); }
+        body.dark-mode .nav-btn.hold { box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4), -8px -8px 16px rgba(40, 45, 65, 0.8), 0 0 0 2px rgba(99, 179, 237, 0.3); }
         .nav-btn:hover { transform: translateY(-3px); background-color: #ffffff; }
         body.dark-mode .nav-btn:hover { background-color: rgba(40, 45, 65, 1); }
-        
-        /* ====== 弹窗通用及美化样式 (部分修改) ====== */
+        .nav-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-day), inset -6px -6px 12px var(--shadow-light-day); transform: translateY(0); }
+        body.dark-mode .nav-btn:active { box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.25), inset -6px -6px 12px rgba(40, 45, 65, 0.8); }
+        .theme-toggle, .color-palette-btn, .sync-btn, .add-nav-btn { position: fixed; bottom: 30px; width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s ease; box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); background-color: rgba(255, 255, 255, 0.9); color: var(--text-day); font-size: 18px; display: flex; align-items: center; justify-content: center; z-index: 10; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .theme-toggle { right: 30px; }
+        .add-nav-btn { right: 30px; bottom: 90px; font-size: 24px; }
+        .color-palette-btn { left: 30px; }
+        .sync-btn { left: 50%; transform: translateX(-50%); }
+        body.dark-mode .theme-toggle, body.dark-mode .color-palette-btn, body.dark-mode .sync-btn, body.dark-mode .add-nav-btn { box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); background-color: rgba(30, 35, 55, 1); color: var(--text-night); }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
         .modal-overlay.show { display: flex; opacity: 1; }
-        .modal-content { width: 90%; max-width: 500px; background: var(--bg-day); color: var(--text-day); border-radius: 16px; box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); padding: 25px; transition: all 0.3s ease; transform: scale(0.95); }
-        body.dark-mode .modal-content { background: var(--bg-night); color: var(--text-night); box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night); }
+        .modal-content { width: 90%; background: var(--bg-day); color: var(--text-day); border-radius: 16px; box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); padding: 25px; transition: transform 0.3s ease, background 0.5s ease, box-shadow 0.5s ease; transform: scale(0.95); }
         .modal-overlay.show .modal-content { transform: scale(1); }
-        .modal-input, .modal-select { width: 100%; padding: 12px 15px; border: none; border-radius: 10px; font-size: 16px; background: var(--bg-day); color: var(--text-day); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); transition: all 0.3s ease; }
+        body.dark-mode .modal-content { background: var(--bg-night); color: var(--text-night); box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 600; margin-bottom: 20px; }
+        .modal-title-group { display: flex; align-items: center; gap: 8px; }
+        .modal-header .close-btn, .modal-header .settings-btn { cursor: pointer; border: none; background: transparent; color: inherit; padding: 5px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease; }
+        .modal-header .close-btn { font-size: 24px; font-weight: bold; width: 36px; height: 36px; }
+        .modal-header .settings-btn { font-size: 20px; width: 32px; height: 32px; }
+        .modal-header .close-btn:hover, .modal-header .settings-btn:hover { background: rgba(0,0,0,0.05); }
+        body.dark-mode .modal-header .close-btn:hover, body.dark-mode .modal-header .settings-btn:hover { background: rgba(255,255,255,0.08); }
+        .modal-input, .modal-select { width: 100%; padding: 12px 15px; border: none; border-radius: 10px; font-size: 16px; background: var(--bg-day); color: var(--text-day); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); transition: all 0.3s ease; caret-color: var(--hold-border); }
         body.dark-mode .modal-input, body.dark-mode .modal-select { background: var(--bg-night); color: var(--text-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
+        .modal-input:focus, .modal-select:focus { outline: none; box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day), 0 0 0 2px var(--hold-border); }
+        body.dark-mode .modal-input:focus, body.dark-mode .modal-select:focus { box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night), 0 0 0 2px var(--hold-border); }
         .modal-button { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; color: white; background: var(--hold-border); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); transition: all 0.3s ease; }
-        
-        /* ====== ✨ “添加导航”弹窗特定样式 (已美化) ====== */
-        #addNavModal .modal-body { display: flex; flex-direction: column; gap: 20px; }
-        .type-selector { display: flex; gap: 15px; margin-bottom: 10px; }
-        .type-selector label { display: flex; align-items: center; gap: 5px; cursor: pointer; font-size: 16px; }
-        #link-inputs, #project-inputs { display: none; flex-direction: column; gap: 20px; }
-        #link-inputs.active, #project-inputs.active { display: flex; }
-        .folder-upload-area { padding: 20px; text-align: center; border-radius: 10px; cursor: pointer; transition: all 0.3s ease; /* ✨ 修改：采用拟态风格 */ background: var(--bg-day); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
-        body.dark-mode .folder-upload-area { background: var(--bg-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
-        .folder-upload-area:hover { box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day), 0 0 0 2px var(--hold-border); }
-        body.dark-mode .folder-upload-area:hover { box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night), 0 0 0 2px var(--hold-border); }
-        #folder-name-display { margin-top: 10px; color: #5a6778; font-style: italic; font-size: 14px; }
-        body.dark-mode #folder-name-display { color: #c0c6cc; }
-        
-        @media (max-width: 480px) {
-            .function-bar { gap: 15px; }
-            .function-btn { width: 44px; height: 44px; font-size: 20px; }
-            .nav-container { grid-template-columns: 1fr 1fr; gap: 18px; padding: 10px; }
-            .nav-btn { padding: 18px 10px; font-size: 15px; }
-        }
+        body.dark-mode .modal-button { box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); }
+        .modal-button:active { box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2), inset -4px -4px 8px rgba(255,255,255,0.7); }
+        body.dark-mode .modal-button:active { box-shadow: inset 4px 4px 8px rgba(0,0,0,0.4), inset -4px -4px 8px rgba(255,255,255,0.2); }
+        .modal-button:disabled { background: #9db2c2; cursor: not-allowed; }
+        #syncModal .modal-content { max-width: 500px; max-height: 80vh; display: flex; flex-direction: column; }
+        #syncModal .modal-body, #settingsModal .modal-body, #addNavModal .modal-body { display: flex; flex-direction: column; gap: 15px; flex-grow: 1; min-height: 0; }
+        .file-list-container { flex-grow: 1; overflow-y: auto; border-radius: 10px; padding: 5px; margin-top: 10px; background: var(--bg-day); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
+        body.dark-mode .file-list-container { background: var(--bg-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
+        .file-list-container ul { list-style: none; padding: 5px; }
+        .file-list-container li { padding: 8px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; gap: 10px; }
+        .file-list-container li:hover { background-color: rgba(0,0,0,0.05); }
+        body.dark-mode .file-list-container li:hover { background-color: rgba(255,255,255,0.08); }
+        .file-list-status { text-align: center; color: #889; padding: 30px 10px; }
+        .file-info { flex-grow: 1; cursor: pointer; min-width: 0; }
+        .file-name { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 16px; }
+        .file-timestamp { font-size: 12px; font-weight: 300; color: #9A86A4; }
+        .delete-btn { background: transparent; border: none; cursor: pointer; padding: 0; flex-shrink: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background 0.2s, color 0.2s; color: #bbb; font-size: 22px; font-weight: bold; line-height: 1; }
+        .delete-btn:hover { background: #f0f0f0; color: #e53e3e; }
+        body.dark-mode .delete-btn { color: #889; }
+        body.dark-mode .delete-btn:hover { background: rgba(255,255,255,0.1); color: #fc8181; }
+        #settingsModal .modal-content, #addNavModal .modal-content { max-width: 400px; }
+        #settingsModal .modal-body .form-section, #addNavModal .modal-body .form-section { display: flex; flex-direction: column; gap: 8px;}
+        #settingsModal label, #addNavModal label { font-size: 14px; color: #5a6778; }
+        body.dark-mode #settingsModal label, body.dark-mode #addNavModal label { color: #c0c6cc; }
+        .nav-type-selector { display: flex; gap: 10px; border-radius: 12px; padding: 5px; background: var(--bg-day); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
+        body.dark-mode .nav-type-selector { background: var(--bg-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
+        .nav-type-selector input[type="radio"] { display: none; }
+        .nav-type-selector label { flex: 1; text-align: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-weight: 600; }
+        .nav-type-selector input[type="radio"]:checked + label { background: var(--hold-border); color: white; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+        #addNavModal .status-text { text-align: center; font-size: 14px; color: #889; min-height: 20px; }
+
+        @media (max-width: 480px) { .editable-title { font-size: 26px; } .editable-subtitle { font-size: 14px; } .title-card { padding: 30px 15px; } .nav-container { grid-template-columns: 1fr 1fr; gap: 18px; padding: 10px; } .nav-btn { padding: 18px 10px; font-size: 15px; } .theme-toggle, .color-palette-btn, .sync-btn, .add-nav-btn { width: 44px; height: 44px; bottom: 20px; font-size: 16px; } .add-nav-btn { bottom: 75px; font-size: 22px; } .color-palette-btn { left: 20px; } }
     </style>
 </head>
 <body>
@@ -72,195 +93,188 @@
         <h1 class="editable-title" id="title">Jellyfish导航</h1>
         <div class="editable-subtitle" id="subtitle">点击即可跳转 | By淡季水母</div>
     </div>
-
-    <!-- ✨ 新增: 功能按钮栏 -->
-    <div class="function-bar">
-        <button class="function-btn" id="themeBtn" title="切换主题">🌞</button>
-        <button class="function-btn" id="syncBtn" title="数据云盘">☁️</button>
-        <button class="function-btn" id="addNavBtn" title="添加新的小手机">📱</button>
-        <button class="function-btn" id="colorBtn" title="调整颜色">🎨</button>
-    </div>
-
-    <div class="nav-container" id="navContainer">
-        <!-- 按钮将由JS动态加载 -->
-    </div>
-
-    <!-- ✨ 修改: “添加导航”弹窗内容 -->
-    <div class="modal-overlay" id="addNavModal">
+    <div class="nav-container" id="navContainer"></div>
+    <button class="theme-toggle" id="themeBtn">🌞</button>
+    <button class="sync-btn" id="syncBtn">☁️</button>
+    <button class="color-palette-btn" id="colorBtn">🎨</button>
+    <button class="add-nav-btn" id="addNavBtn" title="添加导航">+</button>
+    
+    <div class="modal-overlay" id="syncModal">
         <div class="modal-content">
             <div class="modal-header">
-                <span>添加新的小手机</span>
-                <button class="close-btn" id="closeAddNavModalBtn">&times;</button>
+                <div class="modal-title-group"><span>数据云盘</span><button class="settings-btn" id="settingsBtn" title="设置GitHub信息">⚙️</button></div>
+                <button class="close-btn" data-modal-id="syncModal">&times;</button>
             </div>
+            <div class="modal-body"><select id="buttonSelector" class="modal-select"></select><input type="file" id="fileUploader"><input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）"><button id="uploadBtn" class="modal-button">上传文件</button><div class="file-list-container"><ul id="fileList"></ul><div id="fileListStatus" class="file-list-status">请选择一个分类</div></div></div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="settingsModal">
+         <div class="modal-content">
+            <div class="modal-header"><div class="modal-title-group"><span>GitHub 配置</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div>
+            <div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/my-repo"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button></div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="addNavModal">
+        <div class="modal-content">
+            <div class="modal-header"><div class="modal-title-group"><span>添加导航</span></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div>
             <div class="modal-body">
-                <input type="text" id="newNavName" class="modal-input" placeholder="输入按钮名称 (必填)">
-                <div class="type-selector">
-                    <label><input type="radio" name="navType" value="link" checked> 外部链接</label>
-                    <label><input type="radio" name="navType" value="project"> 上传项目</label>
-                </div>
-                <div id="link-inputs" class="active">
-                    <input type="url" id="newNavUrl" class="modal-input" placeholder="https://example.com">
-                </div>
-                <div id="project-inputs">
-                    <label for="projectFolderUpload" class="folder-upload-area">
-                        点击此处选择项目文件夹
-                        <div id="folder-name-display">未选择任何文件夹</div>
-                    </label>
-                    <input type="file" id="projectFolderUpload" webkitdirectory directory multiple hidden>
-                </div>
-                <button id="createNavBtn" class="modal-button">确认创建</button>
-                <div id="progress-text"></div>
+                <div class="nav-type-selector"><input type="radio" id="type-link" name="nav-type" value="link" checked><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload"><label for="type-upload">上传项目</label></div>
+                <div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div>
+                <div id="link-section" class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div>
+                <div id="upload-section" class="form-section" style="display: none;"><label>选择项目文件夹</label><button id="folderPickerBtn" class="modal-button" style="background: #5a6778;">点击选择文件夹</button><div class="status-text" id="folder-picker-status"></div></div>
+                <button id="createNavBtn" class="modal-button">确认创建</button><div class="status-text" id="upload-status"></div>
             </div>
         </div>
     </div>
-    
-    <!-- 其他弹窗保持不变 (为了简洁，省略其HTML，但它们依然存在) -->
-    <!-- <div class="modal-overlay" id="syncModal"> ... </div> -->
-    <!-- <div class="modal-overlay" id="settingsModal"> ... </div> -->
-    
+
     <script>
-    // ====== 全局变量与配置 ======
-    let GITHUB_CONFIG = {};
-    const SYNC_FOLDER = 'data_sync';
-    let longPressTimer = null, sourceBtn = null, targetBtn = null, isLongPress = false;
-
-    // DOM 元素获取
-    const navContainer = document.getElementById('navContainer');
-    const titleEl = document.getElementById('title');
-    const subtitleEl = document.getElementById('subtitle');
-    const themeBtn = document.getElementById('themeBtn');
-    const colorBtn = document.getElementById('colorBtn');
-
-    // ====== 核心功能：按钮创建与事件绑定 ======
-    function addEventListenersToButton(btn) {
-        btn.addEventListener('mousedown', handlePressStart);
-        btn.addEventListener('touchstart', handlePressStart, { passive: false });
-        btn.addEventListener('mouseup', handlePressEnd);
-        btn.addEventListener('touchend', handlePressEnd);
-        btn.addEventListener('mouseleave', handlePressEnd);
-        btn.addEventListener('touchcancel', handlePressEnd);
-        btn.addEventListener('click', function (e) {
-            if (!isLongPress) {
-                const href = this.getAttribute('data-href');
-                if (href) window.location.href = href;
-            }
-            isLongPress = false;
-        });
-    }
-    function handlePressStart(e) {
-        if (longPressTimer) clearTimeout(longPressTimer);
-        const currentBtn = e.currentTarget;
-        longPressTimer = setTimeout(() => {
-            isLongPress = true; sourceBtn = currentBtn;
-            sourceBtn.classList.add('hold');
-            document.addEventListener('mousemove', handleDragOver);
-            document.addEventListener('touchmove', handleDragOver, { passive: false });
-        }, 300);
-    }
-    function handlePressEnd() {
-        clearTimeout(longPressTimer);
-        document.removeEventListener('mousemove', handleDragOver);
-        document.removeEventListener('touchmove', handleDragOver);
-        if (isLongPress) swapButtons(sourceBtn, targetBtn);
-        sourceBtn = null; targetBtn = null;
-        clearHoldClass();
-    }
-    function handleDragOver(e) { /* ... 此函数保持不变 ... */ }
-    function createNavButton(text, href) { /* ... 此函数保持不变 ... */ }
-
-    // ====== 配置保存与加载 ======
-    function saveConfig() { /* ... 此函数保持不变 ... */ }
-    function loadConfig() { /* ... 此函数保持不变 ... */ }
-    function saveTitleConfig() { /* ... 此函数保持不变 ... */ }
-    function loadTitleConfig() { /* ... 此函数保持不变 ... */ }
-
-    // ====== 按钮拖拽与常规操作 ======
-    function clearHoldClass() { document.querySelectorAll('.nav-btn.hold').forEach(btn => btn.classList.remove('hold')); }
-    function swapButtons(a, b) {
-        if (!a || !b || a === b) return;
-        const aSibling = a.nextSibling === b ? a : a.nextSibling;
-        navContainer.insertBefore(a, b);
-        navContainer.insertBefore(b, aSibling);
-        saveConfig();
-    }
-    
-    // ====== 主题与颜色 ======
-    function initTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-        document.body.classList.toggle('dark-mode', isDark);
-        themeBtn.textContent = isDark ? '🌙' : '🌞';
-    }
-    themeBtn.addEventListener('click', () => {
-        const isDark = document.body.classList.toggle('dark-mode');
-        themeBtn.textContent = isDark ? '🌙' : '🌞';
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
-    // ... colorBtn 的逻辑保持不变
-
-    // ====== “添加导航” 弹窗逻辑 (功能不变，仅关联新按钮) ======
-    const addNavBtn = document.getElementById('addNavBtn');
-    const addNavModal = document.getElementById('addNavModal');
-    const closeAddNavModalBtn = document.getElementById('closeAddNavModalBtn');
-    
-    addNavBtn.addEventListener('click', () => addNavModal.classList.add('show'));
-    closeAddNavModalBtn.addEventListener('click', () => resetAndCloseAddModal());
-    addNavModal.addEventListener('click', e => (e.target === addNavModal) && resetAndCloseAddModal());
-    // ... createNavBtn, file upload 等所有相关逻辑保持不变
-
-    // ====== 数据云盘 (☁️) 与 GitHub 配置 ======
-    // ... 所有 syncModal 和 settingsModal 的逻辑保持不变
-    // (注意: 弹窗的HTML部分为了简洁已省略，但您的JS代码可能仍引用了它们，请确保JS能够找到这些元素)
-
-    // ====== 页面加载时的初始化 ======
-    window.addEventListener('load', () => {
-        loadTitleConfig();
-        loadConfig();
-        initTheme();
-        // initColors(); // 确保您有这个函数的定义
-        // loadGithubConfig(); // 确保您有这个函数的定义
+        // [JS 全局变量及基础函数]
+        let longPressTimer = null, sourceBtn = null, targetBtn = null, isLongPress = false;
+        let GITHUB_CONFIG = {}; const SYNC_FOLDER = 'data_sync';
+        let localDirectoryHandle = null;
+        const navContainer = document.getElementById('navContainer');
         
-        titleEl.addEventListener('click', () => { const n = prompt('新标题:', titleEl.textContent); if (n) { titleEl.textContent = n; saveTitleConfig(); } });
-        subtitleEl.addEventListener('click', () => { const n = prompt('新描述:', subtitleEl.textContent); if (n) { subtitleEl.textContent = n; saveTitleConfig(); } });
-    });
-    
-    // 提示: 为确保页面能完整运行，请将下面这个最终的、未经省略的 <script> 块替换您现有的整个 <script> 标签
-    </script>
-    <script>
-    // ====== 全局变量与配置 ======
-    let GITHUB_CONFIG = {}; const SYNC_FOLDER = 'data_sync'; let longPressTimer = null, sourceBtn = null, targetBtn = null, isLongPress = false;
-    const navContainer = document.getElementById('navContainer'), titleEl = document.getElementById('title'), subtitleEl = document.getElementById('subtitle'), themeBtn = document.getElementById('themeBtn'), colorBtn = document.getElementById('colorBtn'), root = document.documentElement;
-    
-    function addEventListenersToButton(btn) { btn.addEventListener('mousedown', handlePressStart); btn.addEventListener('touchstart', handlePressStart, { passive: false }); btn.addEventListener('mouseup', handlePressEnd); btn.addEventListener('touchend', handlePressEnd); btn.addEventListener('mouseleave', handlePressEnd); btn.addEventListener('touchcancel', handlePressEnd); btn.addEventListener('click', function (e) { if (!isLongPress) { const href = this.getAttribute('data-href'); if (href) window.location.href = href; } isLongPress = false; }); }
-    function handlePressStart(e) { if (longPressTimer) clearTimeout(longPressTimer); const currentBtn = e.currentTarget; longPressTimer = setTimeout(() => { isLongPress = true; sourceBtn = currentBtn; sourceBtn.classList.add('hold'); document.addEventListener('mousemove', handleDragOver); document.addEventListener('touchmove', handleDragOver, { passive: false }); }, 300); }
-    function handlePressEnd() { clearTimeout(longPressTimer); document.removeEventListener('mousemove', handleDragOver); document.removeEventListener('touchmove', handleDragOver); if (isLongPress) { swapButtons(sourceBtn, targetBtn); } sourceBtn = null; targetBtn = null; clearHoldClass(); }
-    function handleDragOver(e) { if (e.type === 'touchmove') e.preventDefault(); const touch = e.touches ? e.touches[0] : e; const hoverElement = document.elementFromPoint(touch.clientX, touch.clientY); const hoverBtn = hoverElement ? hoverElement.closest('.nav-btn') : null; if (targetBtn && targetBtn !== hoverBtn) { targetBtn.classList.remove('hold'); } if (hoverBtn && hoverBtn !== sourceBtn) { targetBtn = hoverBtn; targetBtn.classList.add('hold'); } else if (!hoverBtn) { if (targetBtn) targetBtn.classList.remove('hold'); targetBtn = null; } }
-    function createNavButton(text, href) { const newBtn = document.createElement('button'); newBtn.className = 'nav-btn'; newBtn.textContent = text; newBtn.setAttribute('data-href', href); addEventListenersToButton(newBtn); navContainer.appendChild(newBtn); return newBtn; }
-    function saveConfig() { const config = Array.from(document.querySelectorAll('.nav-btn')).map(btn => ({ text: btn.textContent, href: btn.getAttribute('data-href') })); localStorage.setItem('navConfig', JSON.stringify(config)); }
-    function loadConfig() { const savedBtnConfig = localStorage.getItem('navConfig'); navContainer.innerHTML = ''; const configToLoad = savedBtnConfig ? JSON.parse(savedBtnConfig) : [ { text: 'GitHub', href: 'https://github.com' }, { text: '百度', href: 'https://baidu.com' } ]; configToLoad.forEach(item => createNavButton(item.text, item.href)); }
-    function saveTitleConfig() { localStorage.setItem('titleConfig', JSON.stringify({ title: titleEl.textContent, subtitle: subtitleEl.textContent })); }
-    function loadTitleConfig() { const saved = localStorage.getItem('titleConfig'); if (saved) { const { title, subtitle } = JSON.parse(saved); titleEl.textContent = title; subtitleEl.textContent = subtitle; } }
-    function clearHoldClass() { document.querySelectorAll('.nav-btn.hold').forEach(btn => btn.classList.remove('hold')); }
-    function swapButtons(a, b) { if (!a || !b || a === b) return; const aSibling = a.nextSibling === b ? a : a.nextSibling; navContainer.insertBefore(a, b); navContainer.insertBefore(b, aSibling); saveConfig(); }
-    function initTheme() { const savedTheme = localStorage.getItem('theme'); const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches); document.body.classList.toggle('dark-mode', isDark); themeBtn.textContent = isDark ? '🌙' : '🌞'; }
-    themeBtn.addEventListener('click', () => { const isDark = document.body.classList.toggle('dark-mode'); themeBtn.textContent = isDark ? '🌙' : '🌞'; localStorage.setItem('theme', isDark ? 'dark' : 'light'); });
-    
-    // 省略 colorBtn 和云盘的逻辑，它们无需修改，但必须存在于最终代码中
-    // 为了方便您直接复制，我将它们也包含进来
-    function initColors() {['dayColor1','dayColor2','nightColor1','nightColor2'].forEach(c=>{const s=localStorage.getItem(c);if(s)root.style.setProperty(`--${c.replace(/Color/,'-color')}`,s)})}colorBtn.addEventListener('click',()=>{const cD1=prompt('日间1',localStorage.getItem('dayColor1')||'#f5f7fa'),cD2=prompt('日间2',localStorage.getItem('dayColor2')||'#e4eaf5'),cN1=prompt('夜间1',localStorage.getItem('nightColor1')||'#1a1a2e'),cN2=prompt('夜间2',localStorage.getItem('nightColor2')||'#16213e');if(cD1)localStorage.setItem('dayColor1',cD1);if(cD2)localStorage.setItem('dayColor2',cD2);if(cN1)localStorage.setItem('nightColor1',cN1);if(cN2)localStorage.setItem('nightColor2',cN2);initColors()});
-    
-    const addNavBtn = document.getElementById('addNavBtn'), addNavModal = document.getElementById('addNavModal'), closeAddNavModalBtn = document.getElementById('closeAddNavModalBtn'), createNavBtn = document.getElementById('createNavBtn'), newNavNameInput = document.getElementById('newNavName'), navTypeRadios = document.querySelectorAll('input[name="navType"]'), linkInputs = document.getElementById('link-inputs'), projectInputs = document.getElementById('project-inputs'), newNavUrlInput = document.getElementById('newNavUrl'), projectFolderUpload = document.getElementById('projectFolderUpload'), folderNameDisplay = document.getElementById('folder-name-display'), progressText = document.getElementById('progress-text');
-    addNavBtn.addEventListener('click', () => addNavModal.classList.add('show')); closeAddNavModalBtn.addEventListener('click', () => resetAndCloseAddModal()); addNavModal.addEventListener('click', e => (e.target === addNavModal) && resetAndCloseAddModal());
-    navTypeRadios.forEach(radio => radio.addEventListener('change', e => { linkInputs.classList.toggle('active', e.target.value === 'link'); projectInputs.classList.toggle('active', e.target.value === 'project'); }));
-    projectFolderUpload.addEventListener('change', () => { folderNameDisplay.textContent = projectFolderUpload.files.length > 0 ? `${projectFolderUpload.files.length} 个文件/文件夹已选择` : '未选择任何文件夹'; });
-    createNavBtn.addEventListener('click', async () => { const name = newNavNameInput.value.trim(); const type = document.querySelector('input[name="navType"]:checked').value; if (!name) return alert('请输入按钮名称！'); if (type === 'link') { const url = newNavUrlInput.value.trim(); if (!url.startsWith('http')) return alert('请输入有效的网址！'); createNavButton(name, url); saveConfig(); resetAndCloseAddModal(); } else if (type === 'project') { if (!checkConfig()) return alert('请先配置GitHub信息！'); const files = projectFolderUpload.files; if (files.length === 0) return alert('请选择项目文件夹！'); if (!Array.from(files).some(f => f.name.toLowerCase() === 'index.html' && f.webkitRelativePath.split('/').length === 2)) return alert('文件夹根目录必须包含index.html！'); createNavBtn.disabled = true; progressText.textContent = '准备上传...'; const safeFolderName = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + Date.now(); try { for (let i = 0; i < files.length; i++) { const file = files[i]; progressText.textContent = `上传中 (${i + 1}/${files.length}): ${file.name}`; const content = await readFileAsBase64(file); const path = `${safeFolderName}/${file.webkitRelativePath.split('/').slice(1).join('/')}`; await uploadFileToGithub(path, content); } createNavButton(name, `${safeFolderName}/index.html`); saveConfig(); alert('项目上传成功！'); resetAndCloseAddModal(); } catch(error) { alert(`上传失败: ${error.message}`); } finally { createNavBtn.disabled = false; progressText.textContent = ''; } } });
-    function readFileAsBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result.split(',')[1]); reader.onerror = reject; reader.readAsDataURL(file); }); }
-    async function uploadFileToGithub(path, content) { const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`; const response = await fetch(apiUrl, { method: 'PUT', headers: { 'Authorization': `token ${GITHUB_CONFIG.token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ message: `Create ${path}`, content, branch: 'main' }) }); if (!response.ok) throw new Error((await response.json()).message); }
-    function resetAndCloseAddModal() { newNavNameInput.value = ''; newNavUrlInput.value = ''; projectFolderUpload.value = ''; folderNameDisplay.textContent = '未选择任何文件夹'; linkInputs.classList.add('active'); projectInputs.classList.remove('active'); document.querySelector('input[name="navType"][value="link"]').checked = true; addNavModal.classList.remove('show'); }
-    function loadGithubConfig() { const saved = localStorage.getItem('githubConfig'); if (saved) GITHUB_CONFIG = JSON.parse(saved); return !!saved; }
-    function checkConfig() { return GITHUB_CONFIG.owner && GITHUB_CONFIG.repo && GITHUB_CONFIG.token; }
-    window.addEventListener('load', () => { loadTitleConfig(); loadConfig(); initTheme(); initColors(); loadGithubConfig(); titleEl.addEventListener('click', () => { const n = prompt('新标题:', titleEl.textContent); if (n) { titleEl.textContent = n; saveTitle-config(); } }); subtitleEl.addEventListener('click', () => { const n = prompt('新描述:', subtitleEl.textContent); if (n) { subtitleEl.textContent = n; saveTitleConfig(); } }); });
-    // 您原有的 syncModal 和 settingsModal 的JS逻辑也应在此处，但因它们无需修改且非常庞大，此处不再重复，请务必从您之前的代码中保留它们。
+        const syncModalElements = { buttonSelector: document.getElementById('buttonSelector'), fileList: document.getElementById('fileList'), fileListStatus: document.getElementById('fileListStatus'), fileUploader: document.getElementById('fileUploader'), fileNameInput: document.getElementById('fileNameInput'), uploadBtn: document.getElementById('uploadBtn'), githubRepoInput: document.getElementById('githubRepoInput'), githubTokenInput: document.getElementById('githubTokenInput'), saveSettingsBtn: document.getElementById('saveSettingsBtn') };
+        
+        // [核心功能: 按钮交互与配置管理]
+        function clearHoldClass() { document.querySelectorAll('.nav-btn.hold').forEach(btn => btn.classList.remove('hold')); }
+        function swapButtons(a, b) { if (!a || !b || a === b) return; const tempText = a.textContent, tempHref = a.getAttribute('data-href'); a.textContent = b.textContent; a.setAttribute('data-href', tempHref); b.textContent = tempText; b.setAttribute('data-href', a.getAttribute('data-href')); saveConfig(); }
+        function saveConfig() { const config = []; document.querySelectorAll('.nav-btn').forEach(btn => config.push({ text: btn.textContent, href: btn.getAttribute('data-href') })); localStorage.setItem('navConfig', JSON.stringify(config)); }
+        function attachButtonListeners(btn) {
+            function startLongPress(e) { if(e.type === 'touchstart') e.preventDefault(); const touch = e.type.startsWith('touch') ? e.touches[0] : e; if(longPressTimer) clearTimeout(longPressTimer); longPressTimer = setTimeout(() => { isLongPress = true; sourceBtn = btn; sourceBtn.classList.add('hold'); document.addEventListener('mousemove', detectTarget); document.addEventListener('touchmove', detectTarget, { passive: false }); }, 300); }
+            function endLongPress() { clearTimeout(longPressTimer); if (isLongPress) { swapButtons(sourceBtn, targetBtn); setTimeout(() => isLongPress = false, 50); } sourceBtn = null; targetBtn = null; clearHoldClass(); document.removeEventListener('mousemove', detectTarget); document.removeEventListener('touchmove', detectTarget); }
+            btn.addEventListener('mousedown', startLongPress); btn.addEventListener('touchstart', startLongPress); btn.addEventListener('mouseup', endLongPress); btn.addEventListener('touchend', endLongPress); btn.addEventListener('touchcancel', endLongPress); btn.addEventListener('click', function(e) { if (!isLongPress) { const href = this.getAttribute('data-href'); if (href) window.location.href = href; } else { e.preventDefault(); } });
+        }
+        function detectTarget(e) { e.preventDefault(); const touch = e.type.startsWith('touch') ? e.touches[0] : e; const hoverBtn = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.nav-btn'); if (hoverBtn && hoverBtn !== sourceBtn) { if (targetBtn) targetBtn.classList.remove('hold'); targetBtn = hoverBtn; targetBtn.classList.add('hold'); } }
+        function loadConfig() {
+            navContainer.innerHTML = '';
+            const savedBtnConfig = localStorage.getItem('navConfig');
+            let config = savedBtnConfig ? JSON.parse(savedBtnConfig) : [ {text: "我的相册", href: "page1/page1.html"}, {text: "旅行记录", href: "page2/page2.html"}, {text: "日常笔记", href: "page3/page3.html"}, {text: "学习资料", href: "page4/page4.html"}, {text: "项目文档", href: "page5/page5.html"}, {text: "收藏夹", href: "page6/page6.html"}, {text: "关于我", href: "page7/page7.html"}, {text: "GitHub", href: "https://github.com"} ];
+            config.forEach(item => addNewButtonToDOM(item.text, item.href));
+        }
+
+        // [核心功能: 标题与主题]
+        function saveTitleConfig() { localStorage.setItem('titleConfig', JSON.stringify({ title: document.getElementById('title').textContent, subtitle: document.getElementById('subtitle').textContent })); }
+        function loadTitleConfig() { const d = localStorage.getItem('titleConfig'); if(d) { const {title, subtitle} = JSON.parse(d); document.getElementById('title').textContent = title; document.getElementById('subtitle').textContent = subtitle; } }
+        document.getElementById('title').addEventListener('click', () => { const n = prompt('请输入新标题：', document.getElementById('title').textContent); if (n?.trim()) { document.getElementById('title').textContent = n.trim(); saveTitleConfig(); } });
+        document.getElementById('subtitle').addEventListener('click', () => { const n = prompt('请输入新描述：', document.getElementById('subtitle').textContent); if (n !== null) { document.getElementById('subtitle').textContent = n.trim(); saveTitleConfig(); } });
+        const themeBtn = document.getElementById('themeBtn');
+        function initTheme() { const t=localStorage.getItem('theme'); if (t==='dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.body.classList.add('dark-mode'); themeBtn.textContent = '🌙'; } else { themeBtn.textContent = '🌞'; } }
+        themeBtn.addEventListener('click', () => { document.body.classList.toggle('dark-mode'); const i=document.body.classList.contains('dark-mode'); themeBtn.textContent=i?'🌙':'🌞'; localStorage.setItem('theme', i?'dark':'light'); });
+        const colorBtn = document.getElementById('colorBtn'), root = document.documentElement;
+        function initColors() { const d1=localStorage.getItem('dayColor1')||'#f5f7fa', d2=localStorage.getItem('dayColor2')||'#e4eaf5', n1=localStorage.getItem('nightColor1')||'#1a1a2e', n2=localStorage.getItem('nightColor2')||'#16213e'; root.style.setProperty('--day-color1', d1); root.style.setProperty('--day-color2', d2); root.style.setProperty('--night-color1', n1); root.style.setProperty('--night-color2', n2); }
+        colorBtn.addEventListener('click', () => { const cD1=getComputedStyle(root).getPropertyValue('--day-color1').trim(), cD2=getComputedStyle(root).getPropertyValue('--day-color2').trim(), cN1=getComputedStyle(root).getPropertyValue('--night-color1').trim(), cN2=getComputedStyle(root).getPropertyValue('--night-color2').trim(); const nD1=prompt('日间渐变1：',cD1), nD2=prompt('日间渐变2：',cD2), nN1=prompt('夜间渐变1：',cN1), nN2=prompt('夜间渐变2：',cN2); const isHex=(c)=> /^#([0-9A-F]{3,4}|[0-9A-F]{6}|[0-9A-F]{8})$/i.test(c); if(nD1&&isHex(nD1)){root.style.setProperty('--day-color1', nD1);localStorage.setItem('dayColor1',nD1);} if(nD2&&isHex(nD2)){root.style.setProperty('--day-color2',nD2);localStorage.setItem('dayColor2',nD2);} if(nN1&&isHex(nN1)){root.style.setProperty('--night-color1',nN1);localStorage.setItem('nightColor1',nN1);} if(nN2&&isHex(nN2)){root.style.setProperty('--night-color2',nN2);localStorage.setItem('nightColor2',nN2);} });
+
+        // [核心功能: 弹窗管理]
+        function setupModals() {
+            document.querySelectorAll('.close-btn').forEach(btn => btn.addEventListener('click', () => document.getElementById(btn.dataset.modalId).classList.remove('show')));
+            document.querySelectorAll('.modal-overlay').forEach(modal => modal.addEventListener('click', e => (e.target === modal) && modal.classList.remove('show')));
+            document.getElementById('syncBtn').addEventListener('click', () => { document.getElementById('syncModal').classList.add('show'); populateButtonSelector(); fetchFilesForSelectedButton(); });
+            document.getElementById('settingsBtn').addEventListener('click', () => {
+                // ✅ FIX: Use syncModalElements object to reference these inputs
+                if (GITHUB_CONFIG.owner && GITHUB_CONFIG.repo) syncModalElements.githubRepoInput.value = `${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`; 
+                syncModalElements.githubTokenInput.value = GITHUB_CONFIG.token || '';
+                document.getElementById('settingsModal').classList.add('show');
+            });
+            document.getElementById('addNavBtn').addEventListener('click', () => document.getElementById('addNavModal').classList.add('show'));
+        }
+
+        // [核心功能: 数据云盘 (旧)]
+        function saveGithubConfig(config) { localStorage.setItem('githubConfig', JSON.stringify(config)); GITHUB_CONFIG = config; }
+        function loadGithubConfig() { const savedConfig = localStorage.getItem('githubConfig'); if(savedConfig) GITHUB_CONFIG = JSON.parse(savedConfig); }
+        function checkConfig(showAlert = true, modalName = "数据云盘") { if (!GITHUB_CONFIG.owner || !GITHUB_CONFIG.repo || !GITHUB_CONFIG.token) { if (showAlert) alert(`请先配置GitHub仓库信息。\n(点击☁️按钮 -> 点击标题旁⚙️)`); return false; } return true; }
+        syncModalElements.saveSettingsBtn.addEventListener('click', () => { const [owner, repo] = syncModalElements.githubRepoInput.value.trim().split('/').map(s=>s.trim()); const token = syncModalElements.githubTokenInput.value.trim(); if (!owner || !repo || !token) { alert('请填写完整信息。'); return; } saveGithubConfig({ owner, repo, token, branch: 'main' }); alert('配置已保存！'); document.getElementById('settingsModal').classList.remove('show'); fetchFilesForSelectedButton(); });
+        function populateButtonSelector() { const currentSelection = syncModalElements.buttonSelector.value; syncModalElements.buttonSelector.innerHTML = ''; document.querySelectorAll('.nav-btn').forEach(btn => { const option = document.createElement('option'); option.value = option.textContent = btn.textContent.trim(); syncModalElements.buttonSelector.appendChild(option); }); if (Array.from(syncModalElements.buttonSelector.options).some(opt => opt.value === currentSelection)) syncModalElements.buttonSelector.value = currentSelection; }
+        syncModalElements.buttonSelector.addEventListener('change', fetchFilesForSelectedButton);
+        syncModalElements.fileUploader.addEventListener('change', () => { if(syncModalElements.fileUploader.files.length > 0) syncModalElements.fileNameInput.value = syncModalElements.fileUploader.files[0].name; });
+        async function fetchFilesForSelectedButton() {
+            const selectedButtonName = syncModalElements.buttonSelector.value;
+            syncModalElements.fileList.innerHTML = '';
+            syncModalElements.fileListStatus.style.display = 'block';
+            if (!selectedButtonName) { syncModalElements.fileListStatus.textContent = '请选择一个分类'; return; }
+            if (!checkConfig(true, "数据云盘")) { syncModalElements.fileListStatus.innerHTML = `尚未配置GitHub信息<br>请点击标题旁 ⚙️ 进行设置`; return; }
+            syncModalElements.fileListStatus.textContent = '正在加载...';
+            const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${SYNC_FOLDER}/${selectedButtonName}`;
+           
+            try {
+                const response = await fetch(apiUrl, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, cache: 'no-cache' });
+                if (response.status === 404) { syncModalElements.fileListStatus.textContent = '该分类下暂无文件'; return; }
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const files = await response.json();
+                if (files.length === 0) { syncModalElements.fileListStatus.textContent = '该分类下暂无文件'; } 
+                else {
+                    syncModalElements.fileListStatus.textContent = '正在获取文件信息...';
+                    const filesWithDates = await Promise.all(files.map(async (file) => ({ ...file, commitDate: await getLatestCommitDate(file.path) })));
+                    filesWithDates.sort((a, b) => new Date(b.commitDate) - new Date(a.commitDate));
+                    syncModalElements.fileList.innerHTML = ''; syncModalElements.fileListStatus.style.display = 'none';
+                    filesWithDates.forEach(file => {
+                        const li = document.createElement('li');
+                        const fileInfo = document.createElement('div'); fileInfo.className = 'file-info'; fileInfo.dataset.downloadUrl = file.download_url; fileInfo.dataset.fileName = file.name;
+                        const fileNameSpan = document.createElement('span'); fileNameSpan.className = 'file-name'; fileNameSpan.textContent = file.name;
+                        const fileTimestampSpan = document.createElement('span'); fileTimestampSpan.className = 'file-timestamp'; fileTimestampSpan.textContent = new Date(file.commitDate).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+                        fileInfo.append(fileNameSpan, fileTimestampSpan);
+                        const deleteBtn = document.createElement('button'); deleteBtn.className = 'delete-btn'; deleteBtn.innerHTML = '&times;'; deleteBtn.title = '删除文件';
+                        li.append(fileInfo, deleteBtn); syncModalElements.fileList.appendChild(li);
+                        fileInfo.addEventListener('click', (e) => forceDownload(e.currentTarget.dataset.downloadUrl, e.currentTarget.dataset.fileName, fileInfo));
+                        deleteBtn.addEventListener('click', () => deleteFile(file.path, file.sha, li));
+                    });
+                }
+            } catch (error) { console.error('获取文件列表失败:', error); syncModalElements.fileListStatus.textContent = `加载失败，请检查网络或配置。`; }
+        }
+        async function getLatestCommitDate(filePath) { const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(filePath)}&page=1&per_page=1`; try { const response = await fetch(url, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` } }); if (!response.ok) return new Date(0).toISOString(); const commits = await response.json(); return commits[0]?.commit.committer.date || new Date(0).toISOString(); } catch (error) { console.error(`获取提交日期失败 for ${filePath}:`, error); return new Date(0).toISOString(); } }
+        async function deleteFile(filePath, sha, listItemElement) { if (!confirm(`确定要永久删除文件 "${filePath.split('/').pop()}" 吗？此操作不可恢复。`)) return; listItemElement.style.opacity = '0.5'; const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${filePath}`; try { const response = await fetch(apiUrl, { method: 'DELETE', headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, body: JSON.stringify({ message: `Delete file: ${filePath}`, sha: sha, branch: 'main' }) }); if (!response.ok) throw new Error(`删除失败: ${(await response.json()).message}`); listItemElement.remove(); if (syncModalElements.fileList.children.length === 0) { syncModalElements.fileListStatus.textContent = '该分类下暂无文件'; syncModalElements.fileListStatus.style.display = 'block'; } } catch (error) { console.error('删除文件失败:', error); alert(`删除文件失败: ${error.message}`); listItemElement.style.opacity = '1'; } }
+        async function forceDownload(url, filename, element) { const originalName = element.querySelector('.file-name').textContent; element.querySelector('.file-name').textContent = '准备下载中...'; element.style.pointerEvents = 'none'; try { const response = await fetch(url); if (!response.ok) throw new Error(`下载请求失败: ${response.statusText}`); const blob = await response.blob(); const link = document.createElement('a'); link.href = window.URL.createObjectURL(blob); link.download = filename; document.body.appendChild(link); link.click(); link.remove(); window.URL.revokeObjectURL(link.href); } catch (error) { console.error('Download error:', error); alert(`下载文件时出错: ${error.message}`); } finally { element.querySelector('.file-name').textContent = originalName; element.style.pointerEvents = 'auto'; } }
+        syncModalElements.uploadBtn.addEventListener('click', async () => { if (!checkConfig()) return; const selectedButtonName = syncModalElements.buttonSelector.value, file = syncModalElements.fileUploader.files[0]; let fileName = syncModalElements.fileNameInput.value.trim() || (file && file.name); if (!selectedButtonName || !file || !fileName) { alert('请选择分类、文件，并确保文件名不为空。'); return; } syncModalElements.uploadBtn.disabled = true; syncModalElements.uploadBtn.textContent = '上传中...'; try { const content = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result.split(',')[1]); reader.onerror = reject; reader.readAsDataURL(file); }); const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${SYNC_FOLDER}/${selectedButtonName}/${fileName}`; const response = await fetch(apiUrl, { method: 'PUT', headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, body: JSON.stringify({ message: `Upload ${fileName}`, content: content, branch: 'main' }) }); if (!response.ok) throw new Error(`上传失败: ${response.statusText}`); alert('上传成功！'); syncModalElements.fileUploader.value = ''; syncModalElements.fileNameInput.value = ''; fetchFilesForSelectedButton(); } catch (error) { console.error('上传失败:', error); alert(`上传失败: ${error.message}`); } finally { syncModalElements.uploadBtn.disabled = false; syncModalElements.uploadBtn.textContent = '上传文件'; } });
+        
+        // [核心功能: 新增导航]
+        const addNavModalElements = { typeLink: document.getElementById('type-link'), typeUpload: document.getElementById('type-upload'), linkSection: document.getElementById('link-section'), uploadSection: document.getElementById('upload-section'), nameInput: document.getElementById('newButtonNameInput'), urlInput: document.getElementById('newButtonUrlInput'), folderPickerBtn: document.getElementById('folderPickerBtn'), folderStatus: document.getElementById('folder-picker-status'), createBtn: document.getElementById('createNavBtn'), uploadStatus: document.getElementById('upload-status') };
+        addNavModalElements.typeLink.addEventListener('change', () => { addNavModalElements.linkSection.style.display = 'flex'; addNavModalElements.uploadSection.style.display = 'none'; });
+        addNavModalElements.typeUpload.addEventListener('change', () => { addNavModalElements.linkSection.style.display = 'none'; addNavModalElements.uploadSection.style.display = 'flex'; });
+        addNavModalElements.folderPickerBtn.addEventListener('click', async () => { if (!window.showDirectoryPicker) { alert('您的浏览器不支持文件夹选择功能，请使用最新版的Chrome或Edge浏览器。'); return; } try { localDirectoryHandle = await window.showDirectoryPicker(); addNavModalElements.folderStatus.textContent = `已选择: ${localDirectoryHandle.name}`; } catch (err) { console.log('用户取消了文件夹选择'); } });
+        function addNewButtonToDOM(text, href) { const newBtn = document.createElement('button'); newBtn.className = 'nav-btn'; newBtn.textContent = text; newBtn.setAttribute('data-href', href); navContainer.appendChild(newBtn); attachButtonListeners(newBtn); }
+        async function getFilesInDirectory(dirHandle, path = '') { const files = []; for await (const entry of dirHandle.values()) { const newPath = path ? `${path}/${entry.name}` : entry.name; if (entry.kind === 'file') { const file = await entry.getFile(); files.push({ file, path: newPath }); } else if (entry.kind === 'directory') { files.push(...await getFilesInDirectory(entry, newPath)); } } return files; }
+        function fileToBase64(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result.split(',')[1]); reader.onerror = reject; reader.readAsDataURL(file); }); }
+        addNavModalElements.createBtn.addEventListener('click', async () => {
+            const buttonName = addNavModalElements.nameInput.value.trim();
+            if (!buttonName) { alert('请输入按钮名称。'); return; }
+            const navType = document.querySelector('input[name="nav-type"]:checked').value;
+            addNavModalElements.createBtn.disabled = true; addNavModalElements.createBtn.textContent = '处理中...';
+            try {
+                if (navType === 'link') { const url = addNavModalElements.urlInput.value.trim(); if (!url) { alert('请输入网址链接。'); return; } addNewButtonToDOM(buttonName, url); saveConfig(); document.getElementById('addNavModal').classList.remove('show'); } 
+                else if (navType === 'upload') {
+                    if (!checkConfig()) return;
+                    if (!localDirectoryHandle) { alert('请选择一个项目文件夹。'); return; }
+                    const filesToUpload = await getFilesInDirectory(localDirectoryHandle);
+                    const safePath = buttonName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, '').replace(/\s+/g, '-') || `project-${Date.now()}`;
+                    if (!filesToUpload.some(f => f.path.endsWith('index.html'))) { alert('错误：选择的文件夹中必须包含一个 index.html 文件。'); return; }
+                    for (let i = 0; i < filesToUpload.length; i++) {
+                        const { file, path } = filesToUpload[i];
+                        addNavModalElements.uploadStatus.textContent = `上传中 ${i + 1}/${filesToUpload.length}: ${path}`;
+                        const content = await fileToBase64(file);
+                        const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${safePath}/${path}`;
+                        const response = await fetch(apiUrl, { method: 'PUT', headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, body: JSON.stringify({ message: `Create ${path}`, content: content, branch: GITHUB_CONFIG.branch || 'main' }) });
+                        if (!response.ok) throw new Error(`上传 ${path} 失败: ${response.statusText}`);
+                    }
+                    addNewButtonToDOM(buttonName, `${safePath}/index.html`); saveConfig();
+                    alert('项目上传并发布成功！'); document.getElementById('addNavModal').classList.remove('show');
+                }
+            } catch(error) { console.error('创建导航失败:', error); alert(`操作失败: ${error.message}`); addNavModalElements.uploadStatus.textContent = `操作失败!`; } 
+            finally { 
+                addNavModalElements.createBtn.disabled = false; addNavModalElements.createBtn.textContent = '确认创建'; 
+                addNavModalElements.nameInput.value = ''; addNavModalElements.urlInput.value = ''; addNavModalElements.folderStatus.textContent = ''; addNavModalElements.uploadStatus.textContent = '';
+                localDirectoryHandle = null;
+            }
+        });
+
+        // [页面加载初始化]
+        window.addEventListener('load', () => {
+            loadTitleConfig();
+            loadConfig();
+            initTheme();
+            initColors();
+            loadGithubConfig();
+            setupModals();
+        });
     </script>
 </body>
 </html>
