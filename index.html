@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    
+    <!-- V6.1.3 - "Isomorphic" Cache Buster -->
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Jellyfish导航</title>
@@ -46,7 +52,8 @@
         .fab-drawer { position: absolute; bottom: 65px; left: 0; display: flex; flex-direction: column; gap: 15px; opacity: 0; transform: translateY(20px); transition: opacity 0.2s ease-out, transform 0.2s ease-out; pointer-events: none; }
         .fab-container.active .fab-drawer { opacity: 1; transform: translateY(0); pointer-events: auto; }
         .fab-drawer-item { position: relative; } /* For status indicator positioning */
-        #sync-status-indicator { position: absolute; right: 5px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background-color: #28a745; transition: all 0.3s ease; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
+        #sync-status-indicator { position: absolute; right: 5px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background-color: transparent; transition: all 0.3s ease; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
+        #sync-status-indicator.synced { background-color: #28a745; }
         #sync-status-indicator.syncing { background-color: #ffc107; animation: pulse 1.5s infinite; }
         #sync-status-indicator.error { background-color: #dc3545; animation: none; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
@@ -99,14 +106,14 @@
         <button class="fab-main theme-toggle" id="themeBtn" title="切换主题">🌞</button>
     </div>
     
-    <!-- Modals -->
+    <!-- Modals (HTML structure for modals remains unchanged) -->
     <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>管理小手机</span></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="background: #5a6778; margin-bottom: 20px;">进入管理模式</button><div class="nav-type-selector"><input type="radio" id="type-link" name="nav-type" value="link" checked><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload"><label for="type-upload">上传项目</label></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section" class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目文件夹</label><button id="folderPickerBtn" class="modal-button" style="background: #5a6778;">点击选择文件夹</button><div class="status-text" id="folder-picker-status"></div></div><button id="createNavBtn" class="modal-button">创建新导航</button><div class="status-text" id="upload-status"></div></div></div></div>
     <div class="modal-overlay" id="syncModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据云盘</span><button class="settings-btn" id="settingsBtn" title="设置GitHub信息">⚙️</button></div><button class="close-btn" data-modal-id="syncModal">&times;</button></div><div class="modal-body"><select id="buttonSelector" class="modal-select"></select><input type="file" id="fileUploader"><input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）"><button id="uploadBtn" class="modal-button">上传文件</button><div id="file-list-container"><ul id="fileList"></ul><div id="fileListStatus" class="file-list-status">请选择一个分类</div></div></div></div></div>
     <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>GitHub 配置</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/my-repo"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button></div></div></div>
     <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body"><div class="color-picker-grid"><div class="color-picker-group"><label>日间模式 - 渐变1</label><div class="color-input-wrapper"><input type="color" id="dayColor1Picker"><input type="text" class="hex-input" id="dayColor1Hex"></div></div><div class="color-picker-group"><label>日间模式 - 渐变2</label><div class="color-input-wrapper"><input type="color" id="dayColor2Picker"><input type="text" class="hex-input" id="dayColor2Hex"></div></div><div class="color-picker-group"><label>夜间模式 - 渐变1</label><div class="color-input-wrapper"><input type="color" id="nightColor1Picker"><input type="text" class="hex-input" id="nightColor1Hex"></div></div><div class="color-picker-group"><label>夜间模式 - 渐变2</label><div class="color-input-wrapper"><input type="color" id="nightColor2Picker"><input type="text" class="hex-input" id="nightColor2Hex"></div></div></div><div class="preview-container"><div class="preview-box" id="dayPreview" data-label="Day"></div><div class="preview-box" id="nightPreview" data-label="Night"></div></div><div class="preset-manager"><div class="preset-row"><input type="text" id="presetNameInput" class="modal-input" placeholder="为当前配色命名"><button id="savePresetBtn" class="modal-button" style="background:#28a745">保存</button><button id="updatePresetBtn" class="modal-button">更新</button></div><div class="preset-row"><select id="presetSelector" class="modal-select"></select><button id="deletePresetBtn" class="modal-button" style="background:#dc3545">删除</button></div></div><div class="random-toggle-section"><span>每次启动时随机应用预设</span><label class="toggle-switch"><input type="checkbox" id="randomPaletteToggle"><span class="slider"></span></label></div></div></div></div>
 
     <script>
-    // [JS - V6.1.2 "The Watcher" - Sync Status Indicator & Robust Error Handling]
+    // [JS - V6.1.3 "Isomorphic" - No functional changes, relying on cache-busting meta tags]
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false, isLongPress = false;
     let longPressTimer = null, sourceBtn = null, targetBtn = null, localDirectoryHandle = null;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
