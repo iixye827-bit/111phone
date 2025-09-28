@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Jellyfish导航</title>
+    <style>
+        /* [原始CSS样式 - 无需改动] */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
+        :root { --day-color1: #f5f7fa; --day-color2: #e4eaf5; --night-color1: #1a1a2e; --night-color2: #16213e; --hold-border: #4299e1; --text-day: #2d3748; --text-night: #f0f2f5; --bg-day: #eef2f9; --bg-night: #1a1a2e; --shadow-light-day: rgba(255, 255, 255, 0.9); --shadow-dark-day: rgba(174, 190, 212, 0.4); --shadow-light-night: rgba(40, 45, 65, 0.9); --shadow-dark-night: rgba(0, 0, 0, 0.3); }
+        body { min-height: 100vh; background: linear-gradient(135deg, var(--day-color1) 0%, var(--day-color2) 100%); padding: 20px; display: flex; flex-direction: column; align-items: center; transition: background 0.5s ease; touch-action: manipulation; overflow-x: hidden; }
+        body.dark-mode { background: linear-gradient(135deg, var(--night-color1) 0%, var(--night-color2) 100%); --hold-border: #63b3ed; color: var(--text-night); }
+        .title-card { width: 100%; max-width: 800px; padding: 40px 20px; margin: 20px 0; border-radius: 16px; box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); text-align: center; transition: all 0.5s ease; }
+        body.dark-mode .title-card { box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night); background-color: rgba(30, 35, 55, 0.9); }
+        .editable-title { font-size: 32px; color: var(--text-day); margin-bottom: 20px; cursor: pointer; padding: 6px 12px; border-radius: 8px; transition: all 0.3s ease; display: block; width: fit-content; margin: 0 auto 20px auto; user-select: none; }
+        body.dark-mode .editable-title { color: var(--text-night); }
+        .editable-title:hover { background-color: rgba(255, 255, 255, 0.8); }
+        body.dark-mode .editable-title:hover { background-color: rgba(50, 55, 75, 0.8); }
+        .editable-subtitle { font-size: 16px; color: #5a6778; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: all 0.3s ease; display: block; width: fit-content; margin: 0 auto; line-height: 1.5; user-select: none; }
+        body.dark-mode .editable-subtitle { color: #c0c6cc; }
+        .editable-subtitle:hover { background-color: rgba(255, 255, 255, 0.8); color: var(--text-day); }
+        body.dark-mode .editable-subtitle:hover { background-color: rgba(50, 55, 75, 0.8); color: var(--text-night); }
+        .nav-container { width: 100%; max-width: 1200px; margin: 20px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; padding: 20px; }
+        .nav-btn { padding: 22px 16px; border: none; border-radius: 14px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background-color: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); font-size: 17px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .nav-btn.hold { border: 2px solid var(--hold-border); transform: scale(1.02); z-index: 5; box-shadow: 8px 8px 16px rgba(174, 190, 212, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(66, 153, 225, 0.3); }
+        body.dark-mode .nav-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background-color: rgba(30, 35, 55, 0.9); color: var(--text-night); }
+        body.dark-mode .nav-btn.hold { box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4), -8px -8px 16px rgba(40, 45, 65, 0.8), 0 0 0 2px rgba(99, 179, 237, 0.3); }
+        .nav-btn:hover { transform: translateY(-3px); background-color: #ffffff; }
+        body.dark-mode .nav-btn:hover { background-color: rgba(40, 45, 65, 1); }
+        .nav-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-day), inset -6px -6px 12px var(--shadow-light-day); transform: translateY(0); }
+        body.dark-mode .nav-btn:active { box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.25), inset -6px -6px 12px rgba(40, 45, 65, 0.8); }
+        .theme-toggle, .color-palette-btn, .sync-btn { position: fixed; bottom: 30px; width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s ease; box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); background-color: rgba(255, 255, 255, 0.9); color: var(--text-day); font-size: 18px; display: flex; align-items: center; justify-content: center; z-index: 10; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .theme-toggle { right: 30px; }
+        .color-palette-btn { left: 30px; }
+        .sync-btn { left: 50%; transform: translateX(-50%); }
+        body.dark-mode .theme-toggle, body.dark-mode .color-palette-btn, body.dark-mode .sync-btn { box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); background-color: rgba(30, 35, 55, 1); color: var(--text-night); }
+
+        /* ====== 弹窗通用及美化样式 ====== */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.3s ease; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal-content { width: 90%; background: var(--bg-day); color: var(--text-day); border-radius: 16px; box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); padding: 25px; transition: transform 0.3s ease, background 0.5s ease, box-shadow 0.5s ease; transform: scale(0.95); }
+        .modal-overlay.show .modal-content { transform: scale(1); }
+        body.dark-mode .modal-content { background: var(--bg-night); color: var(--text-night); box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; font-size: 20px; font-weight: 600; margin-bottom: 20px; }
+        /* 修改：新增标题组，用于包裹标题和设置按钮 */
+        .modal-title-group { display: flex; align-items: center; gap: 8px; }
+        /* 修改：调整关闭按钮和设置按钮的样式 */
+        .modal-header .close-btn { font-size: 24px; font-weight: bold; width: 36px; height: 36px; }
+        .modal-header .settings-btn { font-size: 20px; width: 32px; height: 32px; } /* 尺寸调小 */
+        .modal-header .close-btn, .modal-header .settings-btn { cursor: pointer; border: none; background: transparent; color: inherit; padding: 5px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease; }
+        .modal-header .close-btn:hover, .modal-header .settings-btn:hover { background: rgba(0,0,0,0.05); }
+        body.dark-mode .modal-header .close-btn:hover, body.dark-mode .modal-header .settings-btn:hover { background: rgba(255,255,255,0.08); }
+        .modal-input, .modal-select { width: 100%; padding: 12px 15px; border: none; border-radius: 10px; font-size: 16px; background: var(--bg-day); color: var(--text-day); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); transition: all 0.3s ease; caret-color: var(--hold-border); }
+        body.dark-mode .modal-input, body.dark-mode .modal-select { background: var(--bg-night); color: var(--text-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
+        .modal-input:focus, .modal-select:focus { outline: none; box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day), 0 0 0 2px var(--hold-border); }
+        body.dark-mode .modal-input:focus, body.dark-mode .modal-select:focus { box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night), 0 0 0 2px var(--hold-border); }
+        .modal-button { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; color: white; background: var(--hold-border); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); transition: all 0.3s ease; }
+        body.dark-mode .modal-button { box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); }
+        .modal-button:active { box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2), inset -4px -4px 8px rgba(255,255,255,0.7); }
+        body.dark-mode .modal-button:active { box-shadow: inset 4px 4px 8px rgba(0,0,0,0.4), inset -4px -4px 8px rgba(255,255,255,0.2); }
+        .modal-button:disabled { background: #9db2c2; cursor: not-allowed; }
+        
+        /* ====== 同步弹窗特定样式 ====== */
+        #syncModal .modal-content { max-width: 500px; max-height: 80vh; display: flex; flex-direction: column; }
+        #syncModal .modal-body { display: flex; flex-direction: column; gap: 15px; flex-grow: 1; min-height: 0; }
+        .file-list-container { flex-grow: 1; overflow-y: auto; border-radius: 10px; padding: 5px; margin-top: 10px; background: var(--bg-day); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
+        body.dark-mode .file-list-container { background: var(--bg-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
+        .file-list-container ul { list-style: none; padding: 5px; }
+        .file-list-container li { padding: 10px 15px; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .file-list-container li:hover { background-color: rgba(0,0,0,0.05); }
+        body.dark-mode .file-list-container li:hover { background-color: rgba(255,255,255,0.08); }
+        .file-list-status { text-align: center; color: #889; padding: 30px 10px; }
+
+        /* ====== 设置弹窗特定样式 ====== */
+        #settingsModal .modal-content { max-width: 400px; }
+        #settingsModal .modal-body { display: flex; flex-direction: column; gap: 20px; }
+        #settingsModal label { font-size: 14px; color: #5a6778; }
+        body.dark-mode #settingsModal label { color: #c0c6cc; }
+
+        @media (max-width: 480px) { /* [原始响应式CSS - 无需改动] */ .editable-title { font-size: 26px; } .editable-subtitle { font-size: 14px; } .title-card { padding: 30px 15px; } .nav-container { grid-template-columns: 1fr 1fr; gap: 18px; padding: 10px; } .nav-btn { padding: 18px 10px; font-size: 15px; } .theme-toggle, .color-palette-btn, .sync-btn { width: 44px; height: 44px; bottom: 20px; font-size: 16px; } .color-palette-btn { left: 20px; } }
+    </style>
+    <!-- [图标链接等... 无需改动] -->
+</head>
+<body>
+    <div class="title-card">
+        <h1 class="editable-title" id="title">Jellyfish导航</h1>
+        <div class="editable-subtitle" id="subtitle">点击即可跳转 | By淡季水母</div>
+    </div>
+
+    <div class="nav-container" id="navContainer">
+        <!-- 导航按钮... -->
+        <button class="nav-btn" data-href="page1/page1.html">我的相册</button>
+        <button class="nav-btn" data-href="page2/page2.html">旅行记录</button>
+        <button class="nav-btn" data-href="page3/page3.html">日常笔记</button>
+        <button class="nav-btn" data-href="page4/page4.html">学习资料</button>
+        <button class="nav-btn" data-href="page5/page5.html">项目文档</button>
+        <button class="nav-btn" data-href="page6/page6.html">收藏夹</button>
+        <button class="nav-btn" data-href="page7/page7.html">关于我</button>
+        <button class="nav-btn" data-href="https://github.com">GitHub</button>
+        <button class="nav-btn" data-href="https://baidu.com">百度</button>
+    </div>
+
+    <button class="theme-toggle" id="themeBtn">🌞</button>
+    <button class="sync-btn" id="syncBtn">☁️</button>
+    <button class="color-palette-btn" id="colorBtn">🎨</button>
+
+    <!-- 主弹窗（数据云盘）-->
+    <div class="modal-overlay" id="syncModal">
+        <div class="modal-content">
+            <!-- 修改：调整了header的HTML结构以实现新布局 -->
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <span>数据云盘</span>
+                    <button class="settings-btn" id="settingsBtn" title="设置GitHub信息">⚙️</button>
+                </div>
+                <button class="close-btn" id="closeSyncModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <select id="buttonSelector" class="modal-select"></select>
+                <input type="file" id="fileUploader">
+                <input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）">
+                <button id="uploadBtn" class="modal-button">上传文件</button>
+                <div class="file-list-container">
+                    <ul id="fileList"></ul>
+                    <div id="fileListStatus" class="file-list-status">请选择一个分类</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GitHub设置弹窗 -->
+    <div class="modal-overlay" id="settingsModal">
+         <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                     <span>GitHub 配置</span>
+                </div>
+                <button class="close-btn" id="closeSettingsModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label>
+                    <input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/my-repo">
+                </div>
+                <div>
+                    <label for="githubTokenInput">Personal Access Token</label>
+                    <input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx">
+                </div>
+                <button id="saveSettingsBtn" class="modal-button">保存配置</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // [原始JS逻辑 + 新版云同步JS逻辑 - 无需改动，与上一版完全相同]
+        // ... (为节省篇幅，所有JS代码已折叠，请放心，它们与上一版本完全一致，能够支持新的HTML结构) ...
+        let longPressTimer = null, sourceBtn = null, targetBtn = null, isLongPress = false; function clearHoldClass() { document.querySelectorAll('.nav-btn.hold').forEach(btn => btn.classList.remove('hold')); } function swapButtons(a, b) { if (!a || !b || a === b) return; const tempText = a.textContent, tempHref = a.getAttribute('data-href'); a.textContent = b.textContent; b.textContent = tempText; a.setAttribute('data-href', b.getAttribute('data-href')); b.setAttribute('data-href', tempHref); saveConfig(); } function saveConfig() { const config = []; document.querySelectorAll('.nav-btn').forEach(btn => config.push({ text: btn.textContent, href: btn.getAttribute('data-href') })); localStorage.setItem('navConfig', JSON.stringify(config)); } function getHtmlBtnSignature() { let signature = ''; document.querySelectorAll('#navContainer > .nav-btn').forEach(btn => { signature += `${btn.textContent.trim()}|${btn.getAttribute('data-href').trim()},`; }); return signature; } function loadConfig() { const currentHtmlSignature = getHtmlBtnSignature(); const savedHtmlSignature = localStorage.getItem('htmlBtnSignature'); const savedBtnConfig = localStorage.getItem('navConfig'); if (currentHtmlSignature !== savedHtmlSignature) { localStorage.removeItem('navConfig'); localStorage.setItem('htmlBtnSignature', currentHtmlSignature); return; } if (savedBtnConfig) { const btnList = document.querySelectorAll('.nav-btn'); JSON.parse(savedBtnConfig).forEach((item, index) => { if (btnList[index]) { btnList[index].textContent = item.text; btnList[index].setAttribute('data-href', item.href); } }); } } function saveTitleConfig() { const titleText = document.getElementById('title').textContent; const subtitleText = document.getElementById('subtitle').textContent; localStorage.setItem('titleConfig', JSON.stringify({ title: titleText, subtitle: subtitleText })); } function loadTitleConfig() { const savedTitleData = localStorage.getItem('titleConfig'); if (!savedTitleData) return; const { title, subtitle } = JSON.parse(savedTitleData); document.getElementById('title').textContent = title; document.getElementById('subtitle').textContent = subtitle; } document.querySelectorAll('.nav-btn').forEach(btn => { btn.addEventListener('mousedown', startLongPress); btn.addEventListener('touchstart', startLongPress, { passive: false }); btn.addEventListener('mouseup', endLongPress); btn.addEventListener('touchend', endLongPress); btn.addEventListener('touchcancel', endLongPress); btn.addEventListener('click', function() { if (!isLongPress) { const href = this.getAttribute('data-href'); if (href) window.location.href = href; } }); function startLongPress(e) { if (e.type === 'touchstart') e = e.touches[0]; if (longPressTimer) clearTimeout(longPressTimer); longPressTimer = setTimeout(() => { isLongPress = true; sourceBtn = btn; sourceBtn.classList.add('hold'); document.addEventListener('mousemove', detectTarget); document.addEventListener('touchmove', detectTarget, { passive: false }); }, 300); } function endLongPress() { clearTimeout(longPressTimer); if (isLongPress) { swapButtons(sourceBtn, targetBtn); } isLongPress = false; sourceBtn = null; targetBtn = null; clearHoldClass(); document.removeEventListener('mousemove', detectTarget); document.removeEventListener('touchmove', detectTarget); } }); function detectTarget(e) { e.preventDefault(); if (e.type === 'touchmove') e = e.touches[0]; const hoverBtn = document.elementFromPoint(e.clientX, e.clientY)?.closest('.nav-btn'); if (hoverBtn && hoverBtn !== sourceBtn) { if (targetBtn) targetBtn.classList.remove('hold'); targetBtn = hoverBtn; targetBtn.classList.add('hold'); } } document.getElementById('title').addEventListener('click', () => { const newTitle = prompt('请输入新标题：', document.getElementById('title').textContent); if (newTitle?.trim()) { document.getElementById('title').textContent = newTitle.trim(); saveTitleConfig(); } }); document.getElementById('subtitle').addEventListener('click', () => { const newSub = prompt('请输入新描述：', document.getElementById('subtitle').textContent); if (newSub?.trim()) { document.getElementById('subtitle').textContent = newSub.trim(); saveTitleConfig(); } }); const themeBtn = document.getElementById('themeBtn'); function initTheme() { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.body.classList.add('dark-mode'); themeBtn.textContent = '🌙'; } else { themeBtn.textContent = '🌞'; } } themeBtn.addEventListener('click', () => { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); themeBtn.textContent = isDark ? '🌙' : '🌞'; localStorage.setItem('theme', isDark ? 'dark' : 'light'); }); const colorBtn = document.getElementById('colorBtn'); const root = document.documentElement; function initColors() { const day1 = localStorage.getItem('dayColor1') || '#f5f7fa', day2 = localStorage.getItem('dayColor2') || '#e4eaf5', night1 = localStorage.getItem('nightColor1') || '#1a1a2e', night2 = localStorage.getItem('nightColor2') || '#16213e'; root.style.setProperty('--day-color1', day1); root.style.setProperty('--day-color2', day2); root.style.setProperty('--night-color1', night1); root.style.setProperty('--night-color2', night2); } colorBtn.addEventListener('click', () => { const cD1 = getComputedStyle(root).getPropertyValue('--day-color1').trim(), cD2 = getComputedStyle(root).getPropertyValue('--day-color2').trim(), cN1 = getComputedStyle(root).getPropertyValue('--night-color1').trim(), cN2 = getComputedStyle(root).getPropertyValue('--night-color2').trim(); const nD1 = prompt('日间渐变1：', cD1), nD2 = prompt('日间渐变2：', cD2), nN1 = prompt('夜间渐变1：', cN1), nN2 = prompt('夜间渐变2：', cN2); const isHex = (c) => /^#([0-9A-F]{3}|[0-9A-F]{6})$/i.test(c); if (nD1 && isHex(nD1)) { root.style.setProperty('--day-color1', nD1); localStorage.setItem('dayColor1', nD1); } if (nD2 && isHex(nD2)) { root.style.setProperty('--day-color2', nD2); localStorage.setItem('dayColor2', nD2); } if (nN1 && isHex(nN1)) { root.style.setProperty('--night-color1', nN1); localStorage.setItem('nightColor1', nN1); } if (nN2 && isHex(nN2)) { root.style.setProperty('--night-color2', nN2); localStorage.setItem('nightColor2', nN2); } }); let GITHUB_CONFIG = {}; const SYNC_FOLDER = 'data_sync'; const syncBtn = document.getElementById('syncBtn'); const syncModal = document.getElementById('syncModal'); const closeSyncModalBtn = document.getElementById('closeSyncModalBtn'); const buttonSelector = document.getElementById('buttonSelector'); const fileUploader = document.getElementById('fileUploader'); const fileNameInput = document.getElementById('fileNameInput'); const uploadBtn = document.getElementById('uploadBtn'); const fileList = document.getElementById('fileList'); const fileListStatus = document.getElementById('fileListStatus'); const settingsBtn = document.getElementById('settingsBtn'); const settingsModal = document.getElementById('settingsModal'); const closeSettingsModalBtn = document.getElementById('closeSettingsModalBtn'); const githubRepoInput = document.getElementById('githubRepoInput'); const githubTokenInput = document.getElementById('githubTokenInput'); const saveSettingsBtn = document.getElementById('saveSettingsBtn'); function saveGithubConfig(config) { localStorage.setItem('githubConfig', JSON.stringify(config)); GITHUB_CONFIG = config; } function loadGithubConfig() { const savedConfig = localStorage.getItem('githubConfig'); if (savedConfig) { GITHUB_CONFIG = JSON.parse(savedConfig); return true; } return false; } function checkConfig() { if (!GITHUB_CONFIG.owner || !GITHUB_CONFIG.repo || !GITHUB_CONFIG.token) { fileListStatus.innerHTML = `尚未配置GitHub信息<br>请点击标题旁 ⚙️ 进行设置`; return false; } return true; } syncBtn.addEventListener('click', () => { syncModal.classList.add('show'); populateButtonSelector(); fetchFilesForSelectedButton(); }); settingsBtn.addEventListener('click', () => { if (GITHUB_CONFIG.owner && GITHUB_CONFIG.repo) { githubRepoInput.value = `${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`; } githubTokenInput.value = GITHUB_CONFIG.token || ''; settingsModal.classList.add('show'); }); const closeModal = (modal) => modal.classList.remove('show'); closeSyncModalBtn.addEventListener('click', () => closeModal(syncModal)); closeSettingsModalBtn.addEventListener('click', () => closeModal(settingsModal)); syncModal.addEventListener('click', (e) => (e.target === syncModal) && closeModal(syncModal)); settingsModal.addEventListener('click', (e) => (e.target === settingsModal) && closeModal(settingsModal)); saveSettingsBtn.addEventListener('click', () => { const repoPath = githubRepoInput.value.trim(); const token = githubTokenInput.value.trim(); const [owner, repo] = repoPath.split('/').map(s => s.trim()); if (!owner || !repo || !token) { alert('请填写完整的仓库信息和Token。'); return; } saveGithubConfig({ owner, repo, token, branch: 'main' }); alert('配置已保存！'); closeModal(settingsModal); fetchFilesForSelectedButton(); }); function populateButtonSelector() { const currentSelection = buttonSelector.value; buttonSelector.innerHTML = ''; document.querySelectorAll('.nav-btn').forEach(btn => { const option = document.createElement('option'); const btnText = btn.textContent.trim(); option.value = btnText; option.textContent = btnText; buttonSelector.appendChild(option); }); if (Array.from(buttonSelector.options).some(opt => opt.value === currentSelection)) { buttonSelector.value = currentSelection; } } buttonSelector.addEventListener('change', fetchFilesForSelectedButton); fileUploader.addEventListener('change', () => { if(fileUploader.files.length > 0) { fileNameInput.value = fileUploader.files[0].name; } }); async function fetchFilesForSelectedButton() { const selectedButtonName = buttonSelector.value; fileList.innerHTML = ''; fileListStatus.style.display = 'block'; if (!selectedButtonName) { fileListStatus.textContent = '请选择一个分类'; return; } if (!checkConfig()) return; fileListStatus.textContent = '正在加载...'; const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${SYNC_FOLDER}/${selectedButtonName}`; try { const response = await fetch(apiUrl, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` } }); if (response.status === 404) { fileListStatus.textContent = '该分类下暂无文件'; return; } if (!response.ok) throw new Error(`HTTP ${response.status}`); const files = await response.json(); if (files.length === 0) { fileListStatus.textContent = '该分类下暂无文件'; } else { fileListStatus.style.display = 'none'; files.forEach(file => { const li = document.createElement('li'); li.textContent = file.name; li.dataset.downloadUrl = file.download_url; li.dataset.fileName = file.name; li.addEventListener('click', (e) => { const { downloadUrl, fileName } = e.currentTarget.dataset; const a = document.createElement('a'); a.href = downloadUrl; a.download = fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a); }); fileList.appendChild(li); }); } } catch (error) { console.error('获取文件列表失败:', error); fileListStatus.textContent = `加载失败，请检查网络或配置。`; } } uploadBtn.addEventListener('click', async () => { if (!checkConfig()) return; const selectedButtonName = buttonSelector.value; const file = fileUploader.files[0]; let fileName = fileNameInput.value.trim() || (file && file.name); if (!selectedButtonName || !file || !fileName) { alert('请选择分类、文件，并确保文件名不为空。'); return; } uploadBtn.disabled = true; uploadBtn.textContent = '上传中...'; try { const reader = new FileReader(); const contentPromise = new Promise((resolve, reject) => { reader.onload = () => resolve(reader.result.split(',')[1]); reader.onerror = error => reject(error); reader.readAsDataURL(file); }); const content = await contentPromise; const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${SYNC_FOLDER}/${selectedButtonName}/${fileName}`; const response = await fetch(apiUrl, { method: 'PUT', headers: { 'Authorization': `token ${GITHUB_CONFIG.token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ message: `Upload ${fileName}`, content: content, branch: 'main' }) }); if (!response.ok) throw new Error(`上传失败: ${response.statusText}`); alert('上传成功！'); fileUploader.value = ''; fileNameInput.value = ''; fetchFilesForSelectedButton(); } catch (error) { console.error('上传失败:', error); alert(`上传失败: ${error.message}`); } finally { uploadBtn.disabled = false; uploadBtn.textContent = '上传文件'; } }); window.addEventListener('load', () => { loadTitleConfig(); loadConfig(); initTheme(); initColors(); loadGithubConfig(); });
+    </script>
+</body>
+</html>
