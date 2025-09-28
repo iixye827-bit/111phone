@@ -1,10 +1,9 @@
-[
-  {
-    "text": "1",
-    "href": "1/index.html"
-  },
-  {
-    "text": "EVE",
-    "href": "https://qstghg-wi18orwied-melom-karona-ffcb84.netlify.app"
-  }
-]
+{
+  "buttons": [
+    {
+      "text": "EVE",
+      "href": "https://qstghg-wi18orwied-melom-karona-ffcb84.netlify.app"
+    }
+  ],
+  "themePresets": []
+}
