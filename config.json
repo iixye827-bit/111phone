@@ -1,6 +1,11 @@
 {
   "title": "Jellyfis",
   "subtitle": "点击即可跳转 | By淡季水母",
-  "buttons": [],
+  "buttons": [
+    {
+      "text": "111",
+      "href": "https://33chat.netlify.app/"
+    }
+  ],
   "themePresets": []
 }
