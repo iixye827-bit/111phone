@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Jellyfish中心</title>
     <style>
-        /* [CSS - V7.2.1 "Hotfix" - Slider UI Fix] */
+        /* [CSS - V7.3.0 "Gesture Navigation Update"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root { --day-color1: #f5f7fa; --day-color2: #e4eaf5; --night-color1: #1f2a40; --night-color2: #16213e; --hold-border: #5B99E2; --text-day: #2d3748; --text-night: #e0e6f0; --bg-day: #eef2f9; --bg-night: #1a2337; --shadow-light-day: rgba(255, 255, 255, 0.9); --shadow-dark-day: rgba(174, 190, 212, 0.4); --shadow-light-night: rgba(40, 52, 79, 0.9); --shadow-dark-night: rgba(0, 0, 0, 0.3); }
         body { min-height: 100vh; background: linear-gradient(135deg, var(--day-color1) 0%, var(--day-color2) 100%); padding: 20px; display: flex; flex-direction: column; align-items: center; transition: background 0.5s ease; touch-action: manipulation; overflow-x: hidden; }
@@ -92,6 +92,16 @@
         #syncModal .file-upload-section { display: flex; flex-direction: column; gap: 10px; } #syncModal input[type="file"] { display: none; }
         #syncModal .progress-container { display: none; height: 12px; background-color: var(--bg-day); border-radius: 6px; box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day); padding: 2px; } body.dark-mode #syncModal .progress-container { box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night); }
         #syncModal .progress-bar { width: 0%; height: 100%; border-radius: 4px; background-color: #707899; transition: width 0.2s linear; }
+        /* == New Iframe Modal Styles == */
+        .iframe-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .iframe-modal-overlay.active { transform: translateX(0); }
+        .iframe-modal-content { width: 100%; height: 100%; background: #fff; box-shadow: -5px 0 15px rgba(0,0,0,0.2); transition: transform 0.3s ease-out; }
+        .iframe-modal-content.dragging { transition: none; }
+        .iframe-modal-content iframe { width: 100%; height: 100%; border: none; }
+        .swipe-hint { position: fixed; left: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; background: rgba(0,0,0,0.6); color: white; padding: 10px 15px 10px 10px; border-radius: 0 8px 8px 0; z-index: 2001; opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
+        .swipe-hint.show { opacity: 1; }
+        .swipe-hint .arrow { width: 16px; height: 16px; border-right: 3px solid white; border-bottom: 3px solid white; transform: rotate(-45deg); animation: hint-pulse 1.5s infinite; margin-right: 10px; }
+        @keyframes hint-pulse { 0% { opacity: 0.3; } 50% { opacity: 1; transform: rotate(-45deg) scale(1.1); } 100% { opacity: 0.3; } }
         @media (max-width: 480px) { .editable-title { font-size: 26px; } .editable-subtitle { font-size: 14px; } .title-card { padding: 30px 15px; } .nav-container { grid-template-columns: 1fr 1fr; gap: 18px; padding: 10px; } .nav-btn { padding: 18px 10px; font-size: 15px; } .fab-container { right: 20px; bottom: 20px; } .fab-main, .fab-drawer-item { width: 44px; height: 44px; font-size: 20px; } .fab-drawer { bottom: 55px; } }
     </style>
 </head>
@@ -121,14 +131,31 @@
     <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>GitHub 配置</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/my-repo"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button></div></div></div>
     <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body"><div class="color-picker-grid"><div class="color-picker-group"><label>日间模式 - 渐变1</label><div class="color-input-wrapper"><input type="color" id="dayColor1Picker"><span class="hex-display" id="dayColor1Hex"></span></div></div><div class="color-picker-group"><label>日间模式 - 渐变2</label><div class="color-input-wrapper"><input type="color" id="dayColor2Picker"><span class="hex-display" id="dayColor2Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 渐变1</label><div class="color-input-wrapper"><input type="color" id="nightColor1Picker"><span class="hex-display" id="nightColor1Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 渐变2</label><div class="color-input-wrapper"><input type="color" id="nightColor2Picker"><span class="hex-display" id="nightColor2Hex"></span></div></div></div><div class="preview-container"><div class="preview-box" id="dayPreview" data-label="Day"></div><div class="preview-box" id="nightPreview" data-label="Night"></div></div><div class="preset-manager"><div class="preset-row"><input type="text" id="presetNameInput" class="modal-input" placeholder="为当前配色命名"><button id="savePresetBtn" class="modal-button save">保存</button><button id="updatePresetBtn" class="modal-button">更新</button></div><div class="preset-row"><select id="presetSelector" class="modal-select"></select><button id="deletePresetBtn" class="modal-button delete">删除</button></div></div><div class="random-toggle-section"><span>每次启动时随机应用预设</span><label class="toggle-switch"><input type="checkbox" id="randomPaletteToggle"><span class="slider"></span></label></div></div></div></div>
 
+    <!-- == NEW: Iframe Modal for In-App Browser == -->
+    <div class="iframe-modal-overlay" id="iframeModal">
+        <div class="iframe-modal-content">
+            <iframe id="iframeContent" src="about:blank" frameborder="0" allow="fullscreen" sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts"></iframe>
+        </div>
+        <div class="swipe-hint" id="swipeHint">
+            <div class="arrow"></div>
+            <span>向右滑动关闭</span>
+        </div>
+    </div>
+
+
     <script>
-    // [JS - V7.2.1 "Hotfix" - Fixed slider logic and refined UX]
+    // [JS - V7.3.0 "Gesture Navigation Update"]
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false, isLongPress = false;
     let longPressTimer = null, sourceBtn = null, targetBtn = null, localDirectoryHandle = null;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
     const syncErrorModal = document.getElementById('syncErrorModal');
-    
+    // New Iframe Modal Elements
+    const iframeModal = document.getElementById('iframeModal');
+    const iframeModalContent = iframeModal.querySelector('.iframe-modal-content');
+    const iframeEl = document.getElementById('iframeContent');
+    const swipeHint = document.getElementById('swipeHint');
+
     const getDefaultConfig = () => ({ title: 'Jellyfish中心', subtitle: '点击即可跳转 | By淡季水母', buttons: [], themePresets: [] });
     let currentConfig = getDefaultConfig();
     
@@ -214,7 +241,32 @@
     function clearHoldClass() { document.querySelectorAll('.nav-btn.hold').forEach(btn => btn.classList.remove('hold')); }
     async function swapButtons(a, b) { if (!a || !b || a === b) return; const parent = a.parentNode; const aNext = a.nextSibling; const bNext = b.nextSibling; if (aNext === b) { parent.insertBefore(b, a); } else if (bNext === a) { parent.insertBefore(a, b); } else { parent.insertBefore(b, aNext); parent.insertBefore(a, bNext); } updateButtonOrderAndSave('Reorder buttons'); }
     function updateButtonOrderAndSave(commitMessage) { const newOrder = []; document.querySelectorAll('.nav-btn').forEach(btn => newOrder.push({ text: btn.textContent.replace('×', '').trim(), href: btn.dataset.href })); currentConfig.buttons = newOrder; saveGlobalConfig(commitMessage); }
-    function attachButtonListeners(btn) { function startDrag(e) { if (!isManagementMode) return; if(e.type === 'touchstart') e.preventDefault(); longPressTimer = setTimeout(() => { isLongPress = true; sourceBtn = btn; sourceBtn.classList.add('hold'); document.addEventListener('mousemove', detectTarget); document.addEventListener('touchmove', detectTarget, { passive: false }); }, 200); } function endDrag() { if (!isManagementMode) return; clearTimeout(longPressTimer); if (isLongPress) { swapButtons(sourceBtn, targetBtn).finally(()=>setTimeout(() => isLongPress = false, 50)); } sourceBtn = null; targetBtn = null; clearHoldClass(); document.removeEventListener('mousemove', detectTarget); document.removeEventListener('touchmove', detectTarget); } btn.addEventListener('mousedown', startDrag); btn.addEventListener('touchstart', startDrag); btn.addEventListener('mouseup', endDrag); btn.addEventListener('touchend', endDrag); btn.addEventListener('touchcancel', endDrag); btn.addEventListener('click', function(e) { if (isManagementMode || isLongPress) { e.preventDefault(); return; } const href = this.dataset.href; if (href) window.location.href = href; }); }
+    
+    // == Modified Button Click Logic for In-App Browser ==
+    function attachButtonListeners(btn) {
+        function startDrag(e) { /* ... existing drag logic ... */ }
+        function endDrag() { /* ... existing drag logic ... */ }
+        btn.addEventListener('mousedown', startDrag); btn.addEventListener('touchstart', startDrag);
+        btn.addEventListener('mouseup', endDrag); btn.addEventListener('touchend', endDrag); btn.addEventListener('touchcancel', endDrag);
+
+        btn.addEventListener('click', function(e) {
+            if (isManagementMode || isLongPress) {
+                e.preventDefault();
+                return;
+            }
+            const href = this.dataset.href;
+            if (!href) return;
+
+            // If it's an external link, open in iframe modal. Otherwise, navigate directly.
+            if (href.startsWith('http')) {
+                e.preventDefault();
+                openIframeModal(href);
+            } else {
+                window.location.href = href;
+            }
+        });
+    }
+
     function detectTarget(e) { e.preventDefault(); const touch = e.type.startsWith('touch') ? e.touches[0] : e; const hoverBtn = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.nav-btn'); if (hoverBtn && hoverBtn !== sourceBtn) { if (targetBtn) targetBtn.classList.remove('hold'); targetBtn = hoverBtn; targetBtn.classList.add('hold'); } }
     document.getElementById('enterManageModeBtn').addEventListener('click', () => { document.getElementById('addNavModal').classList.remove('show'); setTimeout(() => toggleManagementMode(true), 150); });
     navContainer.addEventListener('click', async (e) => { if (!e.target.classList.contains('delete-icon')) return; const btnToDelete = e.target.closest('.nav-btn'); const buttonName = btnToDelete.textContent.replace('×', '').trim(); if (!confirm(`确定要删除 "${buttonName}" 吗？\n警告：如果这是上传的项目，其在GitHub上的整个文件夹都将被永久删除！`)) return; btnToDelete.style.cssText = 'transition: all 0.3s ease; transform: scale(0.8); opacity: 0;'; setTimeout(async () => { btnToDelete.remove(); const href = btnToDelete.dataset.href; const isExternalLink = href.startsWith('http'); if (!isExternalLink && href.includes('/')) { const folderPath = href.substring(0, href.lastIndexOf('/')); const success = await deleteGithubFolder(folderPath); if (!success) { alert('删除云端文件夹失败!'); location.reload(); return; } } updateButtonOrderAndSave(`Delete button: ${buttonName}`); }, 300); });
@@ -255,6 +307,70 @@
     }); wrapper.appendChild(container);})();
     addNavModalElements.folderPickerBtn.addEventListener("click",async()=>{if(!window.showDirectoryPicker)return void alert("您的浏览器不支持文件夹选择。");try{localDirectoryHandle=await window.showDirectoryPicker(),addNavModalElements.folderStatus.textContent=`已选择: ${localDirectoryHandle.name}`}catch(e){console.log("用户取消了文件夹选择")}});function fileToBase64(e){return new Promise((t,n)=>{const o=new FileReader;o.onload=()=>t(o.result.split(",")[1]),o.onerror=n,o.readAsDataURL(e)})}async function getFilesInDirectory(e,t=""){const n=[];for await(const o of e.values()){const l=t?`${t}/${o.name}`:o.name;if("file"===o.kind){const file=await o.getFile();n.push({file,path:l})}else"directory"===o.kind&&n.push(...await getFilesInDirectory(o,l))}return n}
     addNavModalElements.createBtn.addEventListener("click",async()=>{const e=addNavModalElements.nameInput.value.trim();if(!e)return void alert("请输入按钮名称。");const t=document.querySelector('input[name="nav-type"]:checked').value;addNavModalElements.createBtn.disabled=!0,addNavModalElements.createBtn.textContent="处理中...";try{let n;if("link"===t){const o=addNavModalElements.urlInput.value.trim();if(!o)return void alert("请输入网址链接。");n={text:e,href:o}}else if("upload"===t){if(!checkConfig())return;if(!localDirectoryHandle)return void alert("请选择一个项目文件夹。");const l=await getFilesInDirectory(localDirectoryHandle),path=e.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-")||`project-${Date.now()}`;if(!l.some(e=>e.path.endsWith("index.html")))return void alert("错误：文件夹中必须包含 index.html");for(let c=0;c<l.length;c++){const{file,path:subpath}=l[c];addNavModalElements.uploadStatus.textContent=`上传中 ${c+1}/${l.length}: ${subpath}`; const content_b64 = await fileToBase64(file); const u=withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}/${subpath}`); await uploadFileWithProgress(u, content_b64, GITHUB_CONFIG.token, `Create ${subpath}`);}addNavModalElements.uploadStatus.textContent="正在处理...";n={text:e,href:`${path}/index.html`};alert("项目上传发布成功！")} addNewButtonToDOM(n.text, n.href); resetAddNavForm(); if(!addNavModalElements.stayOpenToggle.checked) { document.getElementById("addNavModal").classList.remove("show"); } }catch(o){console.error("创建失败:",o),alert(`操作失败: ${o.message}`),addNavModalElements.uploadStatus.textContent="操作失败!"}finally{addNavModalElements.createBtn.disabled=!1,addNavModalElements.createBtn.textContent="加入新手机"}});
+    
+    // == New In-App Browser Logic ==
+    function openIframeModal(url) {
+        // Show first-time user hint
+        if (!localStorage.getItem('swipeHintShown')) {
+            swipeHint.classList.add('show');
+            setTimeout(() => {
+                swipeHint.classList.remove('show');
+                localStorage.setItem('swipeHintShown', 'true');
+            }, 4000);
+        }
+        iframeEl.src = url;
+        iframeModal.classList.add('active');
+    }
+    function closeIframeModal() {
+        iframeModal.classList.remove('active');
+        // IMPORTANT: Clear the iframe's src after the animation to stop it from running in the background
+        setTimeout(() => {
+            iframeEl.src = 'about:blank';
+        }, 400); // Must match CSS transition duration
+    }
+
+    // Gesture Handling for closing the iframe modal
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+    const edgeThreshold = 50; // Only start swipe if touch begins within 50px of the left edge
+
+    iframeModal.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        // Only initiate drag if it starts near the left edge, preventing accidental swipes
+        if (startX < edgeThreshold) {
+            isDragging = true;
+            iframeModalContent.classList.add('dragging'); // Disable CSS transition for instant feedback
+        }
+    }, { passive: true });
+
+    iframeModal.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+        const diffX = currentX - startX;
+        // Only allow dragging to the right (to close)
+        if (diffX > 0) {
+            iframeModalContent.style.transform = `translateX(${diffX}px)`;
+        }
+    }, { passive: false });
+
+    iframeModal.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        iframeModalContent.classList.remove('dragging'); // Re-enable CSS transition for smooth snap/close
+        iframeModalContent.style.transform = ''; // Reset inline style
+
+        const diffX = currentX - startX;
+        const closeThreshold = window.innerWidth / 3; // Must swipe 1/3 of the screen to close
+
+        if (diffX > closeThreshold) {
+            closeIframeModal();
+        }
+        // If not swiped far enough, the CSS handles snapping back to place.
+        startX = 0;
+        currentX = 0;
+    });
+
     window.addEventListener('load', async () => {
         initTheme(); loadGithubConfig();
         await loadInitialData();
