@@ -1,8 +1,14 @@
 {
+  "title": "Jellyfish导航",
+  "subtitle": "点击即可跳转 | By淡季水母",
   "buttons": [
     {
       "text": "EVE",
       "href": "https://qstghg-wi18orwied-melom-karona-ffcb84.netlify.app"
+    },
+    {
+      "text": "33",
+      "href": "https://33chat.netlify.app/"
     }
   ],
   "themePresets": []
