@@ -66,17 +66,16 @@
         .file-list-container { flex-grow: 1; overflow-y: auto; border-radius: 10px; padding: 5px; margin-top: 10px; background: var(--bg-day); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
         body.dark-mode .file-list-container { background: var(--bg-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
         .file-list-container ul { list-style: none; padding: 5px; }
-        /* ✨ 修改：列表项布局改为flex，以容纳删除按钮 */
         .file-list-container li { padding: 8px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; gap: 10px; }
         .file-list-container li:hover { background-color: rgba(0,0,0,0.05); }
         body.dark-mode .file-list-container li:hover { background-color: rgba(255,255,255,0.08); }
         .file-list-status { text-align: center; color: #889; padding: 30px 10px; }
-        
-        /* ✨ 新增：文件信息（名称+时间戳）和删除按钮的样式 */
         .file-info { flex-grow: 1; cursor: pointer; min-width: 0; }
         .file-name { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 16px; }
         .file-timestamp { font-size: 12px; font-weight: 300; color: #9A86A4; }
-        .delete-btn { background: transparent; border: none; font-size: 18px; cursor: pointer; padding: 5px; border-radius: 50%; flex-shrink: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: background 0.2s, color 0.2s; color: #aaa; }
+
+        /* ✨ 修改：删除按钮样式优化 */
+        .delete-btn { background: transparent; border: none; cursor: pointer; padding: 0; flex-shrink: 0; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background 0.2s, color 0.2s; color: #bbb; font-size: 22px; font-weight: bold; line-height: 1; }
         .delete-btn:hover { background: #f0f0f0; color: #e53e3e; }
         body.dark-mode .delete-btn { color: #889; }
         body.dark-mode .delete-btn:hover { background: rgba(255,255,255,0.1); color: #fc8181; }
@@ -91,11 +90,11 @@
     </style>
 </head>
 <body>
+    <!-- [HTML结构 - 无需改动] -->
     <div class="title-card">
         <h1 class="editable-title" id="title">Jellyfish导航</h1>
         <div class="editable-subtitle" id="subtitle">点击即可跳转 | By淡季水母</div>
     </div>
-
     <div class="nav-container" id="navContainer">
         <!-- 本地文件跳转：用data-href存储链接，便于交换 -->
         <button class="nav-btn" data-href="33Chat/index.html">33聊天室</button>
@@ -113,12 +112,9 @@
          <button class="nav-btn" data-href="https://ruaphone.com/">喵喵机</button>
         <button class="nav-btn" data-href="http://1.94.145.63:8000/">SillyTavern</button>
     </div>
-
     <button class="theme-toggle" id="themeBtn">🌞</button>
     <button class="sync-btn" id="syncBtn">☁️</button>
     <button class="color-palette-btn" id="colorBtn">🎨</button>
-
-    <!-- 主弹窗（数据云盘）和GitHub设置弹窗的HTML结构保持不变 -->
     <div class="modal-overlay" id="syncModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -166,26 +162,23 @@
         // [原始JS逻辑 - 无需改动]
         let longPressTimer = null, sourceBtn = null, targetBtn = null, isLongPress = false; function clearHoldClass() { document.querySelectorAll('.nav-btn.hold').forEach(btn => btn.classList.remove('hold')); } function swapButtons(a, b) { if (!a || !b || a === b) return; const tempText = a.textContent, tempHref = a.getAttribute('data-href'); a.textContent = b.textContent; b.textContent = tempText; a.setAttribute('data-href', b.getAttribute('data-href')); b.setAttribute('data-href', tempHref); saveConfig(); } function saveConfig() { const config = []; document.querySelectorAll('.nav-btn').forEach(btn => config.push({ text: btn.textContent, href: btn.getAttribute('data-href') })); localStorage.setItem('navConfig', JSON.stringify(config)); } function getHtmlBtnSignature() { let signature = ''; document.querySelectorAll('#navContainer > .nav-btn').forEach(btn => { signature += `${btn.textContent.trim()}|${btn.getAttribute('data-href').trim()},`; }); return signature; } function loadConfig() { const currentHtmlSignature = getHtmlBtnSignature(); const savedHtmlSignature = localStorage.getItem('htmlBtnSignature'); const savedBtnConfig = localStorage.getItem('navConfig'); if (currentHtmlSignature !== savedHtmlSignature) { localStorage.removeItem('navConfig'); localStorage.setItem('htmlBtnSignature', currentHtmlSignature); return; } if (savedBtnConfig) { const btnList = document.querySelectorAll('.nav-btn'); JSON.parse(savedBtnConfig).forEach((item, index) => { if (btnList[index]) { btnList[index].textContent = item.text; btnList[index].setAttribute('data-href', item.href); } }); } } function saveTitleConfig() { const titleText = document.getElementById('title').textContent; const subtitleText = document.getElementById('subtitle').textContent; localStorage.setItem('titleConfig', JSON.stringify({ title: titleText, subtitle: subtitleText })); } function loadTitleConfig() { const savedTitleData = localStorage.getItem('titleConfig'); if (!savedTitleData) return; const { title, subtitle } = JSON.parse(savedTitleData); document.getElementById('title').textContent = title; document.getElementById('subtitle').textContent = subtitle; } document.querySelectorAll('.nav-btn').forEach(btn => { btn.addEventListener('mousedown', startLongPress); btn.addEventListener('touchstart', startLongPress, { passive: false }); btn.addEventListener('mouseup', endLongPress); btn.addEventListener('touchend', endLongPress); btn.addEventListener('touchcancel', endLongPress); btn.addEventListener('click', function() { if (!isLongPress) { const href = this.getAttribute('data-href'); if (href) window.location.href = href; } }); function startLongPress(e) { if (e.type === 'touchstart') e = e.touches[0]; if (longPressTimer) clearTimeout(longPressTimer); longPressTimer = setTimeout(() => { isLongPress = true; sourceBtn = btn; sourceBtn.classList.add('hold'); document.addEventListener('mousemove', detectTarget); document.addEventListener('touchmove', detectTarget, { passive: false }); }, 300); } function endLongPress() { clearTimeout(longPressTimer); if (isLongPress) { swapButtons(sourceBtn, targetBtn); } isLongPress = false; sourceBtn = null; targetBtn = null; clearHoldClass(); document.removeEventListener('mousemove', detectTarget); document.removeEventListener('touchmove', detectTarget); } }); function detectTarget(e) { e.preventDefault(); if (e.type === 'touchmove') e = e.touches[0]; const hoverBtn = document.elementFromPoint(e.clientX, e.clientY)?.closest('.nav-btn'); if (hoverBtn && hoverBtn !== sourceBtn) { if (targetBtn) targetBtn.classList.remove('hold'); targetBtn = hoverBtn; targetBtn.classList.add('hold'); } } document.getElementById('title').addEventListener('click', () => { const newTitle = prompt('请输入新标题：', document.getElementById('title').textContent); if (newTitle?.trim()) { document.getElementById('title').textContent = newTitle.trim(); saveTitleConfig(); } }); document.getElementById('subtitle').addEventListener('click', () => { const newSub = prompt('请输入新描述：', document.getElementById('subtitle').textContent); if (newSub?.trim()) { document.getElementById('subtitle').textContent = newSub.trim(); saveTitleConfig(); } }); const themeBtn = document.getElementById('themeBtn'); function initTheme() { const savedTheme = localStorage.getItem('theme'); if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.body.classList.add('dark-mode'); themeBtn.textContent = '🌙'; } else { themeBtn.textContent = '🌞'; } } themeBtn.addEventListener('click', () => { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); themeBtn.textContent = isDark ? '🌙' : '🌞'; localStorage.setItem('theme', isDark ? 'dark' : 'light'); }); const colorBtn = document.getElementById('colorBtn'); const root = document.documentElement; function initColors() { const day1 = localStorage.getItem('dayColor1') || '#f5f7fa', day2 = localStorage.getItem('dayColor2') || '#e4eaf5', night1 = localStorage.getItem('nightColor1') || '#1a1a2e', night2 = localStorage.getItem('nightColor2') || '#16213e'; root.style.setProperty('--day-color1', day1); root.style.setProperty('--day-color2', day2); root.style.setProperty('--night-color1', night1); root.style.setProperty('--night-color2', night2); } colorBtn.addEventListener('click', () => { const cD1 = getComputedStyle(root).getPropertyValue('--day-color1').trim(), cD2 = getComputedStyle(root).getPropertyValue('--day-color2').trim(), cN1 = getComputedStyle(root).getPropertyValue('--night-color1').trim(), cN2 = getComputedStyle(root).getPropertyValue('--night-color2').trim(); const nD1 = prompt('日间渐变1：', cD1), nD2 = prompt('日间渐变2：', cD2), nN1 = prompt('夜间渐变1：', cN1), nN2 = prompt('夜间渐变2：', cN2); const isHex = (c) => /^#([0-9A-F]{3}|[0-9A-F]{6})$/i.test(c); if (nD1 && isHex(nD1)) { root.style.setProperty('--day-color1', nD1); localStorage.setItem('dayColor1', nD1); } if (nD2 && isHex(nD2)) { root.style.setProperty('--day-color2', nD2); localStorage.setItem('dayColor2', nD2); } if (nN1 && isHex(nN1)) { root.style.setProperty('--night-color1', nN1); localStorage.setItem('nightColor1', nN1); } if (nN2 && isHex(nN2)) { root.style.setProperty('--night-color2', nN2); localStorage.setItem('nightColor2', nN2); } });
         
-        // [云盘JS逻辑 - V3.0]
+        // [云盘JS逻辑 - V4.0]
         let GITHUB_CONFIG = {}; const SYNC_FOLDER = 'data_sync'; const syncBtn = document.getElementById('syncBtn'); const syncModal = document.getElementById('syncModal'); const closeSyncModalBtn = document.getElementById('closeSyncModalBtn'); const buttonSelector = document.getElementById('buttonSelector'); const fileUploader = document.getElementById('fileUploader'); const fileNameInput = document.getElementById('fileNameInput'); const uploadBtn = document.getElementById('uploadBtn'); const fileList = document.getElementById('fileList'); const fileListStatus = document.getElementById('fileListStatus'); const settingsBtn = document.getElementById('settingsBtn'); const settingsModal = document.getElementById('settingsModal'); const closeSettingsModalBtn = document.getElementById('closeSettingsModalBtn'); const githubRepoInput = document.getElementById('githubRepoInput'); const githubTokenInput = document.getElementById('githubTokenInput'); const saveSettingsBtn = document.getElementById('saveSettingsBtn'); function saveGithubConfig(config) { localStorage.setItem('githubConfig', JSON.stringify(config)); GITHUB_CONFIG = config; } function loadGithubConfig() { const savedConfig = localStorage.getItem('githubConfig'); if (savedConfig) { GITHUB_CONFIG = JSON.parse(savedConfig); return true; } return false; } function checkConfig() { if (!GITHUB_CONFIG.owner || !GITHUB_CONFIG.repo || !GITHUB_CONFIG.token) { fileListStatus.innerHTML = `尚未配置GitHub信息<br>请点击标题旁 ⚙️ 进行设置`; return false; } return true; } syncBtn.addEventListener('click', () => { syncModal.classList.add('show'); populateButtonSelector(); fetchFilesForSelectedButton(); }); settingsBtn.addEventListener('click', () => { if (GITHUB_CONFIG.owner && GITHUB_CONFIG.repo) { githubRepoInput.value = `${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`; } githubTokenInput.value = GITHUB_CONFIG.token || ''; settingsModal.classList.add('show'); }); const closeModal = (modal) => modal.classList.remove('show'); closeSyncModalBtn.addEventListener('click', () => closeModal(syncModal)); closeSettingsModalBtn.addEventListener('click', () => closeModal(settingsModal)); syncModal.addEventListener('click', (e) => (e.target === syncModal) && closeModal(syncModal)); settingsModal.addEventListener('click', (e) => (e.target === settingsModal) && closeModal(settingsModal)); saveSettingsBtn.addEventListener('click', () => { const repoPath = githubRepoInput.value.trim(); const token = githubTokenInput.value.trim(); const [owner, repo] = repoPath.split('/').map(s => s.trim()); if (!owner || !repo || !token) { alert('请填写完整的仓库信息和Token。'); return; } saveGithubConfig({ owner, repo, token, branch: 'main' }); alert('配置已保存！'); closeModal(settingsModal); fetchFilesForSelectedButton(); }); function populateButtonSelector() { const currentSelection = buttonSelector.value; buttonSelector.innerHTML = ''; document.querySelectorAll('.nav-btn').forEach(btn => { const option = document.createElement('option'); const btnText = btn.textContent.trim(); option.value = btnText; option.textContent = btnText; buttonSelector.appendChild(option); }); if (Array.from(buttonSelector.options).some(opt => opt.value === currentSelection)) { buttonSelector.value = currentSelection; } } buttonSelector.addEventListener('change', fetchFilesForSelectedButton); fileUploader.addEventListener('change', () => { if(fileUploader.files.length > 0) { fileNameInput.value = fileUploader.files[0].name; } });
         
-        /* ✨ 修改：重构文件获取逻辑，增加时间戳获取和排序 */
         async function fetchFilesForSelectedButton() {
             const selectedButtonName = buttonSelector.value;
             fileList.innerHTML = '';
             fileListStatus.style.display = 'block';
 
-            if (!selectedButtonName) {
-                fileListStatus.textContent = '请选择一个分类';
-                return;
-            }
+            if (!selectedButtonName) { fileListStatus.textContent = '请选择一个分类'; return; }
             if (!checkConfig()) return;
 
             fileListStatus.textContent = '正在加载...';
             const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${SYNC_FOLDER}/${selectedButtonName}`;
            
             try {
-                const response = await fetch(apiUrl, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` } });
+                // ✨ 增加 cache: 'no-cache' 告诉浏览器不要缓存这个API请求
+                const response = await fetch(apiUrl, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, cache: 'no-cache' });
                 if (response.status === 404) { fileListStatus.textContent = '该分类下暂无文件'; return; }
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const files = await response.json();
@@ -194,56 +187,45 @@
                     fileListStatus.textContent = '该分类下暂无文件';
                 } else {
                     fileListStatus.textContent = '正在获取文件信息...';
-                    // 为每个文件获取提交日期
                     const filesWithDates = await Promise.all(files.map(async (file) => {
                         const commitDate = await getLatestCommitDate(file.path);
                         return { ...file, commitDate };
                     }));
-                    
-                    // 按日期降序排序
                     filesWithDates.sort((a, b) => new Date(b.commitDate) - new Date(a.commitDate));
-
-                    fileList.innerHTML = ''; // 清空列表，准备渲染
+                    fileList.innerHTML = '';
                     fileListStatus.style.display = 'none';
 
                     filesWithDates.forEach(file => {
                         const li = document.createElement('li');
-                        
                         const fileInfo = document.createElement('div');
                         fileInfo.className = 'file-info';
                         fileInfo.dataset.downloadUrl = file.download_url;
                         fileInfo.dataset.fileName = file.name;
-
                         const fileNameSpan = document.createElement('span');
                         fileNameSpan.className = 'file-name';
                         fileNameSpan.textContent = file.name;
-                        
                         const fileTimestampSpan = document.createElement('span');
                         fileTimestampSpan.className = 'file-timestamp';
                         fileTimestampSpan.textContent = new Date(file.commitDate).toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-                        
                         fileInfo.appendChild(fileNameSpan);
                         fileInfo.appendChild(fileTimestampSpan);
 
                         const deleteBtn = document.createElement('button');
                         deleteBtn.className = 'delete-btn';
-                        deleteBtn.innerHTML = '🗑️';
+                        deleteBtn.innerHTML = '&times;'; // ✨ 使用 '×' 符号
                         deleteBtn.title = '删除文件';
-                        deleteBtn.dataset.filePath = file.path;
-                        deleteBtn.dataset.fileSha = file.sha;
-
+                        
                         li.appendChild(fileInfo);
                         li.appendChild(deleteBtn);
                         fileList.appendChild(li);
 
-                        // 绑定事件
                         fileInfo.addEventListener('click', (e) => {
                             const { downloadUrl, fileName } = e.currentTarget.dataset;
                             forceDownload(downloadUrl, fileName, fileInfo);
                         });
-                        deleteBtn.addEventListener('click', (e) => {
-                            const { filePath, fileSha } = e.currentTarget.dataset;
-                            deleteFile(filePath, fileSha);
+                        // ✨ 传递li元素给deleteFile函数
+                        deleteBtn.addEventListener('click', () => {
+                            deleteFile(file.path, file.sha, li);
                         });
                     });
                 }
@@ -253,12 +235,11 @@
             }
         }
         
-        /* ✨ 新增：获取单个文件最新提交日期的函数 */
         async function getLatestCommitDate(filePath) {
             const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(filePath)}&page=1&per_page=1`;
             try {
                 const response = await fetch(url, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` } });
-                if (!response.ok) return new Date(0).toISOString(); // 出错时返回一个很早的日期
+                if (!response.ok) return new Date(0).toISOString();
                 const commits = await response.json();
                 return commits[0]?.commit.committer.date || new Date(0).toISOString();
             } catch (error) {
@@ -267,12 +248,21 @@
             }
         }
         
-        /* ✨ 新增：删除文件的函数 */
-        async function deleteFile(filePath, sha) {
+        /* ✨ 修改：重构删除逻辑，采用“乐观UI更新” */
+        async function deleteFile(filePath, sha, listItemElement) {
             if (!confirm(`确定要永久删除文件 "${filePath.split('/').pop()}" 吗？此操作不可恢复。`)) {
                 return;
             }
             
+            // 1. 乐观UI更新：立即从视图中删除
+            listItemElement.remove();
+            // 如果删除后列表为空，显示提示
+            if (fileList.children.length === 0) {
+                 fileListStatus.textContent = '该分类下暂无文件';
+                 fileListStatus.style.display = 'block';
+            }
+
+            // 2. 在后台执行实际的API调用
             const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${filePath}`;
             try {
                 const response = await fetch(apiUrl, {
@@ -285,12 +275,13 @@
                     const errorData = await response.json();
                     throw new Error(`删除失败: ${errorData.message}`);
                 }
-                
-                alert('文件删除成功！');
-                fetchFilesForSelectedButton(); // 重新加载文件列表
+                // 成功：无需操作，因为UI已经更新了
+                console.log("文件已从GitHub成功删除");
             } catch (error) {
+                // 3. 失败回滚：如果API调用失败，提示用户并刷新列表以恢复原状
                 console.error('删除文件失败:', error);
-                alert(`删除文件失败: ${error.message}`);
+                alert(`删除文件失败: ${error.message}\n\n列表将自动刷新以恢复。`);
+                fetchFilesForSelectedButton(); // 重新加载真实的文件列表
             }
         }
 
