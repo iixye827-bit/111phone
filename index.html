@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V9.1.0 "Album Refactor, iOS Drag Fix, Final Polish"] */
+        /* [CSS - V9.2.0 "Final Fixes & Polish"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -91,7 +91,8 @@
         #nukeDataBtn:active { background: #c53030 !important; box-shadow: inset 4px 4px 8px rgba(155, 37, 37, 0.7) !important; }
         #settingsModal .modal-body .nuke-section { margin: 15px 0 10px; border-top: 1px solid rgba(128,128,128,0.3); padding-top: 15px; display: flex; justify-content: center; }
         #syncErrorModal .modal-content { max-width: 450px; } #sync-error-message { padding: 12px; border-radius: 8px; background: rgba(255, 0, 0, 0.1); border: 1px solid rgba(255, 0, 0, 0.2); font-family: monospace; font-size: 14px; word-wrap: break-word; user-select: text; } body.dark-mode #sync-error-message { background: rgba(252, 129, 129, 0.1); border-color: rgba(252, 129, 129, 0.2); }
-        #colorPaletteModal .modal-content, #helpModal .modal-content { max-width: 500px; } #colorPaletteModal .modal-body { gap: 20px; }
+        #colorPaletteModal .modal-content, #helpModal .modal-content { max-width: 500px; } 
+        #colorPaletteModal .modal-body { gap: 20px; padding-bottom: 15px; }
         .color-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .color-picker-group { display: flex; flex-direction: column; gap: 8px; }
         .color-picker-group label { font-size: 14px; color: #5a6778; } body.dark-mode .color-picker-group label { color: #c0c6cc; }
         .color-input-wrapper { display: flex; align-items: center; border-radius: 10px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); } body.dark-mode .color-input-wrapper { background:var(--bg-night-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
@@ -196,7 +197,7 @@
         #memoryModal #photo-list-container { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
         #memoryModal .photo-item { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,0.7); cursor: pointer; transition: transform 0.2s ease; background-color: rgba(128,128,128,0.1); }
         #memoryModal .photo-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
-        #memoryModal .photo-title-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); color: white; font-size: 12px; padding: 4px 8px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-top: 1px solid rgba(255,255,255,0.2); }
+        #memoryModal .photo-title-overlay { position: absolute; top: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); color: white; font-size: 12px; padding: 4px 8px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid rgba(255,255,255,0.2); }
         #memoryPhotoViewerOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 5000; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         #memoryPhotoViewerOverlay.active { opacity: 1; pointer-events: auto; }
         #memoryPhotoViewerOverlay .viewer-header { flex-shrink: 0; display: flex; justify-content: flex-end; padding: 20px; color: white; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); }
@@ -293,7 +294,7 @@
                 <h4>步骤 4：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌜 按钮展开菜单 → 点击 <strong>☁️ (数据云盘)</strong> → 点击标题旁的 <strong>⚙️ (设置)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤3</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，并采用了最高效的架构。</p>
             </div>
             <div id="help-page-2" class="help-page-content">
-                <h3>功能详解</h3><h4>1. 导航管理</h4><p><strong>添加新手机</strong>：长按主菜单 → 点击 📲 图标。可选择添加`外部链接`或`上传项目`。</p><p><strong>管理与删除</strong>：在“管理小手机”弹窗内，点击`进入管理模式`，即可对现有按钮进行排序或删除。现在支持**长按拖拽排序**。</p><h4>2. 主题与个性化</h4><p><strong>实时调色</strong>：长按主菜单 → 点击 🎨 图标。可实时调整日间/夜间模式的背景渐变色，以及**日间/夜间模式下的标题卡片背景图片**。</p><p><strong>色彩预设</strong>：您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能。</p><h4>3. 文件云盘与同步状态</h4><p><strong>访问与管理</strong>：长按主菜单 → 点击 ☁️ 图标。您可以分门别类地管理与“上传项目”相关联的所有文件。建议用来存储备份文件。</p><p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p><ul><li><strong>🟢 绿点</strong>: `已同步` - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: `同步中` - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: `同步失败` - 发生错误，请点击图标查看失败原因，通常是网络问题或PAT失效。</li></ul><h4>4. 基础操作</h4><p><strong>编辑标题</strong>：直接点击页面上的主标题或副标题即可修改。</p><p><strong>访问链接与返回</strong>：对于外部链接，会在应用内全屏打开。您可以从屏幕**最左侧边缘向右滑动**来关闭当前页面并返回中心。</p><p><strong>切换主题</strong>：**单击 (短按)** 右下角的 🌞/🌜 按钮。</p><h4>5. 危险区域</h4><div class="warning"><p><strong>清空所有数据</strong>：在 `GitHub 配置` (⚙️) 弹窗的最下方。此操作会 **永久删除** 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
+                <h3>功能详解</h3><h4>1. 导航管理</h4><p><strong>添加新手机</strong>：长按主菜单 → 点击 📲 图标。可选择添加`外部链接`或`上传项目`。</p><p><strong>管理与删除</strong>：在“管理小手机”弹窗内，点击`进入管理模式`，即可对现有按钮进行排序或删除。现在支持**长按拖拽排序**（完美适配iOS与安卓）。</p><h4>2. 主题与个性化</h4><p><strong>实时调色</strong>：长按主菜单 → 点击 🎨 图标。可实时调整日间/夜间模式的背景渐变色，以及**日间/夜间模式下的标题卡片背景图片**。</p><p><strong>色彩预设</strong>：您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能。</p><h4>3. 文件云盘与同步状态</h4><p><strong>访问与管理</strong>：长按主菜单 → 点击 ☁️ 图标。您可以分门别类地管理与“上传项目”相关联的所有文件。建议用来存储备份文件。</p><p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p><ul><li><strong>🟢 绿点</strong>: `已同步` - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: `同步中` - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: `同步失败` - 发生错误，请点击图标查看失败原因，通常是网络问题或PAT失效。</li></ul><h4>4. 基础操作</h4><p><strong>编辑标题</strong>：直接点击页面上的主标题或副标题即可修改。</p><p><strong>访问链接与返回</strong>：对于外部链接，会在应用内全屏打开。您可以从屏幕**最左侧边缘向右滑动**来关闭当前页面并返回中心。</p><p><strong>切换主题</strong>：**单击 (短按)** 右下角的 🌞/🌜 按钮。</p><h4>5. 危险区域</h4><div class="warning"><p><strong>清空所有数据</strong>：在 `GitHub 配置` (⚙️) 弹窗的最下方。此操作会 **永久删除** 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
             </div>
             <div id="help-page-3" class="help-page-content">
                 <h3>免责声明与使用条款</h3><h4>1. 服务条款</h4><p>本应用 (JellyfishCenter) 按“现状”提供，不附带任何明示或暗示的保证。开发者不保证应用的持续可用性、功能完整性或无错误。所有因使用本应用导致的直接或间接风险与责任，均由用户自行承担。</p><h4>2. 数据安全</h4><p>用户需自行负责其GitHub个人访问令牌 (PAT) 的安全保管。任何因PAT泄露导致的数据丢失、篡改或账户安全问题，开发者概不负责。强烈建议为本应用创建独立的、具有最小必要权限 (<code>repo</code>) 的PAT。</p><h4>3. 知识产权与版权责任</h4><div class="important-note"><p>本应用可能被用于托管或链接至第三方项目（“小手机”）。用户必须对所上传或链接的内容负全部法律责任，并确保拥有展示、使用和分发该内容的合法权利。<strong>用户必须尊重所有原创作者的知识产权，不得侵犯他人版权。</strong></p></div><h4>4. 使用与分发限制</h4><div class="warning"><p>本项目 (JellyfishCenter) 及其源代码仅供个人非商业性使用。严禁以下行为：</p><ul><li>对本项目的源代码进行任何形式的二次修改、再分发或公开发布（即“二传二改”）。</li><li>公开或私下分享通过本应用“上传项目”功能生成的任何网页链接或文件。此行为可能构成对原创内容的未授权分发。</li></ul></div><p>继续使用本应用，即表示您已阅读、理解并同意上述所有条款。</p>
@@ -492,7 +493,7 @@
     </div>
 
     <script>
-    // [JS - V9.1.0 "Album Refactor, iOS Drag Fix, Final Polish"]
+    // [JS - V9.2.0 "Final Fixes & Polish"]
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
@@ -650,13 +651,19 @@
     document.getElementById('title').addEventListener('click', () => { if(isManagementMode) return; const newTitle = prompt('新标题：', currentConfig.title); if (newTitle?.trim() && newTitle.trim() !== currentConfig.title) { document.getElementById('title').textContent = newTitle.trim(); currentConfig.title = newTitle.trim(); saveGlobalConfig('Update main title'); } });
     document.getElementById('subtitle').addEventListener('click', () => { if(isManagementMode) return; const newSubtitle = prompt('新描述：', currentConfig.subtitle); if (newSubtitle !== null && newSubtitle.trim() !== currentConfig.subtitle) { document.getElementById('subtitle').textContent = newSubtitle.trim(); currentConfig.subtitle = newSubtitle.trim(); saveGlobalConfig('Update subtitle'); } });
     
-    // Drag and Drop Logic
+    // Universal Drag and Drop Logic (Mouse & Touch)
     let draggedItem = null;
-    navContainer.addEventListener('dragstart', e => { if (!isManagementMode) return; draggedItem = e.target; setTimeout(() => e.target.classList.add('dragging'), 0); });
-    navContainer.addEventListener('dragend', e => { if (!isManagementMode || !draggedItem) return; draggedItem.classList.remove('dragging'); draggedItem = null; });
-    navContainer.addEventListener('dragover', e => { e.preventDefault(); if (!isManagementMode) return; const target = e.target.closest('.nav-btn'); if (target && target !== draggedItem) { navContainer.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('drag-over')); target.classList.add('drag-over'); } });
-    navContainer.addEventListener('dragleave', e => { if (!isManagementMode) return; e.target.closest('.nav-btn')?.classList.remove('drag-over'); });
-    navContainer.addEventListener('drop', e => { e.preventDefault(); if (!isManagementMode || !draggedItem) return; const dropTarget = e.target.closest('.nav-btn'); if (dropTarget && dropTarget !== draggedItem) { dropTarget.classList.remove('drag-over'); const allBtns = [...navContainer.querySelectorAll('.nav-btn')]; const draggedIndex = allBtns.indexOf(draggedItem); const targetIndex = allBtns.indexOf(dropTarget); if (draggedIndex < targetIndex) { navContainer.insertBefore(draggedItem, dropTarget.nextSibling); } else { navContainer.insertBefore(draggedItem, dropTarget); } updateButtonOrderAndSave('Reorder buttons'); } });
+    function getDragAfterElement(container, y) { const draggableElements = [...container.querySelectorAll('.nav-btn:not(.dragging)')]; return draggableElements.reduce((closest, child) => { const box = child.getBoundingClientRect(); const offset = y - box.top - box.height / 2; if (offset < 0 && offset > closest.offset) { return { offset: offset, element: child }; } else { return closest; } }, { offset: Number.NEGATIVE_INFINITY }).element; }
+    const handleDragStart = (e) => { if (!isManagementMode) return; draggedItem = e.target.closest('.nav-btn'); if (draggedItem) { setTimeout(() => draggedItem.classList.add('dragging'), 0); } };
+    const handleDragMove = (e) => { if (!draggedItem) return; e.preventDefault(); const clientY = e.touches ? e.touches[0].clientY : e.clientY; const afterElement = getDragAfterElement(navContainer, clientY); if (afterElement == null) { navContainer.appendChild(draggedItem); } else { navContainer.insertBefore(draggedItem, afterElement); } };
+    const handleDragEnd = () => { if (!draggedItem) return; draggedItem.classList.remove('dragging'); updateButtonOrderAndSave('Reorder buttons'); draggedItem = null; };
+    navContainer.addEventListener('dragstart', handleDragStart);
+    navContainer.addEventListener('dragend', handleDragEnd);
+    navContainer.addEventListener('dragover', e => e.preventDefault());
+    navContainer.addEventListener('drop', handleDragEnd);
+    navContainer.addEventListener('touchstart', handleDragStart, { passive: true });
+    navContainer.addEventListener('touchmove', handleDragMove, { passive: false });
+    navContainer.addEventListener('touchend', handleDragEnd);
 
     function applyAllBackgrounds() {
         const isDark = document.body.classList.contains('dark-mode');
@@ -676,6 +683,8 @@
         const titleCard = document.getElementById('titleCard');
         if (titleCardBgImage) {
             titleCard.style.backgroundImage = `url(${titleCardBgImage})`;
+            titleCard.style.backgroundSize = 'cover';
+            titleCard.style.backgroundPosition = 'center';
         } else {
             titleCard.style.backgroundImage = isDark ? 'var(--bg-night-element)' : 'var(--bg-day-element)';
         }
@@ -841,6 +850,7 @@
         let memoryDataSha = null;
         let isSaving = false;
         let saveTimeout = null;
+        let lastWanderedPhotoId = null;
 
         const ui = {
             modal: document.getElementById('memoryModal'),
@@ -1159,16 +1169,25 @@
                 }
             },
             'wander-global': () => {
-                if (memoryCache.album.photos.length > 0) {
-                    const randomPhoto = memoryCache.album.photos[Math.floor(Math.random() * memoryCache.album.photos.length)];
+                let photoPool = memoryCache.album.photos;
+                if (photoPool.length > 1) {
+                    photoPool = photoPool.filter(p => p.id !== lastWanderedPhotoId);
+                }
+                if (photoPool.length > 0) {
+                    const randomPhoto = photoPool[Math.floor(Math.random() * photoPool.length)];
+                    lastWanderedPhotoId = randomPhoto.id;
                     openPhotoViewer(randomPhoto.id, memoryCache.album.photos, 'wander');
                 }
             },
             'wander-local': () => {
-                const localPhotos = memoryCache.album.photos.filter(p => p.albumId === state.currentAlbumId);
+                let localPhotos = memoryCache.album.photos.filter(p => p.albumId === state.currentAlbumId);
+                if (localPhotos.length > 1) {
+                    localPhotos = localPhotos.filter(p => p.id !== lastWanderedPhotoId);
+                }
                 if (localPhotos.length > 0) {
                     const randomPhoto = localPhotos[Math.floor(Math.random() * localPhotos.length)];
-                    openPhotoViewer(randomPhoto.id, localPhotos, 'wander');
+                    lastWanderedPhotoId = randomPhoto.id;
+                    openPhotoViewer(randomPhoto.id, memoryCache.album.photos.filter(p => p.albumId === state.currentAlbumId), 'wander');
                 }
             },
             'close-viewer': closePhotoViewer,
