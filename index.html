@@ -6,93 +6,126 @@
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+
+    <!-- PWA & Mobile App Settings -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Jellyfish中心</title>
+    <meta name="theme-color" content="#16213e">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+
+    <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V7.3.0 "Gesture Navigation Update"] */
+        /* [CSS - V8.5.0 "Drag & Drop UI"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
-        :root { --day-color1: #f5f7fa; --day-color2: #e4eaf5; --night-color1: #1f2a40; --night-color2: #16213e; --hold-border: #5B99E2; --text-day: #2d3748; --text-night: #e0e6f0; --bg-day: #eef2f9; --bg-night: #1a2337; --shadow-light-day: rgba(255, 255, 255, 0.9); --shadow-dark-day: rgba(174, 190, 212, 0.4); --shadow-light-night: rgba(40, 52, 79, 0.9); --shadow-dark-night: rgba(0, 0, 0, 0.3); }
+        :root {
+            --day-color1: #f5f7fa; --day-color2: #e4eaf5;
+            --night-color1: #1f2a40; --night-color2: #16213e;
+            --hold-border: #5B99E2; --text-day: #2d3748; --text-night: #e0e6f0;
+            --bg-day-element: linear-gradient(135deg, var(--day-color2), var(--day-color1));
+            --bg-night-element: linear-gradient(135deg, var(--night-color2), var(--night-color1));
+            --shadow-light-day: rgba(255, 255, 255, 0.9); --shadow-dark-day: rgba(174, 190, 212, 0.4);
+            --shadow-light-night: rgba(40, 52, 79, 0.9); --shadow-dark-night: rgba(0, 0, 0, 0.3);
+        }
         body { min-height: 100vh; background: linear-gradient(135deg, var(--day-color1) 0%, var(--day-color2) 100%); padding: 20px; display: flex; flex-direction: column; align-items: center; transition: background 0.5s ease; touch-action: manipulation; overflow-x: hidden; }
         body.dark-mode { background: linear-gradient(135deg, var(--night-color1) 0%, var(--night-color2) 100%); --hold-border: #63b3ed; color: var(--text-night); }
-        .title-card { width: 100%; max-width: 800px; padding: 40px 20px; margin: 20px 0; border-radius: 16px; box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); background-color: var(--bg-day); backdrop-filter: blur(8px); text-align: center; transition: all 0.5s ease; }
-        body.dark-mode .title-card { box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night); background-color: var(--bg-night); }
+        .title-card { width: 100%; max-width: 800px; padding: 40px 20px; margin: 20px 0; border-radius: 16px; box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); background: var(--bg-day-element); backdrop-filter: blur(8px); text-align: center; transition: all 0.5s ease; }
+        body.dark-mode .title-card { box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night); background: var(--bg-night-element); }
         .editable-title, .editable-subtitle { opacity: 0; transition: opacity 0.5s ease; } /* FOUC Fix */
-        .editable-title { font-size: 32px; color: var(--text-day); margin-bottom: 20px; cursor: pointer; padding: 6px 12px; border-radius: 8px; display: block; width: fit-content; margin: 0 auto 20px auto; user-select: none; }
+        .editable-title { font-size: 36px; font-weight: 700; color: var(--text-day); margin-bottom: 20px; cursor: pointer; padding: 6px 12px; border-radius: 8px; display: block; width: fit-content; margin: 0 auto 20px auto; user-select: none; }
         body.dark-mode .editable-title { color: var(--text-night); }
         .editable-title:hover { background-color: rgba(255, 255, 255, 0.8); } body.dark-mode .editable-title:hover { background-color: rgba(50, 55, 75, 0.8); }
         .editable-subtitle { font-size: 16px; color: #5a6778; cursor: pointer; padding: 4px 8px; border-radius: 6px; display: block; width: fit-content; margin: 0 auto; line-height: 1.5; user-select: none; }
         body.dark-mode .editable-subtitle { color: #c0c6cc; }
         .editable-subtitle:hover { background-color: rgba(255, 255, 255, 0.8); color: var(--text-day); } body.dark-mode .editable-subtitle:hover { background-color: rgba(50, 55, 75, 0.8); color: var(--text-night); }
         .nav-container { width: 100%; max-width: 1200px; margin: 20px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; padding: 20px; position: relative; z-index: 10; }
-        .nav-btn { position: relative; padding: 22px 16px; border: none; border-radius: 14px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background-color: var(--bg-day); backdrop-filter: blur(8px); font-size: 17px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .nav-btn { position: relative; padding: 22px 16px; border: none; border-radius: 14px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background: var(--bg-day-element); backdrop-filter: blur(8px); font-size: 17px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent; }
         .nav-btn.hold { border: 2px solid var(--hold-border); transform: scale(1.02); z-index: 5; box-shadow: 8px 8px 16px rgba(174, 190, 212, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(91, 153, 226, 0.3); }
-        body.dark-mode .nav-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background-color: var(--bg-night); color: var(--text-night); }
+        body.dark-mode .nav-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
         body.dark-mode .nav-btn.hold { box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4), -8px -8px 16px rgba(40, 52, 79, 0.8), 0 0 0 2px rgba(99, 179, 237, 0.3); }
-        .nav-btn:hover { transform: translateY(-3px); background-color: #f7faff; } body.dark-mode .nav-btn:hover { background-color: #212d46; }
+        .nav-btn:hover { transform: translateY(-3px); filter: brightness(1.05); }
         .nav-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-day), inset -6px -6px 12px var(--shadow-light-day); transform: translateY(0); }
         body.dark-mode .nav-btn:active { box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.25), inset -6px -6px 12px rgba(40, 52, 79, 0.8); }
         .delete-icon { display: none; position: absolute; top: -5px; right: -5px; width: 24px; height: 24px; background-color: #f56565; color: white; border-radius: 50%; border: 2px solid white; font-size: 16px; font-weight: bold; line-height: 20px; text-align: center; cursor: pointer; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .page-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px); z-index: 99; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
         .page-overlay.show { opacity: 1; pointer-events: auto; }
         .page-overlay.management-overlay { background: transparent; backdrop-filter: none; z-index: 5; }
-        .management-active .nav-btn { cursor: move; animation: wiggle 0.2s ease-in-out infinite alternate; pointer-events: auto !important; }
+        .management-active .nav-btn { cursor: move; animation: wiggle 0.2s ease-in-out infinite alternate; pointer-events: auto !important; -webkit-touch-callout: none; }
         .management-active .nav-btn > .delete-icon { display: block; }
+        .nav-btn.dragging { opacity: 0.4; }
+        .nav-btn.drag-over { border: 2px dashed var(--hold-border); transform: scale(1.03); }
         @keyframes wiggle { from { transform: rotate(-0.5deg); } to { transform: rotate(0.5deg); } }
         .fab-container { position: fixed; right: 30px; bottom: 30px; z-index: 100; }
-        .fab-main, .fab-drawer-item { width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); background-color: var(--bg-day); color: var(--text-day); font-size: 22px; display: flex; align-items: center; justify-content: center; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body.dark-mode .fab-main, body.dark-mode .fab-drawer-item { box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); background-color: var(--bg-night); color: var(--text-night); }
+        .fab-main, .fab-drawer-item { position: relative; width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 22px; display: flex; align-items: center; justify-content: center; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body.dark-mode .fab-main, body.dark-mode .fab-drawer-item { box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
         .fab-main:active, .fab-drawer-item:active { transform: scale(0.95); }
         .fab-container.active .fab-main { transform: rotate(45deg); }
         .fab-drawer { position: absolute; bottom: 65px; left: 0; display: flex; flex-direction: column; gap: 15px; opacity: 0; transform: translateY(20px); transition: opacity 0.2s ease-out, transform 0.2s ease-out; pointer-events: none; }
         .fab-container.active .fab-drawer { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        .fab-drawer-item { position: relative; }
         #sync-status-indicator { position: absolute; right: 5px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background-color: transparent; transition: all 0.3s ease; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
         #sync-status-indicator.synced { background-color: #28a745; } #sync-status-indicator.syncing { background-color: #ffc107; animation: pulse 1.5s infinite; } #sync-status-indicator.error { background-color: #dc3545; animation: none; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
-        .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:1000;opacity:0;transition:opacity .3s ease}.modal-overlay.show{display:flex;opacity:1}.modal-content{width:90%;background:var(--bg-day);color:var(--text-day);border-radius:16px;box-shadow:12px 12px 24px var(--shadow-dark-day),-12px -12px 24px var(--shadow-light-day);padding:25px;transition:transform .3s ease,background .5s ease,box-shadow .5s ease;transform:scale(.95);display:flex;flex-direction:column;max-height:90vh}.modal-overlay.show .modal-content{transform:scale(1)}body.dark-mode .modal-content{background:var(--bg-night);color:var(--text-night);box-shadow:12px 12px 24px var(--shadow-dark-night),-12px -12px 24px var(--shadow-light-night)}.modal-header{display:flex;justify-content:space-between;align-items:center;font-size:20px;font-weight:600;margin-bottom:20px;flex-shrink:0}.modal-title-group{display:flex;align-items:center;gap:8px}.modal-header .close-btn,.modal-header .settings-btn{cursor:pointer;border:none;background:transparent;color:inherit;padding:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s ease}.modal-header .close-btn{font-size:24px;font-weight:bold;width:36px;height:36px}.modal-header .settings-btn{font-size:20px;width:32px;height:32px}.modal-header .close-btn:hover,.modal-header .settings-btn:hover{background:rgba(0,0,0,0.05)}body.dark-mode .modal-header .close-btn:hover,body.dark-mode .modal-header .settings-btn:hover{background:rgba(255,255,255,0.08)}
+        .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:1000;opacity:0;transition:opacity .3s ease}.modal-overlay.show{display:flex;opacity:1}.modal-content{width:90%;background:var(--bg-day-element);color:var(--text-day);border-radius:16px;box-shadow:12px 12px 24px var(--shadow-dark-day),-12px -12px 24px var(--shadow-light-day);padding:12px;transition:transform .3s ease,background .5s ease,box-shadow .5s ease;transform:scale(.95);display:flex;flex-direction:column;max-height:90vh}.modal-overlay.show .modal-content{transform:scale(1)}body.dark-mode .modal-content{background:var(--bg-night-element);color:var(--text-night);box-shadow:12px 12px 24px var(--shadow-dark-night),-12px -12px 24px var(--shadow-light-night)}.modal-header{display:flex;justify-content:space-between;align-items:center;font-size:20px;font-weight:600;margin-bottom:20px;flex-shrink:0; padding: 0 3px;}.modal-title-group{display:flex;align-items:center;gap:8px}.modal-header .close-btn,.modal-header .settings-btn{cursor:pointer;border:none;background:transparent;color:inherit;padding:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s ease}.modal-header .close-btn{font-size:24px;font-weight:bold;width:36px;height:36px}.modal-header .settings-btn{font-size:20px;width:32px;height:32px}.modal-header .close-btn:hover,.modal-header .settings-btn:hover{background:rgba(0,0,0,0.05)}body.dark-mode .modal-header .close-btn:hover,body.dark-mode .modal-header .settings-btn:hover{background:rgba(255,255,255,0.08)}
         .modal-body { overflow-y: auto; flex-grow: 1; display:flex; flex-direction:column; gap: 15px; margin-right: -5px; padding-right: 5px; scrollbar-width: none; -ms-overflow-style: none; }
+        .modal-body > * { margin-left: 3px; margin-right: 3px; width: calc(100% - 6px); }
         .modal-body::-webkit-scrollbar { width: 0; background: transparent; }
-        .modal-input,.modal-select{width:100%;padding:12px 15px;border:none;border-radius:10px;font-size:16px;background:var(--bg-day);color:var(--text-day);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day);transition:all .3s ease;caret-color:var(--hold-border)}body.dark-mode .modal-input,body.dark-mode .modal-select{background:var(--bg-night);color:var(--text-night);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}.modal-input:focus,.modal-select:focus{outline:none;box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day),0 0 0 2px var(--hold-border)}body.dark-mode .modal-input:focus,body.dark-mode .modal-select:focus{box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night),0 0 0 2px var(--hold-border)}
-        .modal-button{width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;color:var(--hold-border);background:var(--bg-day);box-shadow:4px 4px 8px var(--shadow-dark-day),-4px -4px 8px var(--shadow-light-day);transition:all .2s ease}body.dark-mode .modal-button{color:var(--hold-border);background:var(--bg-night);box-shadow:4px 4px 8px var(--shadow-dark-night),-4px -4px 8px var(--shadow-light-night)}.modal-button:active{box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day)}body.dark-mode .modal-button:active{box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}.modal-button:disabled{color:#9db2c2;cursor:not-allowed;box-shadow:none;}
+        .modal-input,.modal-select{padding:12px 15px;border:none;border-radius:10px;font-size:16px;background:var(--bg-day-element);color:var(--text-day);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day);transition:all .3s ease;caret-color:var(--hold-border)}body.dark-mode .modal-input,body.dark-mode .modal-select{background:var(--bg-night-element);color:var(--text-night);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}.modal-input:focus,.modal-select:focus{outline:none;box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day),0 0 0 2px var(--hold-border)}body.dark-mode .modal-input:focus,body.dark-mode .modal-select:focus{box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night),0 0 0 2px var(--hold-border)}
+        .modal-button{padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;color:var(--hold-border);background:var(--bg-day-element);box-shadow:4px 4px 8px var(--shadow-dark-day),-4px -4px 8px var(--shadow-light-day);transition:all .2s ease}body.dark-mode .modal-button{color:var(--hold-border);background:var(--bg-night-element);box-shadow:4px 4px 8px var(--shadow-dark-night),-4px -4px 8px var(--shadow-light-night)}.modal-button:active{box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day)}body.dark-mode .modal-button:active{box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}.modal-button:disabled{color:#9db2c2;cursor:not-allowed;box-shadow:none;}
+        #nukeDataBtn { background: #e53e3e !important; color: white !important; box-shadow: 4px 4px 8px rgba(229, 62, 62, 0.5), -4px -4px 8px rgba(255, 255, 255, 0.9) !important; }
+        #nukeDataBtn:active { background: #c53030 !important; box-shadow: inset 4px 4px 8px rgba(155, 37, 37, 0.7) !important; }
+        #settingsModal .modal-body .nuke-section { margin: 15px 0 10px; border-top: 1px solid rgba(128,128,128,0.3); padding-top: 15px; display: flex; justify-content: center; }
         #syncErrorModal .modal-content { max-width: 450px; } #sync-error-message { padding: 12px; border-radius: 8px; background: rgba(255, 0, 0, 0.1); border: 1px solid rgba(255, 0, 0, 0.2); font-family: monospace; font-size: 14px; word-wrap: break-word; user-select: text; } body.dark-mode #sync-error-message { background: rgba(252, 129, 129, 0.1); border-color: rgba(252, 129, 129, 0.2); }
-        #colorPaletteModal .modal-content { max-width: 450px; } #colorPaletteModal .modal-body { gap: 20px; }
+        #colorPaletteModal .modal-content, #helpModal .modal-content { max-width: 500px; } #colorPaletteModal .modal-body { gap: 20px; }
         .color-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .color-picker-group { display: flex; flex-direction: column; gap: 8px; }
         .color-picker-group label { font-size: 14px; color: #5a6778; } body.dark-mode .color-picker-group label { color: #c0c6cc; }
-        .color-input-wrapper { display: flex; align-items: center; border-radius: 10px; padding: 5px; background:var(--bg-day); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); } body.dark-mode .color-input-wrapper { background:var(--bg-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
+        .color-input-wrapper { display: flex; align-items: center; border-radius: 10px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); } body.dark-mode .color-input-wrapper { background:var(--bg-night-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
         input[type="color"] { width: 36px; height: 30px; border: none; background: transparent; cursor: pointer; -webkit-appearance: none; padding: 0; flex-shrink: 0; }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; } input[type="color"]::-webkit-color-swatch { border-radius: 6px; border: none; }
         .hex-display { flex-grow: 1; text-align: right; padding: 0 10px; font-family: monospace; font-size: 16px; color: #889; }
         .preview-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .preview-box { height: 40px; border-radius: 8px; position: relative; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-        .preview-box::before { content: attr(data-label); } #dayPreview { border: 2px solid var(--bg-day); color: var(--text-day); } body.dark-mode #dayPreview { border-color: rgba(255,255,255,0.1); }
-        #nightPreview { border: 2px solid var(--bg-night); color: var(--text-night); } body.dark-mode #nightPreview { border-color: rgba(255,255,255,0.2); }
+        .preview-box::before { content: attr(data-label); } #dayPreview { border: 2px solid var(--bg-day-element); color: var(--text-day); } body.dark-mode #dayPreview { border-color: rgba(255,255,255,0.1); }
+        #nightPreview { border: 2px solid var(--bg-night-element); color: var(--text-night); } body.dark-mode #nightPreview { border-color: rgba(255,255,255,0.2); }
         .preset-manager { border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; display: flex; flex-direction: column; gap: 15px; }
         body.dark-mode .preset-manager { border-color: rgba(255,255,255,0.1); } .preset-row { display: flex; align-items: center; gap: 10px; }
         .preset-row .modal-input, .preset-row .modal-select { flex-grow: 1; }
         .preset-row .modal-button { width: auto; padding: 12px 15px; flex-shrink: 0; font-size: 14px; }
         .preset-row .modal-button.save { color: #28a745; } .preset-row .modal-button.delete { color: #dc3545; }
-        .random-toggle-section { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 12px; background:var(--bg-day); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
-        body.dark-mode .random-toggle-section { background:var(--bg-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
+        .random-toggle-section { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 12px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
+        body.dark-mode .random-toggle-section { background:var(--bg-night-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
         .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; } .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; } .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--hold-border); } input:checked + .slider:before { transform: translateX(18px); }
-        #file-list-container{flex-grow:1;overflow-y:auto;border-radius:10px;padding:5px;margin-top:10px;background:var(--bg-day);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day)}body.dark-mode #file-list-container{background:var(--bg-night);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}#file-list-container ul{list-style:none;padding:5px}#file-list-container li{padding:8px 15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;transition:background .2s;gap:10px}#file-list-container li:hover{background-color:rgba(0,0,0,0.05)}body.dark-mode #file-list-container li:hover{background-color:rgba(255,255,255,0.08)}#file-list-status{text-align:center;color:#889;padding:30px 10px}.file-info{flex-grow:1;cursor:pointer;min-width:0}.file-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px}.file-timestamp{font-size:12px;font-weight:300;color:#9A86A4}.delete-btn{background:transparent;border:none;cursor:pointer;padding:0;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s,color .2s;color:#bbb;font-size:22px;font-weight:bold;line-height:1}.delete-btn:hover{background:#f0f0f0;color:#e53e3e}body.dark-mode .delete-btn{color:#889}body.dark-mode .delete-btn:hover{background:rgba(255,255,255,0.1);color:#fc8181}
+        #file-list-container{flex-grow:1;overflow-y:auto;border-radius:10px;padding:5px;margin-top:10px;background:var(--bg-day-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day)}body.dark-mode #file-list-container{background:var(--bg-night-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}#file-list-container ul{list-style:none;padding:5px}#file-list-container li{padding:8px 15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;transition:background .2s;gap:10px}#file-list-container li:hover{background-color:rgba(0,0,0,0.05)}body.dark-mode #file-list-container li:hover{background-color:rgba(255,255,255,0.08)}#file-list-status{text-align:center;color:#889;padding:30px 10px}.file-info{flex-grow:1;cursor:pointer;min-width:0}.file-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px}.file-timestamp{font-size:12px;font-weight:300;color:#9A86A4}.delete-btn{background:transparent;border:none;cursor:pointer;padding:0;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s,color .2s;color:#bbb;font-size:22px;font-weight:bold;line-height:1}.delete-btn:hover{background:#f0f0f0;color:#e53e3e}body.dark-mode .delete-btn{color:#889}body.dark-mode .delete-btn:hover{background:rgba(255,255,255,0.1);color:#fc8181}
         #settingsModal .modal-content,#addNavModal .modal-content, #syncModal .modal-content {max-width:400px}
         #settingsModal .modal-body .form-section,#addNavModal .modal-body .form-section{display:flex;flex-direction:column;gap:8px}#settingsModal label,#addNavModal label{font-size:14px;color:#5a6778}body.dark-mode #settingsModal label,body.dark-mode #addNavModal label{color:#c0c6cc}
-        .nav-type-selector-wrapper { position: relative; } .nav-type-selector-wrapper input[name="nav-type"] { display: none; }
-        .nav-type-selector { position: relative; display: flex; border-radius: 12px; padding: 5px; background:var(--bg-day); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); } body.dark-mode .nav-type-selector { background:var(--bg-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
-        .nav-type-selector::before { content: ""; position: absolute; top: 5px; bottom: 5px; width: calc(50% - 5px); background: var(--bg-day); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); border-radius: 8px; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 0; transform: translateX(0); } body.dark-mode .nav-type-selector::before { background: var(--bg-night); box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); }
-        .nav-type-selector-wrapper #type-upload:checked ~ .nav-type-selector::before { transform: translateX(100%); }
-        .nav-type-selector label { position: relative; z-index: 1; flex: 1; text-align: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: color .3s ease; font-weight: 600; color: #889; } 
-        .nav-type-selector-wrapper input[name="nav-type"]:checked + label { color: var(--hold-border); }
+        .segmented-control { position: relative; display: flex; border-radius: 12px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
+        body.dark-mode .segmented-control { background:var(--bg-night-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
+        .segmented-control label { position: relative; z-index: 1; flex: 1; text-align: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: color .3s ease; font-weight: 600; color: #889; font-size: 14px; }
+        .segmented-control .slider-indicator { position: absolute; top: 5px; left: 5px; bottom: 5px; background: var(--bg-day-element); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); border-radius: 8px; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 0; }
+        body.dark-mode .segmented-control .slider-indicator { background: var(--bg-night-element); box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); }
+        #addNavModal input[type="radio"]:checked + label, #helpModal input[type="radio"]:checked + label { color: var(--hold-border); }
+        #type-upload:checked ~ .slider-indicator { transform: translateX(100%); }
+        .segmented-control.two-segments .slider-indicator { width: calc(50% - 5px); }
+        .segmented-control.three-segments .slider-indicator { width: calc(33.33% - 4px); }
         #addNavModal .status-text{text-align:center;font-size:14px;color:#889;min-height:20px} #addNavModal .modal-header { gap: 10px; } #addNavModal .modal-title-group { flex-grow: 1; }
         .header-toggle-group { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: normal; color: #5a6778; } body.dark-mode .header-toggle-group { color: #c0c6cc; }
         .file-select-wrapper { display: flex; align-items: center; gap: 10px; width: 100%; } .file-select-wrapper .modal-button { flex-shrink: 0; width: auto; padding: 10px 15px; font-size: 14px; }
         .file-select-wrapper .status-text { flex-grow: 1; font-size: 14px; color: #889; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         #syncModal .file-upload-section { display: flex; flex-direction: column; gap: 10px; } #syncModal input[type="file"] { display: none; }
-        #syncModal .progress-container { display: none; height: 12px; background-color: var(--bg-day); border-radius: 6px; box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day); padding: 2px; } body.dark-mode #syncModal .progress-container { box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night); }
+        #syncModal .progress-container { display: none; height: 12px; background:var(--bg-day-element); border-radius: 6px; box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day); padding: 2px; } body.dark-mode #syncModal .progress-container { box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night); }
         #syncModal .progress-bar { width: 0%; height: 100%; border-radius: 4px; background-color: #707899; transition: width 0.2s linear; }
-        /* == New Iframe Modal Styles == */
+        #helpModal .modal-body { gap: 0; padding-top: 15px; } #helpModal .modal-body > input[name="help-tab"] { display: none; } #help-tab-2:checked ~ .segmented-control .slider-indicator { transform: translateX(100%); } #help-tab-3:checked ~ .segmented-control .slider-indicator { transform: translateX(200%); }
+        .help-page-content { display: none; padding: 15px 5px 0 5px; overflow-x: hidden; }
+        #help-tab-1:checked ~ .help-content-wrapper > #help-page-1, #help-tab-2:checked ~ .help-content-wrapper > #help-page-2, #help-tab-3:checked ~ .help-content-wrapper > #help-page-3 { display: block; }
+        .help-page-content h3 { font-size: 1.3em; margin: 20px 0 10px 0; padding-bottom: 5px; border-bottom: 1px solid rgba(128,128,128,0.3); } .help-page-content h4 { font-size: 1.1em; margin: 18px 0 8px 0; }
+        .help-page-content p, .help-page-content li, .help-page-content a { line-height: 1.7; color: #4a5568; margin-bottom: 8px; word-wrap: break-word; }
+        body.dark-mode .help-page-content p, body.dark-mode .help-page-content li, body.dark-mode .help-page-content a { color: #a0aec0; }
+        .help-page-content ul, .help-page-content ol { padding-left: 25px; } .help-page-content ol li { margin-bottom: 12px; }
+        .help-page-content strong { color: var(--hold-border); font-weight: 600; } .help-page-content code { background-color: rgba(128,128,128,0.15); padding: 2px 5px; border-radius: 4px; font-family: monospace; word-wrap: break-word; }
+        .help-page-content a { color: var(--hold-border); text-decoration: none; font-weight: 600; } .help-page-content a:hover { text-decoration: underline; }
+        .help-page-content .warning { background-color: rgba(229, 62, 62, 0.1); border-left: 4px solid #e53e3e; padding: 10px 15px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        .help-page-content .important-note { background-color: rgba(91, 153, 226, 0.1); border-left: 4px solid var(--hold-border); padding: 10px 15px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+        /* == Iframe Modal & Confirmation Toast Styles == */
         .iframe-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
         .iframe-modal-overlay.active { transform: translateX(0); }
         .iframe-modal-content { width: 100%; height: 100%; background: #fff; box-shadow: -5px 0 15px rgba(0,0,0,0.2); transition: transform 0.3s ease-out; }
@@ -102,14 +135,20 @@
         .swipe-hint.show { opacity: 1; }
         .swipe-hint .arrow { width: 16px; height: 16px; border-right: 3px solid white; border-bottom: 3px solid white; transform: rotate(-45deg); animation: hint-pulse 1.5s infinite; margin-right: 10px; }
         @keyframes hint-pulse { 0% { opacity: 0.3; } 50% { opacity: 1; transform: rotate(-45deg) scale(1.1); } 100% { opacity: 0.3; } }
-        @media (max-width: 480px) { .editable-title { font-size: 26px; } .editable-subtitle { font-size: 14px; } .title-card { padding: 30px 15px; } .nav-container { grid-template-columns: 1fr 1fr; gap: 18px; padding: 10px; } .nav-btn { padding: 18px 10px; font-size: 15px; } .fab-container { right: 20px; bottom: 20px; } .fab-main, .fab-drawer-item { width: 44px; height: 44px; font-size: 20px; } .fab-drawer { bottom: 55px; } }
+        #gestureCaptureZone { position: fixed; top: 0; left: 0; width: 50px; height: 100%; z-index: 2002; }
+        #returnConfirmationToast { position: fixed; top: 0; left: 50%; transform: translate(-50%, -120%); width: calc(100% - 30px); max-width: 400px; background: var(--bg-night-element); color: var(--text-night); padding: 12px 16px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 2003; display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
+        #returnConfirmationToast.show { transform: translate(-50%, 0); }
+        .toast-btn { background: transparent; border: none; color: white; font-size: 15px; font-weight: 600; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+        .toast-btn-confirm { background-color: rgba(99, 179, 237, 0.8); } .toast-btn-confirm:hover { background-color: rgba(99, 179, 237, 1); }
+        .toast-btn-cancel { background-color: rgba(255, 255, 255, 0.2); } .toast-btn-cancel:hover { background-color: rgba(255, 255, 255, 0.3); }
+        @media (max-width: 480px) { .editable-title { font-size: 28px; } .editable-subtitle { font-size: 14px; } .title-card { padding: 30px 15px; } .nav-container { grid-template-columns: 1fr 1fr; gap: 18px; padding: 10px; } .nav-btn { padding: 18px 10px; font-size: 15px; } .fab-container { right: 20px; bottom: 20px; } .fab-main, .fab-drawer-item { width: 44px; height: 44px; font-size: 20px; } .fab-drawer { bottom: 55px; } .segmented-control label { font-size: 13px; padding: 8px 5px; } }
     </style>
 </head>
 <body>
     <div class="page-overlay" id="pageOverlay"></div>
     <div class="title-card">
-        <h1 class="editable-title" id="title">Jellyfish中心</h1>
-        <div class="editable-subtitle" id="subtitle">点击即可跳转 | By淡季水母</div>
+        <h1 class="editable-title" id="title">JellyfishCenter</h1>
+        <div class="editable-subtitle" id="subtitle">长按🌞打开工具栏 | By淡季水母</div>
     </div>
     <div class="nav-container" id="navContainer">
         <p id="loading-status" style="text-align: center; color: #889; width: 100%;">正在从云端加载配置...</p>
@@ -117,6 +156,7 @@
 
     <div class="fab-container" id="fabContainer">
         <div class="fab-drawer" id="fabDrawer">
+            <button class="fab-drawer-item" id="helpBtn" title="使用指南">❔</button>
             <button class="fab-drawer-item" id="syncBtn" title="数据云盘">☁️<span id="sync-status-indicator" title="云同步状态"></span></button>
             <button class="fab-drawer-item" id="addNavBtn" title="管理小手机">📱</button>
             <button class="fab-drawer-item" id="colorBtn" title="主题设置">🎨</button>
@@ -125,50 +165,78 @@
     </div>
     
     <!-- Modals -->
-    <div class="modal-overlay" id="syncErrorModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>⚠️ 同步失败</span></div><button class="close-btn" data-modal-id="syncErrorModal">&times;</button></div><div class="modal-body"><p>无法连接到云端。请检查您的网络连接或GitHub配置。</p><p><strong>失败原因:</strong></p><div id="sync-error-message"></div><button id="forceSyncBtn" class="modal-button" style="margin-top: 20px;">强制同步</button></div></div></div>
-    <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>管理小手机</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入管理模式</button><div class="nav-type-selector-wrapper"><input type="radio" id="type-link" name="nav-type" value="link" checked><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload"><label for="type-upload">上传项目</label><div class="nav-type-selector"></div></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section" class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目文件夹</label><div class="file-select-wrapper"><button id="folderPickerBtn" class="modal-button">选择文件夹</button><span id="folder-picker-status" class="status-text">未选择任何文件夹</span></div></div><button id="createNavBtn" class="modal-button">加入新手机</button><div class="status-text" id="upload-status"></div></div></div></div>
-    <div class="modal-overlay" id="syncModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据云盘</span><button class="settings-btn" id="settingsBtn" title="设置GitHub信息">⚙️</button></div><button class="close-btn" data-modal-id="syncModal">&times;</button></div><div class="modal-body"><select id="buttonSelector" class="modal-select"></select><div class="file-upload-section"><input type="file" id="fileUploader"><div class="file-select-wrapper"><button id="selectFileBtn" class="modal-button">选择文件</button><span id="selectedFileName" class="status-text">未选择任何文件</span></div><input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）"><button id="uploadBtn" class="modal-button">上传文件</button><div id="progressContainer" class="progress-container"><div id="uploadProgressBar" class="progress-bar"></div></div></div><div id="file-list-container"><ul id="fileList"></ul><div id="fileListStatus" class="file-list-status">请选择一个分类</div></div></div></div></div>
-    <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>GitHub 配置</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/my-repo"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button></div></div></div>
-    <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body"><div class="color-picker-grid"><div class="color-picker-group"><label>日间模式 - 渐变1</label><div class="color-input-wrapper"><input type="color" id="dayColor1Picker"><span class="hex-display" id="dayColor1Hex"></span></div></div><div class="color-picker-group"><label>日间模式 - 渐变2</label><div class="color-input-wrapper"><input type="color" id="dayColor2Picker"><span class="hex-display" id="dayColor2Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 渐变1</label><div class="color-input-wrapper"><input type="color" id="nightColor1Picker"><span class="hex-display" id="nightColor1Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 渐变2</label><div class="color-input-wrapper"><input type="color" id="nightColor2Picker"><span class="hex-display" id="nightColor2Hex"></span></div></div></div><div class="preview-container"><div class="preview-box" id="dayPreview" data-label="Day"></div><div class="preview-box" id="nightPreview" data-label="Night"></div></div><div class="preset-manager"><div class="preset-row"><input type="text" id="presetNameInput" class="modal-input" placeholder="为当前配色命名"><button id="savePresetBtn" class="modal-button save">保存</button><button id="updatePresetBtn" class="modal-button">更新</button></div><div class="preset-row"><select id="presetSelector" class="modal-select"></select><button id="deletePresetBtn" class="modal-button delete">删除</button></div></div><div class="random-toggle-section"><span>每次启动时随机应用预设</span><label class="toggle-switch"><input type="checkbox" id="randomPaletteToggle"><span class="slider"></span></label></div></div></div></div>
+    <div class="modal-overlay" id="helpModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>使用指南</span></div><button class="close-btn" data-modal-id="helpModal">&times;</button></div><div class="modal-body">
+        <input type="radio" id="help-tab-1" name="help-tab" value="setup" checked>
+        <input type="radio" id="help-tab-2" name="help-tab" value="features">
+        <input type="radio" id="help-tab-3" name="help-tab" value="disclaimer">
 
-    <!-- == NEW: Iframe Modal for In-App Browser == -->
+        <div class="segmented-control three-segments">
+            <label for="help-tab-1">首次配置</label>
+            <label for="help-tab-2">功能详解</label>
+            <label for="help-tab-3">免责声明</label>
+            <div class="slider-indicator"></div>
+        </div>
+        <div class="help-content-wrapper">
+            <div id="help-page-1" class="help-page-content">
+                <h3>从零开始 (必需)</h3><p>此流程将创建一个安全的“钥匙”(PAT)和两个云端“仓库”（一个用于代码，一个用于数据），让本应用可以为您安全地存储和同步所有数据。</p>
+                <h4>步骤 1：创建 GitHub 个人访问令牌 (PAT)</h4><p>这个令牌是应用访问您私人云仓库的专属安全密码。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub Token 创建页面</a>。</li><li><strong>填写基本信息</strong>：备注(Note)填写 <code>JellyfishCenterToken</code>，有效期(Expiration)选择 <code>No expiration</code> (永不过期)。</li><li><strong>分配权限 (关键)</strong>：只需 <strong>勾选 <code>repo</code></strong> 这一项。</li><li><strong>生成并复制</strong>：滑动到页面最底部，点击 <strong><code>Generate token</code></strong> 按钮。<strong>【❗极其重要❗】</strong> GitHub 只会显示这一次完整的 Token。请 <strong>立即点击复制按钮</strong> 将其保存到安全的地方，下一步会马上用到。它应该以 <code>ghp_</code> 开头。</li></ol>
+                <h4>步骤 2：复刻 (Fork) 应用代码仓库</h4><p>此步骤会将应用的核心代码复制一份到您的账户下，用于网站托管服务（如Netlify）进行构建。</p><ol><li><strong>访问仓库页面</strong>：在浏览器中打开 <a href="https://github.com/Yeexein/JellyfishPhones" target="_blank" rel="noopener noreferrer">https://github.com/Yeexein/JellyfishPhones</a>。</li><li><strong>执行 Fork 操作</strong>：<ul><li><strong>电脑端</strong>：在页面右上角，您会看到 `Watch`、`Fork`、`Star` 等按钮。点击 <strong><code>Fork</code></strong>。</li><li><strong>手机端</strong>：在页面顶部仓库名称下方，找到并点击 <strong><code>...</code> (更多选项)</strong> 菜单，然后在弹出的菜单中选择 <strong><code>Fork</code></strong>。</li></ul></li><li><strong>完成复刻</strong>：在接下来的页面中，您无需修改任何设置。直接点击 <strong><code>Create fork</code></strong> 按钮即可。</li></ol>
+                <h4>步骤 3：创建私人数据仓库</h4><p>此步骤将创建一个独立的、完全私密的仓库，专门用来存放您的所有配置和文件。这可以避免因数据更新导致网站被频繁重新构建，是**一劳永逸的最佳实践**。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub 仓库创建页面</a>。</li><li><strong>填写仓库信息</strong>：<ul><li><strong>Repository name (仓库名称)</strong>：起一个清晰的名字，例如 <code>My-Jellyfish-Data</code>。</li><li><strong>关键：选择 <code>Private</code> (私有)</strong>。这是您的私人数据，必须设为私有。</li><li><strong>勾选 <code>Add a README file</code></strong>：确保仓库被成功初始化。</li></ul></li><li><strong>点击 <code>Create repository</code></strong> 按钮完成创建。</li></ol>
+                <h4>步骤 4：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌙 按钮展开菜单 → 点击 <strong>☁️ (数据云盘)</strong> → 点击标题旁的 <strong>⚙️ (设置)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤3</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，并采用了最高效的架构。</p>
+            </div>
+            <div id="help-page-2" class="help-page-content">
+                <h3>功能详解</h3><h4>1. 导航管理</h4><p><strong>添加新手机</strong>：长按主菜单 → 点击 📱 图标。可选择添加`外部链接`或`上传项目`。</p><p><strong>管理与删除</strong>：在“管理小手机”弹窗内，点击`进入管理模式`，即可对现有按钮进行**拖动排序**或点击`×`进行删除。</p><h4>2. 主题与个性化</h4><p><strong>实时调色</strong>：长按主菜单 → 点击 🎨 图标。可实时调整日间/夜间模式的背景渐变色。</p><p><strong>色彩预设</strong>：您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能。</p><h4>3. 文件云盘与同步状态</h4><p><strong>访问与管理</strong>：长按主菜单 → 点击 ☁️ 图标。您可以分门别类地管理与“上传项目”相关联的所有文件。建议用来存储备份文件。</p><p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p><ul><li><strong>🟢 绿点</strong>: `已同步` - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: `同步中` - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: `同步失败` - 发生错误，请点击图标查看失败原因，通常是网络问题或PAT失效。</li></ul><h4>4. 基础操作</h4><p><strong>编辑标题</strong>：直接点击页面上的主标题或副标题即可修改。</p><p><strong>访问链接与返回</strong>：对于外部链接，会在应用内全屏打开。您可以从屏幕**最左侧边缘向右滑动**来关闭当前页面并返回中心。</p><p><strong>切换主题</strong>：**单击 (短按)** 右下角的 🌞/🌙 按钮。</p><h4>5. 危险区域</h4><div class="warning"><p><strong>清空所有数据</strong>：在 `GitHub 配置` (⚙️) 弹窗的最下方。此操作会 **永久删除** 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
+            </div>
+            <div id="help-page-3" class="help-page-content">
+                <h3>免责声明与使用条款</h3><h4>1. 服务条款</h4><p>本应用 (JellyfishCenter) 按“现状”提供，不附带任何明示或暗示的保证。开发者不保证应用的持续可用性、功能完整性或无错误。所有因使用本应用导致的直接或间接风险与责任，均由用户自行承担。</p><h4>2. 数据安全</h4><p>用户需自行负责其GitHub个人访问令牌 (PAT) 的安全保管。任何因PAT泄露导致的数据丢失、篡改或账户安全问题，开发者概不负责。强烈建议为本应用创建独立的、具有最小必要权限 (<code>repo</code>) 的PAT。</p><h4>3. 知识产权与版权责任</h4><div class="important-note"><p>本应用可能被用于托管或链接至第三方项目（“小手机”）。用户必须对所上传或链接的内容负全部法律责任，并确保拥有展示、使用和分发该内容的合法权利。<strong>用户必须尊重所有原创作者的知识产权，不得侵犯他人版权。</strong></p></div><h4>4. 使用与分发限制</h4><div class="warning"><p>本项目 (JellyfishCenter) 及其源代码仅供个人非商业性使用。严禁以下行为：</p><ul><li>对本项目的源代码进行任何形式的二次修改、再分发或公开发布（即“二传二改”）。</li><li>公开或私下分享通过本应用“上传项目”功能生成的任何网页链接或文件。此行为可能构成对原创内容的未授权分发。</li></ul></div><p>继续使用本应用，即表示您已阅读、理解并同意上述所有条款。</p>
+            </div>
+        </div>
+    </div></div></div>
+    <div class="modal-overlay" id="syncErrorModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>⚠️ 同步失败</span></div><button class="close-btn" data-modal-id="syncErrorModal">&times;</button></div><div class="modal-body"><p>无法连接到云端。请检查您的网络连接或GitHub配置。</p><p><strong>失败原因:</strong></p><div id="sync-error-message"></div></div></div></div>
+    <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>管理小手机</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入管理模式</button><div class="segmented-control two-segments"><input type="radio" id="type-link" name="nav-type" value="link" checked hidden><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload" hidden><label for="type-upload">上传项目</label><div class="slider-indicator"></div></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section" class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div></div><button id="createNavBtn" class="modal-button">加入新手机</button><div class="status-text" id="upload-status"></div></div></div></div>
+    <div class="modal-overlay" id="syncModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据云盘</span><button class="settings-btn" id="settingsBtn" title="设置GitHub信息">⚙️</button></div><button class="close-btn" data-modal-id="syncModal">&times;</button></div><div class="modal-body"><select id="buttonSelector" class="modal-select"></select><div class="file-upload-section"><input type="file" id="fileUploader"><div class="file-select-wrapper"><button id="selectFileBtn" class="modal-button">选择文件</button><span id="selectedFileName" class="status-text">未选择任何文件</span></div><input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）"><button id="uploadBtn" class="modal-button">上传文件</button><div id="progressContainer" class="progress-container"><div id="uploadProgressBar" class="progress-bar"></div></div></div><div id="file-list-container"><ul id="fileList"></ul><div id="fileListStatus" class="file-list-status">请选择一个分类</div></div></div></div></div>
+    <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>GitHub 配置</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button><div class="nuke-section"><button id="nukeDataBtn" class="modal-button">清空所有云端及本地数据</button></div></div></div></div>
+    <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body"><div class="color-picker-grid"><div class="color-picker-group"><label>日间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="dayColor1Picker"><span class="hex-display" id="dayColor1Hex"></span></div></div><div class="color-picker-group"><label>日间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="dayColor2Picker"><span class="hex-display" id="dayColor2Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="nightColor1Picker"><span class="hex-display" id="nightColor1Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="nightColor2Picker"><span class="hex-display" id="nightColor2Hex"></span></div></div></div><div class="preview-container"><div class="preview-box" id="dayPreview" data-label="Day"></div><div class="preview-box" id="nightPreview" data-label="Night"></div></div><div class="preset-manager"><div class="preset-row"><input type="text" id="presetNameInput" class="modal-input" placeholder="为当前配色命名"><button id="savePresetBtn" class="modal-button save">保存</button><button id="updatePresetBtn" class="modal-button">更新</button></div><div class="preset-row"><select id="presetSelector" class="modal-select"></select><button id="deletePresetBtn" class="modal-button delete">删除</button></div></div><div class="random-toggle-section"><span>每次启动时随机应用预设</span><label class="toggle-switch"><input type="checkbox" id="randomPaletteToggle"><span class="slider"></span></label></div></div></div></div>
+
+    <!-- == Iframe Modal & Confirmation Toast == -->
     <div class="iframe-modal-overlay" id="iframeModal">
+        <div id="returnConfirmationToast" class="return-toast">
+            <span>返回 JellyfishCenter?</span>
+            <div>
+                <button id="cancelReturnBtn" class="toast-btn toast-btn-cancel">取消</button>
+                <button id="confirmReturnBtn" class="toast-btn toast-btn-confirm">确认</button>
+            </div>
+        </div>
         <div class="iframe-modal-content">
             <iframe id="iframeContent" src="about:blank" frameborder="0" allow="fullscreen" sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts"></iframe>
         </div>
-        <div class="swipe-hint" id="swipeHint">
-            <div class="arrow"></div>
-            <span>向右滑动关闭</span>
-        </div>
+        <div id="gestureCaptureZone"></div>
+        <div class="swipe-hint" id="swipeHint"><div class="arrow"></div><span>向右滑动关闭</span></div>
     </div>
 
-
     <script>
-    // [JS - V7.3.0 "Gesture Navigation Update"]
-    let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false, isLongPress = false;
-    let longPressTimer = null, sourceBtn = null, targetBtn = null, localDirectoryHandle = null;
-    const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
-    const syncStatusIndicator = document.getElementById('sync-status-indicator');
-    const syncErrorModal = document.getElementById('syncErrorModal');
-    // New Iframe Modal Elements
-    const iframeModal = document.getElementById('iframeModal');
-    const iframeModalContent = iframeModal.querySelector('.iframe-modal-content');
-    const iframeEl = document.getElementById('iframeContent');
-    const swipeHint = document.getElementById('swipeHint');
+    // [JS - V8.5.0 "Compatibility & Drag-n-Drop"]
+    var GITHUB_CONFIG = {}, configSha = null, isManagementMode = false, isLongPress = false;
+    var longPressTimer = null, projectFile = null, draggedBtn = null;
+    var navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
+    var syncStatusIndicator = document.getElementById('sync-status-indicator');
+    var syncErrorModal = document.getElementById('syncErrorModal');
+    var iframeModal = document.getElementById('iframeModal'), iframeModalContent = iframeModal.querySelector('.iframe-modal-content'), iframeEl = document.getElementById('iframeContent'), swipeHint = document.getElementById('swipeHint'), returnConfirmationToast = document.getElementById('returnConfirmationToast');
 
-    const getDefaultConfig = () => ({ title: 'Jellyfish中心', subtitle: '点击即可跳转 | By淡季水母', buttons: [], themePresets: [] });
-    let currentConfig = getDefaultConfig();
+    var getDefaultConfig = function() { return { title: 'JellyfishCenter', subtitle: '长按🌞打开工具栏 | By淡季水母', buttons: [], themePresets: [] }; };
+    var currentConfig = getDefaultConfig();
     
-    const utf8_to_b64 = (str) => btoa(unescape(encodeURIComponent(str)));
-    const b64_to_utf8 = (str) => decodeURIComponent(escape(atob(str)));
+    var utf8_to_b64 = function(str) { return btoa(unescape(encodeURIComponent(str))); };
+    var b6_to_utf8 = function(str) { return decodeURIComponent(escape(atob(str))); };
 
-    let syncStatusTimeout;
-    function updateSyncStatus(status, message = '') {
+    var syncStatusTimeout;
+    function updateSyncStatus(status, message) {
+        message = message || '云同步状态: ' + status;
         syncStatusIndicator.className = status;
-        syncStatusIndicator.title = message || `云同步状态: ${status}`;
+        syncStatusIndicator.title = message;
         clearTimeout(syncStatusTimeout);
         if (status === 'synced') {
-            syncStatusTimeout = setTimeout(() => {
+            syncStatusTimeout = setTimeout(function() {
                 syncStatusIndicator.className = '';
                 syncStatusIndicator.title = '云同步状态: 已同步';
             }, 3000);
@@ -179,204 +247,599 @@
         }
     }
 
-    const withCacheBust = (url) => `${url}${url.includes('?') ? '&' : '?'}v=${Date.now()}`;
+    var withCacheBust = function(url) { return url + (url.indexOf('?') > -1 ? '&' : '?') + 'v=' + Date.now(); };
     
-    async function fetchConfigFromGithub() {
-        if (!checkConfig(false)) return getDefaultConfig();
+    function fetchConfigFromGithub() {
+        if (!checkConfig(false)) return Promise.resolve(getDefaultConfig());
         updateSyncStatus('syncing', '正在从云端读取配置...');
-        const url = withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/config.json`);
-        try {
-            const response = await fetch(url, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` } });
-            if (response.status === 404) {
-                console.log('Config.json not found. Auto-creating it now.'); configSha = null;
-                await saveGlobalConfig('Auto-create initial config.json');
+        var url = withCacheBust('https://api.github.com/repos/' + GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo + '/contents/config.json');
+        
+        return fetch(url, { headers: { 'Authorization': 'token ' + GITHUB_CONFIG.token } })
+            .then(function(response) {
+                if (response.status === 404) {
+                    console.log('Config.json not found. Auto-creating it now.'); configSha = null;
+                    return saveGlobalConfig('Auto-create initial config.json').then(function() {
+                        return getDefaultConfig();
+                    });
+                }
+                if (!response.ok) throw new Error(response.status + ': ' + response.statusText);
+                return response.json();
+            })
+            .then(function(data) {
+                if (!data) return getDefaultConfig();
+                configSha = data.sha;
+                updateSyncStatus('synced', '配置读取成功');
+                return JSON.parse(b6_to_utf8(data.content));
+            })
+            .catch(function(error) {
+                console.error('Failed to fetch config from GitHub:', error);
+                updateSyncStatus('error', '读取失败: ' + error.message);
                 return getDefaultConfig();
-            }
-            if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
-            const data = await response.json();
-            configSha = data.sha;
-            updateSyncStatus('synced', '配置读取成功');
-            return JSON.parse(b64_to_utf8(data.content));
-        } catch (error) {
-            console.error('Failed to fetch config from GitHub:', error);
-            updateSyncStatus('error', `读取失败: ${error.message}`);
-            return getDefaultConfig();
-        }
+            });
     }
 
-    async function saveGlobalConfig(commitMessage) {
-        if (!checkConfig(true)) { updateSyncStatus('error', '配置不完整，无法同步。'); return; }
-        updateSyncStatus('syncing', `正在同步: ${commitMessage}`);
-        const url = withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/config.json`);
-        const content = utf8_to_b64(JSON.stringify(currentConfig, null, 2));
-        const body = { message: commitMessage, content: content, branch: 'main' };
+    function saveGlobalConfig(commitMessage) {
+        if (!checkConfig(true)) { updateSyncStatus('error', '配置不完整，无法同步。'); return Promise.resolve(); }
+        updateSyncStatus('syncing', '正在同步: ' + commitMessage);
+        var url = withCacheBust('https://api.github.com/repos/' + GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo + '/contents/config.json');
+        var content = utf8_to_b64(JSON.stringify(currentConfig, null, 2));
+        var body = { message: commitMessage, content: content, branch: 'main' };
         if (configSha) { body.sha = configSha; }
-        try {
-            const response = await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, body: JSON.stringify(body) });
-            if (!response.ok) {
-                 const errorData = await response.json().catch(() => ({ message: response.statusText }));
-                 throw new Error(`${response.status}: ${errorData.message}`);
+
+        return fetch(url, { method: 'PUT', headers: { 'Authorization': 'token ' + GITHUB_CONFIG.token }, body: JSON.stringify(body) })
+            .then(function(response) {
+                if (!response.ok) {
+                    return response.json().catch(function() { return { message: response.statusText }; })
+                        .then(function(errorData) {
+                            throw new Error(response.status + ': ' + errorData.message);
+                        });
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                configSha = data.content.sha;
+                console.log('Global configuration saved successfully.');
+                updateSyncStatus('synced', '同步成功！');
+            })
+            .catch(function(error) {
+                console.error('Failed to save config to GitHub:', error);
+                updateSyncStatus('error', '写入失败: ' + error.message);
+            });
+    }
+
+    function setupDragAndDropListeners(btn) {
+        btn.setAttribute('draggable', true);
+        btn.addEventListener('dragstart', handleDragStart, false);
+        btn.addEventListener('dragover', handleDragOver, false);
+        btn.addEventListener('dragleave', handleDragLeave, false);
+        btn.addEventListener('drop', handleDrop, false);
+        btn.addEventListener('dragend', handleDragEnd, false);
+    }
+
+    function removeDragAndDropListeners(btn) {
+        btn.setAttribute('draggable', false);
+        btn.removeEventListener('dragstart', handleDragStart, false);
+        btn.removeEventListener('dragover', handleDragOver, false);
+        btn.removeEventListener('dragleave', handleDragLeave, false);
+        btn.removeEventListener('drop', handleDrop, false);
+        btn.removeEventListener('dragend', handleDragEnd, false);
+    }
+
+    function handleDragStart(e) {
+        draggedBtn = this;
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', this.innerHTML);
+        setTimeout(function() { draggedBtn.classList.add('dragging'); }, 0);
+    }
+    
+    function handleDragOver(e) {
+        if (e.preventDefault) { e.preventDefault(); }
+        e.dataTransfer.dropEffect = 'move';
+        if (this !== draggedBtn) { this.classList.add('drag-over'); }
+        return false;
+    }
+    
+    function handleDragLeave(e) { this.classList.remove('drag-over'); }
+    
+    function handleDrop(e) {
+        if (e.stopPropagation) { e.stopPropagation(); }
+        this.classList.remove('drag-over');
+        if (draggedBtn !== this) {
+            var draggedIndex = Array.prototype.indexOf.call(navContainer.children, draggedBtn);
+            var targetIndex = Array.prototype.indexOf.call(navContainer.children, this);
+            if (draggedIndex < targetIndex) {
+                navContainer.insertBefore(draggedBtn, this.nextSibling);
+            } else {
+                navContainer.insertBefore(draggedBtn, this);
             }
-            const data = await response.json();
-            configSha = data.content.sha;
-            console.log('Global configuration saved successfully.');
-            updateSyncStatus('synced', '同步成功！');
-        } catch (error) {
-            console.error('Failed to save config to GitHub:', error);
-            updateSyncStatus('error', `写入失败: ${error.message}`);
+            updateButtonOrderAndSave('Reorder buttons');
+        }
+        return false;
+    }
+    
+    function handleDragEnd(e) {
+        this.classList.remove('dragging');
+        var allBtns = document.querySelectorAll('.nav-btn');
+        for (var i = 0; i < allBtns.length; i++) {
+            allBtns[i].classList.remove('drag-over');
         }
     }
-    document.getElementById('forceSyncBtn').addEventListener('click', () => saveGlobalConfig('Manual force sync'));
     
-    function toggleManagementMode(forceState) { isManagementMode = forceState !== undefined ? forceState : !isManagementMode; pageOverlay.classList.toggle('show', isManagementMode); pageOverlay.classList.toggle('management-overlay', isManagementMode); document.body.classList.toggle('management-active', isManagementMode); document.querySelectorAll('.nav-btn').forEach(btn => { const deleteIcon = btn.querySelector('.delete-icon'); if (isManagementMode && !deleteIcon) { const icon = document.createElement('span'); icon.className = 'delete-icon'; icon.innerHTML = '&times;'; icon.title = '删除此按钮'; btn.appendChild(icon); } else if (!isManagementMode && deleteIcon) { deleteIcon.remove(); } }); }
-    pageOverlay.addEventListener('click', (e) => { if (isManagementMode && !e.target.closest('.nav-btn')) { toggleManagementMode(false); } if (fabContainer.classList.contains('active')) { toggleFabMenu(false); } });
-    const fabContainer = document.getElementById('fabContainer'), fabMainBtn = document.getElementById('themeBtn');
-    let fabPressTimer = null, isFabLongPress = false;
-    function toggleFabMenu(forceState) { const isActive = forceState !== undefined ? forceState : !fabContainer.classList.contains('active'); fabContainer.classList.toggle('active', isActive); if (!isManagementMode) pageOverlay.classList.toggle('show', isActive); }
-    fabMainBtn.addEventListener('mousedown', (e) => { e.preventDefault(); isFabLongPress = false; fabPressTimer = setTimeout(() => { isFabLongPress = true; toggleFabMenu(true); }, 300); });
-    fabMainBtn.addEventListener('mouseup', () => { clearTimeout(fabPressTimer); if (!isFabLongPress) { fabContainer.classList.contains('active') ? toggleFabMenu(false) : toggleTheme(); } });
-    fabMainBtn.addEventListener('contextmenu', e => e.preventDefault());
-    fabMainBtn.addEventListener('touchstart', e => { e.preventDefault(); fabMainBtn.dispatchEvent(new MouseEvent('mousedown')); }, { passive: false });
-    fabMainBtn.addEventListener('touchend', e => { e.preventDefault(); fabMainBtn.dispatchEvent(new MouseEvent('mouseup')); }, { passive: false });
-    function clearHoldClass() { document.querySelectorAll('.nav-btn.hold').forEach(btn => btn.classList.remove('hold')); }
-    async function swapButtons(a, b) { if (!a || !b || a === b) return; const parent = a.parentNode; const aNext = a.nextSibling; const bNext = b.nextSibling; if (aNext === b) { parent.insertBefore(b, a); } else if (bNext === a) { parent.insertBefore(a, b); } else { parent.insertBefore(b, aNext); parent.insertBefore(a, bNext); } updateButtonOrderAndSave('Reorder buttons'); }
-    function updateButtonOrderAndSave(commitMessage) { const newOrder = []; document.querySelectorAll('.nav-btn').forEach(btn => newOrder.push({ text: btn.textContent.replace('×', '').trim(), href: btn.dataset.href })); currentConfig.buttons = newOrder; saveGlobalConfig(commitMessage); }
-    
-    // == Modified Button Click Logic for In-App Browser ==
-    function attachButtonListeners(btn) {
-        function startDrag(e) { /* ... existing drag logic ... */ }
-        function endDrag() { /* ... existing drag logic ... */ }
-        btn.addEventListener('mousedown', startDrag); btn.addEventListener('touchstart', startDrag);
-        btn.addEventListener('mouseup', endDrag); btn.addEventListener('touchend', endDrag); btn.addEventListener('touchcancel', endDrag);
-
-        btn.addEventListener('click', function(e) {
-            if (isManagementMode || isLongPress) {
-                e.preventDefault();
-                return;
-            }
-            const href = this.dataset.href;
-            if (!href) return;
-
-            // If it's an external link, open in iframe modal. Otherwise, navigate directly.
-            if (href.startsWith('http')) {
-                e.preventDefault();
-                openIframeModal(href);
+    function toggleManagementMode(forceState) { 
+        isManagementMode = forceState !== undefined ? forceState : !isManagementMode; 
+        pageOverlay.classList.toggle('show', isManagementMode); 
+        pageOverlay.classList.toggle('management-overlay', isManagementMode); 
+        document.body.classList.toggle('management-active', isManagementMode); 
+        document.querySelectorAll('.nav-btn').forEach(function(btn) {
+            var deleteIcon = btn.querySelector('.delete-icon');
+            if (isManagementMode) {
+                if (!deleteIcon) {
+                    var icon = document.createElement('span'); 
+                    icon.className = 'delete-icon'; 
+                    icon.innerHTML = '&times;'; 
+                    icon.title = '删除此按钮'; 
+                    btn.appendChild(icon);
+                }
+                setupDragAndDropListeners(btn);
             } else {
-                window.location.href = href;
+                if (deleteIcon) { deleteIcon.remove(); }
+                removeDragAndDropListeners(btn);
             }
         });
     }
-
-    function detectTarget(e) { e.preventDefault(); const touch = e.type.startsWith('touch') ? e.touches[0] : e; const hoverBtn = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.nav-btn'); if (hoverBtn && hoverBtn !== sourceBtn) { if (targetBtn) targetBtn.classList.remove('hold'); targetBtn = hoverBtn; targetBtn.classList.add('hold'); } }
-    document.getElementById('enterManageModeBtn').addEventListener('click', () => { document.getElementById('addNavModal').classList.remove('show'); setTimeout(() => toggleManagementMode(true), 150); });
-    navContainer.addEventListener('click', async (e) => { if (!e.target.classList.contains('delete-icon')) return; const btnToDelete = e.target.closest('.nav-btn'); const buttonName = btnToDelete.textContent.replace('×', '').trim(); if (!confirm(`确定要删除 "${buttonName}" 吗？\n警告：如果这是上传的项目，其在GitHub上的整个文件夹都将被永久删除！`)) return; btnToDelete.style.cssText = 'transition: all 0.3s ease; transform: scale(0.8); opacity: 0;'; setTimeout(async () => { btnToDelete.remove(); const href = btnToDelete.dataset.href; const isExternalLink = href.startsWith('http'); if (!isExternalLink && href.includes('/')) { const folderPath = href.substring(0, href.lastIndexOf('/')); const success = await deleteGithubFolder(folderPath); if (!success) { alert('删除云端文件夹失败!'); location.reload(); return; } } updateButtonOrderAndSave(`Delete button: ${buttonName}`); }, 300); });
-    document.getElementById('title').addEventListener('click', () => { if(isManagementMode) return; const newTitle = prompt('新标题：', currentConfig.title); if (newTitle?.trim() && newTitle.trim() !== currentConfig.title) { document.getElementById('title').textContent = newTitle.trim(); currentConfig.title = newTitle.trim(); saveGlobalConfig('Update main title'); } });
-    document.getElementById('subtitle').addEventListener('click', () => { if(isManagementMode) return; const newSubtitle = prompt('新描述：', currentConfig.subtitle); if (newSubtitle !== null && newSubtitle.trim() !== currentConfig.subtitle) { document.getElementById('subtitle').textContent = newSubtitle.trim(); currentConfig.subtitle = newSubtitle.trim(); saveGlobalConfig('Update subtitle'); } });
-    function initTheme() { const t=localStorage.getItem('theme'); if (t==='dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.body.classList.add('dark-mode'); fabMainBtn.textContent = '🌙'; } else { fabMainBtn.textContent = '🌞'; } }
-    function toggleTheme() { document.body.classList.toggle('dark-mode'); const i=document.body.classList.contains('dark-mode'); fabMainBtn.textContent=i?'🌙':'🌞'; localStorage.setItem('theme', i?'dark':'light'); };
-    const colorModal = { pickerD1: document.getElementById('dayColor1Picker'), hexD1: document.getElementById('dayColor1Hex'), pickerD2: document.getElementById('dayColor2Picker'), hexD2: document.getElementById('dayColor2Hex'), pickerN1: document.getElementById('nightColor1Picker'), hexN1: document.getElementById('nightColor1Hex'), pickerN2: document.getElementById('nightColor2Picker'), hexN2: document.getElementById('nightColor2Hex'), presetName: document.getElementById('presetNameInput'), presetSelector: document.getElementById('presetSelector'), saveBtn: document.getElementById('savePresetBtn'), updateBtn: document.getElementById('updatePresetBtn'), deleteBtn: document.getElementById('deletePresetBtn'), randomToggle: document.getElementById('randomPaletteToggle'), dayPreview: document.getElementById('dayPreview'), nightPreview: document.getElementById('nightPreview') };
-    const root = document.documentElement; function applyColors(colors, saveToLocal = true) { Object.entries(colors).forEach(([key, value]) => { const cssVar = `--${key.replace('Color', '-color')}`; root.style.setProperty(cssVar, value); if (saveToLocal) localStorage.setItem(key, value); }); updateColorUI(colors); }
-    function updateColorUI(colors) { colorModal.pickerD1.value = colors.dayColor1; colorModal.hexD1.textContent = colors.dayColor1; colorModal.pickerD2.value = colors.dayColor2; colorModal.hexD2.textContent = colors.dayColor2; colorModal.pickerN1.value = colors.nightColor1; colorModal.hexN1.textContent = colors.nightColor1; colorModal.pickerN2.value = colors.nightColor2; colorModal.hexN2.textContent = colors.nightColor2; colorModal.dayPreview.style.background = `linear-gradient(135deg, ${colors.dayColor1}, ${colors.dayColor2})`; colorModal.nightPreview.style.background = `linear-gradient(135deg, ${colors.nightColor1}, ${colors.nightColor2})`; }
-    function getCurrentColors(fromLocalStorage = true) { const source = fromLocalStorage ? localStorage : { getItem: (key) => getComputedStyle(root).getPropertyValue(`--${key.replace('Color', '-color')}`).trim() }; return { dayColor1: source.getItem('dayColor1') || '#f5f7fa', dayColor2: source.getItem('dayColor2') || '#e4eaf5', nightColor1: source.getItem('nightColor1') || '#1f2a40', nightColor2: source.getItem('nightColor2') || '#16213e', }; }
-    function setupColorSync(picker, hexDisplay, key) { picker.addEventListener('input', () => { hexDisplay.textContent = picker.value; applyColors({ ...getCurrentColors(), [key]: picker.value }); }); }
-    function loadColorState() { populatePresetDropdown(); const randomPaletteEnabled = localStorage.getItem('randomPaletteEnabled') === 'true'; colorModal.randomToggle.checked = randomPaletteEnabled; if (randomPaletteEnabled && currentConfig.themePresets && currentConfig.themePresets.length > 0) { const randomPreset = currentConfig.themePresets[Math.floor(Math.random() * currentConfig.themePresets.length)]; applyColors(randomPreset.colors); } else { applyColors(getCurrentColors()); } }
-    function populatePresetDropdown() { colorModal.presetSelector.innerHTML = '<option value="">选择一个预设...</option>'; (currentConfig.themePresets || []).forEach((p, i) => { const opt = document.createElement('option'); opt.value = i; opt.textContent = p.name; colorModal.presetSelector.appendChild(opt); }); }
-    colorModal.saveBtn.addEventListener('click', () => { const name = colorModal.presetName.value.trim(); if (!name) return alert('请输入预设名称'); if ((currentConfig.themePresets || []).some(p => p.name === name)) return alert('预设名称已存在'); if (!currentConfig.themePresets) currentConfig.themePresets = []; currentConfig.themePresets.push({ name, colors: getCurrentColors(false) }); saveGlobalConfig(`Save theme preset: ${name}`); populatePresetDropdown(); colorModal.presetSelector.value = currentConfig.themePresets.length - 1; colorModal.presetName.value = ''; });
-    colorModal.updateBtn.addEventListener('click', () => { const index = colorModal.presetSelector.value; if (index === '' || !currentConfig.themePresets) return alert('请选择一个预设'); const name = colorModal.presetName.value.trim() || currentConfig.themePresets[index].name; currentConfig.themePresets[index] = { name, colors: getCurrentColors(false) }; saveGlobalConfig(`Update theme preset: ${name}`); populatePresetDropdown(); colorModal.presetSelector.value = index; });
-    colorModal.deleteBtn.addEventListener('click', () => { const index = colorModal.presetSelector.value; if (index === '' || !currentConfig.themePresets) return alert('请选择一个预设'); const presetName = currentConfig.themePresets[index].name; if (!confirm(`确定删除云端预设 "${presetName}"?`)) return; currentConfig.themePresets.splice(index, 1); saveGlobalConfig(`Delete theme preset: ${presetName}`); populatePresetDropdown(); });
-    colorModal.presetSelector.addEventListener('change', () => { const index = colorModal.presetSelector.value; if (index === '' || !currentConfig.themePresets) return; applyColors(currentConfig.themePresets[index].colors); colorModal.presetName.value = currentConfig.themePresets[index].name; });
-    colorModal.randomToggle.addEventListener('change', () => { localStorage.setItem('randomPaletteEnabled', colorModal.randomToggle.checked); });
-    const syncModalElements = { buttonSelector: document.getElementById("buttonSelector"), fileList: document.getElementById("fileList"), fileListStatus: document.getElementById("fileListStatus"), fileUploader: document.getElementById("fileUploader"), selectFileBtn: document.getElementById("selectFileBtn"), selectedFileName: document.getElementById("selectedFileName"), fileNameInput: document.getElementById("fileNameInput"), uploadBtn: document.getElementById("uploadBtn"), progressContainer: document.getElementById("progressContainer"), progressBar: document.getElementById("uploadProgressBar"), githubRepoInput: document.getElementById("githubRepoInput"), githubTokenInput: document.getElementById("githubTokenInput"), saveSettingsBtn: document.getElementById("saveSettingsBtn") };
-    function setupModals(){document.querySelectorAll(".close-btn").forEach(e=>e.addEventListener("click",()=>{document.getElementById(e.dataset.modalId).classList.remove("show")})),document.querySelectorAll(".modal-overlay").forEach(e=>e.addEventListener("click",t=>e===t.target&&e.classList.remove("show"))),document.getElementById("syncBtn").addEventListener("click",()=>{document.getElementById("syncModal").classList.add("show"),populateButtonSelector(),fetchFilesForSelectedButton(),toggleFabMenu(!1)}),document.getElementById("settingsBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(syncModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),syncModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show")}),document.getElementById("addNavBtn").addEventListener("click",()=>{document.getElementById("addNavModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("colorBtn").addEventListener("click",()=>{document.getElementById("colorPaletteModal").classList.add("show"),updateColorUI(getCurrentColors()),toggleFabMenu(!1)})}
-    function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){const e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e=!0){return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据云盘 -> 标题旁⚙️)"),!1):!0}
-    async function loadInitialData() { navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>'; const fetchedConfig = await fetchConfigFromGithub(); currentConfig = { ...getDefaultConfig(), ...fetchedConfig }; document.getElementById('title').textContent = currentConfig.title; document.getElementById('subtitle').textContent = currentConfig.subtitle; document.querySelector('.editable-title').style.opacity = 1; document.querySelector('.editable-subtitle').style.opacity = 1; navContainer.innerHTML = ''; if (!currentConfig.buttons || currentConfig.buttons.length === 0) { navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">配置为空，请添加导航按钮。</p>'; } else { currentConfig.buttons.forEach(item => addNewButtonToDOM(item.text, item.href, false)); } loadColorState(); }
-    async function deleteGithubFolder(folderPath) { if (!checkConfig(true)) return false; const contentsUrl = withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${folderPath}`); try { const contentsResponse = await fetch(contentsUrl, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` } }); if (!contentsResponse.ok) throw new Error(`Could not list folder: ${contentsResponse.statusText}`); const files = await contentsResponse.json(); const deletePromises = files.map(file => fetch(withCacheBust(file.url), { method: 'DELETE', headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, body: JSON.stringify({ message: `Delete file: ${file.path}`, sha: file.sha, branch: 'main' }) })); await Promise.all(deletePromises); return true; } catch (error) { console.error(`Failed to delete folder "${folderPath}":`, error); return false; } }
-    syncModalElements.saveSettingsBtn.addEventListener("click",async()=>{const[e,t]=syncModalElements.githubRepoInput.value.trim().split("/").map(e=>e.trim()),n=syncModalElements.githubTokenInput.value.trim();if(e&&t&&n){saveGithubConfig({owner:e,repo:t,token:n,branch:"main"}),alert("配置已保存！刷新页面加载云端配置。"),document.getElementById("settingsModal").classList.remove("show"),await loadInitialData()}else{alert("请填写完整信息。")}});function populateButtonSelector(){const e=syncModalElements.buttonSelector.value;syncModalElements.buttonSelector.innerHTML="",document.querySelectorAll(".nav-btn").forEach(t=>{const n=t.textContent.replace("×","").trim(),o=document.createElement("option");o.value=o.textContent=n,syncModalElements.buttonSelector.appendChild(o)}),Array.from(syncModalElements.buttonSelector.options).some(t=>t.value===e)&&(syncModalElements.buttonSelector.value=e)}
-    syncModalElements.buttonSelector.addEventListener("change",fetchFilesForSelectedButton); syncModalElements.selectFileBtn.addEventListener('click', () => syncModalElements.fileUploader.click());
-    syncModalElements.fileUploader.addEventListener("change",()=>{ if(syncModalElements.fileUploader.files.length>0){ const file = syncModalElements.fileUploader.files[0]; syncModalElements.fileNameInput.value=file.name; syncModalElements.selectedFileName.textContent = file.name; } else { syncModalElements.selectedFileName.textContent = "未选择任何文件"; }});
-    async function fetchFilesForSelectedButton(){const e=syncModalElements.buttonSelector.value;if(syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="block",!e)return void(syncModalElements.fileListStatus.textContent="请选择一个分类");if(!checkConfig(!0))return void(syncModalElements.fileListStatus.innerHTML="尚未配置GitHub信息<br>请点击标题旁 ⚙️");syncModalElements.fileListStatus.textContent="正在加载...";const t=withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${e}`);try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`}});if(404===n.status)return void(syncModalElements.fileListStatus.textContent="该分类下暂无文件");if(!n.ok)throw new Error(`HTTP ${n.status}`);const o=await n.json();if(0===o.length)syncModalElements.fileListStatus.textContent="该分类下暂无文件";else{const l=await Promise.all(o.map(async e=>({...e,commitDate:await getLatestCommitDate(e.path)})));l.sort((e,t)=>new Date(t.commitDate)-new Date(e.commitDate)),syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="none",l.forEach(e=>{const t=document.createElement("li"),n=document.createElement("div");n.className="file-info",n.dataset.downloadUrl=e.download_url,n.dataset.fileName=e.name;const o=document.createElement("span");o.className="file-name",o.textContent=e.name;const l=document.createElement("span");l.className="file-timestamp",l.textContent=(new Date(e.commitDate)).toLocaleString("zh-CN",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}),n.append(o,l);const a=document.createElement("button");a.className="delete-btn",a.innerHTML="&times;",a.title="删除文件",t.append(n,a),syncModalElements.fileList.appendChild(t),n.addEventListener("click",t=>forceDownload(t.currentTarget.dataset.downloadUrl,t.currentTarget.dataset.fileName,n)),a.addEventListener("click",()=>deleteFile(e.path,e.sha,t))})}}catch(n){console.error("获取文件列表失败:",n),syncModalElements.fileListStatus.textContent="加载失败，请检查网络或配置。"}}
-    async function getLatestCommitDate(e){const t=withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`);try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`}});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";const o=withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${e}`);try{const l=await fetch(o,{method:"DELETE",headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},body:JSON.stringify({message:`Delete file: ${e}`,sha:t,branch:"main"})});if(!l.ok)throw new Error(`删除失败: ${(await l.json()).message}`);n.remove(),0===syncModalElements.fileList.children.length&&(syncModalElements.fileListStatus.textContent="该分类下暂无文件",syncModalElements.fileListStatus.style.display="block")}catch(l){console.error("删除文件失败:",l),alert(`删除文件失败: ${l.message}`),n.style.opacity="1"}}async function forceDownload(e,t,n){const o=n.querySelector(".file-name").textContent;n.querySelector(".file-name").textContent="准备下载...";n.style.pointerEvents="none";try{const l=await fetch(e);if(!l.ok)throw new Error(`下载请求失败: ${l.statusText}`);const a=await l.blob(),c=document.createElement("a");c.href=window.URL.createObjectURL(a),c.download=t,document.body.appendChild(c),c.click(),c.remove(),window.URL.revokeObjectURL(c.href)}catch(l){console.error("Download error:",l),alert(`下载出错: ${l.message}`)}finally{n.querySelector(".file-name").textContent=o,n.style.pointerEvents="auto"}}
-    function uploadFileWithProgress(url, fileContent, token, commitMessage) { return new Promise((resolve, reject) => { const body = { message: commitMessage, content: fileContent, branch: "main" }; const xhr = new XMLHttpRequest(); xhr.open("PUT", url, true); xhr.setRequestHeader("Authorization", `token ${token}`); xhr.setRequestHeader("Content-Type", "application/json"); xhr.upload.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = (event.loaded / event.total) * 100; syncModalElements.progressBar.style.width = percentComplete + '%'; } }; xhr.onload = () => { if (xhr.status >= 200 && xhr.status < 300) { resolve(JSON.parse(xhr.responseText)); } else { reject(new Error(`上传失败: ${xhr.statusText} - ${xhr.responseText}`)); } }; xhr.onerror = () => reject(new Error("网络错误，上传失败。")); xhr.send(JSON.stringify(body)); }); }
-    syncModalElements.uploadBtn.addEventListener("click", async () => { if (!checkConfig()) return; const category = syncModalElements.buttonSelector.value; const file = syncModalElements.fileUploader.files[0]; let fileName = syncModalElements.fileNameInput.value.trim() || (file && file.name); if (!category || !file || !fileName) { return alert("请选择分类、文件，并确保文件名不为空。"); } syncModalElements.uploadBtn.disabled = true; syncModalElements.uploadBtn.textContent = "上传中..."; syncModalElements.progressContainer.style.display = 'block'; syncModalElements.progressBar.style.width = '0%'; try { const content = await fileToBase64(file); const url = withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${category}/${fileName}`); await uploadFileWithProgress(url, content, GITHUB_CONFIG.token, `Upload ${fileName}`); syncModalElements.uploadBtn.textContent = '正在处理...'; setTimeout(() => { alert("上传成功！"); syncModalElements.fileUploader.value = ""; syncModalElements.fileNameInput.value = ""; syncModalElements.selectedFileName.textContent = '未选择任何文件'; fetchFilesForSelectedButton(); }, 200); } catch (error) { console.error("上传失败:", error); alert(`上传失败: ${error.message}`); } finally { setTimeout(() => { syncModalElements.uploadBtn.disabled = false; syncModalElements.uploadBtn.textContent = "上传文件"; syncModalElements.progressContainer.style.display = 'none'; }, 1000); } });
-    const addNavModalElements={typeLinkRadio:document.getElementById("type-link"),typeUploadRadio:document.getElementById("type-upload"),linkSection:document.getElementById("link-section"),uploadSection:document.getElementById("upload-section"),nameInput:document.getElementById("newButtonNameInput"),urlInput:document.getElementById("newButtonUrlInput"),folderPickerBtn:document.getElementById("folderPickerBtn"),folderStatus:document.getElementById("folder-picker-status"),createBtn:document.getElementById("createNavBtn"),uploadStatus:document.getElementById("upload-status"),stayOpenToggle:document.getElementById("stayOpenToggle")};
-    function addNewButtonToDOM(text, href, save=true) { navContainer.querySelector("#loading-status")?.remove(); const btn = document.createElement("button"); btn.className = "nav-btn"; btn.textContent = text; btn.dataset.href = href; navContainer.appendChild(btn); attachButtonListeners(btn); if (isManagementMode) { const icon = document.createElement('span'); icon.className = 'delete-icon'; icon.innerHTML = '&times;'; icon.title = '删除此按钮'; btn.appendChild(icon); } if (save) { if(!currentConfig.buttons) currentConfig.buttons = []; currentConfig.buttons.push({text, href}); saveGlobalConfig(`Add button: ${text}`); } }
-    function resetAddNavForm() { addNavModalElements.nameInput.value = ""; addNavModalElements.urlInput.value = ""; addNavModalElements.folderStatus.textContent = "未选择任何文件夹"; addNavModalElements.uploadStatus.textContent = ""; localDirectoryHandle = null; }
-    addNavModalElements.typeLinkRadio.addEventListener("change",()=>{addNavModalElements.linkSection.style.display="flex",addNavModalElements.uploadSection.style.display="none"});addNavModalElements.typeUploadRadio.addEventListener("change",()=>{addNavModalElements.linkSection.style.display="none",addNavModalElements.uploadSection.style.display="flex"});
-    (function initSlidingSelector() { const wrapper = document.querySelector('.nav-type-selector-wrapper'); const container = document.createElement('div'); container.className = 'nav-type-selector';const radios = wrapper.querySelectorAll('input[name="nav-type"]'); const labels = wrapper.querySelectorAll('label'); radios.forEach((radio, index) => {
-        container.appendChild(labels[index]);
-    }); wrapper.appendChild(container);})();
-    addNavModalElements.folderPickerBtn.addEventListener("click",async()=>{if(!window.showDirectoryPicker)return void alert("您的浏览器不支持文件夹选择。");try{localDirectoryHandle=await window.showDirectoryPicker(),addNavModalElements.folderStatus.textContent=`已选择: ${localDirectoryHandle.name}`}catch(e){console.log("用户取消了文件夹选择")}});function fileToBase64(e){return new Promise((t,n)=>{const o=new FileReader;o.onload=()=>t(o.result.split(",")[1]),o.onerror=n,o.readAsDataURL(e)})}async function getFilesInDirectory(e,t=""){const n=[];for await(const o of e.values()){const l=t?`${t}/${o.name}`:o.name;if("file"===o.kind){const file=await o.getFile();n.push({file,path:l})}else"directory"===o.kind&&n.push(...await getFilesInDirectory(o,l))}return n}
-    addNavModalElements.createBtn.addEventListener("click",async()=>{const e=addNavModalElements.nameInput.value.trim();if(!e)return void alert("请输入按钮名称。");const t=document.querySelector('input[name="nav-type"]:checked').value;addNavModalElements.createBtn.disabled=!0,addNavModalElements.createBtn.textContent="处理中...";try{let n;if("link"===t){const o=addNavModalElements.urlInput.value.trim();if(!o)return void alert("请输入网址链接。");n={text:e,href:o}}else if("upload"===t){if(!checkConfig())return;if(!localDirectoryHandle)return void alert("请选择一个项目文件夹。");const l=await getFilesInDirectory(localDirectoryHandle),path=e.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-")||`project-${Date.now()}`;if(!l.some(e=>e.path.endsWith("index.html")))return void alert("错误：文件夹中必须包含 index.html");for(let c=0;c<l.length;c++){const{file,path:subpath}=l[c];addNavModalElements.uploadStatus.textContent=`上传中 ${c+1}/${l.length}: ${subpath}`; const content_b64 = await fileToBase64(file); const u=withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}/${subpath}`); await uploadFileWithProgress(u, content_b64, GITHUB_CONFIG.token, `Create ${subpath}`);}addNavModalElements.uploadStatus.textContent="正在处理...";n={text:e,href:`${path}/index.html`};alert("项目上传发布成功！")} addNewButtonToDOM(n.text, n.href); resetAddNavForm(); if(!addNavModalElements.stayOpenToggle.checked) { document.getElementById("addNavModal").classList.remove("show"); } }catch(o){console.error("创建失败:",o),alert(`操作失败: ${o.message}`),addNavModalElements.uploadStatus.textContent="操作失败!"}finally{addNavModalElements.createBtn.disabled=!1,addNavModalElements.createBtn.textContent="加入新手机"}});
     
-    // == New In-App Browser Logic ==
-    function openIframeModal(url) {
-        // Show first-time user hint
-        if (!localStorage.getItem('swipeHintShown')) {
-            swipeHint.classList.add('show');
-            setTimeout(() => {
-                swipeHint.classList.remove('show');
-                localStorage.setItem('swipeHintShown', 'true');
-            }, 4000);
-        }
-        iframeEl.src = url;
-        iframeModal.classList.add('active');
+    pageOverlay.addEventListener('click', function(e) { 
+        if (isManagementMode && !e.target.closest('.nav-btn')) { toggleManagementMode(false); } 
+        if (fabContainer.classList.contains('active')) { toggleFabMenu(false); } 
+    });
+    
+    var fabContainer = document.getElementById('fabContainer'), fabMainBtn = document.getElementById('themeBtn');
+    var fabPressTimer = null, isFabLongPress = false;
+    function toggleFabMenu(forceState) { 
+        var isActive = forceState !== undefined ? forceState : !fabContainer.classList.contains('active'); 
+        fabContainer.classList.toggle('active', isActive); 
+        if (!isManagementMode) pageOverlay.classList.toggle('show', isActive); 
     }
-    function closeIframeModal() {
-        iframeModal.classList.remove('active');
-        // IMPORTANT: Clear the iframe's src after the animation to stop it from running in the background
-        setTimeout(() => {
-            iframeEl.src = 'about:blank';
-        }, 400); // Must match CSS transition duration
+    fabMainBtn.addEventListener('mousedown', function(e) { 
+        e.preventDefault(); isFabLongPress = false; 
+        fabPressTimer = setTimeout(function() { isFabLongPress = true; toggleFabMenu(true); }, 300); 
+    });
+    fabMainBtn.addEventListener('mouseup', function() { 
+        clearTimeout(fabPressTimer); 
+        if (!isFabLongPress) { fabContainer.classList.contains('active') ? toggleFabMenu(false) : toggleTheme(); } 
+    });
+    fabMainBtn.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+    fabMainBtn.addEventListener('touchstart', function(e) { e.preventDefault(); fabMainBtn.dispatchEvent(new MouseEvent('mousedown')); }, { passive: false });
+    fabMainBtn.addEventListener('touchend', function(e) { e.preventDefault(); fabMainBtn.dispatchEvent(new MouseEvent('mouseup')); }, { passive: false });
+    
+    function updateButtonOrderAndSave(commitMessage) { 
+        var newOrder = []; 
+        document.querySelectorAll('.nav-btn').forEach(function(btn) {
+            var textContent = btn.textContent;
+            var deleteIcon = btn.querySelector('.delete-icon');
+            if (deleteIcon) {
+                textContent = textContent.replace(deleteIcon.textContent, '').trim();
+            }
+            newOrder.push({ text: textContent, href: btn.dataset.href });
+        });
+        currentConfig.buttons = newOrder; 
+        saveGlobalConfig(commitMessage); 
+    }
+    
+    function attachButtonListeners(btn) {
+        btn.addEventListener('click', function(e) { 
+            if (isManagementMode || isLongPress) { e.preventDefault(); return; } 
+            var href = this.dataset.href; 
+            if (!href) return; 
+            if (href.startsWith('http')) { e.preventDefault(); openIframeModal(href); } 
+            else { window.location.href = href; } 
+        });
     }
 
-    // Gesture Handling for closing the iframe modal
-    let startX = 0;
-    let currentX = 0;
-    let isDragging = false;
-    const edgeThreshold = 50; // Only start swipe if touch begins within 50px of the left edge
-
-    iframeModal.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].clientX;
-        // Only initiate drag if it starts near the left edge, preventing accidental swipes
-        if (startX < edgeThreshold) {
-            isDragging = true;
-            iframeModalContent.classList.add('dragging'); // Disable CSS transition for instant feedback
-        }
-    }, { passive: true });
-
-    iframeModal.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        currentX = e.touches[0].clientX;
-        const diffX = currentX - startX;
-        // Only allow dragging to the right (to close)
-        if (diffX > 0) {
-            iframeModalContent.style.transform = `translateX(${diffX}px)`;
-        }
-    }, { passive: false });
-
-    iframeModal.addEventListener('touchend', (e) => {
-        if (!isDragging) return;
-        isDragging = false;
-        iframeModalContent.classList.remove('dragging'); // Re-enable CSS transition for smooth snap/close
-        iframeModalContent.style.transform = ''; // Reset inline style
-
-        const diffX = currentX - startX;
-        const closeThreshold = window.innerWidth / 3; // Must swipe 1/3 of the screen to close
-
-        if (diffX > closeThreshold) {
-            closeIframeModal();
-        }
-        // If not swiped far enough, the CSS handles snapping back to place.
-        startX = 0;
-        currentX = 0;
+    document.getElementById('enterManageModeBtn').addEventListener('click', function() { document.getElementById('addNavModal').classList.remove('show'); setTimeout(function() { toggleManagementMode(true); }, 150); });
+    
+    navContainer.addEventListener('click', function(e) { 
+        if (!e.target.classList.contains('delete-icon')) return; 
+        var btnToDelete = e.target.closest('.nav-btn'); 
+        var buttonName = btnToDelete.textContent.replace('×', '').trim(); 
+        if (!confirm('确定要删除 "' + buttonName + '" 吗？\n警告：如果这是上传的项目，其在GitHub上的整个文件夹都将被永久删除！')) return; 
+        btnToDelete.style.cssText = 'transition: all 0.3s ease; transform: scale(0.8); opacity: 0;'; 
+        setTimeout(function() {
+            var href = btnToDelete.dataset.href;
+            btnToDelete.remove();
+            var isExternalLink = href.startsWith('http');
+            var deletePromise = Promise.resolve();
+            if (!isExternalLink && href.indexOf('/') > -1) {
+                var folderPath = href.substring(0, href.lastIndexOf('/'));
+                deletePromise = deleteGithubFolder(folderPath).then(function(success) {
+                    if (!success) {
+                        alert('删除云端文件夹失败!');
+                        location.reload();
+                        return Promise.reject();
+                    }
+                });
+            }
+            deletePromise.then(function() {
+                updateButtonOrderAndSave('Delete button: ' + buttonName);
+            });
+        }, 300); 
     });
 
-    window.addEventListener('load', async () => {
+    document.getElementById('title').addEventListener('click', function() { if(isManagementMode) return; var newTitle = prompt('新标题：', currentConfig.title); if (newTitle && newTitle.trim() && newTitle.trim() !== currentConfig.title) { document.getElementById('title').textContent = newTitle.trim(); currentConfig.title = newTitle.trim(); saveGlobalConfig('Update main title'); } });
+    document.getElementById('subtitle').addEventListener('click', function() { if(isManagementMode) return; var newSubtitle = prompt('新描述：', currentConfig.subtitle); if (newSubtitle !== null && newSubtitle.trim() !== currentConfig.subtitle) { document.getElementById('subtitle').textContent = newSubtitle.trim(); currentConfig.subtitle = newSubtitle.trim(); saveGlobalConfig('Update subtitle'); } });
+    function initTheme() { var t=localStorage.getItem('theme'); if (t==='dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.body.classList.add('dark-mode'); fabMainBtn.textContent = '🌙'; } else { fabMainBtn.textContent = '🌞'; } }
+    function toggleTheme() { document.body.classList.toggle('dark-mode'); var i=document.body.classList.contains('dark-mode'); fabMainBtn.textContent=i?'🌙':'🌞'; localStorage.setItem('theme', i?'dark':'light'); };
+    var colorModal = { pickerD1: document.getElementById('dayColor1Picker'), hexD1: document.getElementById('dayColor1Hex'), pickerD2: document.getElementById('dayColor2Picker'), hexD2: document.getElementById('dayColor2Hex'), pickerN1: document.getElementById('nightColor1Picker'), hexN1: document.getElementById('nightColor1Hex'), pickerN2: document.getElementById('nightColor2Picker'), hexN2: document.getElementById('nightColor2Hex'), presetName: document.getElementById('presetNameInput'), presetSelector: document.getElementById('presetSelector'), saveBtn: document.getElementById('savePresetBtn'), updateBtn: document.getElementById('updatePresetBtn'), deleteBtn: document.getElementById('deletePresetBtn'), randomToggle: document.getElementById('randomPaletteToggle'), dayPreview: document.getElementById('dayPreview'), nightPreview: document.getElementById('nightPreview') };
+    var root = document.documentElement; function applyColors(colors, saveToLocal) { if (saveToLocal === void 0) { saveToLocal = true; } Object.keys(colors).forEach(function(key) { var value = colors[key]; var cssVar = '--' + key.replace('Color', '-color'); root.style.setProperty(cssVar, value); if (saveToLocal) localStorage.setItem(key, value); }); updateColorUI(colors); }
+    function updateColorUI(colors) { colorModal.pickerD1.value = colors.dayColor1; colorModal.hexD1.textContent = colors.dayColor1; colorModal.pickerD2.value = colors.dayColor2; colorModal.hexD2.textContent = colors.dayColor2; colorModal.pickerN1.value = colors.nightColor1; colorModal.hexN1.textContent = colors.nightColor1; colorModal.pickerN2.value = colors.nightColor2; colorModal.hexN2.textContent = colors.nightColor2; colorModal.dayPreview.style.background = 'linear-gradient(135deg, ' + colors.dayColor2 + ', ' + colors.dayColor1 + ')'; colorModal.nightPreview.style.background = 'linear-gradient(135deg, ' + colors.nightColor2 + ', ' + colors.nightColor1 + ')'; }
+    function getCurrentColors(fromLocalStorage) { if (fromLocalStorage === void 0) { fromLocalStorage = true; } var source = fromLocalStorage ? localStorage : { getItem: function(key) { return getComputedStyle(root).getPropertyValue('--' + key.replace('Color', '-color')).trim(); } }; return { dayColor1: source.getItem('dayColor1') || '#f5f7fa', dayColor2: source.getItem('dayColor2') || '#e4eaf5', nightColor1: source.getItem('nightColor1') || '#1f2a40', nightColor2: source.getItem('nightColor2') || '#16213e' }; }
+    function setupColorSync(picker, hexDisplay, key) { picker.addEventListener('input', function() { hexDisplay.textContent = picker.value; var currentColors = getCurrentColors(); currentColors[key] = picker.value; applyColors(currentColors); }); }
+    function loadColorState() { populatePresetDropdown(); var randomPaletteEnabled = localStorage.getItem('randomPaletteEnabled') === 'true'; colorModal.randomToggle.checked = randomPaletteEnabled; if (randomPaletteEnabled && currentConfig.themePresets && currentConfig.themePresets.length > 0) { var randomPreset = currentConfig.themePresets[Math.floor(Math.random() * currentConfig.themePresets.length)]; applyColors(randomPreset.colors, false); } else { applyColors(getCurrentColors()); } }
+    function populatePresetDropdown() { colorModal.presetSelector.innerHTML = '<option value="">选择一个预设...</option>'; (currentConfig.themePresets || []).forEach(function(p, i) { var opt = document.createElement('option'); opt.value = i; opt.textContent = p.name; colorModal.presetSelector.appendChild(opt); }); }
+    colorModal.saveBtn.addEventListener('click', function() { var name = colorModal.presetName.value.trim(); if (!name) return alert('请输入预设名称'); if ((currentConfig.themePresets || []).some(function(p) { return p.name === name; })) return alert('预设名称已存在'); if (!currentConfig.themePresets) currentConfig.themePresets = []; currentConfig.themePresets.push({ name: name, colors: getCurrentColors(false) }); saveGlobalConfig('Save theme preset: ' + name); populatePresetDropdown(); colorModal.presetSelector.value = currentConfig.themePresets.length - 1; colorModal.presetName.value = ''; });
+    colorModal.updateBtn.addEventListener('click', function() { var index = colorModal.presetSelector.value; if (index === '' || !currentConfig.themePresets) return alert('请选择一个预设'); var name = colorModal.presetName.value.trim() || currentConfig.themePresets[index].name; currentConfig.themePresets[index] = { name: name, colors: getCurrentColors(false) }; saveGlobalConfig('Update theme preset: ' + name); populatePresetDropdown(); colorModal.presetSelector.value = index; });
+    colorModal.deleteBtn.addEventListener('click', function() { var index = colorModal.presetSelector.value; if (index === '' || !currentConfig.themePresets) return alert('请选择一个预设'); var presetName = currentConfig.themePresets[index].name; if (!confirm('确定删除云端预设 "' + presetName + '"?')) return; currentConfig.themePresets.splice(index, 1); saveGlobalConfig('Delete theme preset: ' + presetName); populatePresetDropdown(); });
+    colorModal.presetSelector.addEventListener('change', function() { var index = this.value; if (index === '' || !currentConfig.themePresets) return; applyColors(currentConfig.themePresets[index].colors); colorModal.presetName.value = currentConfig.themePresets[index].name; });
+    colorModal.randomToggle.addEventListener('change', function() { localStorage.setItem('randomPaletteEnabled', this.checked); });
+    var syncModalElements = { buttonSelector: document.getElementById("buttonSelector"), fileList: document.getElementById("fileList"), fileListStatus: document.getElementById("fileListStatus"), fileUploader: document.getElementById("fileUploader"), selectFileBtn: document.getElementById("selectFileBtn"), selectedFileName: document.getElementById("selectedFileName"), fileNameInput: document.getElementById("fileNameInput"), uploadBtn: document.getElementById("uploadBtn"), progressContainer: document.getElementById("progressContainer"), progressBar: document.getElementById("uploadProgressBar"), githubRepoInput: document.getElementById("githubRepoInput"), githubTokenInput: document.getElementById("githubTokenInput"), saveSettingsBtn: document.getElementById("saveSettingsBtn") };
+    function setupModals(){document.querySelectorAll(".close-btn").forEach(function(e){e.addEventListener("click",function(){document.getElementById(e.dataset.modalId).classList.remove("show")})}),document.querySelectorAll(".modal-overlay").forEach(function(e){e.addEventListener("click",function(t){e===t.target&&e.classList.remove("show")})}),document.getElementById("helpBtn").addEventListener("click",function(){document.getElementById("helpModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("syncBtn").addEventListener("click",function(){document.getElementById("syncModal").classList.add("show"),populateButtonSelector(),fetchFilesForSelectedButton(),toggleFabMenu(!1)}),document.getElementById("settingsBtn").addEventListener("click",function(){GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(syncModalElements.githubRepoInput.value=GITHUB_CONFIG.owner+'/'+GITHUB_CONFIG.repo),syncModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show")}),document.getElementById("addNavBtn").addEventListener("click",function(){document.getElementById("addNavModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("colorBtn").addEventListener("click",function(){document.getElementById("colorPaletteModal").classList.add("show"),updateColorUI(getCurrentColors()),toggleFabMenu(!1)})}
+    function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){var e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e){e=void 0!==e&&e;return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据云盘 -> 标题旁⚙️)"),!1):!0}
+    function loadInitialData() {
+        navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>';
+        return fetchConfigFromGithub().then(function(fetchedConfig) {
+            currentConfig = Object.assign({}, getDefaultConfig(), fetchedConfig);
+            document.getElementById('title').textContent = currentConfig.title;
+            document.getElementById('subtitle').textContent = currentConfig.subtitle;
+            document.querySelector('.editable-title').style.opacity = 1;
+            document.querySelector('.editable-subtitle').style.opacity = 1;
+            navContainer.innerHTML = '';
+            if (!currentConfig.buttons || currentConfig.buttons.length === 0) {
+                navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">配置为空，请添加导航按钮。</p>';
+            } else {
+                currentConfig.buttons.forEach(function(item) { addNewButtonToDOM(item.text, item.href, false); });
+            }
+            loadColorState();
+        });
+    }
+    function deleteGithubFolder(folderPath) {
+        if (!checkConfig(true)) return Promise.resolve(false);
+        var contentsUrl = withCacheBust('https://api.github.com/repos/' + GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo + '/contents/' + folderPath);
+        return fetch(contentsUrl, { headers: { 'Authorization': 'token ' + GITHUB_CONFIG.token } })
+            .then(function(response) {
+                if (response.status === 404) { console.log('Folder "' + folderPath + '" not found, nothing to delete.'); return []; }
+                if (!response.ok) throw new Error('Could not list folder: ' + response.statusText);
+                return response.json();
+            })
+            .then(function(files) {
+                var deletePromises = files.map(function(file) {
+                    return fetch(withCacheBust(file.url), {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'token ' + GITHUB_CONFIG.token },
+                        body: JSON.stringify({ message: 'Delete file: ' + file.path, sha: file.sha, branch: 'main' })
+                    });
+                });
+                return Promise.all(deletePromises);
+            })
+            .then(function() { return true; })
+            .catch(function(error) {
+                console.error('Failed to delete folder "' + folderPath + '":', error);
+                return false;
+            });
+    }
+    syncModalElements.saveSettingsBtn.addEventListener("click",function(){
+        var repoParts=syncModalElements.githubRepoInput.value.trim().split("/").map(function(e){return e.trim()});
+        var owner = repoParts[0];
+        var repo = repoParts[1];
+        var token=syncModalElements.githubTokenInput.value.trim();
+        if(owner && repo && token){
+            saveGithubConfig({owner:owner,repo:repo,token:token,branch:"main"});
+            alert("配置已保存！刷新页面加载云端配置。");
+            document.getElementById("settingsModal").classList.remove("show");
+            loadInitialData();
+        } else {
+            alert("请填写完整信息。");
+        }
+    });
+    function populateButtonSelector(){var e=syncModalElements.buttonSelector.value;syncModalElements.buttonSelector.innerHTML="",document.querySelectorAll(".nav-btn").forEach(function(t){var n=t.textContent.replace("×","").trim(),o=document.createElement("option");o.value=o.textContent=n,syncModalElements.buttonSelector.appendChild(o)}),Array.prototype.slice.call(syncModalElements.buttonSelector.options).some(function(t){return t.value===e})&&(syncModalElements.buttonSelector.value=e)}
+    syncModalElements.buttonSelector.addEventListener("change",fetchFilesForSelectedButton); syncModalElements.selectFileBtn.addEventListener('click', function() { syncModalElements.fileUploader.click(); });
+    syncModalElements.fileUploader.addEventListener("change",function(){ if(syncModalElements.fileUploader.files.length>0){ var file = syncModalElements.fileUploader.files[0]; syncModalElements.fileNameInput.value=file.name; syncModalElements.selectedFileName.textContent = file.name; } else { syncModalElements.selectedFileName.textContent = "未选择任何文件"; }});
+    function fetchFilesForSelectedButton(){
+        var buttonName=syncModalElements.buttonSelector.value;
+        syncModalElements.fileList.innerHTML="", syncModalElements.fileListStatus.style.display="block";
+        if(!buttonName) return void(syncModalElements.fileListStatus.textContent="请选择一个分类");
+        if(!checkConfig(true)) return void(syncModalElements.fileListStatus.innerHTML="尚未配置GitHub信息<br>请点击标题旁 ⚙️");
+        syncModalElements.fileListStatus.textContent="正在加载...";
+        var url=withCacheBust('https://api.github.com/repos/'+GITHUB_CONFIG.owner+'/'+GITHUB_CONFIG.repo+'/contents/data_sync/'+buttonName);
+        fetch(url,{headers:{"Authorization":'token '+GITHUB_CONFIG.token}})
+            .then(function(response){
+                if(404===response.status) return [];
+                if(!response.ok) throw new Error('HTTP ' + response.status);
+                return response.json();
+            })
+            .then(function(files){
+                if(0===files.length) return syncModalElements.fileListStatus.textContent="该分类下暂无文件", [];
+                return Promise.all(files.map(function(file) {
+                    return getLatestCommitDate(file.path).then(function(commitDate) {
+                        file.commitDate = commitDate;
+                        return file;
+                    });
+                }));
+            })
+            .then(function(filesWithDates) {
+                if (filesWithDates.length === 0) return;
+                filesWithDates.sort(function(a,b){ return new Date(b.commitDate) - new Date(a.commitDate); });
+                syncModalElements.fileList.innerHTML="", syncModalElements.fileListStatus.style.display="none";
+                filesWithDates.forEach(function(file){
+                    var li=document.createElement("li"), fileInfo=document.createElement("div");
+                    fileInfo.className="file-info", fileInfo.dataset.downloadUrl=file.download_url, fileInfo.dataset.fileName=file.name;
+                    var fileNameSpan=document.createElement("span"); fileNameSpan.className="file-name", fileNameSpan.textContent=file.name;
+                    var timestampSpan=document.createElement("span"); timestampSpan.className="file-timestamp", timestampSpan.textContent=(new Date(file.commitDate)).toLocaleString("zh-CN",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"});
+                    fileInfo.append(fileNameSpan,timestampSpan);
+                    var deleteBtn=document.createElement("button"); deleteBtn.className="delete-btn", deleteBtn.innerHTML="&times;", deleteBtn.title="删除文件";
+                    li.append(fileInfo,deleteBtn), syncModalElements.fileList.appendChild(li);
+                    fileInfo.addEventListener("click",function(e){forceDownload(e.currentTarget.dataset.downloadUrl,e.currentTarget.dataset.fileName,fileInfo)});
+                    deleteBtn.addEventListener("click",function(){deleteFile(file.path,file.sha,li)});
+                });
+            })
+            .catch(function(error){ console.error("获取文件列表失败:",error),syncModalElements.fileListStatus.textContent="加载失败，请检查网络或配置。"; });
+    }
+    function getLatestCommitDate(path){
+        var url=withCacheBust('https://api.github.com/repos/'+GITHUB_CONFIG.owner+'/'+GITHUB_CONFIG.repo+'/commits?path='+encodeURIComponent(path)+'&page=1&per_page=1');
+        return fetch(url,{headers:{"Authorization":'token '+GITHUB_CONFIG.token}})
+            .then(function(response){
+                if(!response.ok)return(new Date(0)).toISOString();
+                return response.json();
+            })
+            .then(function(commits){ return (commits[0] && commits[0].commit.committer.date) || (new Date(0)).toISOString(); })
+            .catch(function(error){ console.error('Error fetching commit date for '+path+':',error); return(new Date(0)).toISOString(); });
+    }
+    function deleteFile(path,sha,liElement){
+        if(!confirm('确定要永久删除文件 "'+path.split("/").pop()+'" 吗？')) return;
+        liElement.style.opacity="0.5";
+        var url=withCacheBust('https://api.github.com/repos/'+GITHUB_CONFIG.owner+'/'+GITHUB_CONFIG.repo+'/contents/'+path);
+        fetch(url,{method:"DELETE",headers:{"Authorization":'token '+GITHUB_CONFIG.token},body:JSON.stringify({message:'Delete file: '+path,sha:sha,branch:"main"})})
+            .then(function(response){
+                if(!response.ok) return response.json().then(function(err){ throw new Error('删除失败: '+err.message); });
+                liElement.remove();
+                if(0===syncModalElements.fileList.children.length){ syncModalElements.fileListStatus.textContent="该分类下暂无文件",syncModalElements.fileListStatus.style.display="block"; }
+            })
+            .catch(function(error){ console.error("删除文件失败:",error),alert('删除文件失败: '+error.message),liElement.style.opacity="1"; });
+    }
+    function forceDownload(url,fileName,element){
+        var originalText = element.querySelector(".file-name").textContent;
+        element.querySelector(".file-name").textContent="准备下载...", element.style.pointerEvents="none";
+        fetch(url)
+            .then(function(response){
+                if(!response.ok) throw new Error('下载请求失败: '+response.statusText);
+                return response.blob();
+            })
+            .then(function(blob){
+                var a=document.createElement("a");
+                a.href=window.URL.createObjectURL(blob), a.download=fileName;
+                document.body.appendChild(a), a.click(), a.remove();
+                window.URL.revokeObjectURL(a.href);
+            })
+            .catch(function(error){ console.error("Download error:",error),alert('下载出错: '+error.message); })
+            .finally(function(){ element.querySelector(".file-name").textContent=originalText, element.style.pointerEvents="auto"; });
+    }
+    function uploadFileWithProgress(url, fileContent, token, commitMessage, buttonElement) {
+        return new Promise(function(resolve, reject) {
+            var body = { message: commitMessage, content: fileContent, branch: "main" };
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", url, true);
+            xhr.setRequestHeader("Authorization", "token " + token);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.upload.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    var percentComplete = (event.loaded / event.total) * 100;
+                    syncModalElements.progressBar.style.width = percentComplete + '%';
+                    if (percentComplete >= 99.9 && buttonElement) {
+                        buttonElement.textContent = '正在处理...';
+                    }
+                }
+            };
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(JSON.parse(xhr.responseText));
+                } else {
+                    reject(new Error("上传失败: " + xhr.statusText + " - " + xhr.responseText));
+                }
+            };
+            xhr.onerror = function() { reject(new Error("网络错误，上传失败。")); };
+            xhr.send(JSON.stringify(body));
+        });
+    }
+    syncModalElements.uploadBtn.addEventListener("click", function() {
+        if (!checkConfig()) return;
+        var category = syncModalElements.buttonSelector.value;
+        var file = syncModalElements.fileUploader.files[0];
+        var fileName = (syncModalElements.fileNameInput.value.trim() || (file && file.name));
+        if (!category || !file || !fileName) { return alert("请选择分类、文件，并确保文件名不为空。"); }
+        syncModalElements.uploadBtn.disabled = true;
+        syncModalElements.uploadBtn.textContent = "上传中...";
+        syncModalElements.progressContainer.style.display = 'block';
+        syncModalElements.progressBar.style.width = '0%';
+        fileToBase64(file).then(function(content) {
+            var url = withCacheBust('https://api.github.com/repos/' + GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo + '/contents/data_sync/' + category + '/' + fileName);
+            return uploadFileWithProgress(url, content, GITHUB_CONFIG.token, 'Upload ' + fileName, syncModalElements.uploadBtn);
+        }).then(function() {
+            setTimeout(function() {
+                alert("上传成功！");
+                syncModalElements.fileUploader.value = "";
+                syncModalElements.fileNameInput.value = "";
+                syncModalElements.selectedFileName.textContent = '未选择任何文件';
+                fetchFilesForSelectedButton();
+            }, 200);
+        }).catch(function(error) {
+            console.error("上传失败:", error);
+            alert("上传失败: " + error.message);
+        }).finally(function() {
+            setTimeout(function() {
+                syncModalElements.uploadBtn.disabled = false;
+                syncModalElements.uploadBtn.textContent = "上传文件";
+                syncModalElements.progressContainer.style.display = 'none';
+            }, 1000);
+        });
+    });
+    var addNavModalElements={typeLinkRadio:document.getElementById("type-link"),typeUploadRadio:document.getElementById("type-upload"),linkSection:document.getElementById("link-section"),uploadSection:document.getElementById("upload-section"),nameInput:document.getElementById("newButtonNameInput"),urlInput:document.getElementById("newButtonUrlInput"),filePickerBtn:document.getElementById("filePickerBtn"),projectHtmlPicker:document.getElementById("projectHtmlPicker"),fileStatus:document.getElementById("file-picker-status"),createBtn:document.getElementById("createNavBtn"),uploadStatus:document.getElementById("upload-status"),stayOpenToggle:document.getElementById("stayOpenToggle")};
+    function addNewButtonToDOM(text, href, save) { 
+        save = (save === undefined) ? true : save;
+        var loadingStatus = navContainer.querySelector("#loading-status");
+        if(loadingStatus) { loadingStatus.remove(); }
+        var btn = document.createElement("button"); btn.className = "nav-btn"; btn.textContent = text; btn.dataset.href = href; navContainer.appendChild(btn); attachButtonListeners(btn); 
+        if (isManagementMode) { 
+            var icon = document.createElement('span'); icon.className = 'delete-icon'; icon.innerHTML = '&times;'; icon.title = '删除此按钮'; btn.appendChild(icon);
+            setupDragAndDropListeners(btn);
+        } 
+        if (save) { if(!currentConfig.buttons) currentConfig.buttons = []; currentConfig.buttons.push({text:text, href:href}); saveGlobalConfig('Add button: ' + text); } 
+    }
+    function resetAddNavForm() { addNavModalElements.nameInput.value = ""; addNavModalElements.urlInput.value = ""; addNavModalElements.fileStatus.textContent = "未选择任何文件"; addNavModalElements.uploadStatus.textContent = ""; addNavModalElements.projectHtmlPicker.value = ""; projectFile = null; }
+    
+    document.querySelectorAll('input[name="nav-type"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            addNavModalElements.linkSection.style.display = this.value === 'link' ? 'flex' : 'none';
+            addNavModalElements.uploadSection.style.display = this.value === 'upload' ? 'flex' : 'none';
+        });
+    });
+
+    addNavModalElements.filePickerBtn.addEventListener("click", function() { addNavModalElements.projectHtmlPicker.click(); }); 
+    addNavModalElements.projectHtmlPicker.addEventListener("change", function() { 
+        if (addNavModalElements.projectHtmlPicker.files.length > 0) { 
+            projectFile = addNavModalElements.projectHtmlPicker.files[0]; 
+            addNavModalElements.fileStatus.textContent = '已选择: ' + projectFile.name; 
+        } else { projectFile = null; addNavModalElements.fileStatus.textContent = '未选择任何文件'; }
+    });
+    function fileToBase64(e){return new Promise(function(t,n){var o=new FileReader;o.onload=function(){t(o.result.split(",")[1])},o.onerror=n,o.readAsDataURL(e)})}
+    
+    addNavModalElements.createBtn.addEventListener("click",function(){
+        var buttonName = addNavModalElements.nameInput.value.trim();
+        if(!buttonName) return void alert("请输入按钮名称。");
+        var type = document.querySelector('input[name="nav-type"]:checked').value;
+        addNavModalElements.createBtn.disabled = true;
+        addNavModalElements.createBtn.textContent = "处理中...";
+        var createPromise;
+        if("link"===type){
+            var url = addNavModalElements.urlInput.value.trim();
+            if(!url) {
+                alert("请输入网址链接。");
+                createPromise = Promise.reject();
+            } else {
+                createPromise = Promise.resolve({text: buttonName, href: url});
+            }
+        } else if ("upload"===type){
+            if(!checkConfig()) {
+                createPromise = Promise.reject();
+            } else if(!projectFile) {
+                alert("请选择一个HTML文件。");
+                createPromise = Promise.reject();
+            } else {
+                addNavModalElements.uploadStatus.textContent="正在上传文件...";
+                var path = buttonName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-") || ('project-'+Date.now());
+                createPromise = fileToBase64(projectFile).then(function(content_b64) {
+                    var uploadUrl = withCacheBust('https://api.github.com/repos/'+GITHUB_CONFIG.owner+'/'+GITHUB_CONFIG.repo+'/contents/'+path+'/index.html');
+                    return uploadFileWithProgress(uploadUrl, content_b64, GITHUB_CONFIG.token, 'Create project: '+buttonName, addNavModalElements.createBtn);
+                }).then(function() {
+                    addNavModalElements.uploadStatus.textContent="正在处理...";
+                    alert("项目上传发布成功！");
+                    return {text: buttonName, href: path+'/index.html'};
+                });
+            }
+        } else {
+             createPromise = Promise.reject();
+        }
+
+        createPromise.then(function(buttonData) {
+            if (buttonData) {
+                 addNewButtonToDOM(buttonData.text, buttonData.href); 
+                 resetAddNavForm(); 
+                 if(!addNavModalElements.stayOpenToggle.checked) { document.getElementById("addNavModal").classList.remove("show"); }
+            }
+        }).catch(function(o) {
+            if (o) {
+                console.error("创建失败:", o);
+                alert('操作失败: ' + o.message);
+                addNavModalElements.uploadStatus.textContent="操作失败!";
+            }
+        }).finally(function() {
+            addNavModalElements.createBtn.disabled = false;
+            addNavModalElements.createBtn.textContent = "加入新手机";
+        });
+    });
+    
+    // --- Iframe Modal and Confirmation Logic ---
+    function openIframeModal(url) { 
+        var hintShown = localStorage.getItem('swipeHintShown');
+        if (!hintShown) { 
+            swipeHint.classList.add('show'); 
+            setTimeout(function() { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); 
+        } 
+        iframeEl.src = url; iframeModal.classList.add('active'); 
+    }
+    function closeIframeModal() { hideReturnConfirmation(); iframeModal.classList.remove('active'); setTimeout(function() { iframeEl.src = 'about:blank'; }, 400); }
+    function showReturnConfirmation() { returnConfirmationToast.classList.add('show'); }
+    function hideReturnConfirmation() { returnConfirmationToast.classList.remove('show'); }
+    document.getElementById('confirmReturnBtn').addEventListener('click', closeIframeModal);
+    document.getElementById('cancelReturnBtn').addEventListener('click', hideReturnConfirmation);
+
+    var gestureCaptureZone = document.getElementById('gestureCaptureZone'); var startX = 0, currentX = 0, isDragging = false;
+    gestureCaptureZone.addEventListener('touchstart', function(e) { isDragging = true; startX = e.touches[0].clientX; iframeModalContent.classList.add('dragging'); }, { passive: true });
+    window.addEventListener('touchmove', function(e) { if (!isDragging || returnConfirmationToast.classList.contains('show')) return; e.preventDefault(); currentX = e.touches[0].clientX; var diffX = currentX - startX; if (diffX > 0) { iframeModalContent.style.transform = 'translateX(' + diffX + 'px)'; } }, { passive: false }); 
+    window.addEventListener('touchend', function(e) { if (!isDragging) return; isDragging = false; iframeModalContent.classList.remove('dragging'); iframeModalContent.style.transform = ''; var diffX = currentX - startX; var closeThreshold = window.innerWidth / 3.5; if (diffX > closeThreshold && !returnConfirmationToast.classList.contains('show')) { showReturnConfirmation(); } startX = 0; currentX = 0; });
+
+    function nukeAllData() {
+        if (!checkConfig(true)) return;
+        var confirmation = confirm("⚠️ 极度危险操作！\n\n这将永久删除您所有的数据，包括：\n\n- 所有本地设置 (主题、GitHub配置等)\n- GitHub仓库中的 `config.json` (所有按钮和设置)\n- GitHub仓库中的 `data_sync` 文件夹 (所有上传的文件和项目)\n- GitHub仓库中的所有项目文件夹\n\n此操作不可逆，将使应用恢复到空白的初始状态。确定要继续吗？");
+        if (!confirmation) { return; }
+
+        updateSyncStatus('syncing', '正在执行重置...');
+        
+        var deleteConfigPromise = Promise.resolve();
+        if (configSha) {
+            var configUrl = withCacheBust('https://api.github.com/repos/' + GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo + '/contents/config.json');
+            deleteConfigPromise = fetch(configUrl, {
+                method: 'DELETE', headers: { 'Authorization': 'token ' + GITHUB_CONFIG.token },
+                body: JSON.stringify({ message: 'NUKE: Deleting config file', sha: configSha, branch: 'main' })
+            }).then(function(response) {
+                if (!response.ok && response.status !== 404) { throw new Error('Failed to delete config.json: ' + response.statusText); }
+                console.log('config.json deleted from GitHub.');
+            });
+        }
+
+        deleteConfigPromise.then(function() {
+            var rootContentsUrl = withCacheBust('https://api.github.com/repos/' + GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo + '/contents/');
+            return fetch(rootContentsUrl, { headers: { 'Authorization': 'token ' + GITHUB_CONFIG.token } });
+        }).then(function(rootContentsRes) {
+            if (rootContentsRes.ok) {
+                return rootContentsRes.json();
+            }
+            return [];
+        }).then(function(items) {
+            var folderDeletionPromises = items
+                .filter(function(item) { return item.type === 'dir' && ['data_sync', '.github', 'icons'].indexOf(item.name) === -1; })
+                .map(function(dir) { return deleteGithubFolder(dir.path); });
+            return Promise.all(folderDeletionPromises);
+        }).then(function() {
+            console.log('All project and data folders deleted.');
+            localStorage.clear();
+            alert('所有数据已清空。页面将刷新。');
+            location.reload();
+        }).catch(function(error) {
+            console.error('Nuke operation failed:', error);
+            updateSyncStatus('error', '重置失败: ' + error.message);
+            alert('重置操作失败: ' + error.message);
+        });
+    }
+    document.getElementById('nukeDataBtn').addEventListener('click', nukeAllData);
+
+    window.addEventListener('load', function() {
         initTheme(); loadGithubConfig();
-        await loadInitialData();
-        setupModals();
-        setupColorSync(colorModal.pickerD1, colorModal.hexD1, 'dayColor1'); setupColorSync(colorModal.pickerD2, colorModal.hexD2, 'dayColor2');
-        setupColorSync(colorModal.pickerN1, colorModal.hexN1, 'nightColor1'); setupColorSync(colorModal.pickerN2, colorModal.hexN2, 'nightColor2');
+        loadInitialData().then(function() {
+            setupModals();
+            setupColorSync(colorModal.pickerD1, colorModal.hexD1, 'dayColor1'); 
+            setupColorSync(colorModal.pickerD2, colorModal.hexD2, 'dayColor2');
+            setupColorSync(colorModal.pickerN1, colorModal.hexN1, 'nightColor1'); 
+            setupColorSync(colorModal.pickerN2, colorModal.hexN2, 'nightColor2');
+        });
     });
     </script>
 </body>
