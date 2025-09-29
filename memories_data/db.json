@@ -15,6 +15,16 @@
         "name": "我的照片"
       }
     ],
-    "photos": []
+    "photos": [
+      {
+        "id": "1759149025692-p45n51i28",
+        "albumId": 1759149008934,
+        "title": "水母",
+        "description": "",
+        "path": "memories_data/photos/1759149025692-p45n51i28.png",
+        "sha": "34a5240d698f4ebddd95d8fba3ef4f8afe90689e",
+        "timestamp": 1759149030802
+      }
+    ]
   }
 }
