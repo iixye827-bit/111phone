@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V8.6.0 "Feature Restore & Bug Fix"] */
+        /* [CSS - V8.8.0 "Photo Management & Bug Fixes"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -158,14 +158,7 @@
         @media (max-width: 480px) { .editable-title { font-size: 28px; } .editable-subtitle { font-size: 14px; } .title-card { padding: 30px 15px; } .nav-container { grid-template-columns: 1fr 1fr; gap: 18px; padding: 10px; } .nav-btn { padding: 18px 10px; font-size: 15px; } .fab-container { right: 20px; bottom: 20px; } .fab-main, .fab-drawer-item { width: 44px; height: 44px; font-size: 20px; } .fab-drawer { bottom: 55px; } .segmented-control label { font-size: 13px; padding: 8px 5px; } }
         
         /* ===== [START] MEMORY MODAL STYLES ===== */
-        #memoryModal .modal-content {
-             max-width: 800px;
-             height: calc(100vh - 40px);
-             padding: 0;
-             display: flex;
-             flex-direction: column;
-             overflow: hidden;
-        }
+        #memoryModal .modal-content { max-width: 800px; height: calc(100vh - 40px); padding: 0; display: flex; flex-direction: column; overflow: hidden; }
         #memoryModal .modal-header { padding: 0 15px; margin-top: 15px; margin-bottom: 10px; }
         #memoryModal .app-container { width: 100%; flex-grow: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         #memoryModal .page { width: 100%; height: 100%; display: none; flex-direction: column; position: absolute; top: 0; left: 0; opacity: 0; transform: scale(0.98); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; }
@@ -178,14 +171,13 @@
         #memoryModal .header-btn.manage-btn, #memoryModal .header-btn.wander-btn { color: var(--hold-border); }
         #memoryModal .header-controls { display: flex; gap: 8px; }
         #memoryModal .list-container { flex-grow: 1; overflow-y: auto; padding: 0 15px 80px 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; align-content: flex-start; }
-        #memoryModal .list-container.manage .folder-item .delete-icon, #memoryModal .list-container.manage .album-item .delete-icon { display: flex; }
         #memoryModal #hub-view-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 30px; }
         #memoryModal .hub-btn { width: 80%; max-width: 300px; padding: 40px 20px; border: none; border-radius: 20px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 24px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
         body.dark-mode #memoryModal .hub-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
         #memoryModal .hub-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-day), inset -6px -6px 12px var(--shadow-light-day); } body.dark-mode #memoryModal .hub-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-night), inset -6px -6px 12px var(--shadow-light-night); }
         #memoryModal #notes-list-container { grid-template-columns: 1fr; }
-        #memoryModal .folder-item, #memoryModal .note-item, #memoryModal .album-item { position: relative; padding: 20px 15px; border: none; border-radius: 14px; box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); background: var(--bg-day-element); font-size: 16px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; user-select: none; -webkit-tap-highlight-color: transparent; text-align: left; }
-        #memoryModal .delete-icon { display: none; position: absolute; top: -8px; right: -8px; width: 28px; height: 28px; background-color: #f56565; color: white; border-radius: 50%; border: 2px solid white; font-size: 20px; font-weight: bold; line-height: 24px; text-align: center; cursor: pointer; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); align-items: center; justify-content: center; }
+        #memoryModal .folder-item, #memoryModal .album-item { margin-bottom: 10px; position: relative; padding: 20px 15px; border: none; border-radius: 14px; box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); background: var(--bg-day-element); font-size: 16px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; user-select: none; -webkit-tap-highlight-color: transparent; text-align: left; }
+        #memoryModal .note-item { position: relative; padding: 20px 15px; border: none; border-radius: 14px; box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); background: var(--bg-day-element); font-size: 16px; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; user-select: none; -webkit-tap-highlight-color: transparent; text-align: left; }
         body.dark-mode #memoryModal .folder-item, body.dark-mode #memoryModal .note-item, body.dark-mode #memoryModal .album-item { box-shadow: 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
         #memoryModal .folder-item:active, #memoryModal .note-item:active, #memoryModal .album-item:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); transform: translateY(0); }
         body.dark-mode #memoryModal .folder-item:active, body.dark-mode #memoryModal .note-item:active, body.dark-mode #memoryModal .album-item:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
@@ -237,6 +229,18 @@
         #memoryPhotoDetailsModal #upload-thumbnail { max-width: 100px; max-height: 100px; border-radius: 8px; margin: 0 auto; object-fit: cover; }
         #memoryPhotoDetailsModal .modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
         #memoryPhotoDetailsModal .modal-button.primary { color: var(--hold-border); }
+        #memoryModal .pin-btn { position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 20px; cursor: pointer; opacity: 0.3; transition: opacity 0.2s, transform 0.2s; z-index: 5; }
+        #memoryModal .note-item.pinned .pin-btn { opacity: 1; color: var(--hold-border); }
+        #memoryModal .pin-btn:hover { transform: scale(1.2); }
+        .management-controls { display: none; position: absolute; bottom: 0; left: 0; right: 0; padding: 15px; background: var(--bg-day-element); box-shadow: 0 -4px 12px rgba(0,0,0,0.1); z-index: 101; flex-direction: row; justify-content: space-between; gap: 10px; border-radius: 16px 16px 0 0;}
+        body.dark-mode .management-controls { background: var(--bg-night-element); }
+        .management-controls.active { display: flex; }
+        .management-controls .modal-button { flex-grow: 1; margin: 0; padding: 12px; }
+        .folder-item.manage-mode, .photo-item.manage-mode { cursor: pointer; }
+        .folder-item .manage-checkbox, .photo-item .manage-checkbox { display: none; position: absolute; top: 10px; left: 10px; width: 22px; height: 22px; z-index: 5; }
+        .folder-item.manage-mode .manage-checkbox, .photo-item.manage-mode .manage-checkbox { display: block; }
+        .folder-item.manage-selected, .photo-item.manage-selected { border: 2px solid var(--hold-border); box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day) !important; }
+        body.dark-mode .folder-item.manage-selected, body.dark-mode .photo-item.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
         /* ===== [END] MEMORY MODAL STYLES ===== */
     </style>
 </head>
@@ -341,6 +345,10 @@
                         </div>
                         <div id="folder-list-container" class="list-container"></div>
                         <button id="add-folder-fab" class="fab">+</button>
+                        <div id="memo-management-controls" class="management-controls">
+                             <button id="select-all-memo-folders-btn" class="modal-button">全选</button>
+                             <button id="delete-selected-memo-folders-btn" class="modal-button" style="color:#f56565;">删除选中</button>
+                        </div>
                     </div>
                     <div id="notes-view" class="page">
                         <div class="page-header">
@@ -384,11 +392,16 @@
                             <h1 id="photo-grid-title" class="title">相册</h1>
                             <div class="header-controls">
                                 <button id="local-wander-btn" class="header-btn wander-btn">漫游</button>
+                                <button id="manage-photos-btn" class="header-btn manage-btn">管理</button>
                             </div>
                         </div>
                         <div id="photo-list-container" class="list-container"></div>
                         <label for="photo-uploader" id="add-photo-fab" class="fab">+</label>
                         <input type="file" id="photo-uploader" multiple accept="image/*" style="display: none;">
+                        <div id="photo-management-controls" class="management-controls">
+                             <button id="select-all-photos-btn" class="modal-button">全选</button>
+                             <button id="delete-selected-photos-btn" class="modal-button" style="color:#f56565;">删除选中</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -453,7 +466,7 @@
     </div>
 
     <script>
-    // [JS - V8.6.0 "Feature Restore & Bug Fix"]
+    // [JS - V8.8.0 "Photo Management & Bug Fixes"]
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false, isLongPress = false;
     let longPressTimer = null, sourceBtn = null, targetBtn = null, projectFile = null;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
@@ -537,10 +550,14 @@
                 headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` },
                 body: JSON.stringify({ message: commitMessage, sha: sha, branch: 'main' })
             });
-            if (!response.ok && response.status !== 404) throw new Error(await response.text());
+            if (!response.ok && response.status !== 404) {
+                 const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                 throw new Error(`${response.status}: ${errorData.message}`);
+            }
             return true;
         } catch (error) {
             console.error(`Failed to delete ${path}:`, error);
+            alert(`删除文件 ${path.split('/').pop()} 失败: ${error.message}`);
             return false;
         }
     }
@@ -767,15 +784,27 @@
             albumList: document.getElementById('album-list-container'),
             photoList: document.getElementById('photo-list-container'),
             photoUploader: document.getElementById('photo-uploader'),
+            // Memo Management
+            memoManageBtn: document.getElementById('manage-memo-folders-btn'),
+            memoManageControls: document.getElementById('memo-management-controls'),
+            selectAllMemoBtn: document.getElementById('select-all-memo-folders-btn'),
+            deleteSelectedMemoBtn: document.getElementById('delete-selected-memo-folders-btn'),
+            // Photo Management
+            photoManageBtn: document.getElementById('manage-photos-btn'),
+            photoManageControls: document.getElementById('photo-management-controls'),
+            selectAllPhotosBtn: document.getElementById('select-all-photos-btn'),
+            deleteSelectedPhotosBtn: document.getElementById('delete-selected-photos-btn'),
         };
 
         const state = {
             currentView: 'hub-view',
             currentSection: null,
             isMemoManageMode: false,
+            memoFoldersToDelete: [],
+            isPhotoManageMode: false,
+            photosToDelete: [],
             currentMemoFolderId: null,
             currentNoteId: null,
-            isAlbumManageMode: false,
             currentAlbumId: null,
             currentPhoto: { albumPhotos: [], photoIndex: -1 },
             photoUploadQueue: [],
@@ -807,7 +836,6 @@
                 memoryCache = JSON.parse(b6_to_utf8(result.data.content));
                 memoryDataSha = result.sha;
             } else {
-                // If no data on cloud, keep local initial data and prepare for first save
                 memoryDataSha = null;
             }
             updateStatus('已同步');
@@ -835,14 +863,17 @@
 
         function renderAll() {
             if (!memoryCache) return;
-            if (state.currentSection === 'memo') {
-                if (state.currentView === 'folder-view' || ui.appContainer.querySelector('#memo-section #folder-view').classList.contains('active')) renderMemoFolders();
-                if (state.currentView === 'notes-view' || ui.appContainer.querySelector('#memo-section #notes-view').classList.contains('active')) renderNotes();
-            } else if (state.currentSection === 'album') {
-                if (state.currentView === 'album-folder-view' || ui.appContainer.querySelector('#album-section #album-folder-view').classList.contains('active')) renderAlbumFolders();
-                if (state.currentView === 'photo-grid-view' || ui.appContainer.querySelector('#album-section #photo-grid-view').classList.contains('active')) renderPhotos();
-            } else {
-                showPage('hub-view');
+            const activePage = ui.appContainer.querySelector('.page.active');
+            if (!activePage || activePage.id === 'hub-view') {
+                 showPage('hub-view');
+            } else if (activePage.id === 'memo-section') {
+                const activeMemoView = activePage.querySelector('.page.active');
+                if(activeMemoView.id === 'folder-view') renderMemoFolders();
+                else if(activeMemoView.id === 'notes-view') renderNotes();
+            } else if (activePage.id === 'album-section') {
+                const activeAlbumView = activePage.querySelector('.page.active');
+                if(activeAlbumView.id === 'album-folder-view') renderAlbumFolders();
+                else if(activeAlbumView.id === 'photo-grid-view') renderPhotos();
             }
         }
         
@@ -867,23 +898,41 @@
             }
             memoryCache.memo.folders.forEach(folder => {
                 const el = document.createElement('div');
-                el.className = 'folder-item'; el.dataset.folderId = folder.id;
-                el.innerHTML = `<div class="folder-icon">📁</div><div class="folder-name">${folder.name}</div><div class="delete-icon" data-action="delete-memo-folder">×</div>`;
+                el.className = 'folder-item';
+                el.dataset.folderId = folder.id;
+                if (state.isMemoManageMode) {
+                    el.classList.add('manage-mode');
+                    if (state.memoFoldersToDelete.includes(folder.id)) {
+                        el.classList.add('manage-selected');
+                    }
+                }
+                el.innerHTML = `<input type="checkbox" class="manage-checkbox" data-id="${folder.id}" ${state.memoFoldersToDelete.includes(folder.id) ? 'checked' : ''}>
+                                <div class="folder-icon">📁</div>
+                                <div class="folder-name">${folder.name}</div>`;
                 ui.folderList.appendChild(el);
             });
         }
         function renderNotes() {
             ui.notesList.innerHTML = '';
-            const notesInFolder = memoryCache.memo.notes.filter(n => n.folderId === state.currentMemoFolderId).sort((a, b) => b.timestamp - a.timestamp);
+            const notesInFolder = memoryCache.memo.notes
+                .filter(n => n.folderId === state.currentMemoFolderId)
+                .sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || b.timestamp - a.timestamp);
+
             if (notesInFolder.length === 0) {
                 ui.notesList.innerHTML = `<p class="empty-list-placeholder">没有笔记</p>`; return;
             }
             notesInFolder.forEach(note => {
                 const el = document.createElement('div');
-                el.className = 'note-item'; el.dataset.noteId = note.id;
+                el.className = `note-item ${note.isPinned ? 'pinned' : ''}`; 
+                el.dataset.noteId = note.id;
                 const preview = note.content.substring(0, 100);
                 const date = new Date(note.timestamp).toLocaleDateString('zh-CN');
-                el.innerHTML = `<div class="note-title">${note.title || '无标题'}</div><div class="note-preview">${preview || '没有内容'}</div><div class="note-timestamp">${date}</div>`;
+                el.innerHTML = `<div class="note-content-area">
+                                  <div class="note-title">${note.title || '无标题'}</div>
+                                  <div class="note-preview">${preview || '没有内容'}</div>
+                                  <div class="note-timestamp">${date}</div>
+                                </div>
+                                <button class="pin-btn" data-note-id="${note.id}" title="置顶">📌</button>`;
                 ui.notesList.appendChild(el);
             });
         }
@@ -898,7 +947,7 @@
                 const photoCount = memoryCache.album.photos.filter(p => p.albumId === folder.id).length;
                 const el = document.createElement('div');
                 el.className = 'album-item'; el.dataset.albumId = folder.id;
-                el.innerHTML = `<div><div class="folder-icon">🖼️</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${photoCount} 张照片</div><div class="delete-icon" data-action="delete-album-folder">×</div>`;
+                el.innerHTML = `<div><div class="folder-icon">🖼️</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${photoCount} 张照片</div>`;
                 ui.albumList.appendChild(el);
             });
         }
@@ -911,9 +960,18 @@
             }
             photosInAlbum.forEach(photo => {
                 const el = document.createElement('div');
-                el.className = 'photo-item'; el.dataset.photoId = photo.id;
+                el.className = 'photo-item';
+                el.dataset.photoId = photo.id;
+                if (state.isPhotoManageMode) {
+                    el.classList.add('manage-mode');
+                    if (state.photosToDelete.includes(photo.id)) {
+                        el.classList.add('manage-selected');
+                    }
+                }
                 const photoUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${photo.path}`;
-                el.innerHTML = `<img src="${photoUrl}" alt="${photo.title}" loading="lazy"><div class="photo-title-overlay">${photo.title || '无标题'}</div>`;
+                el.innerHTML = `<input type="checkbox" class="manage-checkbox" data-id="${photo.id}" ${state.photosToDelete.includes(photo.id) ? 'checked' : ''}>
+                                <img src="${photoUrl}" alt="${photo.title}" loading="lazy">
+                                <div class="photo-title-overlay">${photo.title || '无标题'}</div>`;
                 ui.photoList.appendChild(el);
             });
         }
@@ -956,7 +1014,7 @@
 
                 memoryCache.album.photos.push({
                     id: Date.now() + Math.random(), albumId: state.currentAlbumId,
-                    title, description, path, timestamp: Date.now(),
+                    title, description, path, sha: result.sha, timestamp: Date.now(),
                 });
                 scheduleSave();
                 state.photoUploadQueue.shift();
@@ -966,74 +1024,173 @@
                 console.error(error);
             }
         }
-
+        
         function initEventListeners() {
-            const modalBody = document.querySelector('#memoryModal .app-container');
+            // Main Navigation
+            document.getElementById('goto-memo-btn').addEventListener('click', () => { state.currentSection = 'memo'; renderMemoFolders(); showView('folder-view', 'memo-section'); });
+            document.getElementById('goto-album-btn').addEventListener('click', () => { state.currentSection = 'album'; renderAlbumFolders(); showView('album-folder-view', 'album-section'); });
             
-            modalBody.addEventListener('click', e => {
-                const target = e.target;
-                if (target.matches('#goto-memo-btn')) {
-                    state.currentSection = 'memo'; renderMemoFolders(); showView('folder-view', 'memo-section');
-                } else if (target.matches('#goto-album-btn')) {
-                    state.currentSection = 'album'; renderAlbumFolders(); showView('album-folder-view', 'album-section');
-                } else if (target.matches('.back-btn')) {
-                    const targetViewId = target.dataset.target;
-                    if (targetViewId === 'hub-view') {
-                        state.currentSection = null;
-                        showPage('hub-view');
-                    }
-                    else showView(targetViewId, target.closest('.page.active').id);
-                } else if (target.closest('.folder-item')) {
-                    if (state.isMemoManageMode) {
-                        if (target.dataset.action === 'delete-memo-folder') {
-                            const folderItem = target.closest('.folder-item');
-                            const folderId = Number(folderItem.dataset.folderId);
-                            const folder = memoryCache.memo.folders.find(f => f.id === folderId);
-                            if (confirm(`确定要删除文件夹 "${folder.name}" 吗？\n该文件夹下的所有笔记也将被删除！`)) {
-                                memoryCache.memo.folders = memoryCache.memo.folders.filter(f => f.id !== folderId);
-                                memoryCache.memo.notes = memoryCache.memo.notes.filter(n => n.folderId !== folderId);
-                                scheduleSave(); renderMemoFolders();
-                            }
-                        }
+            ui.modal.querySelectorAll('.back-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetViewId = btn.dataset.target;
+                    if (targetViewId === 'hub-view') { state.currentSection = null; showPage('hub-view'); } 
+                    else { showView(targetViewId, btn.closest('.page.active').id); }
+                });
+            });
+
+            // Memo Logic
+            ui.memoManageBtn.addEventListener('click', () => {
+                state.isMemoManageMode = !state.isMemoManageMode;
+                ui.memoManageControls.classList.toggle('active', state.isMemoManageMode);
+                ui.memoManageBtn.textContent = state.isMemoManageMode ? '完成' : '管理';
+                if (!state.isMemoManageMode) state.memoFoldersToDelete = [];
+                renderMemoFolders();
+            });
+            ui.folderList.addEventListener('click', e => {
+                const folderItem = e.target.closest('.folder-item');
+                if (!folderItem) return;
+                const folderId = Number(folderItem.dataset.folderId);
+                if (state.isMemoManageMode) {
+                    folderItem.classList.toggle('manage-selected');
+                    const checkbox = folderItem.querySelector('.manage-checkbox');
+                    if (state.memoFoldersToDelete.includes(folderId)) {
+                        state.memoFoldersToDelete = state.memoFoldersToDelete.filter(id => id !== folderId);
+                        if(checkbox) checkbox.checked = false;
                     } else {
-                        state.currentMemoFolderId = Number(target.closest('.folder-item').dataset.folderId);
-                        const folder = memoryCache.memo.folders.find(f => f.id === state.currentMemoFolderId);
-                        document.getElementById('notes-view-title').textContent = folder.name;
-                        renderNotes(); showView('notes-view', 'memo-section');
+                        state.memoFoldersToDelete.push(folderId);
+                        if(checkbox) checkbox.checked = true;
                     }
-                } else if (target.closest('.note-item')) {
-                    state.currentNoteId = Number(target.closest('.note-item').dataset.noteId);
+                } else {
+                    state.currentMemoFolderId = folderId;
+                    const folder = memoryCache.memo.folders.find(f => f.id === state.currentMemoFolderId);
+                    document.getElementById('notes-view-title').textContent = folder.name;
+                    renderNotes(); showView('notes-view', 'memo-section');
+                }
+            });
+            ui.notesList.addEventListener('click', e => {
+                const noteItem = e.target.closest('.note-item');
+                if (!noteItem) return;
+                if (e.target.matches('.pin-btn')) {
+                    const noteId = Number(e.target.dataset.noteId);
+                    const note = memoryCache.memo.notes.find(n => n.id === noteId);
+                    if (note) { note.isPinned = !note.isPinned; scheduleSave(); renderNotes(); }
+                } else {
+                    state.currentNoteId = Number(noteItem.dataset.noteId);
                     const note = memoryCache.memo.notes.find(n => n.id === state.currentNoteId);
                     document.getElementById('note-title-input').value = note.title;
                     document.getElementById('note-content-textarea').value = note.content;
                     document.getElementById('delete-note-btn').style.display = 'inline-block';
                     showView('note-editor-view', 'memo-section');
-                } else if (target.matches('#add-note-fab')) {
-                    state.currentNoteId = null;
-                    document.getElementById('note-title-input').value = '';
-                    document.getElementById('note-content-textarea').value = '';
-                    document.getElementById('delete-note-btn').style.display = 'none';
-                    showView('note-editor-view', 'memo-section');
-                } else if (target.matches('#save-note-btn')) {
-                    const title = document.getElementById('note-title-input').value.trim();
-                    const content = document.getElementById('note-content-textarea').value.trim();
-                    if (state.currentNoteId) {
-                        const note = memoryCache.memo.notes.find(n => n.id === state.currentNoteId);
-                        note.title = title; note.content = content; note.timestamp = Date.now();
-                    } else {
-                        if (!title && !content) { showView('notes-view', 'memo-section'); return; };
-                        memoryCache.memo.notes.push({ id: Date.now(), folderId: state.currentMemoFolderId, title, content, timestamp: Date.now() });
-                    }
-                    scheduleSave(); renderNotes(); showView('notes-view', 'memo-section');
-                } else if (target.matches('#cancel-note-btn')) {
-                    showView('notes-view', 'memo-section');
-                } else if (target.matches('#delete-note-btn')) {
-                    if (!confirm('确定删除此笔记？')) return;
-                    memoryCache.memo.notes = memoryCache.memo.notes.filter(n => n.id !== state.currentNoteId);
-                    scheduleSave(); renderNotes(); showView('notes-view', 'memo-section');
                 }
             });
+            document.getElementById('add-note-fab').addEventListener('click', () => {
+                state.currentNoteId = null;
+                document.getElementById('note-title-input').value = '';
+                document.getElementById('note-content-textarea').value = '';
+                document.getElementById('delete-note-btn').style.display = 'none';
+                showView('note-editor-view', 'memo-section');
+            });
+            document.getElementById('save-note-btn').addEventListener('click', () => {
+                const title = document.getElementById('note-title-input').value.trim();
+                const content = document.getElementById('note-content-textarea').value.trim();
+                if (state.currentNoteId) {
+                    const note = memoryCache.memo.notes.find(n => n.id === state.currentNoteId);
+                    note.title = title; note.content = content; note.timestamp = Date.now();
+                } else {
+                    if (!title && !content) { showView('notes-view', 'memo-section'); return; };
+                    memoryCache.memo.notes.push({ id: Date.now(), folderId: state.currentMemoFolderId, title, content, timestamp: Date.now(), isPinned: false });
+                }
+                scheduleSave(); renderNotes(); showView('notes-view', 'memo-section');
+            });
+            document.getElementById('cancel-note-btn').addEventListener('click', () => showView('notes-view', 'memo-section'));
+            document.getElementById('delete-note-btn').addEventListener('click', () => {
+                if (!confirm('确定删除此笔记？')) return;
+                memoryCache.memo.notes = memoryCache.memo.notes.filter(n => n.id !== state.currentNoteId);
+                scheduleSave(); renderNotes(); showView('notes-view', 'memo-section');
+            });
+            ui.selectAllMemoBtn.addEventListener('click', () => {
+                const allFolderIds = memoryCache.memo.folders.map(f => f.id);
+                state.memoFoldersToDelete = state.memoFoldersToDelete.length === allFolderIds.length ? [] : allFolderIds;
+                renderMemoFolders();
+            });
+            ui.deleteSelectedMemoBtn.addEventListener('click', () => {
+                if (state.memoFoldersToDelete.length === 0) return alert('请先选择要删除的文件夹。');
+                if (confirm(`确定要删除选中的 ${state.memoFoldersToDelete.length} 个文件夹吗？\n文件夹内的所有笔记也将被永久删除！`)) {
+                    memoryCache.memo.folders = memoryCache.memo.folders.filter(f => !state.memoFoldersToDelete.includes(f.id));
+                    memoryCache.memo.notes = memoryCache.memo.notes.filter(n => !state.memoFoldersToDelete.includes(n.folderId));
+                    state.memoFoldersToDelete = [];
+                    scheduleSave();
+                    renderMemoFolders();
+                }
+            });
+
+            // Album Logic
+            document.getElementById('album-list-container').addEventListener('click', e => {
+                 const albumItem = e.target.closest('.album-item');
+                 if (albumItem) {
+                    state.currentAlbumId = Number(albumItem.dataset.albumId);
+                    const album = memoryCache.album.folders.find(f => f.id === state.currentAlbumId);
+                    document.getElementById('photo-grid-title').textContent = album.name;
+                    renderPhotos();
+                    showView('photo-grid-view', 'album-section');
+                 }
+            });
+             ui.photoManageBtn.addEventListener('click', () => {
+                state.isPhotoManageMode = !state.isPhotoManageMode;
+                ui.photoManageControls.classList.toggle('active', state.isPhotoManageMode);
+                ui.photoManageBtn.textContent = state.isPhotoManageMode ? '完成' : '管理';
+                if (!state.isPhotoManageMode) state.photosToDelete = [];
+                renderPhotos();
+            });
+            ui.photoList.addEventListener('click', e => {
+                const photoItem = e.target.closest('.photo-item');
+                if (!photoItem) return;
+                const photoId = Number(photoItem.dataset.photoId);
+                if(state.isPhotoManageMode){
+                    photoItem.classList.toggle('manage-selected');
+                    const checkbox = photoItem.querySelector('.manage-checkbox');
+                    if (state.photosToDelete.includes(photoId)) {
+                        state.photosToDelete = state.photosToDelete.filter(id => id !== photoId);
+                        if(checkbox) checkbox.checked = false;
+                    } else {
+                        state.photosToDelete.push(photoId);
+                        if(checkbox) checkbox.checked = true;
+                    }
+                } else {
+                    // Open photo viewer logic here
+                }
+            });
+            ui.selectAllPhotosBtn.addEventListener('click', () => {
+                const allPhotoIds = memoryCache.album.photos.filter(p => p.albumId === state.currentAlbumId).map(p => p.id);
+                state.photosToDelete = state.photosToDelete.length === allPhotoIds.length ? [] : allPhotoIds;
+                renderPhotos();
+            });
+            ui.deleteSelectedPhotosBtn.addEventListener('click', async () => {
+                if (state.photosToDelete.length === 0) return alert('请先选择要删除的照片。');
+                if (!confirm(`确定要从云端永久删除选中的 ${state.photosToDelete.length} 张照片吗？`)) return;
+
+                updateStatus('正在删除...');
+                const photosToRemove = memoryCache.album.photos.filter(p => state.photosToDelete.includes(p.id));
+                const deletionPromises = photosToRemove.map(p => deleteFromGithub(p.path, `Delete photo ${p.path}`, p.sha));
+                const results = await Promise.all(deletionPromises);
+                
+                const successfulDeletions = results.filter(Boolean).length;
+                if(successfulDeletions < photosToRemove.length) {
+                    alert(`有 ${photosToRemove.length - successfulDeletions} 张照片删除失败，请检查网络或权限后重试。`);
+                }
+
+                memoryCache.album.photos = memoryCache.album.photos.filter(p => !state.photosToDelete.includes(p.id));
+                state.photosToDelete = [];
+                state.isPhotoManageMode = false;
+                ui.photoManageControls.classList.remove('active');
+                ui.photoManageBtn.textContent = '管理';
+                scheduleSave();
+                renderPhotos();
+                renderAlbumFolders(); // Update count
+                updateStatus('删除完成');
+            });
             
+            // Photo Upload
             document.getElementById('save-photo-details-btn').addEventListener('click', () => saveUploadedPhoto(false));
             document.getElementById('skip-photo-details-btn').addEventListener('click', () => saveUploadedPhoto(true));
             ui.photoUploader.addEventListener('change', e => {
@@ -1052,10 +1209,8 @@
                 }
                 ui.modal.classList.add('show');
                 if (!memoryCache) {
-                    // Optimistic update: show UI immediately with default/empty data
                     memoryCache = getInitialData();
                     renderAll();
-                    // Then fetch real data in the background
                     syncWithGithub();
                 } else {
                     renderAll();
