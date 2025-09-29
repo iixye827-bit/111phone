@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V8.6.0 "Touch Drag & Drop"] */
+        /* [CSS - V8.7.0 "Background Image"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -27,8 +27,9 @@
             --shadow-light-day: rgba(255, 255, 255, 0.9); --shadow-dark-day: rgba(174, 190, 212, 0.4);
             --shadow-light-night: rgba(40, 52, 79, 0.9); --shadow-dark-night: rgba(0, 0, 0, 0.3);
         }
-        body { min-height: 100vh; background: linear-gradient(135deg, var(--day-color1) 0%, var(--day-color2) 100%); padding: 20px; display: flex; flex-direction: column; align-items: center; transition: background 0.5s ease; touch-action: manipulation; overflow-x: hidden; }
-        body.dark-mode { background: linear-gradient(135deg, var(--night-color1) 0%, var(--night-color2) 100%); --hold-border: #63b3ed; color: var(--text-night); }
+        body { min-height: 100vh; background-image: linear-gradient(135deg, var(--day-color1) 0%, var(--day-color2) 100%); padding: 20px; display: flex; flex-direction: column; align-items: center; transition: background 0.5s ease; touch-action: manipulation; overflow-x: hidden; }
+        body.dark-mode { background-image: linear-gradient(135deg, var(--night-color1) 0%, var(--night-color2) 100%); --hold-border: #63b3ed; color: var(--text-night); }
+        body.background-image-active { background-size: cover; background-position: center center; background-repeat: no-repeat; background-attachment: fixed; }
         .title-card { width: 100%; max-width: 800px; padding: 40px 20px; margin: 20px 0; border-radius: 16px; box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); background: var(--bg-day-element); backdrop-filter: blur(8px); text-align: center; transition: all 0.5s ease; }
         body.dark-mode .title-card { box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night); background: var(--bg-night-element); }
         .editable-title, .editable-subtitle { opacity: 0; transition: opacity 0.5s ease; } /* FOUC Fix */
@@ -87,6 +88,7 @@
         .preview-box::before { content: attr(data-label); } #dayPreview { border: 2px solid var(--bg-day-element); color: var(--text-day); } body.dark-mode #dayPreview { border-color: rgba(255,255,255,0.1); }
         #nightPreview { border: 2px solid var(--bg-night-element); color: var(--text-night); } body.dark-mode #nightPreview { border-color: rgba(255,255,255,0.2); }
         .preset-manager { border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .bg-manager #bg-image-status { flex-grow: 1; text-align: center; font-size: 13px; color: #889; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px; }
         body.dark-mode .preset-manager { border-color: rgba(255,255,255,0.1); } .preset-row { display: flex; align-items: center; gap: 10px; }
         .preset-row .modal-input, .preset-row .modal-select { flex-grow: 1; }
         .preset-row .modal-button { width: auto; padding: 12px 15px; flex-shrink: 0; font-size: 14px; }
@@ -186,7 +188,7 @@
                 <h4>步骤 4：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌙 按钮展开菜单 → 点击 <strong>☁️ (数据云盘)</strong> → 点击标题旁的 <strong>⚙️ (设置)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤3</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，并采用了最高效的架构。</p>
             </div>
             <div id="help-page-2" class="help-page-content">
-                <h3>功能详解</h3><h4>1. 导航管理</h4><p><strong>添加新手机</strong>：长按主菜单 → 点击 📱 图标。可选择添加`外部链接`或`上传项目`。</p><p><strong>管理与删除</strong>：在“管理小手机”弹窗内，点击`进入管理模式`，即可对现有按钮进行**长按拖动排序**或点击`×`进行删除。</p><h4>2. 主题与个性化</h4><p><strong>实时调色</strong>：长按主菜单 → 点击 🎨 图标。可实时调整日间/夜间模式的背景渐变色。</p><p><strong>色彩预设</strong>：您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能。</p><h4>3. 文件云盘与同步状态</h4><p><strong>访问与管理</strong>：长按主菜单 → 点击 ☁️ 图标。您可以分门别类地管理与“上传项目”相关联的所有文件。建议用来存储备份文件。</p><p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p><ul><li><strong>🟢 绿点</strong>: `已同步` - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: `同步中` - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: `同步失败` - 发生错误，请点击图标查看失败原因，通常是网络问题或PAT失效。</li></ul><h4>4. 基础操作</h4><p><strong>编辑标题</strong>：直接点击页面上的主标题或副标题即可修改。</p><p><strong>访问链接与返回</strong>：对于外部链接，会在应用内全屏打开。您可以从屏幕**最左侧边缘向右滑动**来关闭当前页面并返回中心。</p><p><strong>切换主题</strong>：**单击 (短按)** 右下角的 🌞/🌙 按钮。</p><h4>5. 危险区域</h4><div class="warning"><p><strong>清空所有数据</strong>：在 `GitHub 配置` (⚙️) 弹窗的最下方。此操作会 **永久删除** 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
+                <h3>功能详解</h3><h4>1. 导航管理</h4><p><strong>添加新手机</strong>：长按主菜单 → 点击 📱 图标。可选择添加`外部链接`或`上传项目`。</p><p><strong>管理与删除</strong>：在“管理小手机”弹窗内，点击`进入管理模式`，即可对现有按钮进行**长按拖动排序**或点击`×`进行删除。</p><h4>2. 主题与个性化</h4><p><strong>实时调色</strong>：长按主菜单 → 点击 🎨 图标。可实时调整日间/夜间模式的背景渐变色。</p><p><strong>背景图片</strong>：在主题设置中，您可以选择本地图片作为页面背景，该设置会自动同步到云端。</p><p><strong>色彩预设</strong>：您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能。</p><h4>3. 文件云盘与同步状态</h4><p><strong>访问与管理</strong>：长按主菜单 → 点击 ☁️ 图标。您可以分门别类地管理与“上传项目”相关联的所有文件。建议用来存储备份文件。</p><p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p><ul><li><strong>🟢 绿点</strong>: `已同步` - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: `同步中` - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: `同步失败` - 发生错误，请点击图标查看失败原因，通常是网络问题或PAT失效。</li></ul><h4>4. 基础操作</h4><p><strong>编辑标题</strong>：直接点击页面上的主标题或副标题即可修改。</p><p><strong>访问链接与返回</strong>：对于外部链接，会在应用内全屏打开。您可以从屏幕**最左侧边缘向右滑动**来关闭当前页面并返回中心。</p><p><strong>切换主题</strong>：**单击 (短按)** 右下角的 🌞/🌙 按钮。</p><h4>5. 危险区域</h4><div class="warning"><p><strong>清空所有数据</strong>：在 `GitHub 配置` (⚙️) 弹窗的最下方。此操作会 **永久删除** 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
             </div>
             <div id="help-page-3" class="help-page-content">
                 <h3>免责声明与使用条款</h3><h4>1. 服务条款</h4><p>本应用 (JellyfishCenter) 按“现状”提供，不附带任何明示或暗示的保证。开发者不保证应用的持续可用性、功能完整性或无错误。所有因使用本应用导致的直接或间接风险与责任，均由用户自行承担。</p><h4>2. 数据安全</h4><p>用户需自行负责其GitHub个人访问令牌 (PAT) 的安全保管。任何因PAT泄露导致的数据丢失、篡改或账户安全问题，开发者概不负责。强烈建议为本应用创建独立的、具有最小必要权限 (<code>repo</code>) 的PAT。</p><h4>3. 知识产权与版权责任</h4><div class="important-note"><p>本应用可能被用于托管或链接至第三方项目（“小手机”）。用户必须对所上传或链接的内容负全部法律责任，并确保拥有展示、使用和分发该内容的合法权利。<strong>用户必须尊重所有原创作者的知识产权，不得侵犯他人版权。</strong></p></div><h4>4. 使用与分发限制</h4><div class="warning"><p>本项目 (JellyfishCenter) 及其源代码仅供个人非商业性使用。严禁以下行为：</p><ul><li>对本项目的源代码进行任何形式的二次修改、再分发或公开发布（即“二传二改”）。</li><li>公开或私下分享通过本应用“上传项目”功能生成的任何网页链接或文件。此行为可能构成对原创内容的未授权分发。</li></ul></div><p>继续使用本应用，即表示您已阅读、理解并同意上述所有条款。</p>
@@ -197,7 +199,13 @@
     <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>管理小手机</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入管理模式</button><div class="segmented-control two-segments"><input type="radio" id="type-link" name="nav-type" value="link" checked hidden><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload" hidden><label for="type-upload">上传项目</label><div class="slider-indicator"></div></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section" class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div></div><button id="createNavBtn" class="modal-button">加入新手机</button><div class="status-text" id="upload-status"></div></div></div></div>
     <div class="modal-overlay" id="syncModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据云盘</span><button class="settings-btn" id="settingsBtn" title="设置GitHub信息">⚙️</button></div><button class="close-btn" data-modal-id="syncModal">&times;</button></div><div class="modal-body"><select id="buttonSelector" class="modal-select"></select><div class="file-upload-section"><input type="file" id="fileUploader"><div class="file-select-wrapper"><button id="selectFileBtn" class="modal-button">选择文件</button><span id="selectedFileName" class="status-text">未选择任何文件</span></div><input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）"><button id="uploadBtn" class="modal-button">上传文件</button><div id="progressContainer" class="progress-container"><div id="uploadProgressBar" class="progress-bar"></div></div></div><div id="file-list-container"><ul id="fileList"></ul><div id="fileListStatus" class="file-list-status">请选择一个分类</div></div></div></div></div>
     <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>GitHub 配置</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button><div class="nuke-section"><button id="nukeDataBtn" class="modal-button">清空所有云端及本地数据</button></div></div></div></div>
-    <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body"><div class="color-picker-grid"><div class="color-picker-group"><label>日间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="dayColor1Picker"><span class="hex-display" id="dayColor1Hex"></span></div></div><div class="color-picker-group"><label>日间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="dayColor2Picker"><span class="hex-display" id="dayColor2Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="nightColor1Picker"><span class="hex-display" id="nightColor1Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="nightColor2Picker"><span class="hex-display" id="nightColor2Hex"></span></div></div></div><div class="preview-container"><div class="preview-box" id="dayPreview" data-label="Day"></div><div class="preview-box" id="nightPreview" data-label="Night"></div></div><div class="preset-manager"><div class="preset-row"><input type="text" id="presetNameInput" class="modal-input" placeholder="为当前配色命名"><button id="savePresetBtn" class="modal-button save">保存</button><button id="updatePresetBtn" class="modal-button">更新</button></div><div class="preset-row"><select id="presetSelector" class="modal-select"></select><button id="deletePresetBtn" class="modal-button delete">删除</button></div></div><div class="random-toggle-section"><span>每次启动时随机应用预设</span><label class="toggle-switch"><input type="checkbox" id="randomPaletteToggle"><span class="slider"></span></label></div></div></div></div>
+    <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body">
+        <div class="color-picker-grid"><div class="color-picker-group"><label>日间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="dayColor1Picker"><span class="hex-display" id="dayColor1Hex"></span></div></div><div class="color-picker-group"><label>日间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="dayColor2Picker"><span class="hex-display" id="dayColor2Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="nightColor1Picker"><span class="hex-display" id="nightColor1Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="nightColor2Picker"><span class="hex-display" id="nightColor2Hex"></span></div></div></div>
+        <div class="preview-container"><div class="preview-box" id="dayPreview" data-label="Day"></div><div class="preview-box" id="nightPreview" data-label="Night"></div></div>
+        <div class="preset-manager"><div class="preset-row"><input type="text" id="presetNameInput" class="modal-input" placeholder="为当前配色命名"><button id="savePresetBtn" class="modal-button save">保存</button><button id="updatePresetBtn" class="modal-button">更新</button></div><div class="preset-row"><select id="presetSelector" class="modal-select"></select><button id="deletePresetBtn" class="modal-button delete">删除</button></div></div>
+        <div class="preset-manager bg-manager"><div class="preset-row"><input type="file" id="bgImagePicker" hidden accept="image/*"><button id="selectBgBtn" class="modal-button">选择背景图片</button><span id="bg-image-status"></span><button id="removeBgBtn" class="modal-button delete">移除</button></div></div>
+        <div class="random-toggle-section"><span>每次启动时随机应用预设</span><label class="toggle-switch"><input type="checkbox" id="randomPaletteToggle"><span class="slider"></span></label></div>
+    </div></div></div>
 
     <!-- == Iframe Modal & Confirmation Toast == -->
     <div class="iframe-modal-overlay" id="iframeModal">
@@ -216,7 +224,7 @@
     </div>
 
     <script>
-    // [JS - V8.6.0 "Touch Drag & Drop"]
+    // [JS - V8.7.0 "Background Image"]
     var GITHUB_CONFIG = {}, configSha = null, isManagementMode = false, isLongPress = false;
     var longPressTimer = null, projectFile = null;
     var navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
@@ -228,7 +236,7 @@
     var draggedBtn = null, ghostEl = null, currentDropTarget = null;
     var startX = 0, startY = 0, offsetX = 0, offsetY = 0;
 
-    var getDefaultConfig = function() { return { title: 'JellyfishCenter', subtitle: '长按🌞打开工具栏 | By淡季水母', buttons: [], themePresets: [] }; };
+    var getDefaultConfig = function() { return { title: 'JellyfishCenter', subtitle: '长按🌞打开工具栏 | By淡季水母', buttons: [], themePresets: [], backgroundImagePath: null }; };
     var currentConfig = getDefaultConfig();
     
     var utf8_to_b64 = function(str) { return btoa(unescape(encodeURIComponent(str))); };
@@ -352,8 +360,7 @@
         ghostEl.style.top = newY + 'px';
         ghostEl.style.left = newX + 'px';
 
-        // Find drop target
-        ghostEl.style.display = 'none'; // Hide ghost to find element underneath
+        ghostEl.style.display = 'none';
         var elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
         ghostEl.style.display = '';
         
@@ -385,16 +392,10 @@
             currentDropTarget.classList.remove('drag-over');
         }
 
-        if (ghostEl) {
-            document.body.removeChild(ghostEl);
-        }
-        if (draggedBtn) {
-            draggedBtn.classList.remove('dragging');
-        }
+        if (ghostEl) { document.body.removeChild(ghostEl); }
+        if (draggedBtn) { draggedBtn.classList.remove('dragging'); }
         
-        draggedBtn = null;
-        ghostEl = null;
-        currentDropTarget = null;
+        draggedBtn = null; ghostEl = null; currentDropTarget = null;
         
         document.removeEventListener('touchmove', handleTouchMove);
         document.removeEventListener('touchend', handleTouchEnd);
@@ -435,14 +436,8 @@
         fabContainer.classList.toggle('active', isActive); 
         if (!isManagementMode) pageOverlay.classList.toggle('show', isActive); 
     }
-    fabMainBtn.addEventListener('mousedown', function(e) { 
-        e.preventDefault(); isFabLongPress = false; 
-        fabPressTimer = setTimeout(function() { isFabLongPress = true; toggleFabMenu(true); }, 300); 
-    });
-    fabMainBtn.addEventListener('mouseup', function() { 
-        clearTimeout(fabPressTimer); 
-        if (!isFabLongPress) { fabContainer.classList.contains('active') ? toggleFabMenu(false) : toggleTheme(); } 
-    });
+    fabMainBtn.addEventListener('mousedown', function(e) { e.preventDefault(); isFabLongPress = false; fabPressTimer = setTimeout(function() { isFabLongPress = true; toggleFabMenu(true); }, 300); });
+    fabMainBtn.addEventListener('mouseup', function() { clearTimeout(fabPressTimer); if (!isFabLongPress) { fabContainer.classList.contains('active') ? toggleFabMenu(false) : toggleTheme(); } });
     fabMainBtn.addEventListener('contextmenu', function(e) { e.preventDefault(); });
     fabMainBtn.addEventListener('touchstart', function(e) { e.preventDefault(); fabMainBtn.dispatchEvent(new MouseEvent('mousedown')); }, { passive: false });
     fabMainBtn.addEventListener('touchend', function(e) { e.preventDefault(); fabMainBtn.dispatchEvent(new MouseEvent('mouseup')); }, { passive: false });
@@ -452,24 +447,14 @@
         document.querySelectorAll('.nav-btn').forEach(function(btn) {
             var textContent = btn.textContent;
             var deleteIcon = btn.querySelector('.delete-icon');
-            if (deleteIcon) {
-                textContent = textContent.replace(deleteIcon.textContent, '').trim();
-            }
+            if (deleteIcon) { textContent = textContent.replace(deleteIcon.textContent, '').trim(); }
             newOrder.push({ text: textContent, href: btn.dataset.href });
         });
         currentConfig.buttons = newOrder; 
         saveGlobalConfig(commitMessage); 
     }
     
-    function attachButtonListeners(btn) {
-        btn.addEventListener('click', function(e) { 
-            if (isManagementMode || isLongPress) { e.preventDefault(); return; } 
-            var href = this.dataset.href; 
-            if (!href) return; 
-            if (href.startsWith('http')) { e.preventDefault(); openIframeModal(href); } 
-            else { window.location.href = href; } 
-        });
-    }
+    function attachButtonListeners(btn) { btn.addEventListener('click', function(e) { if (isManagementMode || isLongPress) { e.preventDefault(); return; } var href = this.dataset.href; if (!href) return; if (href.startsWith('http')) { e.preventDefault(); openIframeModal(href); } else { window.location.href = href; } }); }
 
     document.getElementById('enterManageModeBtn').addEventListener('click', function() { document.getElementById('addNavModal').classList.remove('show'); setTimeout(function() { toggleManagementMode(true); }, 150); });
     
@@ -480,23 +465,15 @@
         if (!confirm('确定要删除 "' + buttonName + '" 吗？\n警告：如果这是上传的项目，其在GitHub上的整个文件夹都将被永久删除！')) return; 
         btnToDelete.style.cssText = 'transition: all 0.3s ease; transform: scale(0.8); opacity: 0;'; 
         setTimeout(function() {
-            var href = btnToDelete.dataset.href;
-            btnToDelete.remove();
-            var isExternalLink = href.startsWith('http');
+            var href = btnToDelete.dataset.href; btnToDelete.remove(); var isExternalLink = href.startsWith('http');
             var deletePromise = Promise.resolve();
             if (!isExternalLink && href.indexOf('/') > -1) {
                 var folderPath = href.substring(0, href.lastIndexOf('/'));
                 deletePromise = deleteGithubFolder(folderPath).then(function(success) {
-                    if (!success) {
-                        alert('删除云端文件夹失败!');
-                        location.reload();
-                        return Promise.reject();
-                    }
+                    if (!success) { alert('删除云端文件夹失败!'); location.reload(); return Promise.reject(); }
                 });
             }
-            deletePromise.then(function() {
-                updateButtonOrderAndSave('Delete button: ' + buttonName);
-            });
+            deletePromise.then(function() { updateButtonOrderAndSave('Delete button: ' + buttonName); });
         }, 300); 
     });
 
@@ -525,15 +502,12 @@
             currentConfig = Object.assign({}, getDefaultConfig(), fetchedConfig);
             document.getElementById('title').textContent = currentConfig.title;
             document.getElementById('subtitle').textContent = currentConfig.subtitle;
-            document.querySelector('.editable-title').style.opacity = 1;
-            document.querySelector('.editable-subtitle').style.opacity = 1;
+            document.querySelector('.editable-title').style.opacity = 1; document.querySelector('.editable-subtitle').style.opacity = 1;
             navContainer.innerHTML = '';
-            if (!currentConfig.buttons || currentConfig.buttons.length === 0) {
-                navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">配置为空，请添加导航按钮。</p>';
-            } else {
-                currentConfig.buttons.forEach(function(item) { addNewButtonToDOM(item.text, item.href, false); });
-            }
+            if (!currentConfig.buttons || currentConfig.buttons.length === 0) { navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">配置为空，请添加导航按钮。</p>'; } 
+            else { currentConfig.buttons.forEach(function(item) { addNewButtonToDOM(item.text, item.href, false); }); }
             loadColorState();
+            if (currentConfig.backgroundImagePath) { loadAndApplyBgFromGithub(currentConfig.backgroundImagePath); }
         });
     }
     function deleteGithubFolder(folderPath) {
@@ -557,23 +531,14 @@
             })
             .then(function() { return true; })
             .catch(function(error) {
-                console.error('Failed to delete folder "' + folderPath + '":', error);
-                return false;
+                console.error('Failed to delete folder "' + folderPath + '":', error); return false;
             });
     }
     syncModalElements.saveSettingsBtn.addEventListener("click",function(){
         var repoParts=syncModalElements.githubRepoInput.value.trim().split("/").map(function(e){return e.trim()});
-        var owner = repoParts[0];
-        var repo = repoParts[1];
-        var token=syncModalElements.githubTokenInput.value.trim();
-        if(owner && repo && token){
-            saveGithubConfig({owner:owner,repo:repo,token:token,branch:"main"});
-            alert("配置已保存！刷新页面加载云端配置。");
-            document.getElementById("settingsModal").classList.remove("show");
-            loadInitialData();
-        } else {
-            alert("请填写完整信息。");
-        }
+        var owner = repoParts[0]; var repo = repoParts[1]; var token=syncModalElements.githubTokenInput.value.trim();
+        if(owner && repo && token){ saveGithubConfig({owner:owner,repo:repo,token:token,branch:"main"}); alert("配置已保存！刷新页面加载云端配置。"); document.getElementById("settingsModal").classList.remove("show"); loadInitialData(); } 
+        else { alert("请填写完整信息。"); }
     });
     function populateButtonSelector(){var e=syncModalElements.buttonSelector.value;syncModalElements.buttonSelector.innerHTML="",document.querySelectorAll(".nav-btn").forEach(function(t){var n=t.textContent.replace("×","").trim(),o=document.createElement("option");o.value=o.textContent=n,syncModalElements.buttonSelector.appendChild(o)}),Array.prototype.slice.call(syncModalElements.buttonSelector.options).some(function(t){return t.value===e})&&(syncModalElements.buttonSelector.value=e)}
     syncModalElements.buttonSelector.addEventListener("change",fetchFilesForSelectedButton); syncModalElements.selectFileBtn.addEventListener('click', function() { syncModalElements.fileUploader.click(); });
@@ -586,19 +551,10 @@
         syncModalElements.fileListStatus.textContent="正在加载...";
         var url=withCacheBust('https://api.github.com/repos/'+GITHUB_CONFIG.owner+'/'+GITHUB_CONFIG.repo+'/contents/data_sync/'+buttonName);
         fetch(url,{headers:{"Authorization":'token '+GITHUB_CONFIG.token}})
-            .then(function(response){
-                if(404===response.status) return [];
-                if(!response.ok) throw new Error('HTTP ' + response.status);
-                return response.json();
-            })
+            .then(function(response){ if(404===response.status) return []; if(!response.ok) throw new Error('HTTP ' + response.status); return response.json(); })
             .then(function(files){
                 if(0===files.length) return syncModalElements.fileListStatus.textContent="该分类下暂无文件", [];
-                return Promise.all(files.map(function(file) {
-                    return getLatestCommitDate(file.path).then(function(commitDate) {
-                        file.commitDate = commitDate;
-                        return file;
-                    });
-                }));
+                return Promise.all(files.map(function(file) { return getLatestCommitDate(file.path).then(function(commitDate) { file.commitDate = commitDate; return file; }); }));
             })
             .then(function(filesWithDates) {
                 if (filesWithDates.length === 0) return;
@@ -621,10 +577,7 @@
     function getLatestCommitDate(path){
         var url=withCacheBust('https://api.github.com/repos/'+GITHUB_CONFIG.owner+'/'+GITHUB_CONFIG.repo+'/commits?path='+encodeURIComponent(path)+'&page=1&per_page=1');
         return fetch(url,{headers:{"Authorization":'token '+GITHUB_CONFIG.token}})
-            .then(function(response){
-                if(!response.ok)return(new Date(0)).toISOString();
-                return response.json();
-            })
+            .then(function(response){ if(!response.ok)return(new Date(0)).toISOString(); return response.json(); })
             .then(function(commits){ return (commits[0] && commits[0].commit.committer.date) || (new Date(0)).toISOString(); })
             .catch(function(error){ console.error('Error fetching commit date for '+path+':',error); return(new Date(0)).toISOString(); });
     }
@@ -635,8 +588,7 @@
         fetch(url,{method:"DELETE",headers:{"Authorization":'token '+GITHUB_CONFIG.token},body:JSON.stringify({message:'Delete file: '+path,sha:sha,branch:"main"})})
             .then(function(response){
                 if(!response.ok) return response.json().then(function(err){ throw new Error('删除失败: '+err.message); });
-                liElement.remove();
-                if(0===syncModalElements.fileList.children.length){ syncModalElements.fileListStatus.textContent="该分类下暂无文件",syncModalElements.fileListStatus.style.display="block"; }
+                liElement.remove(); if(0===syncModalElements.fileList.children.length){ syncModalElements.fileListStatus.textContent="该分类下暂无文件",syncModalElements.fileListStatus.style.display="block"; }
             })
             .catch(function(error){ console.error("删除文件失败:",error),alert('删除文件失败: '+error.message),liElement.style.opacity="1"; });
     }
@@ -644,16 +596,8 @@
         var originalText = element.querySelector(".file-name").textContent;
         element.querySelector(".file-name").textContent="准备下载...", element.style.pointerEvents="none";
         fetch(url)
-            .then(function(response){
-                if(!response.ok) throw new Error('下载请求失败: '+response.statusText);
-                return response.blob();
-            })
-            .then(function(blob){
-                var a=document.createElement("a");
-                a.href=window.URL.createObjectURL(blob), a.download=fileName;
-                document.body.appendChild(a), a.click(), a.remove();
-                window.URL.revokeObjectURL(a.href);
-            })
+            .then(function(response){ if(!response.ok) throw new Error('下载请求失败: '+response.statusText); return response.blob(); })
+            .then(function(blob){ var a=document.createElement("a"); a.href=window.URL.createObjectURL(blob), a.download=fileName; document.body.appendChild(a), a.click(), a.remove(); window.URL.revokeObjectURL(a.href); })
             .catch(function(error){ console.error("Download error:",error),alert('下载出错: '+error.message); })
             .finally(function(){ element.querySelector(".file-name").textContent=originalText, element.style.pointerEvents="auto"; });
     }
@@ -662,26 +606,16 @@
             var body = { message: commitMessage, content: fileContent, branch: "main" };
             var xhr = new XMLHttpRequest();
             xhr.open("PUT", url, true);
-            xhr.setRequestHeader("Authorization", "token " + token);
-            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.setRequestHeader("Authorization", "token " + token); xhr.setRequestHeader("Content-Type", "application/json");
             xhr.upload.onprogress = function(event) {
                 if (event.lengthComputable) {
                     var percentComplete = (event.loaded / event.total) * 100;
-                    syncModalElements.progressBar.style.width = percentComplete + '%';
-                    if (percentComplete >= 99.9 && buttonElement) {
-                        buttonElement.textContent = '正在处理...';
-                    }
+                    if(syncModalElements.progressBar) syncModalElements.progressBar.style.width = percentComplete + '%';
+                    if (percentComplete >= 99.9 && buttonElement) { buttonElement.textContent = '正在处理...'; }
                 }
             };
-            xhr.onload = function() {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    resolve(JSON.parse(xhr.responseText));
-                } else {
-                    reject(new Error("上传失败: " + xhr.statusText + " - " + xhr.responseText));
-                }
-            };
-            xhr.onerror = function() { reject(new Error("网络错误，上传失败。")); };
-            xhr.send(JSON.stringify(body));
+            xhr.onload = function() { if (xhr.status >= 200 && xhr.status < 300) { resolve(JSON.parse(xhr.responseText)); } else { reject(new Error("上传失败: " + xhr.statusText + " - " + xhr.responseText)); } };
+            xhr.onerror = function() { reject(new Error("网络错误，上传失败。")); }; xhr.send(JSON.stringify(body));
         });
     }
     syncModalElements.uploadBtn.addEventListener("click", function() {
@@ -690,31 +624,15 @@
         var file = syncModalElements.fileUploader.files[0];
         var fileName = (syncModalElements.fileNameInput.value.trim() || (file && file.name));
         if (!category || !file || !fileName) { return alert("请选择分类、文件，并确保文件名不为空。"); }
-        syncModalElements.uploadBtn.disabled = true;
-        syncModalElements.uploadBtn.textContent = "上传中...";
-        syncModalElements.progressContainer.style.display = 'block';
-        syncModalElements.progressBar.style.width = '0%';
+        syncModalElements.uploadBtn.disabled = true; syncModalElements.uploadBtn.textContent = "上传中...";
+        syncModalElements.progressContainer.style.display = 'block'; syncModalElements.progressBar.style.width = '0%';
         fileToBase64(file).then(function(content) {
             var url = withCacheBust('https://api.github.com/repos/' + GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo + '/contents/data_sync/' + category + '/' + fileName);
             return uploadFileWithProgress(url, content, GITHUB_CONFIG.token, 'Upload ' + fileName, syncModalElements.uploadBtn);
         }).then(function() {
-            setTimeout(function() {
-                alert("上传成功！");
-                syncModalElements.fileUploader.value = "";
-                syncModalElements.fileNameInput.value = "";
-                syncModalElements.selectedFileName.textContent = '未选择任何文件';
-                fetchFilesForSelectedButton();
-            }, 200);
-        }).catch(function(error) {
-            console.error("上传失败:", error);
-            alert("上传失败: " + error.message);
-        }).finally(function() {
-            setTimeout(function() {
-                syncModalElements.uploadBtn.disabled = false;
-                syncModalElements.uploadBtn.textContent = "上传文件";
-                syncModalElements.progressContainer.style.display = 'none';
-            }, 1000);
-        });
+            setTimeout(function() { alert("上传成功！"); syncModalElements.fileUploader.value = ""; syncModalElements.fileNameInput.value = ""; syncModalElements.selectedFileName.textContent = '未选择任何文件'; fetchFilesForSelectedButton(); }, 200);
+        }).catch(function(error) { console.error("上传失败:", error); alert("上传失败: " + error.message); })
+        .finally(function() { setTimeout(function() { syncModalElements.uploadBtn.disabled = false; syncModalElements.uploadBtn.textContent = "上传文件"; syncModalElements.progressContainer.style.display = 'none'; }, 1000); });
     });
     var addNavModalElements={typeLinkRadio:document.getElementById("type-link"),typeUploadRadio:document.getElementById("type-upload"),linkSection:document.getElementById("link-section"),uploadSection:document.getElementById("upload-section"),nameInput:document.getElementById("newButtonNameInput"),urlInput:document.getElementById("newButtonUrlInput"),filePickerBtn:document.getElementById("filePickerBtn"),projectHtmlPicker:document.getElementById("projectHtmlPicker"),fileStatus:document.getElementById("file-picker-status"),createBtn:document.getElementById("createNavBtn"),uploadStatus:document.getElementById("upload-status"),stayOpenToggle:document.getElementById("stayOpenToggle")};
     function addNewButtonToDOM(text, href, save) { 
@@ -730,138 +648,214 @@
     }
     function resetAddNavForm() { addNavModalElements.nameInput.value = ""; addNavModalElements.urlInput.value = ""; addNavModalElements.fileStatus.textContent = "未选择任何文件"; addNavModalElements.uploadStatus.textContent = ""; addNavModalElements.projectHtmlPicker.value = ""; projectFile = null; }
     
-    document.querySelectorAll('input[name="nav-type"]').forEach(function(radio) {
-        radio.addEventListener('change', function() {
-            addNavModalElements.linkSection.style.display = this.value === 'link' ? 'flex' : 'none';
-            addNavModalElements.uploadSection.style.display = this.value === 'upload' ? 'flex' : 'none';
-        });
-    });
-
+    document.querySelectorAll('input[name="nav-type"]').forEach(function(radio) { radio.addEventListener('change', function() { addNavModalElements.linkSection.style.display = this.value === 'link' ? 'flex' : 'none'; addNavModalElements.uploadSection.style.display = this.value === 'upload' ? 'flex' : 'none'; }); });
     addNavModalElements.filePickerBtn.addEventListener("click", function() { addNavModalElements.projectHtmlPicker.click(); }); 
-    addNavModalElements.projectHtmlPicker.addEventListener("change", function() { 
-        if (addNavModalElements.projectHtmlPicker.files.length > 0) { 
-            projectFile = addNavModalElements.projectHtmlPicker.files[0]; 
-            addNavModalElements.fileStatus.textContent = '已选择: ' + projectFile.name; 
-        } else { projectFile = null; addNavModalElements.fileStatus.textContent = '未选择任何文件'; }
-    });
+    addNavModalElements.projectHtmlPicker.addEventListener("change", function() { if (addNavModalElements.projectHtmlPicker.files.length > 0) { projectFile = addNavModalElements.projectHtmlPicker.files[0]; addNavModalElements.fileStatus.textContent = '已选择: ' + projectFile.name; } else { projectFile = null; addNavModalElements.fileStatus.textContent = '未选择任何文件'; } });
     function fileToBase64(e){return new Promise(function(t,n){var o=new FileReader;o.onload=function(){t(o.result.split(",")[1])},o.onerror=n,o.readAsDataURL(e)})}
     
     addNavModalElements.createBtn.addEventListener("click",function(){
         var buttonName = addNavModalElements.nameInput.value.trim();
         if(!buttonName) return void alert("请输入按钮名称。");
         var type = document.querySelector('input[name="nav-type"]:checked').value;
-        addNavModalElements.createBtn.disabled = true;
-        addNavModalElements.createBtn.textContent = "处理中...";
+        addNavModalElements.createBtn.disabled = true; addNavModalElements.createBtn.textContent = "处理中...";
         var createPromise;
         if("link"===type){
             var url = addNavModalElements.urlInput.value.trim();
-            if(!url) {
-                alert("请输入网址链接。");
-                createPromise = Promise.reject();
-            } else {
-                createPromise = Promise.resolve({text: buttonName, href: url});
-            }
+            if(!url) { alert("请输入网址链接。"); createPromise = Promise.reject(); } 
+            else { createPromise = Promise.resolve({text: buttonName, href: url}); }
         } else if ("upload"===type){
-            if(!checkConfig()) {
-                createPromise = Promise.reject();
-            } else if(!projectFile) {
-                alert("请选择一个HTML文件。");
-                createPromise = Promise.reject();
-            } else {
+            if(!checkConfig()) { createPromise = Promise.reject(); } 
+            else if(!projectFile) { alert("请选择一个HTML文件。"); createPromise = Promise.reject(); } 
+            else {
                 addNavModalElements.uploadStatus.textContent="正在上传文件...";
                 var path = buttonName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-") || ('project-'+Date.now());
                 createPromise = fileToBase64(projectFile).then(function(content_b64) {
                     var uploadUrl = withCacheBust('https://api.github.com/repos/'+GITHUB_CONFIG.owner+'/'+GITHUB_CONFIG.repo+'/contents/'+path+'/index.html');
                     return uploadFileWithProgress(uploadUrl, content_b64, GITHUB_CONFIG.token, 'Create project: '+buttonName, addNavModalElements.createBtn);
                 }).then(function() {
-                    addNavModalElements.uploadStatus.textContent="正在处理...";
-                    alert("项目上传发布成功！");
+                    addNavModalElements.uploadStatus.textContent="正在处理..."; alert("项目上传发布成功！");
                     return {text: buttonName, href: path+'/index.html'};
                 });
             }
-        } else {
-             createPromise = Promise.reject();
-        }
+        } else { createPromise = Promise.reject(); }
 
         createPromise.then(function(buttonData) {
-            if (buttonData) {
-                 addNewButtonToDOM(buttonData.text, buttonData.href); 
-                 resetAddNavForm(); 
-                 if(!addNavModalElements.stayOpenToggle.checked) { document.getElementById("addNavModal").classList.remove("show"); }
-            }
-        }).catch(function(o) {
-            if (o) {
-                console.error("创建失败:", o);
-                alert('操作失败: ' + o.message);
-                addNavModalElements.uploadStatus.textContent="操作失败!";
-            }
-        }).finally(function() {
-            addNavModalElements.createBtn.disabled = false;
-            addNavModalElements.createBtn.textContent = "加入新手机";
-        });
+            if (buttonData) { addNewButtonToDOM(buttonData.text, buttonData.href); resetAddNavForm(); if(!addNavModalElements.stayOpenToggle.checked) { document.getElementById("addNavModal").classList.remove("show"); } }
+        }).catch(function(o) { if (o) { console.error("创建失败:", o); alert('操作失败: ' + o.message); addNavModalElements.uploadStatus.textContent="操作失败!"; } })
+        .finally(function() { addNavModalElements.createBtn.disabled = false; addNavModalElements.createBtn.textContent = "加入新手机"; });
     });
     
-    // --- Iframe Modal and Confirmation Logic ---
-    function openIframeModal(url) { 
-        var hintShown = localStorage.getItem('swipeHintShown');
-        if (!hintShown) { 
-            swipeHint.classList.add('show'); 
-            setTimeout(function() { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); 
-        } 
-        iframeEl.src = url; iframeModal.classList.add('active'); 
-    }
+    // --- Iframe Modal Logic ---
+    function openIframeModal(url) { var hintShown = localStorage.getItem('swipeHintShown'); if (!hintShown) { swipeHint.classList.add('show'); setTimeout(function() { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } iframeEl.src = url; iframeModal.classList.add('active'); }
     function closeIframeModal() { hideReturnConfirmation(); iframeModal.classList.remove('active'); setTimeout(function() { iframeEl.src = 'about:blank'; }, 400); }
     function showReturnConfirmation() { returnConfirmationToast.classList.add('show'); }
     function hideReturnConfirmation() { returnConfirmationToast.classList.remove('show'); }
     document.getElementById('confirmReturnBtn').addEventListener('click', closeIframeModal);
     document.getElementById('cancelReturnBtn').addEventListener('click', hideReturnConfirmation);
-
     var gestureCaptureZone = document.getElementById('gestureCaptureZone'); var iframeStartX = 0, iframeCurrentX = 0, isIframeDragging = false;
     gestureCaptureZone.addEventListener('touchstart', function(e) { isIframeDragging = true; iframeStartX = e.touches[0].clientX; iframeModalContent.classList.add('dragging'); }, { passive: true });
     window.addEventListener('touchmove', function(e) { if (!isIframeDragging || returnConfirmationToast.classList.contains('show')) return; e.preventDefault(); iframeCurrentX = e.touches[0].clientX; var diffX = iframeCurrentX - iframeStartX; if (diffX > 0) { iframeModalContent.style.transform = 'translateX(' + diffX + 'px)'; } }, { passive: false }); 
     window.addEventListener('touchend', function(e) { if (!isIframeDragging) return; isIframeDragging = false; iframeModalContent.classList.remove('dragging'); iframeModalContent.style.transform = ''; var diffX = iframeCurrentX - iframeStartX; var closeThreshold = window.innerWidth / 3.5; if (diffX > closeThreshold && !returnConfirmationToast.classList.contains('show')) { showReturnConfirmation(); } iframeStartX = 0; iframeCurrentX = 0; });
 
+    // --- Background Image Logic ---
+    var bgImagePicker = document.getElementById('bgImagePicker');
+    var selectBgBtn = document.getElementById('selectBgBtn');
+    var removeBgBtn = document.getElementById('removeBgBtn');
+    var bgImageStatus = document.getElementById('bg-image-status');
+
+    function applyBackgroundImage(url) {
+        if (url) {
+            document.body.style.backgroundImage = 'url("' + url + '")';
+            document.body.classList.add('background-image-active');
+        } else {
+            document.body.style.backgroundImage = ''; // Let CSS handle the gradient
+            document.body.classList.remove('background-image-active');
+        }
+    }
+
+    function b64toBlob(b64Data, contentType, sliceSize) {
+        contentType = contentType || ''; sliceSize = sliceSize || 512;
+        var byteCharacters = atob(b64Data); var byteArrays = [];
+        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            var slice = byteCharacters.slice(offset, offset + sliceSize);
+            var byteNumbers = new Array(slice.length);
+            for (var i = 0; i < slice.length; i++) { byteNumbers[i] = slice.charCodeAt(i); }
+            var byteArray = new Uint8Array(byteNumbers); byteArrays.push(byteArray);
+        }
+        return new Blob(byteArrays, {type: contentType});
+    }
+
+    function loadAndApplyBgFromGithub(path) {
+        if (!checkConfig(false)) return;
+        bgImageStatus.textContent = '加载背景中...';
+        var url = 'https://api.github.com/repos/' + GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo + '/contents/' + path;
+        fetch(withCacheBust(url), { headers: { 'Authorization': 'token ' + GITHUB_CONFIG.token } })
+            .then(function(response) { if (!response.ok) throw new Error('Could not fetch background'); return response.json(); })
+            .then(function(data) {
+                var contentType = 'image/' + path.split('.').pop();
+                var blob = b64toBlob(data.content, contentType);
+                var objectURL = URL.createObjectURL(blob);
+                applyBackgroundImage(objectURL);
+                bgImageStatus.textContent = path.split('/').pop();
+            })
+            .catch(function(error) {
+                console.error("Failed to load background image:", error);
+                bgImageStatus.textContent = '背景加载失败';
+                currentConfig.backgroundImagePath = null;
+                saveGlobalConfig('Remove invalid background image path');
+            });
+    }
+
+    function deleteGithubFile(path) {
+        if (!checkConfig(true) || !path) return Promise.resolve(true);
+        var url = 'https://api.github.com/repos/' + GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo + '/contents/' + path;
+        return fetch(withCacheBust(url), { headers: { 'Authorization': 'token ' + GITHUB_CONFIG.token } })
+            .then(function(response) { if (response.status === 404) return null; if (!response.ok) throw new Error('File not found for deletion'); return response.json(); })
+            .then(function(data) {
+                if (!data) return true; // Already deleted
+                return fetch(withCacheBust(url), {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'token ' + GITHUB_CONFIG.token },
+                    body: JSON.stringify({ message: 'Delete file: ' + path, sha: data.sha, branch: 'main' })
+                }).then(function(deleteResponse) {
+                    if (!deleteResponse.ok) throw new Error('Failed to delete file from GitHub');
+                    return true;
+                });
+            });
+    }
+
+    selectBgBtn.addEventListener('click', function() { bgImagePicker.click(); });
+    removeBgBtn.addEventListener('click', function() {
+        if (!currentConfig.backgroundImagePath) return alert('当前没有设置背景图片。');
+        if (!confirm('确定要移除背景图片吗？')) return;
+        
+        bgImageStatus.textContent = '正在移除...';
+        deleteGithubFile(currentConfig.backgroundImagePath)
+            .then(function() {
+                applyBackgroundImage(null);
+                currentConfig.backgroundImagePath = null;
+                bgImageStatus.textContent = '';
+                return saveGlobalConfig('Remove background image');
+            })
+            .catch(function(error) {
+                console.error('Failed to remove background:', error);
+                bgImageStatus.textContent = '移除失败';
+                alert('从云端移除图片失败: ' + error.message);
+            });
+    });
+
+    bgImagePicker.addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+
+        bgImageStatus.textContent = '处理中...';
+        var localUrl = URL.createObjectURL(file);
+        applyBackgroundImage(localUrl);
+
+        var uploadPromise = Promise.resolve();
+        if (currentConfig.backgroundImagePath) {
+            bgImageStatus.textContent = '删除旧背景...';
+            uploadPromise = deleteGithubFile(currentConfig.backgroundImagePath);
+        }
+
+        uploadPromise.then(function() {
+            bgImageStatus.textContent = '上传新背景...';
+            return fileToBase64(file);
+        }).then(function(base64content) {
+            var fileExtension = file.name.split('.').pop();
+            var newPath = 'backgrounds/bg-' + Date.now() + '.' + fileExtension;
+            var url = 'https://api.github.com/repos/' + GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo + '/contents/' + newPath;
+            return fetch(withCacheBust(url), {
+                method: 'PUT',
+                headers: { 'Authorization': 'token ' + GITHUB_CONFIG.token },
+                body: JSON.stringify({ message: 'Upload background image', content: base64content, branch: 'main' })
+            }).then(function(response) {
+                if (!response.ok) throw new Error('Upload failed');
+                return newPath;
+            });
+        }).then(function(newPath) {
+            currentConfig.backgroundImagePath = newPath;
+            bgImageStatus.textContent = newPath.split('/').pop();
+            return saveGlobalConfig('Update background image: ' + newPath);
+        }).catch(function(error) {
+            console.error('Background image update failed:', error);
+            bgImageStatus.textContent = '操作失败';
+            alert('背景图片更新失败: ' + error.message);
+            // Revert to old state if failed
+            loadAndApplyBgFromGithub(currentConfig.backgroundImagePath);
+        }).finally(function() {
+            bgImagePicker.value = ''; // Reset file input
+        });
+    });
+    
     function nukeAllData() {
         if (!checkConfig(true)) return;
-        var confirmation = confirm("⚠️ 极度危险操作！\n\n这将永久删除您所有的数据，包括：\n\n- 所有本地设置 (主题、GitHub配置等)\n- GitHub仓库中的 `config.json` (所有按钮和设置)\n- GitHub仓库中的 `data_sync` 文件夹 (所有上传的文件和项目)\n- GitHub仓库中的所有项目文件夹\n\n此操作不可逆，将使应用恢复到空白的初始状态。确定要继续吗？");
-        if (!confirmation) { return; }
-
+        var confirmation = confirm("⚠️ 极度危险操作！\n\n这将永久删除您所有的数据，包括：\n\n- 所有本地设置\n- GitHub仓库中的所有按钮、配置、上传的文件和背景图\n\n此操作不可逆。确定要继续吗？");
+        if (!confirmation) return;
         updateSyncStatus('syncing', '正在执行重置...');
-        
         var deleteConfigPromise = Promise.resolve();
         if (configSha) {
             var configUrl = withCacheBust('https://api.github.com/repos/' + GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo + '/contents/config.json');
             deleteConfigPromise = fetch(configUrl, {
                 method: 'DELETE', headers: { 'Authorization': 'token ' + GITHUB_CONFIG.token },
                 body: JSON.stringify({ message: 'NUKE: Deleting config file', sha: configSha, branch: 'main' })
-            }).then(function(response) {
-                if (!response.ok && response.status !== 404) { throw new Error('Failed to delete config.json: ' + response.statusText); }
-                console.log('config.json deleted from GitHub.');
-            });
+            }).then(function(response) { if (!response.ok && response.status !== 404) { throw new Error('Failed to delete config.json: ' + response.statusText); } console.log('config.json deleted.'); });
         }
-
         deleteConfigPromise.then(function() {
             var rootContentsUrl = withCacheBust('https://api.github.com/repos/' + GITHUB_CONFIG.owner + '/' + GITHUB_CONFIG.repo + '/contents/');
             return fetch(rootContentsUrl, { headers: { 'Authorization': 'token ' + GITHUB_CONFIG.token } });
-        }).then(function(rootContentsRes) {
-            if (rootContentsRes.ok) {
-                return rootContentsRes.json();
-            }
-            return [];
-        }).then(function(items) {
+        }).then(function(rootContentsRes) { if (rootContentsRes.ok) { return rootContentsRes.json(); } return []; })
+        .then(function(items) {
+            var foldersToDelete = ['data_sync', 'backgrounds'];
             var folderDeletionPromises = items
-                .filter(function(item) { return item.type === 'dir' && ['data_sync', '.github', 'icons'].indexOf(item.name) === -1; })
+                .filter(function(item) { return item.type === 'dir' && (foldersToDelete.indexOf(item.name) !== -1 || !['.github', 'icons'].includes(item.name)); })
                 .map(function(dir) { return deleteGithubFolder(dir.path); });
             return Promise.all(folderDeletionPromises);
         }).then(function() {
-            console.log('All project and data folders deleted.');
-            localStorage.clear();
-            alert('所有数据已清空。页面将刷新。');
-            location.reload();
+            console.log('All project and data folders deleted.'); localStorage.clear();
+            alert('所有数据已清空。页面将刷新。'); location.reload();
         }).catch(function(error) {
-            console.error('Nuke operation failed:', error);
-            updateSyncStatus('error', '重置失败: ' + error.message);
-            alert('重置操作失败: ' + error.message);
+            console.error('Nuke operation failed:', error); updateSyncStatus('error', '重置失败: ' + error.message); alert('重置操作失败: ' + error.message);
         });
     }
     document.getElementById('nukeDataBtn').addEventListener('click', nukeAllData);
