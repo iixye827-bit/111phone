@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V9.0.0 "Drag&Drop, UI Polish, Full Bugfix"] */
+        /* [CSS - V9.1.0 "Album Refactor, iOS Drag Fix, Final Polish"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -65,7 +65,7 @@
         .page-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px); z-index: 99; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
         .page-overlay.show { opacity: 1; pointer-events: auto; }
         .page-overlay.management-overlay { background: transparent; backdrop-filter: none; z-index: 5; }
-        .management-active .nav-btn { cursor: grab; animation: wiggle 0.2s ease-in-out infinite alternate; pointer-events: auto !important; }
+        .management-active .nav-btn { cursor: grab; animation: wiggle 0.2s ease-in-out infinite alternate; pointer-events: auto !important; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
         .management-active .nav-btn:active { cursor: grabbing; }
         .management-active .nav-btn > .delete-icon { display: block; }
         .nav-btn.dragging { opacity: 0.5; }
@@ -196,23 +196,26 @@
         #memoryModal #photo-list-container { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
         #memoryModal .photo-item { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,0.7); cursor: pointer; transition: transform 0.2s ease; background-color: rgba(128,128,128,0.1); }
         #memoryModal .photo-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
-        #memoryModal .photo-item:hover img { transform: scale(1.1); }
-        #memoryModal .photo-title-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); color: white; font-size: 12px; padding: 10px 6px 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; transition: opacity 0.3s ease; }
-        #memoryModal .photo-item:hover .photo-title-overlay { opacity: 1; }
+        #memoryModal .photo-title-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); color: white; font-size: 12px; padding: 4px 8px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-top: 1px solid rgba(255,255,255,0.2); }
         #memoryPhotoViewerOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 5000; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         #memoryPhotoViewerOverlay.active { opacity: 1; pointer-events: auto; }
-        #memoryPhotoViewerOverlay .viewer-header { display: flex; justify-content: flex-end; padding: 20px; color: white; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); }
+        #memoryPhotoViewerOverlay .viewer-header { flex-shrink: 0; display: flex; justify-content: flex-end; padding: 20px; color: white; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); }
         #memoryPhotoViewerOverlay .viewer-btn { background: rgba(40,40,40,0.5); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; transition: background-color 0.2s; }
         #memoryPhotoViewerOverlay .viewer-btn:hover { background: rgba(60,60,60,0.7); }
-        #memoryPhotoViewerOverlay .viewer-content { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+        #memoryPhotoViewerOverlay .viewer-content { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+        #viewer-img-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: padding 0.3s ease; }
         #memoryPhotoViewerOverlay #viewer-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        #memoryPhotoViewerOverlay .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; font-size: 20px; opacity: 0.6; }
+        .viewer-mode-view #viewer-img-container { padding: 40px; }
+        .viewer-mode-wander #viewer-img-container { padding: 0; }
+        #memoryPhotoViewerOverlay .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; font-size: 24px; opacity: 0.6; }
+        .viewer-mode-wander .nav-arrow { display: none; }
         #memoryPhotoViewerOverlay .nav-arrow:hover { opacity: 1; }
-        #memoryPhotoViewerOverlay.wandering .nav-arrow { display: none; }
-        #memoryPhotoViewerOverlay #prev-photo-btn { left: 15px; } #memoryPhotoViewerOverlay #next-photo-btn { right: 15px; }
-        #memoryPhotoViewerOverlay .viewer-footer { padding: 20px; color: white; text-align: center; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); }
-        #memoryPhotoViewerOverlay #viewer-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
-        #memoryPhotoViewerOverlay #viewer-description { font-size: 14px; }
+        #prev-photo-btn { left: 15px; } #next-photo-btn { right: 15px; }
+        #memoryPhotoViewerOverlay .viewer-footer { flex-shrink: 0; padding: 20px; color: white; text-align: center; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); }
+        .viewer-mode-wander .viewer-footer { display: none; }
+        #viewer-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
+        #viewer-description { font-size: 14px; margin-bottom: 8px; }
+        #viewer-timestamp { font-size: 12px; color: #ccc; }
         #memoryModal .empty-list-placeholder { grid-column: 1 / -1; text-align: center; color: #889; margin-top: 50px; }
         #memoryModal .fab { position: absolute; right: 25px; bottom: 25px; width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 28px; display: flex; align-items: center; justify-content: center; user-select: none; z-index: 100; }
         body.dark-mode #memoryModal .fab { box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
@@ -290,10 +293,10 @@
                 <h4>步骤 4：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌜 按钮展开菜单 → 点击 <strong>☁️ (数据云盘)</strong> → 点击标题旁的 <strong>⚙️ (设置)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤3</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，并采用了最高效的架构。</p>
             </div>
             <div id="help-page-2" class="help-page-content">
-                <h3>功能详解</h3><h4>1. 导航管理</h4><p><strong>添加新手机</strong>：长按主菜单 → 点击 📲 图标。可选择添加`外部链接`或`上传项目`。</p><p><strong>管理与删除</strong>：在“管理小手机”弹窗内，点击`进入管理模式`，即可对现有按钮进行排序或删除。现在支持**长按拖拽排序**。</p><h4>2. 主题与个性化</h4><p><strong>实时调色</strong>：长按主菜单 → 点击 🎨 图标。可实时调整日间/夜间模式的背景渐变色，以及**标题卡片的背景图片**。</p><p><strong>色彩预设</strong>：您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能。</p><h4>3. 文件云盘与同步状态</h4><p><strong>访问与管理</strong>：长按主菜单 → 点击 ☁️ 图标。您可以分门别类地管理与“上传项目”相关联的所有文件。建议用来存储备份文件。</p><p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p><ul><li><strong>🟢 绿点</strong>: `已同步` - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: `同步中` - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: `同步失败` - 发生错误，请点击图标查看失败原因，通常是网络问题或PAT失效。</li></ul><h4>4. 基础操作</h4><p><strong>编辑标题</strong>：直接点击页面上的主标题或副标题即可修改。</p><p><strong>访问链接与返回</strong>：对于外部链接，会在应用内全屏打开。您可以从屏幕**最左侧边缘向右滑动**来关闭当前页面并返回中心。</p><p><strong>切换主题</strong>：**单击 (短按)** 右下角的 🌞/🌜 按钮。</p><h4>5. 危险区域</h4><div class="warning"><p><strong>清空所有数据</strong>：在 `GitHub 配置` (⚙️) 弹窗的最下方。此操作会 **永久删除** 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
+                <h3>功能详解</h3><h4>1. 导航管理</h4><p><strong>添加新手机</strong>：长按主菜单 → 点击 📲 图标。可选择添加`外部链接`或`上传项目`。</p><p><strong>管理与删除</strong>：在“管理小手机”弹窗内，点击`进入管理模式`，即可对现有按钮进行排序或删除。现在支持**长按拖拽排序**。</p><h4>2. 主题与个性化</h4><p><strong>实时调色</strong>：长按主菜单 → 点击 🎨 图标。可实时调整日间/夜间模式的背景渐变色，以及**日间/夜间模式下的标题卡片背景图片**。</p><p><strong>色彩预设</strong>：您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能。</p><h4>3. 文件云盘与同步状态</h4><p><strong>访问与管理</strong>：长按主菜单 → 点击 ☁️ 图标。您可以分门别类地管理与“上传项目”相关联的所有文件。建议用来存储备份文件。</p><p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p><ul><li><strong>🟢 绿点</strong>: `已同步` - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: `同步中` - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: `同步失败` - 发生错误，请点击图标查看失败原因，通常是网络问题或PAT失效。</li></ul><h4>4. 基础操作</h4><p><strong>编辑标题</strong>：直接点击页面上的主标题或副标题即可修改。</p><p><strong>访问链接与返回</strong>：对于外部链接，会在应用内全屏打开。您可以从屏幕**最左侧边缘向右滑动**来关闭当前页面并返回中心。</p><p><strong>切换主题</strong>：**单击 (短按)** 右下角的 🌞/🌜 按钮。</p><h4>5. 危险区域</h4><div class="warning"><p><strong>清空所有数据</strong>：在 `GitHub 配置` (⚙️) 弹窗的最下方。此操作会 **永久删除** 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
             </div>
             <div id="help-page-3" class="help-page-content">
-                <h3>免责声明与使用条款</h3><h4>1. 服务条款</h4><p>本应用 (JellyfishCenter) 按“现状”提供，不附带任何明示或暗示的保证。开发者不保证应用的持续可用性、功能完整性或无错误。所有因使用本应用导致的直接或间接风险与责任，均由用户自行承担。</p><h4>2. 数据安全</h4><p>用户需自行负责其GitHub个人访问令牌 (PAT) 的安全保管。任何因PAT泄露导致的数据丢失、篡改或账户安全问题，开发者概不负责。强烈建议为本应用创建独立的、具有最小必要权限 (<code>repo</code>) 的PAT。</p><h4>3. 知识产权与版权责任</h4><div class="important-note"><p>本应用可能被用于托管或链接至第三方项目（“小手机”）。用户必须对所上传或链接的内容负全部法律责任，并确保拥有展示、使用和分发该内容的合法权利。<strong>用户必须尊重所有原创作者的知识产权，不得侵犯他人版权。</strong></p></div><h4>4. 使用与分发限制</h4><div class="warning"><p>本项ç›® (JellyfishCenter) å Šå…¶æº ä»£ç  ä»…ä¾›ä¸ªäººé žå•†ä¸šæ€§ä½¿ç”¨ã€‚ä¸¥ç¦ ä»¥ä¸‹è¡Œä¸ºï¼š</p><ul><li>å¯¹æœ¬é¡¹ç›®çš„æº ä»£ç  è¿›è¡Œä»»ä½•å½¢å¼ çš„äºŒæ¬¡ä¿®æ”¹ã€ å† åˆ†å ‘æˆ–å…¬å¼€å ‘å¸ƒï¼ˆå ³â€œäºŒä¼ äºŒæ”¹â€ ï¼‰ã€‚</li><li>å…¬å¼€æˆ–ç§ ä¸‹åˆ†äº«é€šè¿‡æœ¬åº”ç”¨â€œä¸Šä¼ é¡¹ç›®â€ åŠŸèƒ½ç”Ÿæˆ çš„ä»»ä½•ç½‘é¡µé“¾æŽ¥æˆ–æ–‡ä»¶ã€‚æ­¤è¡Œä¸ºå ¯èƒ½æž„æˆ å¯¹åŽŸåˆ›å†…å®¹çš„æœªæŽˆæ ƒåˆ†å ‘ã€‚</li></ul></div><p>ç»§ç»­ä½¿ç”¨æœ¬åº”ç”¨ï¼Œå ³è¡¨ç¤ºæ‚¨å·²é˜…è¯»ã€ ç †è§£å¹¶å Œæ„ ä¸Šè¿°æ‰€æœ‰æ ¡æ¬¾ã€‚</p>
+                <h3>免责声明与使用条款</h3><h4>1. 服务条款</h4><p>本应用 (JellyfishCenter) 按“现状”提供，不附带任何明示或暗示的保证。开发者不保证应用的持续可用性、功能完整性或无错误。所有因使用本应用导致的直接或间接风险与责任，均由用户自行承担。</p><h4>2. 数据安全</h4><p>用户需自行负责其GitHub个人访问令牌 (PAT) 的安全保管。任何因PAT泄露导致的数据丢失、篡改或账户安全问题，开发者概不负责。强烈建议为本应用创建独立的、具有最小必要权限 (<code>repo</code>) 的PAT。</p><h4>3. 知识产权与版权责任</h4><div class="important-note"><p>本应用可能被用于托管或链接至第三方项目（“小手机”）。用户必须对所上传或链接的内容负全部法律责任，并确保拥有展示、使用和分发该内容的合法权利。<strong>用户必须尊重所有原创作者的知识产权，不得侵犯他人版权。</strong></p></div><h4>4. 使用与分发限制</h4><div class="warning"><p>本项目 (JellyfishCenter) 及其源代码仅供个人非商业性使用。严禁以下行为：</p><ul><li>对本项目的源代码进行任何形式的二次修改、再分发或公开发布（即“二传二改”）。</li><li>公开或私下分享通过本应用“上传项目”功能生成的任何网页链接或文件。此行为可能构成对原创内容的未授权分发。</li></ul></div><p>继续使用本应用，即表示您已阅读、理解并同意上述所有条款。</p>
             </div>
         </div>
     </div></div></div>
@@ -321,10 +324,16 @@
                 <button id="clearNightBgBtn" class="modal-button delete">清除</button>
             </div>
             <div class="background-image-row">
-                <input type="file" id="titleCardBgImagePicker" accept="image/*" hidden>
-                <button id="uploadTitleCardBgBtn" class="modal-button">导入卡片背景</button>
-                <span id="titleCardBgStatus" class="status"></span>
-                <button id="clearTitleCardBgBtn" class="modal-button delete">清除</button>
+                <input type="file" id="dayTitleCardBgImagePicker" accept="image/*" hidden>
+                <button id="uploadDayTitleCardBgBtn" class="modal-button">导入日间卡片</button>
+                <span id="dayTitleCardBgStatus" class="status"></span>
+                <button id="clearDayTitleCardBgBtn" class="modal-button delete">清除</button>
+            </div>
+            <div class="background-image-row">
+                <input type="file" id="nightTitleCardBgImagePicker" accept="image/*" hidden>
+                <button id="uploadNightTitleCardBgBtn" class="modal-button">导入夜间卡片</button>
+                <span id="nightTitleCardBgStatus" class="status"></span>
+                <button id="clearNightTitleCardBgBtn" class="modal-button delete">清除</button>
             </div>
         </div>
     </div></div></div>
@@ -456,12 +465,13 @@
         <div class="viewer-header"> <button data-action="close-viewer" class="viewer-btn">✕</button> </div>
         <div class="viewer-content">
             <button data-action="prev-photo" id="prev-photo-btn" class="viewer-btn nav-arrow">&#10094;</button>
-            <img id="viewer-img" src="" alt="Photo view">
+            <div id="viewer-img-container"><img id="viewer-img" src="" alt="Photo view"></div>
             <button data-action="next-photo" id="next-photo-btn" class="viewer-btn nav-arrow">&#10095;</button>
         </div>
         <div class="viewer-footer">
             <h3 id="viewer-title"></h3>
             <p id="viewer-description"></p>
+            <p id="viewer-timestamp"></p>
         </div>
     </div>
 
@@ -482,7 +492,7 @@
     </div>
 
     <script>
-    // [JS - V9.0.0 "Drag&Drop, UI Polish, Full Bugfix"]
+    // [JS - V9.1.0 "Album Refactor, iOS Drag Fix, Final Polish"]
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
@@ -644,8 +654,8 @@
     let draggedItem = null;
     navContainer.addEventListener('dragstart', e => { if (!isManagementMode) return; draggedItem = e.target; setTimeout(() => e.target.classList.add('dragging'), 0); });
     navContainer.addEventListener('dragend', e => { if (!isManagementMode || !draggedItem) return; draggedItem.classList.remove('dragging'); draggedItem = null; });
-    navContainer.addEventListener('dragover', e => { e.preventDefault(); if (!isManagementMode) return; const target = e.target.closest('.nav-btn'); if (target && target !== draggedItem) { target.classList.add('drag-over'); } });
-    navContainer.addEventListener('dragleave', e => { if (!isManagementMode) return; const target = e.target.closest('.nav-btn'); if (target) { target.classList.remove('drag-over'); } });
+    navContainer.addEventListener('dragover', e => { e.preventDefault(); if (!isManagementMode) return; const target = e.target.closest('.nav-btn'); if (target && target !== draggedItem) { navContainer.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('drag-over')); target.classList.add('drag-over'); } });
+    navContainer.addEventListener('dragleave', e => { if (!isManagementMode) return; e.target.closest('.nav-btn')?.classList.remove('drag-over'); });
     navContainer.addEventListener('drop', e => { e.preventDefault(); if (!isManagementMode || !draggedItem) return; const dropTarget = e.target.closest('.nav-btn'); if (dropTarget && dropTarget !== draggedItem) { dropTarget.classList.remove('drag-over'); const allBtns = [...navContainer.querySelectorAll('.nav-btn')]; const draggedIndex = allBtns.indexOf(draggedItem); const targetIndex = allBtns.indexOf(dropTarget); if (draggedIndex < targetIndex) { navContainer.insertBefore(draggedItem, dropTarget.nextSibling); } else { navContainer.insertBefore(draggedItem, dropTarget); } updateButtonOrderAndSave('Reorder buttons'); } });
 
     function applyAllBackgrounds() {
@@ -661,7 +671,8 @@
             document.body.style.backgroundImage = `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`;
         }
 
-        const titleCardBgImage = localStorage.getItem('titleCardBgImage');
+        const titleCardBgKey = isDark ? 'nightTitleCardBgImage' : 'dayTitleCardBgImage';
+        const titleCardBgImage = localStorage.getItem(titleCardBgKey);
         const titleCard = document.getElementById('titleCard');
         if (titleCardBgImage) {
             titleCard.style.backgroundImage = `url(${titleCardBgImage})`;
@@ -704,7 +715,6 @@
     function setupBgImageManager() {
         const setupPicker = (pickerId, uploadBtnId, clearBtnId, statusId, storageKey, storageNameKey) => {
             const picker = document.getElementById(pickerId);
-            const statusEl = document.getElementById(statusId);
             document.getElementById(uploadBtnId).addEventListener('click', () => picker.click());
             document.getElementById(clearBtnId).addEventListener('click', () => {
                 localStorage.removeItem(storageKey);
@@ -727,13 +737,15 @@
         };
         setupPicker('dayBgImagePicker', 'uploadDayBgBtn', 'clearDayBgBtn', 'dayBgStatus', 'dayBgImage', 'dayBgImageName');
         setupPicker('nightBgImagePicker', 'uploadNightBgBtn', 'clearNightBgBtn', 'nightBgStatus', 'nightBgImage', 'nightBgImageName');
-        setupPicker('titleCardBgImagePicker', 'uploadTitleCardBgBtn', 'clearTitleCardBgBtn', 'titleCardBgStatus', 'titleCardBgImage', 'titleCardBgImageName');
+        setupPicker('dayTitleCardBgImagePicker', 'uploadDayTitleCardBgBtn', 'clearDayTitleCardBgBtn', 'dayTitleCardBgStatus', 'dayTitleCardBgImage', 'dayTitleCardBgImageName');
+        setupPicker('nightTitleCardBgImagePicker', 'uploadNightTitleCardBgBtn', 'clearNightTitleCardBgBtn', 'nightTitleCardBgStatus', 'nightTitleCardBgImage', 'nightTitleCardBgImageName');
     }
     
     function updateBgStatus() {
         document.getElementById('dayBgStatus').textContent = localStorage.getItem('dayBgImageName') || '未设置';
         document.getElementById('nightBgStatus').textContent = localStorage.getItem('nightBgImageName') || '未设置';
-        document.getElementById('titleCardBgStatus').textContent = localStorage.getItem('titleCardBgImageName') || '未设置';
+        document.getElementById('dayTitleCardBgStatus').textContent = localStorage.getItem('dayTitleCardBgImageName') || '未设置';
+        document.getElementById('nightTitleCardBgStatus').textContent = localStorage.getItem('nightTitleCardBgImageName') || '未设置';
     }
     
     const syncModalElements = { buttonSelector: document.getElementById("buttonSelector"), fileList: document.getElementById("fileList"), fileListStatus: document.getElementById("fileListStatus"), fileUploader: document.getElementById("fileUploader"), selectFileBtn: document.getElementById("selectFileBtn"), selectedFileName: document.getElementById("selectedFileName"), fileNameInput: document.getElementById("fileNameInput"), uploadBtn: document.getElementById("uploadBtn"), progressContainer: document.getElementById("progressContainer"), progressBar: document.getElementById("uploadProgressBar"), githubRepoInput: document.getElementById("githubRepoInput"), githubTokenInput: document.getElementById("githubTokenInput"), saveSettingsBtn: document.getElementById("saveSettingsBtn") };
@@ -854,7 +866,7 @@
             isPhotoManageMode: false, photosToDelete: [],
             currentMemoFolderId: null, currentNoteId: null, currentAlbumId: null,
             folderModalContext: null, // 'memo' or 'album'
-            viewerContext: { photos: [], index: -1 },
+            viewerContext: { photos: [], index: -1, mode: 'view' },
             photoUploadQueue: [],
         };
 
@@ -875,7 +887,6 @@
             memoryCache = result.data ? JSON.parse(b6_to_utf8(result.data.content)) : getInitialData();
             memoryDataSha = result.sha;
             updateStatus('已同步');
-            // Ensure data structure is valid
             if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
             if (!memoryCache.album) memoryCache.album = { folders: [], photos: [] };
         }
@@ -895,11 +906,9 @@
             }, 1500);
         }
         
-        // --- Navigation & View Management ---
         function showPage(pageId) { ui.appContainer.querySelectorAll(':scope > .page').forEach(p => p.classList.remove('active')); ui.appContainer.querySelector(`#${pageId}`).classList.add('active'); }
         function showView(viewId, sectionId) { const section = ui.appContainer.querySelector(`#${sectionId}`); section.querySelectorAll(':scope > .page').forEach(p => p.classList.remove('active')); section.querySelector(`#${viewId}`).classList.add('active'); showPage(sectionId); }
 
-        // --- Rendering Functions ---
         function renderMemoFolders() {
             ui.folderList.innerHTML = '';
             memoryCache.memo.folders.forEach(folder => {
@@ -952,18 +961,19 @@
                 el.dataset.photoId = photo.id;
                 el.dataset.action = "open-photo";
                 const photoUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${photo.path}`;
-                el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><img src="${photoUrl}" alt="${photo.title || ''}" loading="lazy"><div class="photo-title-overlay">${photo.title || '无标题'}</div>`;
+                const title = (photo.title || '无标题').substring(0, 10);
+                el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><img src="${photoUrl}" alt="${photo.title || ''}" loading="lazy"><div class="photo-title-overlay">${title}</div>`;
                 ui.photoList.appendChild(el);
             });
             if (photosInAlbum.length === 0) ui.photoList.innerHTML = `<p class="empty-list-placeholder">没有照片</p>`;
         }
 
-        // --- Photo Viewer Logic ---
-        function openPhotoViewer(photoId, photoSet) {
+        function openPhotoViewer(photoId, photoSet, mode = 'view') {
             const photos = photoSet || memoryCache.album.photos.filter(p => p.albumId === state.currentAlbumId);
             const index = photos.findIndex(p => p.id === photoId);
             if (index === -1) return;
-            state.viewerContext = { photos, index };
+            state.viewerContext = { photos, index, mode };
+            ui.photoViewer.className = `viewer-mode-${mode}`;
             updatePhotoViewerContent();
             ui.photoViewer.classList.add('active');
         }
@@ -975,6 +985,7 @@
             ui.photoViewer.querySelector('#viewer-img').src = photoUrl;
             ui.photoViewer.querySelector('#viewer-title').textContent = photo.title || '';
             ui.photoViewer.querySelector('#viewer-description').textContent = photo.description || '';
+            ui.photoViewer.querySelector('#viewer-timestamp').textContent = new Date(photo.timestamp).toLocaleString('zh-CN');
         }
         function closePhotoViewer() { ui.photoViewer.classList.remove('active'); }
         function changePhoto(direction) {
@@ -986,7 +997,6 @@
             updatePhotoViewerContent();
         }
 
-        // --- Event Handlers & Actions ---
         const actions = {
             'goto-memo': () => { state.currentSection = 'memo'; renderMemoFolders(); showView('folder-view', 'memo-section'); },
             'goto-album': () => { state.currentSection = 'album'; renderAlbumFolders(); showView('album-folder-view', 'album-section'); },
@@ -996,8 +1006,7 @@
             'open-memo-folder': (target) => {
                 const folderId = Number(target.dataset.folderId);
                 if (state.isMemoManageMode) {
-                    const isSelected = state.memoFoldersToDelete.includes(folderId);
-                    state.memoFoldersToDelete = isSelected ? state.memoFoldersToDelete.filter(id => id !== folderId) : [...state.memoFoldersToDelete, folderId];
+                    state.memoFoldersToDelete = state.memoFoldersToDelete.includes(folderId) ? state.memoFoldersToDelete.filter(id => id !== folderId) : [...state.memoFoldersToDelete, folderId];
                     renderMemoFolders();
                 } else {
                     state.currentMemoFolderId = folderId;
@@ -1008,8 +1017,7 @@
             'open-album-folder': (target) => {
                 const albumId = Number(target.dataset.albumId);
                 if (state.isAlbumManageMode) {
-                     const isSelected = state.albumFoldersToDelete.includes(albumId);
-                    state.albumFoldersToDelete = isSelected ? state.albumFoldersToDelete.filter(id => id !== albumId) : [...state.albumFoldersToDelete, albumId];
+                    state.albumFoldersToDelete = state.albumFoldersToDelete.includes(albumId) ? state.albumFoldersToDelete.filter(id => id !== albumId) : [...state.albumFoldersToDelete, albumId];
                     renderAlbumFolders();
                 } else {
                     state.currentAlbumId = albumId;
@@ -1028,11 +1036,10 @@
             'open-photo': (target) => {
                 const photoId = Number(target.dataset.photoId);
                 if (state.isPhotoManageMode) {
-                    const isSelected = state.photosToDelete.includes(photoId);
-                    state.photosToDelete = isSelected ? state.photosToDelete.filter(id => id !== photoId) : [...state.photosToDelete, photoId];
+                    state.photosToDelete = state.photosToDelete.includes(photoId) ? state.photosToDelete.filter(id => id !== photoId) : [...state.photosToDelete, photoId];
                     renderPhotos();
                 } else {
-                    openPhotoViewer(photoId);
+                    openPhotoViewer(photoId, null, 'view');
                 }
             },
             'add-memo-folder': () => { state.folderModalContext = 'memo'; document.getElementById('folder-name-input').value = ''; ui.folderModal.classList.add('show'); },
@@ -1154,14 +1161,14 @@
             'wander-global': () => {
                 if (memoryCache.album.photos.length > 0) {
                     const randomPhoto = memoryCache.album.photos[Math.floor(Math.random() * memoryCache.album.photos.length)];
-                    openPhotoViewer(randomPhoto.id, memoryCache.album.photos);
+                    openPhotoViewer(randomPhoto.id, memoryCache.album.photos, 'wander');
                 }
             },
             'wander-local': () => {
                 const localPhotos = memoryCache.album.photos.filter(p => p.albumId === state.currentAlbumId);
                 if (localPhotos.length > 0) {
                     const randomPhoto = localPhotos[Math.floor(Math.random() * localPhotos.length)];
-                    openPhotoViewer(randomPhoto.id, localPhotos);
+                    openPhotoViewer(randomPhoto.id, localPhotos, 'wander');
                 }
             },
             'close-viewer': closePhotoViewer,
@@ -1206,6 +1213,20 @@
             };
             reader.readAsDataURL(file);
         }
+
+        let viewerTouchStartX = 0;
+        let viewerTouchEndX = 0;
+        ui.photoViewer.querySelector('#viewer-img-container').addEventListener('touchstart', e => {
+            if (state.viewerContext.mode === 'wander') viewerTouchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        ui.photoViewer.querySelector('#viewer-img-container').addEventListener('touchend', e => {
+            if (state.viewerContext.mode !== 'wander') return;
+            viewerTouchEndX = e.changedTouches[0].screenX;
+            const swipeDiff = viewerTouchEndX - viewerTouchStartX;
+            if (Math.abs(swipeDiff) > 50) { // Swipe threshold
+                changePhoto(swipeDiff < 0 ? 1 : -1);
+            }
+        });
 
         return {
             open: () => {
