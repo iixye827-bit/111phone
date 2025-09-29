@@ -32,6 +32,16 @@
         "name": "2"
       }
     ],
-    "photos": []
+    "photos": [
+      {
+        "id": 1759156135505.7993,
+        "albumId": 1759150560197,
+        "title": "",
+        "description": "",
+        "path": "memory/photos/1759150560197-1759156132794.jpeg",
+        "sha": "e1c483d8dfa20843e2f3ad0c1103deccc9ac914e",
+        "timestamp": 1759156135505
+      }
+    ]
   }
 }
