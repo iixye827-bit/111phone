@@ -1,6 +1,22 @@
 {
   "title": "Jellyfis",
   "subtitle": "点击即可跳转 | By淡季水母",
+  "categories": [
+    {
+      "name": "全部",
+      "buttons": []
+    },
+    {
+      "name": "小手机",
+      "buttons": [
+        {
+          "text": "333",
+          "href": "https://33chat.netlify.app/"
+        }
+      ]
+    }
+  ],
+  "themePresets": [],
   "buttons": [
     {
       "text": "3333",
@@ -18,6 +34,5 @@
       "text": "33聊天室",
       "href": "https://raw.githack.com/iixye827-bit/111phone/main/33聊天室/index.html"
     }
-  ],
-  "themePresets": []
+  ]
 }
