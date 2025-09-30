@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V9.9.3 "Wander UI & Help Content"] */
+        /* [CSS - V9.9.5 "Lyric & Icon Fix"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -258,7 +258,7 @@
         body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-selected, body.dark-mode .photo-item.manage-selected, body.dark-mode .photo-item-set.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
         /* ===== [END] MEMORY MODAL STYLES ===== */
         
-        /* ===== [START] WANDER VIEW 3.3 STYLES (Upload & UI Fix) ===== */
+        /* ===== [START] WANDER VIEW 3.5 STYLES (Lyric & Icon Fix) ===== */
         #wanderViewOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 6000; background: var(--bg-day-element); color: var(--text-day); display: none; flex-direction: column; opacity: 0; transition: opacity 0.4s ease; }
         body.dark-mode #wanderViewOverlay { background: var(--bg-night-element); color: var(--text-night); }
         #wanderViewOverlay.active { display: flex; opacity: 1; }
@@ -293,9 +293,9 @@
         .player-btn:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
         body.dark-mode .player-btn:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
         .player-btn#play-pause-btn { width: 52px; height: 52px; font-size: 22px; }
-        .player-display { margin: 10px 0; height: 2.5em; text-align: center; font-size: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; position: relative; }
+        .player-display { margin: 10px 0; height: 1.5em; text-align: center; font-size: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; position: relative; }
         .song-title-display { display: flex; align-items: center; justify-content: center; height: 100%; font-weight: 600; }
-        #lyrics-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; align-items: center; justify-content: center; }
+        #lyrics-container { position: absolute; width: 100%; height: 1.5em; top: 0; left: 0; overflow: hidden; }
         #lyrics-ul { list-style: none; transition: transform 0.5s ease; padding: 0; margin: 0;}
         #lyrics-ul li { line-height: 1.5em; opacity: 0.5; transition: opacity 0.5s ease; }
         #lyrics-ul li.current-lyric { opacity: 1; font-weight: bold; }
@@ -317,7 +317,7 @@
         }
         body.dark-mode #player-progress-handle { --handle-color: var(--handle-color-night); }
         #player-progress-handle:hover { box-shadow: 0 0 16px 5px var(--handle-color); }
-        .player-popover { display: none; position: absolute; bottom: calc(100% + 10px); left: 15px; width: 250px; background: var(--bg-day-element); border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); padding: 10px; border: 1px solid rgba(0,0,0,0.05); }
+        .player-popover { display: none; position: absolute; bottom: calc(100% + 10px); left: 15px; width: 250px; background: var(--bg-day-element); border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); padding: 10px; border: 1px solid rgba(0,0,0,0.05); z-index: 20; }
         .player-popover.active { display: block; }
         body.dark-mode .player-popover { background: var(--bg-night-element); border-color: rgba(255,255,255,0.1); }
         .player-popover .popover-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 5px; }
@@ -438,7 +438,7 @@
         <div class="fab-drawer" id="fabDrawer">
             <button class="fab-drawer-item" id="helpBtn" title="使用指南">📧</button>
             <button class="fab-drawer-item" id="syncBtn" title="数据云盘">☁️<span id="sync-status-indicator" title="云同步状态"></span></button>
-            <button class="fab-drawer-item" id="addNavBtn" title="管理小手机">📱</button>
+            <button class="fab-drawer-item" id="addNavBtn" title="管理项目">📱</button>
             <button class="fab-drawer-item" id="colorBtn" title="主题设置">🎨</button>
             <button class="fab-drawer-item" id="memoryBtn" title="记忆">📷</button>
         </div>
@@ -474,7 +474,6 @@
                         <h4>步骤 4：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌜 按钮展开菜单 → 点击 <strong>☁️ (数据云盘)</strong> → 点击标题旁的 <strong>⚙️ (设置)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤3</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，并采用了最高效的架构。</p>
                     </div>
                     <div id="help-page-1" class="help-page-content">
-                        <h3>功能介绍</h3>
                         <details>
                             <summary>核心操作</summary>
                             <div class="details-content">
@@ -485,17 +484,17 @@
                             </div>
                         </details>
                         <details>
-                            <summary>📱 导航管理</summary>
+                            <summary>📱 项目管理</summary>
                             <div class="details-content">
-                                <p><strong>添加新手机</strong>：可选择添加`外部链接`或`上传项目`。上传的项目会直接托管在您的GitHub数据仓库中。</p>
-                                <p><strong>管理与删除</strong>：在“管理小手机”弹窗内，点击`进入管理模式`，即可对现有按钮进行删除。删除“上传项目”类型的按钮会同时删除云端文件。</p>
+                                <p><strong>添加新项目</strong>：可选择添加`外部链接`或`上传项目`。上传的项目会直接托管在您的GitHub数据仓库中。</p>
+                                <p><strong>管理与删除</strong>：在“管理项目”弹窗内，点击`进入管理模式`，即可对现有按钮进行删除。删除“上传项目”类型的按钮会同时删除云端文件。</p>
                             </div>
                         </details>
                         <details>
                             <summary>🎨 主题与个性化</summary>
                             <div class="details-content">
                                 <p><strong>实时调色</strong>：可实时调整日间/夜间模式的背景渐变色，以及标题卡片的背景图片。</p>
-                                <p class="sub-note"><em>请注意：渐变色设置的是页面背景，而按钮、卡片等元素的颜色会使用相反模式的颜色以形成对比（如日间模式下，按钮背景色取自夜间模式的颜色）。</em></p>
+                                <p class="sub-note"><em>请注意：按钮、卡片等元素的背景渐变色，其色彩与方向均与当前模式的页面背景相反，以创造深度感。</em></p>
                                 <p><strong>色彩预设</strong>：您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能，在每次启动时随机应用一个已保存的预设。</p>
                             </div>
                         </details>
@@ -504,7 +503,7 @@
                             <div class="details-content">
                                 <p><strong>访问与管理</strong>：您可以分门别类地管理与“上传项目”相关联的所有文件。建议用来存储备份文件。</p>
                                 <p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p>
-                                <ul><li><strong>🟢 绿点</strong>: `已同步` - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: `同步中` - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: `同步失败` - 发生错误，请点击图标查看失败原因。</li></ul>
+                                <ul><li><strong>🟢 绿点</strong>: <code>已同步</code> - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: <code>同步中</code> - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: <code>同步失败</code> - 发生错误，请点击图标查看失败原因。</li></ul>
                             </div>
                         </details>
                         <details>
@@ -532,7 +531,7 @@
                             </div>
                         </details>
 
-                        <div class="warning"><p><strong>危险操作</strong>：在 `GitHub 配置` (⚙️) 弹窗的最下方有“清空所有数据”按钮。此操作会 **永久删除** 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
+                        <div class="warning"><p><strong>危险操作</strong>：在 <code>GitHub 配置</code> (⚙️) 弹窗的最下方有“清空所有数据”按钮。此操作会 <strong>永久删除</strong> 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
                     </div>
                     <div id="help-page-2" class="help-page-content">
                         <div class="update-header-info">
@@ -566,14 +565,14 @@
                         </footer>
                     </div>
                     <div id="help-page-3" class="help-page-content">
-                        <h3>免责声明与使用条款</h3><h4>1. 服务条款</h4><p>本应用 (JellyfishCenter) 按“现状”提供，不附带任何明示或暗示的保证。开发者不保证应用的持续可用性、功能完整性或无错误。所有因使用本应用导致的直接或间接风险与责任，均由用户自行承担。</p><h4>2. 数据安全</h4><p>用户需自行负责其GitHub个人访问令牌 (PAT) 的安全保管。任何因PAT泄露导致的数据丢失、篡改或账户安全问题，开发者概不负责。强烈建议为本应用创建独立的、具有最小必要权限 (<code>repo</code>) 的PAT。</p><h4>3. 知识产权与版权责任</h4><div class="important-note"><p>本应用可能被用于托管或链接至第三方项目（“小手机”）。用户必须对所上传或链接的内容负全部法律责任，并确保拥有展示、使用和分发该内容的合法权利。<strong>用户必须尊重所有原创作者的知识产权，不得侵犯他人版权。</strong></p></div><h4>4. 使用与分发限制</h4><div class="warning"><p>本项目 (JellyfishCenter) 及其源代码仅供个人非商业性使用。严禁以下行为：</p><ul><li>对本项目的源代码进行任何形式的二次修改、再分发或公开发布（即“二传二改”）。</li><li>公开或私下分享通过本应用“上传项目”功能生成的任何网页链接或文件。此行为可能构成对原创内容的未授权分发。</li></ul></div><p>继续使用本应用，即表示您已阅读、理解并同意上述所有条款。</p>
+                        <h3>免责声明与使用条款</h3><h4>1. 服务条款</h4><p>本应用 (JellyfishCenter) 按“现状”提供，不附带任何明示或暗示的保证。开发者不保证应用的持续可用性、功能完整性或无错误。所有因使用本应用导致的直接或间接风险与责任，均由用户自行承担。</p><h4>2. 数据安全</h4><p>用户需自行负责其GitHub个人访问令牌 (PAT) 的安全保管。任何因PAT泄露导致的数据丢失、篡改或账户安全问题，开发者概不负责。强烈建议为本应用创建独立的、具有最小必要权限 (<code>repo</code>) 的PAT。</p><h4>3. 知识产权与版权责任</h4><div class="important-note"><p>本应用可能被用于托管或链接至第三方项目。用户必须对所上传或链接的内容负全部法律责任，并确保拥有展示、使用和分发该内容的合法权利。<strong>用户必须尊重所有原创作者的知识产权，不得侵犯他人版权。</strong></p></div><h4>4. 使用与分发限制</h4><div class="warning"><p>本项目 (JellyfishCenter) 及其源代码仅供个人非商业性使用。严禁以下行为：</p><ul><li>对本项目的源代码进行任何形式的二次修改、再分发或公开发布（即“二传二改”）。</li><li>公开或私下分享通过本应用“上传项目”功能生成的任何网页链接或文件。此行为可能构成对原创内容的未授权分发。</li></ul></div><p>继续使用本应用，即表示您已阅读、理解并同意上述所有条款。</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="modal-overlay" id="syncErrorModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>⚠️ 同步失败</span></div><button class="close-btn" data-modal-id="syncErrorModal">&times;</button></div><div class="modal-body"><p>无法连接到云端。请检查您的网络连接或GitHub配置。</p><p><strong>失败原因:</strong></p><div id="sync-error-message"></div></div></div></div>
-    <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>管理小手机</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入管理模式</button><div class="segmented-control two-segments"><input type="radio" id="type-link" name="nav-type" value="link" checked hidden><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload" hidden><label for="type-upload">上传项目</label><div class="slider-indicator"></div></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section" class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div></div><button id="createNavBtn" class="modal-button">加入新手机</button><div class="status-text" id="upload-status"></div></div></div></div>
+    <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>管理项目</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入管理模式</button><div class="segmented-control two-segments"><input type="radio" id="type-link" name="nav-type" value="link" checked hidden><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload" hidden><label for="type-upload">上传项目</label><div class="slider-indicator"></div></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section" class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div></div><button id="createNavBtn" class="modal-button">加入新项目</button><div class="status-text" id="upload-status"></div></div></div></div>
     <div class="modal-overlay" id="syncModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据云盘</span><button class="settings-btn" id="settingsBtn" title="设置GitHub信息">⚙️</button></div><button class="close-btn" data-modal-id="syncModal">&times;</button></div><div class="modal-body"><select id="buttonSelector" class="modal-select"></select><div class="file-upload-section"><input type="file" id="fileUploader"><div class="file-select-wrapper"><button id="selectFileBtn" class="modal-button">选择文件</button><span id="selectedFileName" class="status-text">未选择任何文件</span></div><input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）"><button id="uploadBtn" class="modal-button">上传文件</button><div id="progressContainer" class="progress-container"><div id="uploadProgressBar" class="progress-bar"></div></div></div><div id="file-list-container"><ul id="fileList"></ul><div id="fileListStatus" class="file-list-status">请选择一个分类</div></div></div></div></div>
     <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>GitHub 配置</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button><div class="nuke-section"><button id="nukeDataBtn" class="modal-button">清空所有云端及本地数据</button></div></div></div></div>
     <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body">
@@ -756,7 +755,7 @@
         </div>
     </div>
 
-    <!-- Wander View 3.3 -->
+    <!-- Wander View 3.5 -->
     <div id="wanderViewOverlay">
         <div class="wander-header">
             <button class="close-btn" data-action="close-wander-view">&times;</button>
@@ -780,7 +779,7 @@
                     <div id="player-progress-handle"></div>
                 </div>
                 <div class="player-controls">
-                    <button class="player-btn" id="playlist-btn" title="播放列表"></button>
+                    <button class="player-btn" id="playlist-btn" title="音乐列表"></button>
                     <button class="player-btn" id="prev-song-btn" title="上一首"></button>
                     <button class="player-btn" id="play-pause-btn" title="播放"></button>
                     <button class="player-btn" id="next-song-btn" title="下一首"></button>
@@ -853,7 +852,7 @@
     </div>
 
     <script>
-    // [JS - V9.9.3 "Wander UI & Help Content"]
+    // [JS - V9.9.5 "Lyric Scrolling & Icon Fixes"]
     const CURRENT_APP_VERSION = '2.0.0';
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
@@ -1115,7 +1114,7 @@
     syncModalElements.fileUploader.addEventListener("change",()=>{ if(syncModalElements.fileUploader.files.length>0){ const file = syncModalElements.fileUploader.files[0]; syncModalElements.fileNameInput.value=file.name; syncModalElements.selectedFileName.textContent = file.name; } else { syncModalElements.selectedFileName.textContent = "未选择任何文件"; }});
     async function fetchFilesForSelectedButton(){const e=syncModalElements.buttonSelector.value;if(syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="flex",!e)return void(syncModalElements.fileListStatus.textContent="请选择一个分类");if(!checkConfig(!0))return void(syncModalElements.fileListStatus.innerHTML="尚未配置GitHub信息<br>请点击标题旁 ⚙️");syncModalElements.fileListStatus.textContent="正在加载...";const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${e}`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(404===n.status)return void(syncModalElements.fileListStatus.textContent="该分类下暂无文件");if(!n.ok)throw new Error(`HTTP ${n.status}`);const o=await n.json();if(0===o.length)syncModalElements.fileListStatus.textContent="该分类下暂无文件";else{const l=await Promise.all(o.map(async e=>({...e,commitDate:await getLatestCommitDate(e.path)})));l.sort((e,t)=>new Date(t.commitDate)-new Date(e.commitDate)),syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="none",l.forEach(e=>{const t=document.createElement("li"),n=document.createElement("div");n.className="file-info",n.dataset.downloadUrl=e.download_url,n.dataset.fileName=e.name;const o=document.createElement("span");o.className="file-name",o.textContent=e.name;const l=document.createElement("span");l.className="file-timestamp",l.textContent=(new Date(e.commitDate)).toLocaleString("zh-CN",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}),n.append(o,l);const a=document.createElement("button");a.className="delete-btn",a.innerHTML="&times;",a.title="删除文件",t.append(n,a),syncModalElements.fileList.appendChild(t),n.addEventListener("click",t=>forceDownload(t.currentTarget.dataset.downloadUrl,t.currentTarget.dataset.fileName,n)),a.addEventListener("click",()=>deleteFile(e.path,e.sha,t))})}}catch(n){console.error("获取文件列表失败:",n),syncModalElements.fileListStatus.textContent="加载失败，请检查网络或配置。"}}
     async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";const o=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${e}`;try{const l=await fetch(o,{method:"DELETE",headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},body:JSON.stringify({message:`Delete file: ${e}`,sha:t,branch:"main"}),cache:"no-cache"});if(!l.ok)throw new Error(`删除失败: ${(await l.json()).message}`);n.remove(),0===syncModalElements.fileList.children.length&&(syncModalElements.fileListStatus.textContent="该分类下暂无文件",syncModalElements.fileListStatus.style.display="block")}catch(l){console.error("删除文件失败:",l),alert(`删除文件失败: ${l.message}`),n.style.opacity="1"}}async function forceDownload(e,t,n){const o=n.querySelector(".file-name").textContent;n.querySelector(".file-name").textContent="准备下载...";n.style.pointerEvents="none";try{const l=await fetch(e);if(!l.ok)throw new Error(`下载请求失败: ${l.statusText}`);const a=await l.blob(),c=document.createElement("a");c.href=window.URL.createObjectURL(a),c.download=t,document.body.appendChild(c),c.click(),c.remove(),window.URL.revokeObjectURL(c.href)}catch(l){console.error("Download error:",l),alert(`下载出错: ${l.message}`)}finally{n.querySelector(".file-name").textContent=o,n.style.pointerEvents="auto"}}
-    function uploadFileWithProgress({ url, file, token, commitMessage, sha, onProgress }) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = (e) => { const content = e.target.result.split(',')[1]; const body = { message: commitMessage, content: content, branch: "main" }; if(sha) body.sha = sha; activeUploadXHR = new XMLHttpRequest(); activeUploadXHR.open("PUT", url, true); activeUploadXHR.setRequestHeader("Authorization", `token ${token}`); activeUploadXHR.setRequestHeader("Content-Type", "application/json"); activeUploadXHR.upload.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = (event.loaded / event.total) * 100; onProgress(percentComplete); } }; activeUploadXHR.onload = () => { activeUploadXHR = null; if (activeUploadXHR && activeUploadXHR.status >= 200 && activeUploadXHR.status < 301) { resolve(JSON.parse(activeUploadXHR.responseText)); } else { reject(new Error(`上传失败: ${activeUploadXHR.statusText} - ${activeUploadXHR.responseText}`)); } }; activeUploadXHR.onerror = () => { activeUploadXHR = null; reject(new Error("网络错误，上传失败。")); }; activeUploadXHR.onabort = () => { activeUploadXHR = null; reject(new Error("上传已取消。")); }; activeUploadXHR.send(JSON.stringify(body)); }; reader.onerror = (error) => reject(error); reader.readAsDataURL(file); }); }
+    function uploadFileWithProgress({ url, file, token, commitMessage, sha, onProgress }) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = (e) => { const content = e.target.result.split(',')[1]; const body = { message: commitMessage, content: content, branch: "main" }; if(sha) body.sha = sha; activeUploadXHR = new XMLHttpRequest(); activeUploadXHR.open("PUT", url, true); activeUploadXHR.setRequestHeader("Authorization", `token ${token}`); activeUploadXHR.setRequestHeader("Content-Type", "application/json"); activeUploadXHR.upload.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = (event.loaded / event.total) * 100; onProgress(percentComplete); } }; activeUploadXHR.onload = () => { if (activeUploadXHR.status >= 200 && activeUploadXHR.status < 301) { resolve(JSON.parse(activeUploadXHR.responseText)); } else { reject(new Error(`上传失败: ${activeUploadXHR.statusText} - ${activeUploadXHR.responseText}`)); } activeUploadXHR = null; }; activeUploadXHR.onerror = () => { reject(new Error("网络错误，上传失败。")); activeUploadXHR = null; }; activeUploadXHR.onabort = () => { reject(new Error("上传已取消。")); activeUploadXHR = null; }; activeUploadXHR.send(JSON.stringify(body)); }; reader.onerror = (error) => reject(error); reader.readAsDataURL(file); }); }
     syncModalElements.uploadBtn.addEventListener("click", async () => { if (activeUploadXHR) { activeUploadXHR.abort(); return; } if (!checkConfig()) return; const category = syncModalElements.buttonSelector.value; const file = syncModalElements.fileUploader.files[0]; let fileName = syncModalElements.fileNameInput.value.trim() || (file && file.name); if (!category || !file || !fileName) { return alert("请选择分类、文件，并确保文件名不为空。"); } syncModalElements.uploadBtn.disabled = true; syncModalElements.uploadBtn.textContent = "上传中 (0%)..."; syncModalElements.progressContainer.style.display = 'block'; syncModalElements.progressBar.style.width = '0%'; try { const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${category}/${fileName}`; await uploadFileWithProgress({ url, file, token: GITHUB_CONFIG.token, commitMessage: `Upload ${fileName}`, onProgress: (percent) => { syncModalElements.progressBar.style.width = `${percent}%`; if (percent < 100) { syncModalElements.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; } else { syncModalElements.uploadBtn.textContent = '正在处理...'; } } }); alert("上传成功！"); syncModalElements.fileUploader.value = ""; syncModalElements.fileNameInput.value = ""; syncModalElements.selectedFileName.textContent = '未选择任何文件'; fetchFilesForSelectedButton(); } catch (error) { console.error("上传失败:", error); if (error.message !== "上传已取消。") alert(`上传失败: ${error.message}`); } finally { syncModalElements.uploadBtn.disabled = false; syncModalElements.uploadBtn.textContent = "上传文件"; syncModalElements.progressContainer.style.display = 'none'; } });
     const addNavModalElements={typeLinkRadio:document.getElementById("type-link"),typeUploadRadio:document.getElementById("type-upload"),linkSection:document.getElementById("link-section"),uploadSection:document.getElementById("upload-section"),nameInput:document.getElementById("newButtonNameInput"),urlInput:document.getElementById("newButtonUrlInput"),filePickerBtn:document.getElementById("filePickerBtn"),projectHtmlPicker:document.getElementById("projectHtmlPicker"),fileStatus:document.getElementById("file-picker-status"),createBtn:document.getElementById("createNavBtn"),uploadStatus:document.getElementById("upload-status"),stayOpenToggle:document.getElementById("stayOpenToggle")};
     function addNewButtonToDOM(text, href, save=true) { navContainer.querySelector("#loading-status")?.remove(); const btn = document.createElement("button"); btn.className = "nav-btn"; btn.dataset.href = href; const textNode = document.createTextNode(text); btn.appendChild(textNode); navContainer.appendChild(btn); attachButtonListeners(btn); if (isManagementMode) { const icon = document.createElement('span'); icon.className = 'delete-icon'; icon.innerHTML = '&times;'; icon.title = '删除此按钮'; btn.appendChild(icon); } if (save) { if(!currentConfig.buttons) currentConfig.buttons = []; currentConfig.buttons.push({text, href}); saveGlobalConfig(`Add button: ${text}`); } }
@@ -1130,7 +1129,7 @@
 
     addNavModalElements.filePickerBtn.addEventListener("click", () => addNavModalElements.projectHtmlPicker.click()); addNavModalElements.projectHtmlPicker.addEventListener("change", () => { if (addNavModalElements.projectHtmlPicker.files.length > 0) { const projectFile = addNavModalElements.projectHtmlPicker.files[0]; addNavModalElements.fileStatus.textContent = `已选择: ${projectFile.name}`; } else { addNavModalElements.fileStatus.textContent = '未选择任何文件'; }});
     function fileToBase64(e){return new Promise((t,n)=>{const o=new FileReader;o.onload=()=>t(o.result.split(",")[1]),o.onerror=n,o.readAsDataURL(e)})}
-    addNavModalElements.createBtn.addEventListener("click",async()=>{const name=addNavModalElements.nameInput.value.trim();if(!name)return void alert("请输入按钮名称。");const type=document.querySelector('input[name="nav-type"]:checked').value;addNavModalElements.createBtn.disabled=!0;addNavModalElements.createBtn.textContent="处理中...";try{let newButtonData;if("link"===type){const url=addNavModalElements.urlInput.value.trim();if(!url)return void alert("请输入网址链接。");newButtonData={text:name,href:url}}else if("upload"===type){if(!checkConfig())return;const projectFile = addNavModalElements.projectHtmlPicker.files[0]; if(!projectFile)return void alert("请选择一个HTML文件。");addNavModalElements.uploadStatus.textContent="正在上传文件...";const path=name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-")||`project-${Date.now()}`;const u=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}/index.html`;await uploadFileWithProgress({url: u, file: projectFile, token: GITHUB_CONFIG.token, commitMessage: `Create project: ${name}`, onProgress: (p) => { addNavModalElements.uploadStatus.textContent = `上传中: ${Math.round(p)}%`; } });addNavModalElements.uploadStatus.textContent="正在处理...";newButtonData={text:name,href:`${path}/index.html`};alert("项目上传发布成功！")} addNewButtonToDOM(newButtonData.text, newButtonData.href); resetAddNavForm(); if(!addNavModalElements.stayOpenToggle.checked) { document.getElementById("addNavModal").classList.remove("show"); } }catch(o){console.error("创建失败:",o),alert(`操作失败: ${o.message}`),addNavModalElements.uploadStatus.textContent="操作失败!"}finally{addNavModalElements.createBtn.disabled=!1,addNavModalElements.createBtn.textContent="加入新手机"}});
+    addNavModalElements.createBtn.addEventListener("click",async()=>{const name=addNavModalElements.nameInput.value.trim();if(!name)return void alert("请输入按钮名称。");const type=document.querySelector('input[name="nav-type"]:checked').value;addNavModalElements.createBtn.disabled=!0;addNavModalElements.createBtn.textContent="处理中...";try{let newButtonData;if("link"===type){const url=addNavModalElements.urlInput.value.trim();if(!url)return void alert("请输入网址链接。");newButtonData={text:name,href:url}}else if("upload"===type){if(!checkConfig())return;const projectFile = addNavModalElements.projectHtmlPicker.files[0]; if(!projectFile)return void alert("请选择一个HTML文件。");addNavModalElements.uploadStatus.textContent="正在上传文件...";const path=name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-")||`project-${Date.now()}`;const u=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}/index.html`;await uploadFileWithProgress({url: u, file: projectFile, token: GITHUB_CONFIG.token, commitMessage: `Create project: ${name}`, onProgress: (p) => { addNavModalElements.uploadStatus.textContent = `上传中: ${Math.round(p)}%`; } });addNavModalElements.uploadStatus.textContent="正在处理...";newButtonData={text:name,href:`${path}/index.html`};alert("项目上传发布成功！")} addNewButtonToDOM(newButtonData.text, newButtonData.href); resetAddNavForm(); if(!addNavModalElements.stayOpenToggle.checked) { document.getElementById("addNavModal").classList.remove("show"); } }catch(o){console.error("创建失败:",o),alert(`操作失败: ${o.message}`),addNavModalElements.uploadStatus.textContent="操作失败!"}finally{addNavModalElements.createBtn.disabled=!1,addNavModalElements.createBtn.textContent="加入新项目"}});
     
     // --- Iframe Modal and Confirmation Logic ---
     function openIframeModal(url) { if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } iframeEl.src = url; iframeModal.classList.add('active'); }
@@ -1759,7 +1758,7 @@
     })();
     // ===== [END] MEMORY APP LOGIC =====
 
-    // ===== [START] WANDER VIEW 3.3 LOGIC (Upload & UI Fix) =====
+    // ===== [START] WANDER VIEW 3.5 LOGIC (Lyric & Icon Fix) =====
     const WanderView = (() => {
         const MUSIC_DATA_PATH = 'memory/music_data.json';
         const MUSIC_FILES_PATH = 'memory/music/';
@@ -1823,9 +1822,9 @@
             loopAll: '<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>',
             loopOne: '<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v3H13z"/></svg>',
             shuffle: '<svg viewBox="0 0 24 24"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>',
-            settings: '<svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49 1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49.42l.38-2.65c.61-.25 1.17-.59 1.69.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22-.07.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>',
+            musicNote: '<svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>',
             delete: '<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
-            playlist: '<svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>',
+            list: '<svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>',
         };
 
         function start(items) {
@@ -1931,7 +1930,7 @@
             const p = ui.player;
             const sm = ui.settingsModal;
 
-            p.playPauseBtn.innerHTML = icons.play; p.prevBtn.innerHTML = icons.prev; p.nextBtn.innerHTML = icons.next; p.loopBtn.innerHTML = icons.loopAll; p.playlistBtn.innerHTML = icons.playlist; p.openSettingsBtn.innerHTML = icons.settings;
+            p.playPauseBtn.innerHTML = icons.play; p.prevBtn.innerHTML = icons.prev; p.nextBtn.innerHTML = icons.next; p.loopBtn.innerHTML = icons.loopAll; p.playlistBtn.innerHTML = icons.list; p.openSettingsBtn.innerHTML = icons.musicNote;
             
             p.playlistBtn.addEventListener('click', (e) => { e.stopPropagation(); p.popover.classList.toggle('active'); });
             p.openSettingsBtn.addEventListener('click', () => { p.popover.classList.remove('active'); sm.modal.classList.add('show'); });
@@ -1953,8 +1952,8 @@
                 }
             });
             sm.confirmUploadBtn.addEventListener('click', () => {
-                if (activeUploadXHR) {
-                    activeUploadXHR.abort();
+                if (sm.confirmUploadBtn.textContent.startsWith("取消上传")) {
+                    if(activeUploadXHR) activeUploadXHR.abort();
                 } else {
                     uploadPendingFiles();
                 }
@@ -2180,7 +2179,7 @@
                     if(oldLi) oldLi.classList.remove('current-lyric');
                     allLi[currentLineIndex].classList.add('current-lyric');
                     
-                    const offset = allLi[currentLineIndex].offsetTop - lyricsUl.offsetTop - (lyricsUl.clientHeight / 2) + (allLi[currentLineIndex].clientHeight / 2);
+                    const offset = allLi[currentLineIndex].offsetTop;
                     lyricsUl.style.transform = `translateY(-${offset}px)`;
                 }
             }
@@ -2203,76 +2202,84 @@
             const result = await saveToGithub(MUSIC_DATA_PATH, content, 'Update music playlist', musicDataSha);
             if (result.sha) musicDataSha = result.sha;
         }
+        
+        async function uploadLargeFileViaGitData({ file, path, commitMessage, onProgress }) {
+            const { owner, repo, token, branch = 'main' } = GITHUB_CONFIG;
+            const content = await fileToBase64(file);
+            const blobUrl = `https://api.github.com/repos/${owner}/${repo}/git/blobs`;
+            const blobResponse = await new Promise((resolve, reject) => {
+                activeUploadXHR = new XMLHttpRequest();
+                activeUploadXHR.open("POST", blobUrl, true);
+                activeUploadXHR.setRequestHeader("Authorization", `token ${token}`);
+                activeUploadXHR.setRequestHeader("Content-Type", "application/json");
+                activeUploadXHR.upload.onprogress = (event) => { if (event.lengthComputable) onProgress((event.loaded / event.total) * 100); };
+                activeUploadXHR.onload = () => { if (activeUploadXHR.status === 201) resolve(JSON.parse(activeUploadXHR.responseText)); else reject(new Error(`Blob creation failed: ${activeUploadXHR.statusText} - ${activeUploadXHR.responseText}`)); };
+                activeUploadXHR.onerror = () => reject(new Error("Network error during blob creation."));
+                activeUploadXHR.onabort = () => reject(new Error("上传已取消。"));
+                activeUploadXHR.send(JSON.stringify({ content, encoding: "base64" }));
+            });
+            const blobSha = blobResponse.sha;
+            activeUploadXHR = null;
+            onProgress(100);
+
+            const refUrl = `https://api.github.com/repos/${owner}/${repo}/git/ref/heads/${branch}`;
+            const refData = await (await fetch(refUrl, { headers: { 'Authorization': `token ${token}` }})).json();
+            const parentCommitSha = refData.object.sha;
+
+            const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees`;
+            const treeBody = { base_tree: parentCommitSha, tree: [{ path, mode: "100644", type: "blob", sha: blobSha }] };
+            const treeData = await (await fetch(treeUrl, { method: 'POST', headers: { 'Authorization': `token ${token}` }, body: JSON.stringify(treeBody) })).json();
+            const newTreeSha = treeData.sha;
+
+            const commitUrl = `https://api.github.com/repos/${owner}/${repo}/git/commits`;
+            const commitBody = { message: commitMessage, tree: newTreeSha, parents: [parentCommitSha] };
+            const commitData = await (await fetch(commitUrl, { method: 'POST', headers: { 'Authorization': `token ${token}` }, body: JSON.stringify(commitBody) })).json();
+            const newCommitSha = commitData.sha;
+
+            await fetch(refUrl, { method: 'PATCH', headers: { 'Authorization': `token ${token}` }, body: JSON.stringify({ sha: newCommitSha }) });
+            return { sha: blobSha, path };
+        }
 
         async function uploadPendingFiles() {
             const sm = ui.settingsModal;
             if (!state.pendingMusicFile) { alert("请先选择一个音乐文件。"); return; }
-            if (state.pendingMusicFile.size > 70 * 1024 * 1024) { // ~70MB limit for safety with base64
-                alert(`文件过大 (${(state.pendingMusicFile.size / 1024 / 1024).toFixed(1)}MB)。由于API限制，请上传小于70MB的文件。`);
-                return;
-            }
-            
             const displayName = sm.renameInput.value.trim();
             if (!displayName) { alert("请输入歌曲名称。"); return; }
             
             const finalMusicFilename = displayName + '.mp3';
             const finalLrcFilename = displayName + '.lrc';
-
-            sm.confirmUploadBtn.disabled = true;
             sm.confirmUploadBtn.textContent = "取消上传 (0%)";
-
             try {
                 const musicPath = MUSIC_FILES_PATH + finalMusicFilename;
-                const musicResult = await uploadFileWithProgress({ url: musicPath, file: state.pendingMusicFile, token: GITHUB_CONFIG.token, commitMessage: `Upload music: ${finalMusicFilename}`, onProgress: (percent) => { if (percent < 100) { sm.confirmUploadBtn.textContent = `取消上传 (${Math.round(percent)}%)`; } else { sm.confirmUploadBtn.textContent = '正在处理...'; } } });
-
+                const musicResult = await uploadLargeFileViaGitData({ file: state.pendingMusicFile, path: musicPath, commitMessage: `Upload music: ${finalMusicFilename}`, onProgress: (percent) => { if (percent < 100) sm.confirmUploadBtn.textContent = `取消上传 (${Math.round(percent)}%)`; else sm.confirmUploadBtn.textContent = '正在处理...'; } });
                 let lrcResult = { sha: null, path: null };
-                if (state.pendingLrcFile) {
-                    const lrcPath = MUSIC_FILES_PATH + finalLrcFilename;
-                    lrcResult = await uploadFileWithProgress({ url: lrcPath, file: state.pendingLrcFile, token: GITHUB_CONFIG.token, commitMessage: `Upload lyric: ${finalLrcFilename}`, onProgress: () => {} });
-                    if (!lrcResult.sha) alert("歌词文件上传失败，但音乐已成功上传。");
-                }
+                if (state.pendingLrcFile) { try { const lrcPath = MUSIC_FILES_PATH + finalLrcFilename; lrcResult = await uploadLargeFileViaGitData({ file: state.pendingLrcFile, path: lrcPath, commitMessage: `Upload lyric: ${finalLrcFilename}`, onProgress: () => {} }); } catch(e) { alert("歌词文件上传失败，但音乐已成功上传。"); } }
                 
                 const existingIndex = state.playlist.findIndex(t => t.displayName === displayName);
-                if (existingIndex > -1) {
-                    state.playlist[existingIndex] = { ...state.playlist[existingIndex], musicPath, musicSha: musicResult.sha, lrcPath: lrcResult.path, lrcSha: lrcResult.sha };
-                } else {
-                    state.playlist.push({ id: Date.now(), displayName, musicPath, musicSha: musicResult.sha, lrcPath: lrcResult.path, lrcSha: lrcResult.sha });
-                }
+                const newTrackData = { id: Date.now(), displayName, musicPath: musicResult.path, musicSha: musicResult.sha, lrcPath: lrcResult.path, lrcSha: lrcResult.sha };
+                if (existingIndex > -1) state.playlist[existingIndex] = { ...state.playlist[existingIndex], ...newTrackData }; else state.playlist.push(newTrackData);
                 
                 await saveCloudPlaylist();
                 renderPlaylists();
                 resetUploadForm();
                 alert(`"${displayName}" 上传成功！`);
-            } catch (e) {
-                if (e.message !== "上传已取消。") alert("上传失败: " + e.message);
-            } finally {
-                sm.confirmUploadBtn.disabled = false;
-                sm.confirmUploadBtn.textContent = "确认上传";
-            }
+            } catch (e) { if (e.message !== "上传已取消。") alert("上传失败: " + e.message); } 
+            finally { sm.confirmUploadBtn.textContent = "确认上传"; }
         }
         
         function resetUploadForm() {
             const sm = ui.settingsModal;
-            state.pendingMusicFile = null;
-            state.pendingLrcFile = null;
-            sm.musicFilePicker.value = '';
-            sm.lrcFilePicker.value = '';
-            sm.musicStatus.textContent = '';
-            sm.lrcStatus.textContent = '';
+            state.pendingMusicFile = null; state.pendingLrcFile = null;
+            sm.musicFilePicker.value = ''; sm.lrcFilePicker.value = '';
+            sm.musicStatus.textContent = ''; sm.lrcStatus.textContent = '';
             sm.renameInput.value = '';
         }
 
-
         return {
             init: () => {
-                ui.img.addEventListener('click', () => {
-                    const isFullscreen = ui.photoContainer.classList.toggle('fullscreen');
-                    ui.player.container.classList.toggle('hidden', isFullscreen);
-                });
-                initGestures();
-                initPlayer();
-            },
-            start, close,
+                ui.img.addEventListener('click', () => { const isFullscreen = ui.photoContainer.classList.toggle('fullscreen'); ui.player.container.classList.toggle('hidden', isFullscreen); });
+                initGestures(); initPlayer();
+            }, start, close,
             updateTheme: () => {
                 const isDark = document.body.classList.contains('dark-mode');
                 ui.overlay.style.background = isDark ? 'var(--bg-day-element)' : 'var(--bg-day-element)';
