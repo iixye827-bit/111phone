@@ -32,7 +32,7 @@
         "name": "2"
       }
     ],
-    "photos": [
+    "items": [
       {
         "id": 1759156135505.7993,
         "albumId": 1759150560197,
@@ -40,7 +40,8 @@
         "description": "",
         "path": "memory/photos/1759150560197-1759156132794.jpeg",
         "sha": "e1c483d8dfa20843e2f3ad0c1103deccc9ac914e",
-        "timestamp": 1759156135505
+        "timestamp": 1759156135505,
+        "type": "photo"
       },
       {
         "id": 1759156139491.769,
@@ -49,7 +50,8 @@
         "description": "",
         "path": "memory/photos/1759150560197-1759156137126.jpeg",
         "sha": "f25816d7bf3ca095370ac24cd9cbfb3d8b8483af",
-        "timestamp": 1759156139491
+        "timestamp": 1759156139491,
+        "type": "photo"
       },
       {
         "id": 1759156146624.2139,
@@ -58,7 +60,8 @@
         "description": "",
         "path": "memory/photos/1759150560197-1759156144300.jpeg",
         "sha": "3b0ba3270d19d3f7165d9801bbf0a5740550c051",
-        "timestamp": 1759156146624
+        "timestamp": 1759156146624,
+        "type": "photo"
       },
       {
         "id": 1759156152132.014,
@@ -67,7 +70,8 @@
         "description": "",
         "path": "memory/photos/1759150560197-1759156148326.jpeg",
         "sha": "f08b8def201cb8d80b4b27ca47f06254b0317a39",
-        "timestamp": 1759156152132
+        "timestamp": 1759156152132,
+        "type": "photo"
       },
       {
         "id": 1759156180011.6821,
@@ -76,7 +80,8 @@
         "description": "",
         "path": "memory/photos/1759150560197-1759156174214.jpeg",
         "sha": "f270a14ee46dd4390cc442ad6849848c32f7e52d",
-        "timestamp": 1759156180011
+        "timestamp": 1759156180011,
+        "type": "photo"
       },
       {
         "id": 1759156189795.8086,
@@ -85,7 +90,8 @@
         "description": "",
         "path": "memory/photos/1759150560197-1759156184639.jpeg",
         "sha": "980b246d9229ef093a4d2daa68d5eeb26316f4d9",
-        "timestamp": 1759156189795
+        "timestamp": 1759156189795,
+        "type": "photo"
       },
       {
         "id": 1759156199536.3054,
@@ -94,7 +100,8 @@
         "description": "222",
         "path": "memory/photos/1759150560197-1759156195140.jpeg",
         "sha": "b8b91d82587b7f3804307ffe7969a8368693a704",
-        "timestamp": 1759156199536
+        "timestamp": 1759156199536,
+        "type": "photo"
       },
       {
         "id": 1759156219413.885,
@@ -103,7 +110,8 @@
         "description": "22222",
         "path": "memory/photos/1759150560197-1759156216538.jpeg",
         "sha": "b5739c9d0f8b79bd6dc3b5e9605e3b0e176635eb",
-        "timestamp": 1759156219413
+        "timestamp": 1759156219413,
+        "type": "photo"
       },
       {
         "id": 1759156251052.8665,
@@ -112,7 +120,8 @@
         "description": "",
         "path": "memory/photos/1759150560197-1759156249189.jpeg",
         "sha": "ab806dd60f2d094474f5f2f4313504258a5dac8a",
-        "timestamp": 1759156251052
+        "timestamp": 1759156251052,
+        "type": "photo"
       },
       {
         "id": 1759156336136.164,
@@ -121,7 +130,8 @@
         "description": "测试",
         "path": "memory/photos/1759150560197-1759156333327.jpeg",
         "sha": "bf074a7dfdc8ad39adfe35763189357378eb38f4",
-        "timestamp": 1759156336136
+        "timestamp": 1759156336136,
+        "type": "photo"
       },
       {
         "id": 1759157511258.886,
@@ -130,7 +140,81 @@
         "description": "",
         "path": "memory/photos/1759150560197-1759157507454.jpeg",
         "sha": "e1c483d8dfa20843e2f3ad0c1103deccc9ac914e",
-        "timestamp": 1759157511258
+        "timestamp": 1759157511258,
+        "type": "photo"
+      },
+      {
+        "type": "photoset",
+        "id": 1759207847869.8506,
+        "albumId": 1759150560197,
+        "title": "",
+        "description": "",
+        "timestamp": 1759207847869,
+        "photos": [
+          {
+            "title": "",
+            "description": "",
+            "path": "memory/photos/1759150560197-1759207827328-1.jpeg",
+            "sha": "e1c483d8dfa20843e2f3ad0c1103deccc9ac914e",
+            "timestamp": 1759207829284
+          },
+          {
+            "title": "",
+            "description": "",
+            "path": "memory/photos/1759150560197-1759207829289-2.jpeg",
+            "sha": "f25816d7bf3ca095370ac24cd9cbfb3d8b8483af",
+            "timestamp": 1759207831841
+          },
+          {
+            "title": "",
+            "description": "",
+            "path": "memory/photos/1759150560197-1759207831846-3.jpeg",
+            "sha": "3b0ba3270d19d3f7165d9801bbf0a5740550c051",
+            "timestamp": 1759207834409
+          },
+          {
+            "title": "",
+            "description": "",
+            "path": "memory/photos/1759150560197-1759207834414-4.jpeg",
+            "sha": "f08b8def201cb8d80b4b27ca47f06254b0317a39",
+            "timestamp": 1759207836663
+          },
+          {
+            "title": "",
+            "description": "",
+            "path": "memory/photos/1759150560197-1759207836667-5.jpeg",
+            "sha": "f270a14ee46dd4390cc442ad6849848c32f7e52d",
+            "timestamp": 1759207838584
+          },
+          {
+            "title": "",
+            "description": "",
+            "path": "memory/photos/1759150560197-1759207838590-6.jpeg",
+            "sha": "980b246d9229ef093a4d2daa68d5eeb26316f4d9",
+            "timestamp": 1759207840818
+          },
+          {
+            "title": "",
+            "description": "",
+            "path": "memory/photos/1759150560197-1759207840823-7.jpeg",
+            "sha": "b8b91d82587b7f3804307ffe7969a8368693a704",
+            "timestamp": 1759207843064
+          },
+          {
+            "title": "",
+            "description": "",
+            "path": "memory/photos/1759150560197-1759207843069-8.jpeg",
+            "sha": "b5739c9d0f8b79bd6dc3b5e9605e3b0e176635eb",
+            "timestamp": 1759207845625
+          },
+          {
+            "title": "",
+            "description": "",
+            "path": "memory/photos/1759150560197-1759207845629-9.jpeg",
+            "sha": "ab806dd60f2d094474f5f2f4313504258a5dac8a",
+            "timestamp": 1759207847869
+          }
+        ]
       }
     ]
   }
