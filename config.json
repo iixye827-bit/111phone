@@ -3,10 +3,6 @@
   "subtitle": "点击即可跳转 | By淡季水母",
   "buttons": [
     {
-      "text": "222",
-      "href": "https://33chat.netlify.app/"
-    },
-    {
       "text": "111",
       "href": "https://33chat.netlify.app/"
     },
@@ -20,6 +16,10 @@
     },
     {
       "text": "3333",
+      "href": "https://33chat.netlify.app/"
+    },
+    {
+      "text": "222",
       "href": "https://33chat.netlify.app/"
     }
   ],
