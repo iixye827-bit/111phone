@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V9.4.0 "DragDrop Polish & Final Tweaks"] */
+        /* [CSS - V9.5.0 "Wander 2.0 & Final Fixes"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -68,8 +68,8 @@
         .management-active .nav-btn { cursor: grab; animation: wiggle 0.2s ease-in-out infinite alternate; pointer-events: auto !important; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
         .management-active .nav-btn:active { cursor: grabbing; }
         .management-active .nav-btn > .delete-icon { display: block; }
-        .nav-btn.dragging { opacity: 0.8; background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); z-index: 1000; transform: scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
-        .drag-placeholder { background: rgba(0,0,0,0.05); border: 2px dashed var(--hold-border); box-shadow: none; }
+        .nav-btn.dragging { opacity: 0.8; transform: scale(1.05); backdrop-filter: blur(4px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 1000; animation: none !important; }
+        .nav-btn.drag-over { border: 2px dashed var(--hold-border); background: rgba(91, 153, 226, 0.1); }
         @keyframes wiggle { from { transform: rotate(-0.5deg); } to { transform: rotate(0.5deg); } }
         .fab-container { position: fixed; right: 30px; bottom: 30px; z-index: 100; }
         .fab-main, .fab-drawer-item { position: relative; width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 22px; display: flex; align-items: center; justify-content: center; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -114,7 +114,10 @@
         .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; } .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; } .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--hold-border); } input:checked + .slider:before { transform: translateX(18px); }
-        #file-list-container{flex-grow:1;overflow-y:auto;border-radius:10px;padding:5px;margin-top:10px;background:var(--bg-day-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day); display: flex;}body.dark-mode #file-list-container{background:var(--bg-night-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}#file-list-container ul{list-style:none;padding:5px; width: 100%;}#file-list-container li{padding:8px 15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;transition:background .2s;gap:10px}#file-list-container li:hover{background-color:rgba(0,0,0,0.05)}body.dark-mode #file-list-container li:hover{background-color:rgba(255,255,255,0.08)}#file-list-status{width: 100%; text-align:center;color:#a0aec0;padding:30px 10px; align-self: center;} body.dark-mode #file-list-status {color: #718096;} .file-info{flex-grow:1;cursor:pointer;min-width:0}.file-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px}.file-timestamp{font-size:12px;font-weight:300;color:#9A86A4}.delete-btn{background:transparent;border:none;cursor:pointer;padding:0;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s,color .2s;color:#bbb;font-size:22px;font-weight:bold;line-height:1}.delete-btn:hover{background:#f0f0f0;color:#e53e3e}body.dark-mode .delete-btn{color:#889}body.dark-mode .delete-btn:hover{background:rgba(255,255,255,0.1);color:#fc8181}
+        #file-list-container{flex-grow:1;overflow-y:auto;border-radius:10px;padding:5px;margin-top:10px;background:var(--bg-day-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day); display: flex;}body.dark-mode #file-list-container{background:var(--bg-night-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}#file-list-container ul{list-style:none;padding:5px; width: 100%;}#file-list-container li{padding:8px 15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;transition:background .2s;gap:10px}#file-list-container li:hover{background-color:rgba(0,0,0,0.05)}body.dark-mode #file-list-container li:hover{background-color:rgba(255,255,255,0.08)}
+        #fileListStatus{text-align:center;color:#a0aec0;padding:10px;display:flex;align-items:center;justify-content:center;flex-grow:1;min-height:100px; width: 100%;}
+        body.dark-mode #fileListStatus {color:#889;}
+        .file-info{flex-grow:1;cursor:pointer;min-width:0}.file-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px}.file-timestamp{font-size:12px;font-weight:300;color:#9A86A4}.delete-btn{background:transparent;border:none;cursor:pointer;padding:0;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s,color .2s;color:#bbb;font-size:22px;font-weight:bold;line-height:1}.delete-btn:hover{background:#f0f0f0;color:#e53e3e}body.dark-mode .delete-btn{color:#889}body.dark-mode .delete-btn:hover{background:rgba(255,255,255,0.1);color:#fc8181}
         #settingsModal .modal-content,#addNavModal .modal-content, #syncModal .modal-content {max-width:400px}
         #settingsModal .modal-body .form-section,#addNavModal .modal-body .form-section{display:flex;flex-direction:column;gap:8px}#settingsModal label,#addNavModal label{font-size:14px;color:#5a6778}body.dark-mode #settingsModal label,body.dark-mode #addNavModal label{color:#c0c6cc}
         .segmented-control { position: relative; display: flex; border-radius: 12px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
@@ -197,11 +200,13 @@
         #memoryModal #photo-list-container { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
         #memoryModal .photo-item, .photo-item-set { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,0.7); cursor: pointer; transition: transform 0.2s ease; background-color: rgba(128,128,128,0.1); }
         #memoryModal .photo-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
-        .photo-item-set .photo-stack-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; background-color: var(--bg-day-element); box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.3s ease; }
-        body.dark-mode .photo-item-set .photo-stack-img { background-color: var(--bg-night-element); }
-        .photo-item-set .photo-stack-img:nth-child(1) { transform: translate(6px, 6px) scale(0.9); z-index: 1; opacity: 0.7; }
-        .photo-item-set .photo-stack-img:nth-child(2) { transform: translate(3px, 3px) scale(0.95); z-index: 2; opacity: 0.85; }
-        .photo-item-set .photo-stack-img:nth-child(3) { transform: translate(0, 0) scale(1); z-index: 3; }
+        .photo-item-set .photo-stack-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s ease; border: 2px solid var(--bg-day-element); }
+        body.dark-mode .photo-item-set .photo-stack-img { border-color: var(--bg-night-element); }
+        .photo-item-set .photo-stack-img:nth-child(1) { transform: translate(6px, 6px); z-index: 1; }
+        .photo-item-set .photo-stack-img:nth-child(2) { transform: translate(3px, 3px); z-index: 2; }
+        .photo-item-set .photo-stack-img:nth-child(3) { transform: translate(0, 0); z-index: 3; }
+        .photo-item-set:hover .photo-stack-img:nth-child(1) { transform: translate(10px, 10px) rotate(2deg); }
+        .photo-item-set:hover .photo-stack-img:nth-child(2) { transform: translate(5px, 5px) rotate(-1deg); }
         #memoryModal .photo-title-overlay { position: absolute; top: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); color: white; font-size: 12px; padding: 4px 8px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid rgba(255,255,255,0.2); z-index: 5; }
         .photo-item-set .count-overlay { position: absolute; bottom: 5px; right: 8px; background: rgba(0,0,0,0.5); color: white; padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 4px; z-index: 5; }
         #memoryPhotoViewerOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 5000; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
@@ -213,14 +218,11 @@
         #memoryPhotoViewerOverlay .viewer-content { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
         #viewer-img-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: padding 0.3s ease; }
         #memoryPhotoViewerOverlay #viewer-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .viewer-mode-view #viewer-img-container { padding: 40px; }
-        .viewer-mode-wander #viewer-img-container { padding: 0; }
+        .viewer-mode-view #viewer-img-container, .viewer-mode-set #viewer-img-container { padding: 40px; }
         #memoryPhotoViewerOverlay .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; font-size: 24px; opacity: 0.6; display: flex; align-items: center; justify-content: center; }
-        .viewer-mode-wander .nav-arrow { display: none; }
         #memoryPhotoViewerOverlay .nav-arrow:hover { opacity: 1; }
         #prev-photo-btn { left: 15px; } #next-photo-btn { right: 15px; }
         #memoryPhotoViewerOverlay .viewer-footer { flex-shrink: 0; padding: 20px; color: white; text-align: center; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); }
-        .viewer-mode-wander .viewer-footer { display: none; }
         #viewer-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
         #viewer-description { font-size: 14px; margin-bottom: 8px; }
         #viewer-timestamp { font-size: 12px; color: #ccc; }
@@ -510,7 +512,7 @@
     </div>
 
     <script>
-    // [JS - V9.4.0 "DragDrop Polish & Final Tweaks"]
+    // [JS - V9.5.0 "Wander 2.0 & Final Fixes"]
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
@@ -671,79 +673,73 @@
     // Universal Drag-and-Drop Implementation (Rewritten for Touch & Mouse)
     function initializeDragAndDrop(container) {
         let draggedEl = null;
-        let placeholder = null;
+        let isDragging = false;
+        let startTimeout;
 
-        const createPlaceholder = (el) => {
-            const p = document.createElement('div');
-            p.className = 'drag-placeholder';
-            p.style.width = `${el.offsetWidth}px`;
-            p.style.height = `${el.offsetHeight}px`;
-            return p;
+        const onPointerDown = (e) => {
+            if (!isManagementMode || e.target.classList.contains('delete-icon')) return;
+            const target = e.target.closest('.nav-btn');
+            if (!target) return;
+
+            e.preventDefault(); // Prevents text selection on desktop
+
+            startTimeout = setTimeout(() => {
+                draggedEl = target;
+                isDragging = true;
+                draggedEl.classList.add('dragging');
+                
+                document.addEventListener('mousemove', onPointerMove);
+                document.addEventListener('touchmove', onPointerMove, { passive: false });
+                document.addEventListener('mouseup', onPointerUp);
+                document.addEventListener('touchend', onPointerUp);
+            }, 200); // 200ms long-press delay
         };
 
-        const onDragStart = (e) => {
-            if (!isManagementMode) return;
-            draggedEl = e.target.closest('.nav-btn');
-            if (!draggedEl) return;
-
-            // For touch, prevent default to avoid scrolling & other browser actions
-            if (e.type === 'touchstart') e.preventDefault();
-
-            placeholder = createPlaceholder(draggedEl);
-            draggedEl.parentNode.insertBefore(placeholder, draggedEl);
-            
-            setTimeout(() => {
-                if(draggedEl) draggedEl.classList.add('dragging');
-            }, 0);
-
-            // Add move/end listeners to the document to capture movement anywhere on the page
-            document.addEventListener('mousemove', onDragMove);
-            document.addEventListener('touchmove', onDragMove, { passive: false });
-            document.addEventListener('mouseup', onDragEnd);
-            document.addEventListener('touchend', onDragEnd);
-        };
-
-        const onDragMove = (e) => {
-            if (!draggedEl) return;
+        const onPointerMove = (e) => {
+            if (!isDragging || !draggedEl) return;
             e.preventDefault();
 
             const y = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            // Remove previous drag-over class
+            const prevOver = container.querySelector('.drag-over');
+            if(prevOver) prevOver.classList.remove('drag-over');
+
             const afterElement = getDragAfterElement(container, y);
             
-            // Move the placeholder, not the dragged element itself
-            if (afterElement == null) {
-                container.appendChild(placeholder);
+            if (afterElement) {
+                afterElement.classList.add('drag-over');
+                container.insertBefore(draggedEl, afterElement);
             } else {
-                container.insertBefore(placeholder, afterElement);
+                container.appendChild(draggedEl);
             }
         };
 
-        const onDragEnd = () => {
-            if (!draggedEl) return;
+        const onPointerUp = () => {
+            clearTimeout(startTimeout);
+            if (!isDragging || !draggedEl) return;
             
+            isDragging = false;
             draggedEl.classList.remove('dragging');
-            if (placeholder && placeholder.parentNode) {
-                placeholder.parentNode.replaceChild(draggedEl, placeholder);
-            }
-            placeholder = null;
+            const prevOver = container.querySelector('.drag-over');
+            if(prevOver) prevOver.classList.remove('drag-over');
             
             updateButtonOrderAndSave('Reorder buttons');
             draggedEl = null;
 
-            document.removeEventListener('mousemove', onDragMove);
-            document.removeEventListener('touchmove', onDragMove);
-            document.removeEventListener('mouseup', onDragEnd);
-            document.removeEventListener('touchend', onDragEnd);
+            document.removeEventListener('mousemove', onPointerMove);
+            document.removeEventListener('touchmove', onPointerMove);
+            document.removeEventListener('mouseup', onPointerUp);
+            document.removeEventListener('touchend', onPointerUp);
         };
 
-        container.addEventListener('mousedown', onDragStart);
-        container.addEventListener('touchstart', onDragStart, { passive: false });
+        container.addEventListener('mousedown', onPointerDown);
+        container.addEventListener('touchstart', onPointerDown, { passive: false });
     }
 
     function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.nav-btn:not(.dragging), .drag-placeholder')];
+        const draggableElements = [...container.querySelectorAll('.nav-btn:not(.dragging)')];
         return draggableElements.reduce((closest, child) => {
-            if (child.classList.contains('dragging')) return closest;
             const box = child.getBoundingClientRect();
             const offset = y - box.top - box.height / 2;
             if (offset < 0 && offset > closest.offset) {
@@ -855,7 +851,7 @@
     syncModalElements.saveSettingsBtn.addEventListener("click",async()=>{const[e,t]=syncModalElements.githubRepoInput.value.trim().split("/").map(e=>e.trim()),n=syncModalElements.githubTokenInput.value.trim();if(e&&t&&n){saveGithubConfig({owner:e,repo:t,token:n,branch:"main"}),alert("配置已保存！刷新页面加载云端配置。"),document.getElementById("settingsModal").classList.remove("show"),await loadInitialData()}else{alert("请填写完整信息。")}});function populateButtonSelector(){const e=syncModalElements.buttonSelector.value;syncModalElements.buttonSelector.innerHTML="",document.querySelectorAll(".nav-btn").forEach(t=>{const n=t.textContent.replace("×","").trim(),o=document.createElement("option");o.value=o.textContent=n,syncModalElements.buttonSelector.appendChild(o)}),Array.from(syncModalElements.buttonSelector.options).some(t=>t.value===e)&&(syncModalElements.buttonSelector.value=e)}
     syncModalElements.buttonSelector.addEventListener("change",fetchFilesForSelectedButton); syncModalElements.selectFileBtn.addEventListener('click', () => syncModalElements.fileUploader.click());
     syncModalElements.fileUploader.addEventListener("change",()=>{ if(syncModalElements.fileUploader.files.length>0){ const file = syncModalElements.fileUploader.files[0]; syncModalElements.fileNameInput.value=file.name; syncModalElements.selectedFileName.textContent = file.name; } else { syncModalElements.selectedFileName.textContent = "未选择任何文件"; }});
-    async function fetchFilesForSelectedButton(){const e=syncModalElements.buttonSelector.value;if(syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="block",!e)return void(syncModalElements.fileListStatus.textContent="请选择一个分类");if(!checkConfig(!0))return void(syncModalElements.fileListStatus.innerHTML="尚未配置GitHub信息<br>请点击标题旁 ⚙️");syncModalElements.fileListStatus.textContent="正在加载...";const t=withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${e}`);try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`}});if(404===n.status)return void(syncModalElements.fileListStatus.textContent="该分类下暂无文件");if(!n.ok)throw new Error(`HTTP ${n.status}`);const o=await n.json();if(0===o.length)syncModalElements.fileListStatus.textContent="该分类下暂无文件";else{const l=await Promise.all(o.map(async e=>({...e,commitDate:await getLatestCommitDate(e.path)})));l.sort((e,t)=>new Date(t.commitDate)-new Date(e.commitDate)),syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="none",l.forEach(e=>{const t=document.createElement("li"),n=document.createElement("div");n.className="file-info",n.dataset.downloadUrl=e.download_url,n.dataset.fileName=e.name;const o=document.createElement("span");o.className="file-name",o.textContent=e.name;const l=document.createElement("span");l.className="file-timestamp",l.textContent=(new Date(e.commitDate)).toLocaleString("zh-CN",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}),n.append(o,l);const a=document.createElement("button");a.className="delete-btn",a.innerHTML="&times;",a.title="删除文件",t.append(n,a),syncModalElements.fileList.appendChild(t),n.addEventListener("click",t=>forceDownload(t.currentTarget.dataset.downloadUrl,t.currentTarget.dataset.fileName,n)),a.addEventListener("click",()=>deleteFile(e.path,e.sha,t))})}}catch(n){console.error("获取文件列表失败:",n),syncModalElements.fileListStatus.textContent="加载失败，请检查网络或配置。"}}
+    async function fetchFilesForSelectedButton(){const e=syncModalElements.buttonSelector.value;if(syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="flex",!e)return void(syncModalElements.fileListStatus.textContent="请选择一个分类");if(!checkConfig(!0))return void(syncModalElements.fileListStatus.innerHTML="尚未配置GitHub信息<br>请点击标题旁 ⚙️");syncModalElements.fileListStatus.textContent="正在加载...";const t=withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${e}`);try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`}});if(404===n.status)return void(syncModalElements.fileListStatus.textContent="该分类下暂无文件");if(!n.ok)throw new Error(`HTTP ${n.status}`);const o=await n.json();if(0===o.length)syncModalElements.fileListStatus.textContent="该分类下暂无文件";else{const l=await Promise.all(o.map(async e=>({...e,commitDate:await getLatestCommitDate(e.path)})));l.sort((e,t)=>new Date(t.commitDate)-new Date(e.commitDate)),syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="none",l.forEach(e=>{const t=document.createElement("li"),n=document.createElement("div");n.className="file-info",n.dataset.downloadUrl=e.download_url,n.dataset.fileName=e.name;const o=document.createElement("span");o.className="file-name",o.textContent=e.name;const l=document.createElement("span");l.className="file-timestamp",l.textContent=(new Date(e.commitDate)).toLocaleString("zh-CN",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}),n.append(o,l);const a=document.createElement("button");a.className="delete-btn",a.innerHTML="&times;",a.title="删除文件",t.append(n,a),syncModalElements.fileList.appendChild(t),n.addEventListener("click",t=>forceDownload(t.currentTarget.dataset.downloadUrl,t.currentTarget.dataset.fileName,n)),a.addEventListener("click",()=>deleteFile(e.path,e.sha,t))})}}catch(n){console.error("获取文件列表失败:",n),syncModalElements.fileListStatus.textContent="加载失败，请检查网络或配置。"}}
     async function getLatestCommitDate(e){const t=withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`);try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`}});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";const o=withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${e}`);try{const l=await fetch(o,{method:"DELETE",headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},body:JSON.stringify({message:`Delete file: ${e}`,sha:t,branch:"main"})});if(!l.ok)throw new Error(`删除失败: ${(await l.json()).message}`);n.remove(),0===syncModalElements.fileList.children.length&&(syncModalElements.fileListStatus.textContent="该分类下暂无文件",syncModalElements.fileListStatus.style.display="block")}catch(l){console.error("删除文件失败:",l),alert(`删除文件失败: ${l.message}`),n.style.opacity="1"}}async function forceDownload(e,t,n){const o=n.querySelector(".file-name").textContent;n.querySelector(".file-name").textContent="准备下载...";n.style.pointerEvents="none";try{const l=await fetch(e);if(!l.ok)throw new Error(`下载请求失败: ${l.statusText}`);const a=await l.blob(),c=document.createElement("a");c.href=window.URL.createObjectURL(a),c.download=t,document.body.appendChild(c),c.click(),c.remove(),window.URL.revokeObjectURL(c.href)}catch(l){console.error("Download error:",l),alert(`下载出错: ${l.message}`)}finally{n.querySelector(".file-name").textContent=o,n.style.pointerEvents="auto"}}
     function uploadFileWithProgress(url, fileContent, token, commitMessage) { return new Promise((resolve, reject) => { const body = { message: commitMessage, content: fileContent, branch: "main" }; const xhr = new XMLHttpRequest(); xhr.open("PUT", url, true); xhr.setRequestHeader("Authorization", `token ${token}`); xhr.setRequestHeader("Content-Type", "application/json"); xhr.upload.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = (event.loaded / event.total) * 100; syncModalElements.progressBar.style.width = percentComplete + '%'; } }; xhr.onload = () => { if (xhr.status >= 200 && xhr.status < 300) { resolve(JSON.parse(xhr.responseText)); } else { reject(new Error(`上传失败: ${xhr.statusText} - ${xhr.responseText}`)); } }; xhr.onerror = () => reject(new Error("网络错误，上传失败。")); xhr.send(JSON.stringify(body)); }); }
     syncModalElements.uploadBtn.addEventListener("click", async () => { if (!checkConfig()) return; const category = syncModalElements.buttonSelector.value; const file = syncModalElements.fileUploader.files[0]; let fileName = syncModalElements.fileNameInput.value.trim() || (file && file.name); if (!category || !file || !fileName) { return alert("请选择分类、文件，并确保文件名不为空。"); } syncModalElements.uploadBtn.disabled = true; syncModalElements.uploadBtn.textContent = "上传中..."; syncModalElements.progressContainer.style.display = 'block'; syncModalElements.progressBar.style.width = '0%'; try { const content = await fileToBase64(file); const url = withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${category}/${fileName}`); await uploadFileWithProgress(url, content, GITHUB_CONFIG.token, `Upload ${fileName}`); syncModalElements.uploadBtn.textContent = '正在处理...'; setTimeout(() => { alert("上传成功！"); syncModalElements.fileUploader.value = ""; syncModalElements.fileNameInput.value = ""; syncModalElements.selectedFileName.textContent = '未选择任何文件'; fetchFilesForSelectedButton(); }, 200); } catch (error) { console.error("上传失败:", error); alert(`上传失败: ${error.message}`); } finally { setTimeout(() => { syncModalElements.uploadBtn.disabled = false; syncModalElements.uploadBtn.textContent = "上传文件"; syncModalElements.progressContainer.style.display = 'none'; }, 1000); } });
@@ -940,7 +936,8 @@
         let memoryDataSha = null;
         let isSaving = false;
         let saveTimeout = null;
-        
+        let lastWanderedItemId = null;
+
         const ui = {
             modal: document.getElementById('memoryModal'),
             appContainer: document.getElementById('memoryAppContainer'),
@@ -978,31 +975,25 @@
             };
         }
 
-        function updateStatus(text, isError = false, error = null) {
-            let message = text;
-            if (isError && error && error.message) {
-                message += `: ${error.message}`;
-            }
-            ui.status.textContent = message;
-            ui.status.style.color = isError ? '#e53e3e' : 'inherit';
-        }
+        function updateStatus(text, isError = false, reason = '') { ui.status.textContent = isError && reason ? `${text}: ${reason}` : text; ui.status.style.color = isError ? '#e53e3e' : 'inherit'; }
 
         async function syncWithGithub() {
             if (!checkConfig(false)) return;
             updateStatus('同步中...');
             const result = await fetchFromGithub(MEMORY_DATA_PATH);
-            if (result.error) { updateStatus('同步失败', true, {message: result.error}); return; }
+            if (result.error) { updateStatus('同步失败', true, result.error); return; }
             memoryCache = result.data ? JSON.parse(b6_to_utf8(result.data.content)) : getInitialData();
             memoryDataSha = result.sha;
             updateStatus('已同步');
             if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
             if (!memoryCache.album) memoryCache.album = { folders: [], items: [] };
+            // Migration for old data structure
             if (memoryCache.album.photos && !memoryCache.album.items) {
                 memoryCache.album.items = memoryCache.album.photos.map(p => ({...p, type: 'photo'}));
                 delete memoryCache.album.photos;
             }
         }
-
+        
         function scheduleSave() {
             if (isSaving) return;
             clearTimeout(saveTimeout);
@@ -1012,8 +1003,12 @@
                 updateStatus('保存中...');
                 const content = utf8_to_b64(JSON.stringify(memoryCache, null, 2));
                 const result = await saveToGithub(MEMORY_DATA_PATH, content, 'Update memory data', memoryDataSha);
-                if (result.sha) { memoryDataSha = result.sha; updateStatus('已同步'); } 
-                else { updateStatus('保存失败', true, {message: result.error}); }
+                if (result.sha) { 
+                    memoryDataSha = result.sha; 
+                    updateStatus('已同步'); 
+                } else { 
+                    updateStatus('保存失败', true, result.error); 
+                }
                 isSaving = false;
             }, 1500);
         }
@@ -1075,7 +1070,7 @@
                     el.className = `photo-item-set ${state.isPhotoManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
                     el.dataset.action = "open-item";
                     let stackHtml = '';
-                    item.photos.slice(0, 3).reverse().forEach(photo => {
+                    item.photos.slice(0, 3).forEach(photo => {
                         const photoUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${photo.path}`;
                         stackHtml += `<img src="${photoUrl}" class="photo-stack-img" loading="lazy">`;
                     });
@@ -1092,45 +1087,51 @@
             });
             if (itemsInAlbum.length === 0) ui.photoList.innerHTML = `<p class="empty-list-placeholder">没有照片</p>`;
         }
-        
-        function openPhotoViewer(itemList, startIndex, mode = 'view') {
-            if (!itemList || itemList.length === 0) return;
-            state.viewerContext = { items: itemList, index: startIndex, mode };
+
+        function openPhotoViewer(items, initialIndex, mode = 'view') {
+            if (!items || items.length === 0) return;
+            state.viewerContext = { items, index: initialIndex, mode };
             ui.photoViewer.className = `viewer-mode-${mode}`;
             updatePhotoViewerContent();
             ui.photoViewer.classList.add('active');
         }
 
         function updatePhotoViewerContent() {
-            const { items, index, mode } = state.viewerContext;
-            if (index < 0 || index >= items.length) { closePhotoViewer(); return; }
-
+            const { items, index } = state.viewerContext;
+            if (!items || items.length === 0 || index < 0) { closePhotoViewer(); return; }
+            
             const currentItem = items[index];
-            let photo, isSet, setIndex, setLength;
+            let photo, title, description, timestamp, isSet, setIndex, setLength;
 
             if (currentItem.type === 'photoset') {
                 isSet = true;
                 setIndex = currentItem.internalIndex || 0;
                 setLength = currentItem.photos.length;
                 photo = currentItem.photos[setIndex];
+                title = currentItem.title;
+                description = currentItem.description;
+                timestamp = currentItem.timestamp;
             } else {
                 isSet = false;
                 photo = currentItem;
+                title = photo.title;
+                description = photo.description;
+                timestamp = photo.timestamp;
             }
 
             const photoUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${photo.path}`;
             ui.photoViewer.querySelector('#viewer-img').src = photoUrl;
-            ui.photoViewer.querySelector('#viewer-title').textContent = currentItem.title || '';
-            ui.photoViewer.querySelector('#viewer-description').textContent = currentItem.description || '';
-            ui.photoViewer.querySelector('#viewer-timestamp').textContent = new Date(currentItem.timestamp).toLocaleString('zh-CN');
+            ui.photoViewer.querySelector('#viewer-title').textContent = title || '';
+            ui.photoViewer.querySelector('#viewer-description').textContent = description || '';
+            ui.photoViewer.querySelector('#viewer-timestamp').textContent = new Date(timestamp).toLocaleString('zh-CN');
             
             const prevBtn = document.getElementById('prev-photo-btn');
             const nextBtn = document.getElementById('next-photo-btn');
             const counter = document.getElementById('viewer-counter');
 
             if (isSet) {
-                prevBtn.style.display = (index === 0 && setIndex === 0) ? 'none' : 'flex';
-                nextBtn.style.display = (index === items.length - 1 && setIndex === setLength - 1) ? 'none' : 'flex';
+                prevBtn.style.display = (setIndex === 0 && index === 0) ? 'none' : 'flex';
+                nextBtn.style.display = (setIndex === setLength - 1 && index === items.length - 1) ? 'none' : 'flex';
                 counter.textContent = `${setIndex + 1} / ${setLength}`;
                 counter.style.display = 'block';
             } else {
@@ -1138,45 +1139,34 @@
                 nextBtn.style.display = (index === items.length - 1) ? 'none' : 'flex';
                 counter.style.display = 'none';
             }
-            
-            if (mode === 'wander') {
-                 if (isSet) {
-                    prevBtn.style.display = (setIndex === 0) ? 'none' : 'flex';
-                    nextBtn.style.display = (setIndex === setLength - 1) ? 'none' : 'flex';
-                } else {
-                    prevBtn.style.display = 'none';
-                    nextBtn.style.display = 'none';
-                }
-            }
         }
-
-        function closePhotoViewer() { ui.photoViewer.classList.remove('active'); }
-        
+        function closePhotoViewer() { 
+            state.viewerContext.items.forEach(item => { if(item.type === 'photoset') delete item.internalIndex; });
+            ui.photoViewer.classList.remove('active'); 
+        }
         function changePhoto(direction) {
-            let { items, index } = state.viewerContext;
-            let currentItem = items[index];
+            const { items, index } = state.viewerContext;
+            const currentItem = items[index];
 
             if (currentItem.type === 'photoset') {
                 let setIndex = currentItem.internalIndex || 0;
-                if (direction === 1 && setIndex < currentItem.photos.length - 1) {
-                    currentItem.internalIndex++;
-                } else if (direction === -1 && setIndex > 0) {
-                    currentItem.internalIndex--;
-                } else if (index + direction >= 0 && index + direction < items.length) {
-                    state.viewerContext.index += direction;
-                    let nextItem = items[state.viewerContext.index];
-                    if (nextItem.type === 'photoset') {
-                        nextItem.internalIndex = direction === 1 ? 0 : nextItem.photos.length - 1;
-                    }
-                }
-            } else if (index + direction >= 0 && index + direction < items.length) {
-                state.viewerContext.index += direction;
-                let nextItem = items[state.viewerContext.index];
-                if (nextItem.type === 'photoset') {
-                    nextItem.internalIndex = direction === 1 ? 0 : nextItem.photos.length - 1;
+                let newSetIndex = setIndex + direction;
+                if (newSetIndex >= 0 && newSetIndex < currentItem.photos.length) {
+                    currentItem.internalIndex = newSetIndex;
+                    updatePhotoViewerContent();
+                    return;
                 }
             }
-            updatePhotoViewerContent();
+            // If not in a set, or at the edge of a set, change the main item
+            changeItem(direction);
+        }
+        function changeItem(direction) {
+            const { items, index } = state.viewerContext;
+            let newIndex = index + direction;
+            if (newIndex >= 0 && newIndex < items.length) {
+                state.viewerContext.index = newIndex;
+                updatePhotoViewerContent();
+            }
         }
 
         const actions = {
@@ -1222,8 +1212,8 @@
                     renderPhotos();
                 } else {
                     const itemsInAlbum = memoryCache.album.items.filter(i => i.albumId === state.currentAlbumId).sort((a,b) => b.timestamp - a.timestamp);
-                    const startIndex = itemsInAlbum.findIndex(i => i.id === itemId);
-                    openPhotoViewer(itemsInAlbum, startIndex, 'view');
+                    const initialIndex = itemsInAlbum.findIndex(i => i.id === itemId);
+                    openPhotoViewer(itemsInAlbum, initialIndex, 'view');
                 }
             },
             'add-memo-folder': () => { state.folderModalContext = 'memo'; document.getElementById('folder-name-input').value = ''; ui.folderModal.classList.add('show'); },
@@ -1357,21 +1347,29 @@
             },
             'wander-global': () => {
                 let itemPool = [...memoryCache.album.items];
+                if (itemPool.length > 1 && lastWanderedItemId) {
+                    itemPool = itemPool.filter(p => p.id !== lastWanderedItemId);
+                }
                 if (itemPool.length > 0) {
-                    for (let i = itemPool.length - 1; i > 0; i--) { // Fisher-Yates Shuffle
+                    for (let i = itemPool.length - 1; i > 0; i--) { // Fisher-Yates shuffle
                         const j = Math.floor(Math.random() * (i + 1));
                         [itemPool[i], itemPool[j]] = [itemPool[j], itemPool[i]];
                     }
+                    lastWanderedItemId = itemPool[0].id;
                     openPhotoViewer(itemPool, 0, 'wander');
                 }
             },
             'wander-local': () => {
-                let localItems = memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId);
-                 if (localItems.length > 0) {
-                    for (let i = localItems.length - 1; i > 0; i--) { // Fisher-Yates Shuffle
+                let localItems = [...memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId)];
+                 if (localItems.length > 1 && lastWanderedItemId) {
+                    localItems = localItems.filter(p => p.id !== lastWanderedItemId);
+                }
+                if (localItems.length > 0) {
+                    for (let i = localItems.length - 1; i > 0; i--) { // Fisher-Yates shuffle
                         const j = Math.floor(Math.random() * (i + 1));
                         [localItems[i], localItems[j]] = [localItems[j], localItems[i]];
                     }
+                    lastWanderedItemId = localItems[0].id;
                     openPhotoViewer(localItems, 0, 'wander');
                 }
             },
@@ -1408,7 +1406,7 @@
                 state.photoUploadQueue.shift();
                 if (state.photoUploadQueue.length > 0) { processPhotoUploadQueue(); } 
                 else { renderPhotos(); renderAlbumFolders(); }
-            } catch (error) { updateStatus('上传失败', true, error); console.error(error); }
+            } catch (error) { updateStatus('上传失败', true, error.message); console.error(error); }
         }
 
         async function saveUploadedPhotoSet() {
@@ -1451,7 +1449,7 @@
         function processPhotoUploadQueue() {
             if (state.photoUploadQueue.length === 0) return;
             const isBatch = state.photoUploadQueue.length > 1;
-            ui.photosetToggleContainer.style.display = isBatch ? 'flex' : 'none';
+            ui.photosetToggleContainer.style.display = isBatch ? 'block' : 'none';
             ui.photosetToggle.checked = false;
 
             const file = state.photoUploadQueue[0];
@@ -1462,8 +1460,8 @@
                 document.getElementById('photo-desc-input').value = '';
                 ui.photoDetailsModal.dataset.fileData = JSON.stringify({ name: file.name });
                 const button = ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]');
-                button.textContent = (isBatch && !ui.photosetToggle.checked) ? '保存并继续' : '保存';
-                document.getElementById('photo-details-modal-title').textContent = (isBatch && !ui.photosetToggle.checked) ? `添加照片信息 (${state.photoUploadQueue.length} 待处理)` : '添加照片信息';
+                button.textContent = isBatch && !ui.photosetToggle.checked ? '保存并继续' : '保存';
+                document.getElementById('photo-details-modal-title').textContent = isBatch && !ui.photosetToggle.checked ? `添加照片信息 (${state.photoUploadQueue.length} 待处理)` : '添加照片信息';
                 ui.photoDetailsModal.classList.add('show');
             };
             reader.readAsDataURL(file);
