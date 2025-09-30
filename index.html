@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V9.9.1 "Polaroid Layout & Final Player Polish"] */
+        /* [CSS - V9.9.2 "UI/UX Polish & Z-Index Fix"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -134,9 +134,8 @@
         #syncModal .file-upload-section { display: flex; flex-direction: column; gap: 10px; } #syncModal input[type="file"] { display: none; }
         #syncModal .progress-container { display: none; height: 12px; background:var(--bg-day-element); border-radius: 6px; box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day); padding: 2px; } body.dark-mode #syncModal .progress-container { box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night); }
         #syncModal .progress-bar { width: 0%; height: 100%; border-radius: 4px; background-color: #707899; transition: width 0.2s linear; }
-        #helpModal .modal-body { gap: 0; padding-top: 15px; } #helpModal .modal-body > input[name="help-tab"] { display: none; } #help-tab-2:checked ~ .segmented-control .slider-indicator { transform: translateX(100%); } #help-tab-3:checked ~ .segmented-control .slider-indicator { transform: translateX(200%); }
+        #helpModal .modal-body { gap: 0; padding-top: 15px; } #helpModal .modal-body > input[name="help-tab"] { display: none; } 
         .help-page-content { display: none; padding: 15px 5px 0 5px; overflow-x: hidden; }
-        #help-tab-1:checked ~ .help-content-wrapper > #help-page-1, #help-tab-2:checked ~ .help-content-wrapper > #help-page-2, #help-tab-3:checked ~ .help-content-wrapper > #help-page-3 { display: block; }
         .help-page-content h3 { font-size: 1.3em; margin: 20px 0 10px 0; padding-bottom: 5px; border-bottom: 1px solid rgba(128,128,128,0.3); } .help-page-content h4 { font-size: 1.1em; margin: 18px 0 8px 0; }
         .help-page-content p, .help-page-content li, .help-page-content a { line-height: 1.7; color: #4a5568; margin-bottom: 8px; word-wrap: break-word; }
         body.dark-mode .help-page-content p, body.dark-mode .help-page-content li, body.dark-mode .help-page-content a { color: #a0aec0; }
@@ -258,7 +257,7 @@
         body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-selected, body.dark-mode .photo-item.manage-selected, body.dark-mode .photo-item-set.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
         /* ===== [END] MEMORY MODAL STYLES ===== */
         
-        /* ===== [START] WANDER VIEW 3.1 STYLES (POLAROID LAYOUT) ===== */
+        /* ===== [START] WANDER VIEW 3.2 STYLES (PLAYER UI FIX) ===== */
         #wanderViewOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 6000; background: var(--bg-day-element); color: var(--text-day); display: none; flex-direction: column; opacity: 0; transition: opacity 0.4s ease; }
         body.dark-mode #wanderViewOverlay { background: var(--bg-night-element); color: var(--text-night); }
         #wanderViewOverlay.active { display: flex; opacity: 1; }
@@ -294,6 +293,7 @@
         body.dark-mode .player-btn:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
         .player-btn#play-pause-btn { width: 52px; height: 52px; font-size: 22px; }
         .player-display { margin: 10px 0; height: 2.5em; text-align: center; font-size: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; position: relative; }
+        .song-title-display { display: flex; align-items: center; justify-content: center; height: 100%; font-weight: 600; }
         #lyrics-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; align-items: center; justify-content: center; }
         #lyrics-ul { list-style: none; transition: transform 0.5s ease; padding: 0; margin: 0;}
         #lyrics-ul li { line-height: 1.5em; opacity: 0.5; transition: opacity 0.5s ease; }
@@ -301,32 +301,119 @@
         .player-progress-track { position: relative; height: 16px; margin: 10px 0 0 0; cursor: pointer; }
         .player-progress-bar-bg { position: absolute; top: 50%; transform: translateY(-50%); left:0; right: 0; height: 3px; background-color: rgba(128,128,128,0.2); border-radius: 1.5px; }
         #player-progress-bar { position: absolute; top: 50%; transform: translateY(-50%); left:0; height: 3px; background-color: var(--hold-border); border-radius: 1.5px; width: 0; }
-        #player-progress-handle { --handle-color: var(--handle-color-day); position: absolute; top: 50%; left: 0; width: 12px; height: 12px; background-color: transparent; border-radius: 50%; transform: translate(-50%, -50%); animation: soft-breath 2s ease-in-out infinite; }
+        #player-progress-handle {
+            --handle-color: var(--handle-color-day);
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 14px;
+            height: 14px;
+            background-color: var(--handle-color);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px 2px var(--handle-color);
+            transition: box-shadow 0.3s ease;
+        }
         body.dark-mode #player-progress-handle { --handle-color: var(--handle-color-night); }
-        @keyframes soft-breath { 0%, 100% { box-shadow: 0 0 8px 2px var(--handle-color); } 50% { box-shadow: 0 0 12px 4px var(--handle-color); } }
-        .player-popover { display: none; position: absolute; bottom: calc(100% + 10px); left: 0; right: 0; background: var(--bg-day-element); border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); padding: 10px; border: 1px solid rgba(0,0,0,0.05); }
+        #player-progress-handle:hover { box-shadow: 0 0 16px 5px var(--handle-color); }
+        .player-popover { display: none; position: absolute; bottom: calc(100% + 10px); left: 15px; width: 250px; background: var(--bg-day-element); border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); padding: 10px; border: 1px solid rgba(0,0,0,0.05); }
         .player-popover.active { display: block; }
         body.dark-mode .player-popover { background: var(--bg-night-element); border-color: rgba(255,255,255,0.1); }
         .player-popover .popover-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 5px; }
-        .player-popover h4 { font-size: 16px; }
-        .player-popover .settings-btn { width:32px; height:32px; font-size: 20px; }
+        .player-popover h4 { font-size: 16px; flex-grow: 1; }
+        .player-popover .settings-btn { width: 32px; height: 32px; font-size: 20px; flex-shrink: 0; }
         .player-popover ul { list-style: none; max-height: 150px; overflow-y: auto; padding: 0; }
         .player-popover li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 6px; cursor: pointer; }
         .player-popover li:hover { background: rgba(0,0,0,0.05); } body.dark-mode .player-popover li:hover { background: rgba(255,255,255,0.08); }
         .player-popover li.playing { color: var(--hold-border); font-weight: bold; }
         .player-popover .playlist-item-name { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #musicSettingsModal .modal-overlay { z-index: 11000; }
+        #musicSettingsModal.modal-overlay { z-index: 15000; }
         #musicSettingsModal .modal-body { gap: 20px; }
         .music-upload-section, .music-playlist-section { border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; display: flex; flex-direction: column; gap: 15px; }
         .music-upload-section .confirm-upload-wrapper { display: flex; justify-content: center; padding-top: 5px; }
         body.dark-mode .music-upload-section, body.dark-mode .music-playlist-section { border-color: rgba(255,255,255,0.1); }
+        #musicSettingsModal .progress-container { display: none; height: 12px; background:var(--bg-day-element); border-radius: 6px; box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day); padding: 2px; margin-top: 10px; }
+        body.dark-mode #musicSettingsModal .progress-container { box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night); }
+        #musicSettingsModal .progress-bar { width: 0%; height: 100%; border-radius: 4px; background-color: var(--hold-border); transition: width 0.2s linear; }
         #music-playlist-container { max-height: 200px; overflow-y: auto; list-style: none; padding: 0; margin: 0; }
         #music-playlist-container li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 6px; }
         #music-playlist-container li:hover { background: rgba(0,0,0,0.05); } body.dark-mode #music-playlist-container li:hover { background: rgba(255,255,255,0.08); }
         #music-playlist-container li.playing { color: var(--hold-border); font-weight: bold; }
         #music-playlist-container .song-name { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
         #music-playlist-container .delete-song-btn { width: 28px; height: 28px; color: #aaa; } #music-playlist-container .delete-song-btn:hover { color: #f56565; background: rgba(229, 62, 62, 0.1); }
-        /* ===== [END] WANDER VIEW 3.1 STYLES (POLAROID LAYOUT) ===== */
+        /* ===== [END] WANDER VIEW STYLES ===== */
+        
+        /* ===== [START] HELP MODAL UPDATE STYLES ===== */
+        .segmented-control.four-segments .slider-indicator { width: calc(25% - 4px); }
+        #help-tab-0:checked ~ .segmented-control .slider-indicator { transform: translateX(0%); }
+        #help-tab-1:checked ~ .segmented-control .slider-indicator { transform: translateX(100%); }
+        #help-tab-2:checked ~ .segmented-control .slider-indicator { transform: translateX(200%); }
+        #help-tab-3:checked ~ .segmented-control .slider-indicator { transform: translateX(300%); }
+
+        #help-tab-0:checked ~ .help-content-wrapper > #help-page-0,
+        #help-tab-1:checked ~ .help-content-wrapper > #help-page-1,
+        #help-tab-2:checked ~ .help-content-wrapper > #help-page-2,
+        #help-tab-3:checked ~ .help-content-wrapper > #help-page-3 { display: block; }
+        
+        .update-header-info {
+            padding: 10px 15px;
+            background-color: rgba(128,128,128,0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .update-header-info p { margin: 5px 0; color: inherit; }
+        .update-log-entry {
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(128,128,128,0.2);
+        }
+        .update-log-entry:last-of-type { border-bottom: none; }
+        .update-log-entry h4 { font-size: 1.2em; margin: 0 0 10px 0; }
+        .update-date { font-size: 0.8em; font-weight: normal; color: #889; }
+        .update-log-entry ul { list-style: none; padding-left: 5px; }
+        .update-log-entry li { margin-bottom: 8px; display: flex; align-items: flex-start; }
+        .tag {
+            flex-shrink: 0;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 10px;
+            color: white;
+        }
+        .tag.new { background-color: #769fcd; } /* Morandi Blue */
+        .tag.fix { background-color: #93b5b3; } /* Morandi Green */
+        .tag.release { background-color: #d1a787; } /* Morandi Orange/Brown */
+        .update-footer {
+            position: sticky;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: #a0aec0;
+            padding: 10px 0 5px 0;
+            background: var(--bg-day-element);
+            margin: 15px -15px -15px -15px;
+        }
+        body.dark-mode .update-footer { background: var(--bg-night-element); }
+
+        .fab-drawer-item#helpBtn { position: relative; }
+        .fab-drawer-item.has-update::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background-color: #e53e3e;
+            border-radius: 50%;
+            border: 1px solid white;
+            box-shadow: 0 0 5px #e53e3e;
+        }
+        /* ===== [END] HELP MODAL UPDATE STYLES ===== */
     </style>
 </head>
 <body>
@@ -341,9 +428,9 @@
 
     <div class="fab-container" id="fabContainer">
         <div class="fab-drawer" id="fabDrawer">
-            <button class="fab-drawer-item" id="helpBtn" title="使用指南">❓</button>
+            <button class="fab-drawer-item" id="helpBtn" title="使用指南">📧</button>
             <button class="fab-drawer-item" id="syncBtn" title="数据云盘">☁️<span id="sync-status-indicator" title="云同步状态"></span></button>
-            <button class="fab-drawer-item" id="addNavBtn" title="管理小手机">📲</button>
+            <button class="fab-drawer-item" id="addNavBtn" title="管理小手机">📱</button>
             <button class="fab-drawer-item" id="colorBtn" title="主题设置">🎨</button>
             <button class="fab-drawer-item" id="memoryBtn" title="记忆">📷</button>
         </div>
@@ -351,33 +438,74 @@
     </div>
     
     <!-- Modals -->
-    <div class="modal-overlay" id="helpModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>使用指南</span></div><button class="close-btn" data-modal-id="helpModal">&times;</button></div><div class="modal-body">
-        <input type="radio" id="help-tab-1" name="help-tab" value="setup" checked>
-        <input type="radio" id="help-tab-2" name="help-tab" value="features">
-        <input type="radio" id="help-tab-3" name="help-tab" value="disclaimer">
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-group"><span>使用指南</span></div>
+                <button class="close-btn" data-modal-id="helpModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="radio" id="help-tab-0" name="help-tab" value="setup" checked>
+                <input type="radio" id="help-tab-1" name="help-tab" value="features">
+                <input type="radio" id="help-tab-2" name="help-tab" value="updates">
+                <input type="radio" id="help-tab-3" name="help-tab" value="disclaimer">
 
-        <div class="segmented-control three-segments">
-            <label for="help-tab-1">首次配置</label>
-            <label for="help-tab-2">功能详解</label>
-            <label for="help-tab-3">免责声明</label>
-            <div class="slider-indicator"></div>
+                <div class="segmented-control four-segments">
+                    <label for="help-tab-0">首次配置</label>
+                    <label for="help-tab-1">功能详解</label>
+                    <label for="help-tab-2">更新公告</label>
+                    <label for="help-tab-3">免责声明</label>
+                    <div class="slider-indicator"></div>
+                </div>
+                <div class="help-content-wrapper">
+                    <div id="help-page-0" class="help-page-content">
+                        <h3>从零开始 (必需)</h3><p>此流程将创建一个安全的“钥匙”(PAT)和两个云端“仓库”（一个用于代码，一个用于数据），让本应用可以为您安全地存储和同步所有数据。</p>
+                        <h4>步骤 1：创建 GitHub 个人访问令牌 (PAT)</h4><p>这个令牌是应用访问您私人云仓库的专属安全密码。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub Token 创建页面</a>。</li><li><strong>填写基本信息</strong>：备注(Note)填写 <code>JellyfishCenterToken</code>，有效期(Expiration)选择 <code>No expiration</code> (永不过期)。</li><li><strong>分配权限 (关键)</strong>：只需 <strong>勾选 <code>repo</code></strong> 这一项。</li><li><strong>生成并复制</strong>：滑动到页面最底部，点击 <strong><code>Generate token</code></strong> 按钮。<strong>【⚠️极其重要⚠️】</strong> GitHub 只会显示这一次完整的 Token。请 <strong>立即点击复制按钮</strong> 将其保存到安全的地方，下一步会马上用到。它应该以 <code>ghp_</code> 开头。</li></ol>
+                        <h4>步骤 2：复刻 (Fork) 应用代码仓库</h4><p>此步骤会将应用的核心代码复制一份到您的账户下，用于网站托管服务（如Netlify）进行构建。</p><ol><li><strong>访问仓库页面</strong>：在浏览器中打开 <a href="https://github.com/Yeexein/JellyfishPhones" target="_blank" rel="noopener noreferrer">https://github.com/Yeexein/JellyfishPhones</a>。</li><li><strong>执行 Fork 操作</strong>：<ul><li><strong>电脑端</strong>：在页面右上角，您会看到 `Watch`、 `Fork`、 `Star` 等按钮。点击 <strong><code>Fork</code></strong>。</li><li><strong>手机端</strong>：在页面顶部仓库名称下方，找到并点击 <strong><code>...</code> (更多选项)</strong> 菜单，然后在弹出的菜单中选择 <strong><code>Fork</code></strong>。</li></ul></li><li><strong>完成复刻</strong>：在接下来的页面中，您无需修改任何设置。直接点击 <strong><code>Create fork</code></strong> 按钮即可。</li></ol>
+                        <h4>步骤 3：创建私人数据仓库</h4><p>此步骤将创建一个独立的、完全私密的仓库，专门用来存放您的所有配置和文件。这可以避免因数据更新导致网站被频繁重新构建，是**一劳永逸的最佳实践**。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub 仓库创建页面</a>。</li><li><strong>填写仓库信息</strong>：<ul><li><strong>Repository name (仓库名称)</strong>：起一个清晰的名字，例如 <code>My-Jellyfish-Data</code>。</li><li><strong>关键：选择 <code>Private</code> (私有)</strong>。这是您的私人数据，必须设为私有。</li><li><strong>勾选 <code>Add a README file</code></strong>：确保仓库被成功初始化。</li></ul></li><li><strong>点击 <code>Create repository</code></strong> 按钮完成创建。</li></ol>
+                        <h4>步骤 4：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌜 按钮展开菜单 → 点击 <strong>☁️ (数据云盘)</strong> → 点击标题旁的 <strong>⚙️ (设置)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤3</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，并采用了最高效的架构。</p>
+                    </div>
+                    <div id="help-page-1" class="help-page-content">
+                        <h3>功能详解</h3><h4>1. 导航管理</h4><p><strong>添加新手机</strong>：长按主菜单 → 点击 📱 图标。可选择添加`外部链接`或`上传项目`。</p><p><strong>管理与删除</strong>：在“管理小手机”弹窗内，点击`进入管理模式`，即可对现有按钮进行删除。**（排序功能已移除）**</p><h4>2. 主题与个性化</h4><p><strong>实时调色</strong>：长按主菜单 → 点击 🎨 图标。可实时调整日间/夜间模式的背景渐变色，以及**日间/夜间模式下的标题卡片背景图片**。</p><p><strong>色彩预设</strong>：您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能。</p><h4>3. 文件云盘与同步状态</h4><p><strong>访问与管理</strong>：长按主菜单 → 点击 ☁️ 图标。您可以分门别类地管理与“上传项目”相关联的所有文件。建议用来存储备份文件。</p><p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p><ul><li><strong>🟢 绿点</strong>: `已同步` - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: `同步中` - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: `同步失败` - 发生错误，请点击图标查看失败原因，通常是网络问题或PAT失效。</li></ul><h4>4. 基础操作</h4><p><strong>编辑标题</strong>：直接点击页面上的主标题或副标题即可修改。</p><p><strong>访问链接与返回</strong>：对于外部链接，会在应用内全屏打开。您可以从屏幕**最左侧边缘向右滑动**来关闭当前页面并返回中心。</p><p><strong>切换主题</strong>：**单击 (短按)** 右下角的 🌞/🌜 按钮。</p><h4>5. 危险区域</h4><div class="warning"><p><strong>清空所有数据</strong>：在 `GitHub 配置` (⚙️) 弹窗的最下方。此操作会 **永久删除** 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
+                    </div>
+                    <div id="help-page-2" class="help-page-content">
+                        <div class="update-header-info">
+                            <p><strong>小红书ID:</strong> 淡季水母</p>
+                            <p><strong>QQ交流群:</strong> 563191005</p>
+                        </div>
+                        
+                        <div class="update-log-entry">
+                            <h4>v2.0.0 <span class="update-date">- 2025.9.30</span></h4>
+                            <ul>
+                                <li><span class="tag new">更新</span> 极大简化添加网址和文件的方式</li>
+                                <li><span class="tag new">更新</span> 增加了存放文件的功能，可上传和下载</li>
+                                <li><span class="tag new">更新</span> 可以上传背景照片和标题卡片照片</li>
+                                <li><span class="tag new">更新</span> 添加备忘录功能</li>
+                                <li><span class="tag new">更新</span> 添加相册功能，内置漫游模式</li>
+                                <li><span class="tag fix">修复</span> 优化iOS端全屏显示，屏幕左侧右滑返回有确认弹窗，防止误触</li>
+                                <li><span class="tag new">更新</span> 实现真正云同步，数据保存在你自己的github仓库里</li>
+                            </ul>
+                        </div>
+
+                        <div class="update-log-entry">
+                            <h4>v1.0.0 <span class="update-date">- 2025.9.24</span></h4>
+                            <ul>
+                                <li><span class="tag release">发布</span> Jellyfish导航正式上线啦！</li>
+                                <li><span class="tag new">更新</span> 仅有切换昼夜模式、更改图标和卡片颜色的功能</li>
+                            </ul>
+                        </div>
+                        
+                        <footer class="update-footer">
+                            当前版本: v2.0.0
+                        </footer>
+                    </div>
+                    <div id="help-page-3" class="help-page-content">
+                        <h3>免责声明与使用条款</h3><h4>1. 服务条款</h4><p>本应用 (JellyfishCenter) 按“现状”提供，不附带任何明示或暗示的保证。开发者不保证应用的持续可用性、功能完整性或无错误。所有因使用本应用导致的直接或间接风险与责任，均由用户自行承担。</p><h4>2. 数据安全</h4><p>用户需自行负责其GitHub个人访问令牌 (PAT) 的安全保管。任何因PAT泄露导致的数据丢失、篡改或账户安全问题，开发者概不负责。强烈建议为本应用创建独立的、具有最小必要权限 (<code>repo</code>) 的PAT。</p><h4>3. 知识产权与版权责任</h4><div class="important-note"><p>本应用可能被用于托管或链接至第三方项目（“小手机”）。用户必须对所上传或链接的内容负全部法律责任，并确保拥有展示、使用和分发该内容的合法权利。<strong>用户必须尊重所有原创作者的知识产权，不得侵犯他人版权。</strong></p></div><h4>4. 使用与分发限制</h4><div class="warning"><p>本项目 (JellyfishCenter) 及其源代码仅供个人非商业性使用。严禁以下行为：</p><ul><li>对本项目的源代码进行任何形式的二次修改、再分发或公开发布（即“二传二改”）。</li><li>公开或私下分享通过本应用“上传项目”功能生成的任何网页链接或文件。此行为可能构成对原创内容的未授权分发。</li></ul></div><p>继续使用本应用，即表示您已阅读、理解并同意上述所有条款。</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="help-content-wrapper">
-            <div id="help-page-1" class="help-page-content">
-                <h3>从零开始 (必需)</h3><p>此流程将创建一个安全的“钥匙”(PAT)和两个云端“仓库”（一个用于代码，一个用于数据），让本应用可以为您安全地存储和同步所有数据。</p>
-                <h4>步骤 1：创建 GitHub 个人访问令牌 (PAT)</h4><p>这个令牌是应用访问您私人云仓库的专属安全密码。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub Token 创建页面</a>。</li><li><strong>填写基本信息</strong>：备注(Note)填写 <code>JellyfishCenterToken</code>，有效期(Expiration)选择 <code>No expiration</code> (永不过期)。</li><li><strong>分配权限 (关键)</strong>：只需 <strong>勾选 <code>repo</code></strong> 这一项。</li><li><strong>生成并复制</strong>：滑动到页面最底部，点击 <strong><code>Generate token</code></strong> 按钮。<strong>【⚠️极其重要⚠️】</strong> GitHub 只会显示这一次完整的 Token。请 <strong>立即点击复制按钮</strong> 将其保存到安全的地方，下一步会马上用到。它应该以 <code>ghp_</code> 开头。</li></ol>
-                <h4>步骤 2：复刻 (Fork) 应用代码仓库</h4><p>此步骤会将应用的核心代码复制一份到您的账户下，用于网站托管服务（如Netlify）进行构建。</p><ol><li><strong>访问仓库页面</strong>：在浏览器中打开 <a href="https://github.com/Yeexein/JellyfishPhones" target="_blank" rel="noopener noreferrer">https://github.com/Yeexein/JellyfishPhones</a>。</li><li><strong>执行 Fork 操作</strong>：<ul><li><strong>电脑端</strong>：在页面右上角，您会看到 `Watch`、 `Fork`、 `Star` 等按钮。点击 <strong><code>Fork</code></strong>。</li><li><strong>手机端</strong>：在页面顶部仓库名称下方，找到并点击 <strong><code>...</code> (更多选项)</strong> 菜单，然后在弹出的菜单中选择 <strong><code>Fork</code></strong>。</li></ul></li><li><strong>完成复刻</strong>：在接下来的页面中，您无需修改任何设置。直接点击 <strong><code>Create fork</code></strong> 按钮即可。</li></ol>
-                <h4>步骤 3：创建私人数据仓库</h4><p>此步骤将创建一个独立的、完全私密的仓库，专门用来存放您的所有配置和文件。这可以避免因数据更新导致网站被频繁重新构建，是**一劳永逸的最佳实践**。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub 仓库创建页面</a>。</li><li><strong>填写仓库信息</strong>：<ul><li><strong>Repository name (仓库名称)</strong>：起一个清晰的名字，例如 <code>My-Jellyfish-Data</code>。</li><li><strong>关键：选择 <code>Private</code> (私有)</strong>。这是您的私人数据，必须设为私有。</li><li><strong>勾选 <code>Add a README file</code></strong>：确保仓库被成功初始化。</li></ul></li><li><strong>点击 <code>Create repository</code></strong> 按钮完成创建。</li></ol>
-                <h4>步骤 4：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌜 按钮展开菜单 → 点击 <strong>☁️ (数据云盘)</strong> → 点击标题旁的 <strong>⚙️ (设置)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤3</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，并采用了最高效的架构。</p>
-            </div>
-            <div id="help-page-2" class="help-page-content">
-                <h3>功能详解</h3><h4>1. 导航管理</h4><p><strong>添加新手机</strong>：长按主菜单 → 点击 📲 图标。可选择添加`外部链接`或`上传项目`。</p><p><strong>管理与删除</strong>：在“管理小手机”弹窗内，点击`进入管理模式`，即可对现有按钮进行删除。**（排序功能已移除）**</p><h4>2. 主题与个性化</h4><p><strong>实时调色</strong>：长按主菜单 → 点击 🎨 图标。可实时调整日间/夜间模式的背景渐变色，以及**日间/夜间模式下的标题卡片背景图片**。</p><p><strong>色彩预设</strong>：您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能。</p><h4>3. 文件云盘与同步状态</h4><p><strong>访问与管理</strong>：长按主菜单 → 点击 ☁️ 图标。您可以分门别类地管理与“上传项目”相关联的所有文件。建议用来存储备份文件。</p><p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p><ul><li><strong>🟢 绿点</strong>: `已同步` - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: `同步中` - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: `同步失败` - 发生错误，请点击图标查看失败原因，通常是网络问题或PAT失效。</li></ul><h4>4. 基础操作</h4><p><strong>编辑标题</strong>：直接点击页面上的主标题或副标题即可修改。</p><p><strong>访问链接与返回</strong>：对于外部链接，会在应用内全屏打开。您可以从屏幕**最左侧边缘向右滑动**来关闭当前页面并返回中心。</p><p><strong>切换主题</strong>：**单击 (短按)** 右下角的 🌞/🌜 按钮。</p><h4>5. 危险区域</h4><div class="warning"><p><strong>清空所有数据</strong>：在 `GitHub 配置` (⚙️) 弹窗的最下方。此操作会 **永久删除** 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
-            </div>
-            <div id="help-page-3" class="help-page-content">
-                <h3>免责声明与使用条款</h3><h4>1. 服务条款</h4><p>本应用 (JellyfishCenter) 按“现状”提供，不附带任何明示或暗示的保证。开发者不保证应用的持续可用性、功能完整性或无错误。所有因使用本应用导致的直接或间接风险与责任，均由用户自行承担。</p><h4>2. 数据安全</h4><p>用户需自行负责其GitHub个人访问令牌 (PAT) 的安全保管。任何因PAT泄露导致的数据丢失、篡改或账户安全问题，开发者概不负责。强烈建议为本应用创建独立的、具有最小必要权限 (<code>repo</code>) 的PAT。</p><h4>3. 知识产权与版权责任</h4><div class="important-note"><p>本应用可能被用于托管或链接至第三方项目（“小手机”）。用户必须对所上传或链接的内容负全部法律责任，并确保拥有展示、使用和分发该内容的合法权利。<strong>用户必须尊重所有原创作者的知识产权，不得侵犯他人版权。</strong></p></div><h4>4. 使用与分发限制</h4><div class="warning"><p>本项目 (JellyfishCenter) 及其源代码仅供个人非商业性使用。严禁以下行为：</p><ul><li>对本项目的源代码进行任何形式的二次修改、再分发或公开发布（即“二传二改”）。</li><li>公开或私下分享通过本应用“上传项目”功能生成的任何网页链接或文件。此行为可能构成对原创内容的未授权分发。</li></ul></div><p>继续使用本应用，即表示您已阅读、理解并同意上述所有条款。</p>
-            </div>
-        </div>
-    </div></div></div>
+    </div>
     <div class="modal-overlay" id="syncErrorModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>⚠️ 同步失败</span></div><button class="close-btn" data-modal-id="syncErrorModal">&times;</button></div><div class="modal-body"><p>无法连接到云端。请检查您的网络连接或GitHub配置。</p><p><strong>失败原因:</strong></p><div id="sync-error-message"></div></div></div></div>
     <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>管理小手机</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入管理模式</button><div class="segmented-control two-segments"><input type="radio" id="type-link" name="nav-type" value="link" checked hidden><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload" hidden><label for="type-upload">上传项目</label><div class="slider-indicator"></div></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section" class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div></div><button id="createNavBtn" class="modal-button">加入新手机</button><div class="status-text" id="upload-status"></div></div></div></div>
     <div class="modal-overlay" id="syncModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据云盘</span><button class="settings-btn" id="settingsBtn" title="设置GitHub信息">⚙️</button></div><button class="close-btn" data-modal-id="syncModal">&times;</button></div><div class="modal-body"><select id="buttonSelector" class="modal-select"></select><div class="file-upload-section"><input type="file" id="fileUploader"><div class="file-select-wrapper"><button id="selectFileBtn" class="modal-button">选择文件</button><span id="selectedFileName" class="status-text">未选择任何文件</span></div><input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）"><button id="uploadBtn" class="modal-button">上传文件</button><div id="progressContainer" class="progress-container"><div id="uploadProgressBar" class="progress-bar"></div></div></div><div id="file-list-container"><ul id="fileList"></ul><div id="fileListStatus" class="file-list-status">请选择一个分类</div></div></div></div></div>
@@ -562,7 +690,7 @@
         </div>
     </div>
 
-    <!-- Wander View 3.1 -->
+    <!-- Wander View 3.2 -->
     <div id="wanderViewOverlay">
         <div class="wander-header">
             <button class="close-btn" data-action="close-wander-view">&times;</button>
@@ -630,6 +758,9 @@
                     <div class="confirm-upload-wrapper">
                         <button id="confirm-upload-btn" class="modal-button">确认上传</button>
                     </div>
+                    <div class="progress-container" id="musicUploadProgressContainer" style="display: none;">
+                        <div id="musicUploadProgressBar" class="progress-bar"></div>
+                    </div>
                     <input type="file" id="music-file-picker" accept=".mp3" hidden>
                     <input type="file" id="lrc-file-picker" accept=".lrc" hidden>
                 </div>
@@ -659,7 +790,8 @@
     </div>
 
     <script>
-    // [JS - V9.9.1 "Polaroid Layout & Final Player Polish"]
+    // [JS - V9.9.2 "UI/UX Polish & Z-Index Fix"]
+    const CURRENT_APP_VERSION = '2.0.0';
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
@@ -909,8 +1041,8 @@
     }
     
     const syncModalElements = { buttonSelector: document.getElementById("buttonSelector"), fileList: document.getElementById("fileList"), fileListStatus: document.getElementById("fileListStatus"), fileUploader: document.getElementById("fileUploader"), selectFileBtn: document.getElementById("selectFileBtn"), selectedFileName: document.getElementById("selectedFileName"), fileNameInput: document.getElementById("fileNameInput"), uploadBtn: document.getElementById("uploadBtn"), progressContainer: document.getElementById("progressContainer"), progressBar: document.getElementById("uploadProgressBar"), githubRepoInput: document.getElementById("githubRepoInput"), githubTokenInput: document.getElementById("githubTokenInput"), saveSettingsBtn: document.getElementById("saveSettingsBtn") };
-    function setupModals(){document.querySelectorAll(".close-btn").forEach(e=>e.addEventListener("click",()=>{document.getElementById(e.dataset.modalId).classList.remove("show")})),document.querySelectorAll(".modal-overlay").forEach(e=>e.addEventListener("click",t=>e===t.target&&e.classList.remove("show"))),document.getElementById("helpBtn").addEventListener("click",()=>{document.getElementById("helpModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("syncBtn").addEventListener("click",()=>{document.getElementById("syncModal").classList.add("show"),populateButtonSelector(),fetchFilesForSelectedButton(),toggleFabMenu(!1)}),document.getElementById("settingsBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(syncModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),syncModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show")}),document.getElementById("addNavBtn").addEventListener("click",()=>{document.getElementById("addNavModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); })}
-    function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){const e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e=!0){return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据云盘 -> 标题旁⚙️)"),!1):!0}
+    function setupModals(){document.querySelectorAll(".close-btn").forEach(e=>e.addEventListener("click",()=>{document.getElementById(e.dataset.modalId).classList.remove("show")})),document.querySelectorAll(".modal-overlay").forEach(e=>e.addEventListener("click",t=>e===t.target&&e.classList.remove("show"))),document.getElementById("helpBtn").addEventListener("click",()=>{document.getElementById("helpModal").classList.add("show"),toggleFabMenu(!1);localStorage.setItem('lastSeenVersion', CURRENT_APP_VERSION);document.getElementById('helpBtn').classList.remove('has-update');}),document.getElementById("syncBtn").addEventListener("click",()=>{document.getElementById("syncModal").classList.add("show"),populateButtonSelector(),fetchFilesForSelectedButton(),toggleFabMenu(!1)}),document.getElementById("settingsBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(syncModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),syncModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show")}),document.getElementById("addNavBtn").addEventListener("click",()=>{document.getElementById("addNavModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); })}
+    function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){const e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e=!0){return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据云盘 -> 标题旁 ⚙️)"),!1):!0}
     async function loadInitialData() { navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>'; const fetchedConfig = await fetchConfigFromGithub(); currentConfig = { ...getDefaultConfig(), ...fetchedConfig }; document.getElementById('title').textContent = currentConfig.title; document.getElementById('subtitle').textContent = currentConfig.subtitle; document.querySelector('.editable-title').style.opacity = 1; document.querySelector('.editable-subtitle').style.opacity = 1; navContainer.innerHTML = ''; if (!currentConfig.buttons || currentConfig.buttons.length === 0) { navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">配置为空，请添加导航按钮。</p>'; } else { currentConfig.buttons.forEach(item => addNewButtonToDOM(item.text, item.href, false)); } loadColorState(); }
     async function deleteGithubFolder(folderPath) { if (!checkConfig(true)) return false; const contentsUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${folderPath}`; try { const contentsResponse = await fetch(contentsUrl, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, cache: 'no-cache' }); if (contentsResponse.status === 404) { console.log(`Folder "${folderPath}" not found, nothing to delete.`); return true; } if (!contentsResponse.ok) throw new Error(`Could not list folder: ${contentsResponse.statusText}`); const files = await contentsResponse.json(); const deletePromises = files.map(file => fetch(file.url, { method: 'DELETE', headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, body: JSON.stringify({ message: `Delete file: ${file.path}`, sha: file.sha, branch: 'main' }), cache: 'no-cache' })); await Promise.all(deletePromises); return true; } catch (error) { console.error(`Failed to delete folder "${folderPath}":`, error); return false; } }
     syncModalElements.saveSettingsBtn.addEventListener("click",async()=>{const[e,t]=syncModalElements.githubRepoInput.value.trim().split("/").map(e=>e.trim()),n=syncModalElements.githubTokenInput.value.trim();if(e&&t&&n){saveGithubConfig({owner:e,repo:t,token:n,branch:"main"}),alert("配置已保存！刷新页面加载云端配置。"),document.getElementById("settingsModal").classList.remove("show"),await loadInitialData()}else{alert("请填写完整信息。")}});function populateButtonSelector(){const e=syncModalElements.buttonSelector.value;syncModalElements.buttonSelector.innerHTML="",document.querySelectorAll(".nav-btn").forEach(t=>{const n=t.firstChild.textContent.trim(),o=document.createElement("option");o.value=o.textContent=n,syncModalElements.buttonSelector.appendChild(o)}),Array.from(syncModalElements.buttonSelector.options).some(t=>t.value===e)&&(syncModalElements.buttonSelector.value=e)}
@@ -1163,7 +1295,7 @@
             if (!items || items.length === 0 || index < 0) { closePhotoViewer(); return; }
             
             const currentItem = items[index];
-            let photo, title, description, timestamp, isSet, setIndex, setLength;
+            let photo, title, description, timestamp, isSet, setIndex = 0, setLength = 0;
 
             if (currentItem.type === 'photoset') {
                 isSet = true;
@@ -1191,14 +1323,16 @@
             const nextBtn = document.getElementById('next-photo-btn');
             const counter = document.getElementById('viewer-counter');
 
+            const canGoPrev = (isSet && setIndex > 0) || index > 0;
+            const canGoNext = (isSet && setIndex < setLength - 1) || index < items.length - 1;
+
+            prevBtn.style.display = canGoPrev ? 'flex' : 'none';
+            nextBtn.style.display = canGoNext ? 'flex' : 'none';
+
             if (isSet) {
-                prevBtn.style.display = (setIndex > 0) ? 'flex' : 'none';
-                nextBtn.style.display = (setIndex < setLength - 1) ? 'flex' : 'none';
                 counter.textContent = `${setIndex + 1} / ${setLength}`;
                 counter.style.display = 'block';
             } else {
-                prevBtn.style.display = (index > 0) ? 'flex' : 'none';
-                nextBtn.style.display = (index < items.length - 1) ? 'flex' : 'none';
                 counter.style.display = 'none';
             }
         }
@@ -1213,6 +1347,7 @@
             if (currentItem.type === 'photoset') {
                 let setIndex = currentItem.internalIndex || 0;
                 let newSetIndex = setIndex + direction;
+                
                 if (newSetIndex >= 0 && newSetIndex < currentItem.photos.length) {
                     currentItem.internalIndex = newSetIndex;
                     updatePhotoViewerContent();
@@ -1559,7 +1694,7 @@
     })();
     // ===== [END] MEMORY APP LOGIC =====
 
-    // ===== [START] WANDER VIEW 3.1 LOGIC (POLAROID LAYOUT) =====
+    // ===== [START] WANDER VIEW 3.2 LOGIC (PLAYER UI FIX) =====
     const WanderView = (() => {
         const MUSIC_DATA_PATH = 'memory/music_data.json';
         const MUSIC_FILES_PATH = 'memory/music/';
@@ -1623,7 +1758,7 @@
             loopAll: '<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>',
             loopOne: '<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v3H13z"/></svg>',
             shuffle: '<svg viewBox="0 0 24 24"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>',
-            settings: '<svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>',
+            settings: '<svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49 1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49.42l.38-2.65c.61-.25 1.17-.59 1.69.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22-.07.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>',
             delete: '<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
             playlist: '<svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>',
         };
@@ -1838,7 +1973,11 @@
             
             state.lyrics = [];
             ui.player.displayArea.innerHTML = '';
-            
+
+            const displaySongTitle = () => {
+                ui.player.displayArea.innerHTML = `<div class="song-title-display">${track.displayName}</div>`;
+            };
+
             if (track.lrcPath) {
                 try {
                     const response = await fetch(`https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${track.lrcPath}?v=${Date.now()}`);
@@ -1846,14 +1985,18 @@
                         const lrcText = await response.text();
                         state.lyrics = parseLRC(lrcText);
                     }
-                } catch (e) { console.error("Could not fetch lyrics", e); }
+                } catch (e) { 
+                    console.error("Could not fetch lyrics", e); 
+                    state.lyrics = [];
+                }
             }
             
-            if(state.lyrics.length > 0) {
+            if(state.lyrics && state.lyrics.length > 0) {
                  ui.player.displayArea.innerHTML = `<div id="lyrics-container"><ul id="lyrics-ul"></ul></div>`;
                  renderLyrics();
+                 updateLyrics(0);
             } else {
-                 ui.player.displayArea.textContent = track.displayName;
+                 displaySongTitle();
             }
             
             ui.player.audio.play().catch(e => console.error("Audio play failed:", e));
@@ -2066,15 +2209,38 @@
                 ui.player.mainContent.style.transform = isCollapsed ? `translateY(-${ui.player.container.offsetHeight - 30}px)` : 'translateY(0)';
             },
             updateUploadProgress: (percent, filename) => {
-                ui.settingsModal.confirmUploadBtn.textContent = `上传中: ${Math.round(percent)}%`;
+                const progressContainer = document.getElementById('musicUploadProgressContainer');
+                const progressBar = document.getElementById('musicUploadProgressBar');
+                const uploadBtn = ui.settingsModal.confirmUploadBtn;
+
+                if (progressContainer && progressBar) {
+                    progressContainer.style.display = 'block';
+                    progressBar.style.width = `${percent}%`;
+                }
+                uploadBtn.textContent = `上传中: ${Math.round(percent)}%`;
+
+                if (percent >= 100) {
+                    setTimeout(() => {
+                        if (progressContainer) progressContainer.style.display = 'none';
+                        uploadBtn.textContent = '确认上传';
+                    }, 1000);
+                }
             }
         };
     })();
-    // ===== [END] WANDER VIEW 3.1 LOGIC (POLAROID LAYOUT) =====
+    // ===== [END] WANDER VIEW LOGIC =====
+
+    function checkAppUpdate() {
+        const lastSeenVersion = localStorage.getItem('lastSeenVersion');
+        if (lastSeenVersion !== CURRENT_APP_VERSION) {
+            document.getElementById('helpBtn').classList.add('has-update');
+        }
+    }
 
     window.addEventListener('load', async () => {
         initTheme(); 
         loadGithubConfig();
+        checkAppUpdate();
         await loadInitialData();
         setupModals();
         MemoryApp.init();
