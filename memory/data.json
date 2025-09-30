@@ -65,7 +65,7 @@
             "timestamp": 1759214416952
           }
         ],
-        "internalIndex": 0
+        "internalIndex": 1
       },
       {
         "type": "photoset",
@@ -90,7 +90,18 @@
             "sha": "f08b8def201cb8d80b4b27ca47f06254b0317a39",
             "timestamp": 1759215264304
           }
-        ]
+        ],
+        "internalIndex": 2
+      },
+      {
+        "type": "photo",
+        "id": 1759217502633.2456,
+        "albumId": 1759150560197,
+        "title": "",
+        "description": "",
+        "path": "memory/photos/1759150560197-1759217500178.jpeg",
+        "sha": "b5739c9d0f8b79bd6dc3b5e9605e3b0e176635eb",
+        "timestamp": 1759217502633
       }
     ]
   }
