@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V9.5.0 "Wander 2.0 & DragDrop Reconstruction"] */
+        /* [CSS - V9.6.0 "DragDrop Final Reconstruction"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -68,8 +68,10 @@
         .management-active .nav-btn { cursor: grab; animation: wiggle 0.2s ease-in-out infinite alternate; pointer-events: auto !important; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
         .management-active .nav-btn:active { cursor: grabbing; }
         .management-active .nav-btn > .delete-icon { display: block; }
-        .nav-btn.dragging { opacity: 0.8 !important; transform: scale(1.05); backdrop-filter: blur(4px); box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important; z-index: 1000; animation: none !important; cursor: grabbing !important; }
-        .nav-btn.drag-over { border: 2px dashed var(--hold-border); background: rgba(91, 153, 226, 0.1); }
+        .nav-btn.drag-source { opacity: 0.4 !important; animation: none !important; cursor: grabbing !important; }
+        .nav-btn.drag-over { transform: scale(1.03); box-shadow: 0 0 0 3px var(--hold-border), 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day) !important; }
+        body.dark-mode .nav-btn.drag-over { box-shadow: 0 0 0 3px var(--hold-border), 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night) !important; }
+        .drag-ghost { position: fixed; pointer-events: none; z-index: 9999; opacity: 0.8; transform: scale(1.05); backdrop-filter: blur(4px); transition: none; animation: none !important; }
         @keyframes wiggle { from { transform: rotate(-0.5deg); } to { transform: rotate(0.5deg); } }
         .fab-container { position: fixed; right: 30px; bottom: 30px; z-index: 100; }
         .fab-main, .fab-drawer-item { position: relative; width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 22px; display: flex; align-items: center; justify-content: center; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -276,10 +278,10 @@
         #wander-description { font-size: 15px; color: #6a7889; line-height: 1.6; } body.dark-mode #wander-description { color: #a0aec0; }
         .wander-music-player { flex-shrink: 0; width: 100%; max-width: 450px; margin: 0 auto; padding: 10px 20px 20px 20px; z-index: 10; transition: transform 0.3s ease; }
         .wander-music-player.collapsed { transform: translateY(calc(100% - 40px)); }
-        .player-content { padding: 15px; border-radius: 20px; background: var(--bg-day-element); box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); }
+        .player-content { position: relative; padding: 15px; border-radius: 20px; background: var(--bg-day-element); box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); }
         body.dark-mode .player-content { background: var(--bg-night-element); box-shadow: 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night); }
         .player-controls { display: flex; justify-content: space-evenly; align-items: center; }
-        .player-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: var(--bg-day-element); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); color: var(--text-day); font-size: 18px; cursor: pointer; transition: all 0.2s ease; }
+        .player-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: var(--bg-day-element); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); color: var(--text-day); font-size: 18px; cursor: pointer; transition: all 0.2s ease; font-family: 'Segoe UI Symbol', sans-serif;}
         body.dark-mode .player-btn { background: var(--bg-night-element); box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); color: var(--text-night); }
         .player-btn:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
         body.dark-mode .player-btn:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
@@ -289,7 +291,8 @@
         #player-progress-bar { width: 0%; height: 100%; border-radius: 2px; background: var(--hold-border); }
         .player-collapse-handle { width: 40px; height: 5px; border-radius: 2.5px; background: #ccc; margin: 10px auto -5px; cursor: pointer; } 
         body.dark-mode .player-collapse-handle { background: #555; }
-        #playlist-popover { display: none; position: absolute; bottom: 100%; left: 20px; width: calc(100% - 40px); max-height: 200px; overflow-y: auto; background: var(--bg-day-element); border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); padding: 10px; border: 1px solid rgba(0,0,0,0.05); }
+        #playlist-popover { display: none; position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); width: 90%; max-height: 200px; overflow-y: auto; background: var(--bg-day-element); border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); padding: 10px; border: 1px solid rgba(0,0,0,0.05); }
+        #playlist-popover.active { display: block; }
         body.dark-mode #playlist-popover { background: var(--bg-night-element); border-color: rgba(255,255,255,0.1); }
         #playlist-popover ul { list-style: none; }
         #playlist-popover li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 6px; cursor: pointer; }
@@ -556,10 +559,10 @@
                 <div class="player-controls">
                     <button class="player-btn" id="add-song-btn" title="添加歌曲">+</button>
                     <input type="file" id="song-file-picker" accept=".mp3" multiple hidden>
-                    <button class="player-btn" id="prev-song-btn">⏮</button>
-                    <button class="player-btn" id="play-pause-btn">▶</button>
-                    <button class="player-btn" id="next-song-btn">⏭</button>
-                    <button class="player-btn" id="loop-mode-btn" title="顺序播放">🔁</button>
+                    <button class="player-btn" id="prev-song-btn"></button>
+                    <button class="player-btn" id="play-pause-btn"></button>
+                    <button class="player-btn" id="next-song-btn"></button>
+                    <button class="player-btn" id="loop-mode-btn" title="顺序播放"></button>
                 </div>
                 <div id="playlist-popover">
                     <ul id="playlist-ul"></ul>
@@ -586,7 +589,7 @@
     </div>
 
     <script>
-    // [JS - V9.5.0 "Wander 2.0 & DragDrop Reconstruction"]
+    // [JS - V9.6.0 "DragDrop Final Reconstruction"]
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
@@ -743,78 +746,116 @@
     document.getElementById('title').addEventListener('click', () => { if(isManagementMode) return; const newTitle = prompt('新标题：', currentConfig.title); if (newTitle?.trim() && newTitle.trim() !== currentConfig.title) { document.getElementById('title').textContent = newTitle.trim(); currentConfig.title = newTitle.trim(); saveGlobalConfig('Update main title'); } });
     document.getElementById('subtitle').addEventListener('click', () => { if(isManagementMode) return; const newSubtitle = prompt('新描述：', currentConfig.subtitle); if (newSubtitle !== null && newSubtitle.trim() !== currentConfig.subtitle) { document.getElementById('subtitle').textContent = newSubtitle.trim(); currentConfig.subtitle = newSubtitle.trim(); saveGlobalConfig('Update subtitle'); } });
     
-    // Universal Drag-and-Drop Implementation (Rewritten for Touch & Mouse)
+    // ===== [START] DRAG AND DROP RECONSTRUCTION =====
+    // This is a complete rewrite to ensure stability and provide the requested visual feedback.
     function initializeDragAndDrop(container) {
-        let draggedEl = null;
-        let startTimeout;
+        let sourceEl = null;
+        let ghostEl = null;
+        let startX, startY, offsetX, offsetY;
+        let longPressTimer;
 
-        const onPointerDown = (e) => {
+        function onPointerDown(e) {
             if (!isManagementMode || e.target.classList.contains('delete-icon')) return;
             const target = e.target.closest('.nav-btn');
             if (!target) return;
-
-            // Important: Prevents default behavior like text selection or page scrolling on touch
+            
             e.preventDefault();
-
-            startTimeout = setTimeout(() => {
-                draggedEl = target;
-                draggedEl.classList.add('dragging');
-                
-                document.addEventListener('pointermove', onPointerMove);
-                document.addEventListener('pointerup', onPointerUp);
-            }, 200); // 200ms long-press delay
-        };
-
-        const onPointerMove = (e) => {
-            if (!draggedEl) return;
-            e.preventDefault();
-
-            // Remove previous drag-over class
-            const prevOver = container.querySelector('.drag-over');
-            if(prevOver) prevOver.classList.remove('drag-over');
-
-            const afterElement = getDragAfterElement(container, e.clientY);
             
-            if (afterElement) {
-                afterElement.classList.add('drag-over');
-                container.insertBefore(draggedEl, afterElement);
-            } else {
-                container.appendChild(draggedEl);
+            startX = e.clientX;
+            startY = e.clientY;
+
+            longPressTimer = setTimeout(() => {
+                startDrag(target, e.clientX, e.clientY);
+            }, 200); // Long press delay
+
+            document.addEventListener('pointerup', onPointerUpEarly, { once: true });
+            document.addEventListener('pointermove', onPointerMoveEarly, { once: true });
+        }
+
+        function onPointerMoveEarly(e) {
+            if (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) {
+                clearTimeout(longPressTimer);
+                document.removeEventListener('pointerup', onPointerUpEarly);
             }
-        };
-
-        const onPointerUp = () => {
-            clearTimeout(startTimeout);
-            if (!draggedEl) return;
-            
-            draggedEl.classList.remove('dragging');
-            const prevOver = container.querySelector('.drag-over');
-            if(prevOver) prevOver.classList.remove('drag-over');
-            
-            if (draggedEl) { // Check if it was a real drag
-                updateButtonOrderAndSave('Reorder buttons');
-            }
-            draggedEl = null;
-
-            document.removeEventListener('pointermove', onPointerMove);
-            document.removeEventListener('pointerup', onPointerUp);
-        };
+        }
         
+        function onPointerUpEarly() {
+            clearTimeout(longPressTimer);
+            document.removeEventListener('pointermove', onPointerMoveEarly);
+        }
+
+        function startDrag(target, clientX, clientY) {
+            sourceEl = target;
+            
+            const rect = sourceEl.getBoundingClientRect();
+            offsetX = clientX - rect.left;
+            offsetY = clientY - rect.top;
+
+            ghostEl = sourceEl.cloneNode(true);
+            ghostEl.classList.add('drag-ghost');
+            document.body.appendChild(ghostEl);
+            
+            ghostEl.style.width = `${rect.width}px`;
+            ghostEl.style.height = `${rect.height}px`;
+            ghostEl.style.transform = `translate(${clientX - offsetX}px, ${clientY - offsetY}px) scale(1.05)`;
+            
+            sourceEl.classList.add('drag-source');
+
+            document.addEventListener('pointermove', onPointerMove);
+            document.addEventListener('pointerup', onPointerUp, { once: true });
+        }
+
+        function onPointerMove(e) {
+            if (!ghostEl) return;
+            
+            ghostEl.style.transform = `translate(${e.clientX - offsetX}px, ${e.clientY - offsetY}px) scale(1.05)`;
+
+            const currentOver = document.querySelector('.drag-over');
+            if (currentOver) currentOver.classList.remove('drag-over');
+
+            ghostEl.style.display = 'none'; // Hide ghost to check element underneath
+            const elementUnder = document.elementFromPoint(e.clientX, e.clientY);
+            ghostEl.style.display = '';
+
+            const dropTarget = elementUnder ? elementUnder.closest('.nav-btn:not(.drag-source)') : null;
+            if (dropTarget) {
+                dropTarget.classList.add('drag-over');
+            }
+        }
+
+        function onPointerUp() {
+            document.removeEventListener('pointermove', onPointerMove);
+            
+            const dropTarget = document.querySelector('.drag-over');
+            
+            if (dropTarget) {
+                const sourceIndex = Array.from(container.children).indexOf(sourceEl);
+                const targetIndex = Array.from(container.children).indexOf(dropTarget);
+                
+                if (sourceIndex > targetIndex) {
+                    container.insertBefore(sourceEl, dropTarget);
+                } else {
+                    container.insertBefore(sourceEl, dropTarget.nextSibling);
+                }
+                
+                updateButtonOrderAndSave('Reorder buttons');
+                dropTarget.classList.remove('drag-over');
+            }
+            
+            if (sourceEl) {
+                sourceEl.classList.remove('drag-source');
+            }
+            if (ghostEl) {
+                ghostEl.remove();
+            }
+
+            sourceEl = null;
+            ghostEl = null;
+        }
+
         container.addEventListener('pointerdown', onPointerDown);
     }
-
-    function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.nav-btn:not(.dragging)')];
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) {
-                return { offset: offset, element: child };
-            } else {
-                return closest;
-            }
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
+    // ===== [END] DRAG AND DROP RECONSTRUCTION =====
 
 
     function applyAllBackgrounds() {
@@ -1592,13 +1633,12 @@
             playlist: [], // { name: string, url: objectURL }
             currentTrackIndex: -1,
             isPlaying: false,
-            loopMode: 'none' // 'none', 'one', 'all'
+            loopMode: 'all' // 'none', 'one', 'all', 'shuffle'
         };
 
         function start(items) {
             if (!items || items.length === 0) { alert('没有可漫游的项目。'); return; }
-            // Fisher-Yates Shuffle
-            for (let i = items.length - 1; i > 0; i--) {
+            for (let i = items.length - 1; i > 0; i--) { // Fisher-Yates Shuffle
                 const j = Math.floor(Math.random() * (i + 1));
                 [items[i], items[j]] = [items[j], items[i]];
             }
@@ -1612,11 +1652,8 @@
         function close() {
             ui.overlay.classList.remove('active');
             document.body.style.overflow = '';
-            // Pause music when closing
             if (state.isPlaying) {
                 ui.player.audio.pause();
-                ui.player.playPauseBtn.textContent = '▶';
-                state.isPlaying = false;
             }
         }
 
@@ -1658,12 +1695,13 @@
 
         function changeItem(direction) {
             let nextIndex = state.currentIndex + direction;
-            if (nextIndex >= 0 && nextIndex < state.items.length) {
-                state.currentIndex = nextIndex;
-                const newItem = state.items[state.currentIndex];
-                if (newItem.type === 'photoset') {
-                    newItem.internalIndex = direction > 0 ? 0 : newItem.photos.length - 1;
-                }
+            if (nextIndex < 0) nextIndex = state.items.length - 1;
+            if (nextIndex >= state.items.length) nextIndex = 0;
+            
+            state.currentIndex = nextIndex;
+            const newItem = state.items[state.currentIndex];
+            if (newItem.type === 'photoset') {
+                newItem.internalIndex = direction > 0 ? 0 : newItem.photos.length - 1;
             }
         }
 
@@ -1672,10 +1710,10 @@
             ui.overlay.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
             ui.overlay.addEventListener('touchend', e => {
                 let endX = e.changedTouches[0].clientX;
-                if (Math.abs(startX - endX) < 50) return; // Not a swipe
-                if (e.target.closest('.wander-music-player')) return; // Ignore swipes on player
+                if (Math.abs(startX - endX) < 50) return;
+                if (e.target.closest('.wander-music-player')) return;
 
-                if (state.isFullscreen && state.items[state.currentIndex].type !== 'photoset') return; // No swipe on fullscreen single photo
+                if (state.isFullscreen && state.items[state.currentIndex].type !== 'photoset') return;
 
                 changePhoto(startX > endX ? 1 : -1);
             }, { passive: true });
@@ -1683,8 +1721,34 @@
         
         function initPlayer() {
             const p = ui.player;
-            p.addBtn.addEventListener('click', () => p.filePicker.click());
-            p.filePicker.addEventListener('change', (e) => {
+            // Set initial icons
+            p.playPauseBtn.textContent = '▶';
+            p.prevBtn.textContent = '⏮';
+            p.nextBtn.textContent = '⏭';
+            p.loopBtn.textContent = '🔁';
+            p.loopBtn.title = "列表循环";
+            state.loopMode = 'all';
+
+
+            p.addBtn.addEventListener('click', () => p.playlistPopover.classList.toggle('active'));
+            document.addEventListener('click', (e) => {
+                if (!p.container.contains(e.target) && p.playlistPopover.classList.contains('active')) {
+                    p.playlistPopover.classList.remove('active');
+                }
+            });
+
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.mp3';
+            fileInput.multiple = true;
+            fileInput.style.display = 'none';
+            p.container.appendChild(fileInput);
+            p.addBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // prevent closing popover
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', (e) => {
                 const files = Array.from(e.target.files);
                 files.forEach(file => {
                     if (!state.playlist.some(track => track.name === file.name)) {
@@ -1695,40 +1759,49 @@
                 if (state.currentTrackIndex === -1 && state.playlist.length > 0) {
                     playTrack(0);
                 }
+                 p.playlistPopover.classList.add('active');
             });
+
             p.playPauseBtn.addEventListener('click', () => {
-                if (state.isPlaying) p.audio.pause(); else p.audio.play();
+                if (state.playlist.length === 0) return;
+                if(state.currentTrackIndex === -1) playTrack(0);
+                else if (state.isPlaying) p.audio.pause(); 
+                else p.audio.play();
             });
-            p.audio.onplay = () => { state.isPlaying = true; p.playPauseBtn.textContent = '⏸️'; };
+            p.audio.onplay = () => { state.isPlaying = true; p.playPauseBtn.textContent = '⏸'; };
             p.audio.onpause = () => { state.isPlaying = false; p.playPauseBtn.textContent = '▶'; };
             p.audio.ontimeupdate = () => {
-                const progress = (p.audio.currentTime / p.audio.duration) * 100;
-                p.progressBar.style.width = `${progress}%`;
-            };
-            p.audio.onended = () => {
-                if (state.loopMode === 'one') {
-                    playTrack(state.currentTrackIndex);
-                } else {
-                    nextTrack();
+                if(p.audio.duration){
+                    const progress = (p.audio.currentTime / p.audio.duration) * 100;
+                    p.progressBar.style.width = `${progress}%`;
                 }
             };
+            p.audio.onended = () => nextTrack();
             p.nextBtn.addEventListener('click', () => nextTrack());
             p.prevBtn.addEventListener('click', () => {
-                let newIndex = state.currentTrackIndex - 1;
-                if (newIndex < 0) newIndex = state.playlist.length - 1;
+                if (state.playlist.length === 0) return;
+                let newIndex;
+                if (state.loopMode === 'shuffle') {
+                    newIndex = Math.floor(Math.random() * state.playlist.length);
+                } else {
+                    newIndex = state.currentTrackIndex - 1;
+                    if (newIndex < 0) newIndex = state.playlist.length - 1;
+                }
                 playTrack(newIndex);
             });
-            p.loopBtn.addEventListener('click', () => {
-                if (state.loopMode === 'none') { state.loopMode = 'all'; p.loopBtn.textContent = '🔁¹'; p.loopBtn.title = "列表循环"; }
-                else if (state.loopMode === 'all') { state.loopMode = 'one'; p.loopBtn.textContent = '🔂'; p.loopBtn.title = "单曲循环"; }
-                else { state.loopMode = 'none'; p.loopBtn.textContent = '🔁'; p.loopBtn.title = "顺序播放"; }
+             p.loopBtn.addEventListener('click', () => {
+                if (state.loopMode === 'all') { state.loopMode = 'one'; p.loopBtn.textContent = '🔂'; p.loopBtn.title = "单曲循环"; }
+                else if (state.loopMode === 'one') { state.loopMode = 'shuffle'; p.loopBtn.textContent = '🔀'; p.loopBtn.title = "随机播放"; }
+                else if (state.loopMode === 'shuffle') { state.loopMode = 'none'; p.loopBtn.textContent = '➡'; p.loopBtn.title = "顺序播放"; }
+                else { state.loopMode = 'all'; p.loopBtn.textContent = '🔁'; p.loopBtn.title = "列表循环"; }
             });
             p.playlistUL.addEventListener('click', e => {
+                e.stopPropagation();
                 if (e.target.classList.contains('playlist-delete-btn')) {
                     const index = parseInt(e.target.dataset.index, 10);
                     URL.revokeObjectURL(state.playlist[index].url);
                     state.playlist.splice(index, 1);
-                    renderPlaylist();
+                    
                     if (index === state.currentTrackIndex) {
                         p.audio.pause();
                         p.audio.src = '';
@@ -1737,6 +1810,7 @@
                     } else if (index < state.currentTrackIndex) {
                         state.currentTrackIndex--;
                     }
+                    renderPlaylist();
                 } else {
                     const li = e.target.closest('li');
                     if (li) playTrack(parseInt(li.dataset.index, 10));
@@ -1746,23 +1820,28 @@
         
         function nextTrack() {
             if (state.playlist.length === 0) return;
+            if (state.loopMode === 'one' && state.currentTrackIndex !== -1) {
+                playTrack(state.currentTrackIndex);
+                return;
+            }
             let newIndex;
             if (state.loopMode === 'shuffle') {
                 newIndex = Math.floor(Math.random() * state.playlist.length);
             } else {
                 newIndex = state.currentTrackIndex + 1;
                 if (newIndex >= state.playlist.length) {
-                    newIndex = state.loopMode === 'all' ? 0 : -1;
+                    if (state.loopMode === 'all') newIndex = 0;
+                    else { p.audio.pause(); return; }
                 }
             }
-            if (newIndex !== -1) playTrack(newIndex);
+            playTrack(newIndex);
         }
 
         function playTrack(index) {
             if (index < 0 || index >= state.playlist.length) return;
             state.currentTrackIndex = index;
             ui.player.audio.src = state.playlist[index].url;
-            ui.player.audio.play();
+            ui.player.audio.play().catch(e => console.error("Audio play failed:", e));
             renderPlaylist();
         }
 
