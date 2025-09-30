@@ -43,16 +43,6 @@
     "items": [
       {
         "type": "photo",
-        "id": 1759255322959.4626,
-        "albumId": 1759150560197,
-        "title": "",
-        "description": "",
-        "path": "memory/photos/1759150560197-1759255320203.jpeg",
-        "sha": "e1c483d8dfa20843e2f3ad0c1103deccc9ac914e",
-        "timestamp": 1759255322959
-      },
-      {
-        "type": "photo",
         "id": 1759256001696.6292,
         "albumId": 1759154069367,
         "title": "",
@@ -85,26 +75,6 @@
             "timestamp": 1759256722970
           }
         ]
-      },
-      {
-        "type": "photo",
-        "id": 1759262985138.5938,
-        "albumId": 1759150560197,
-        "title": "",
-        "description": "",
-        "path": "memory/photos/1759150560197-1759262976928.jpg",
-        "sha": "34a5240d698f4ebddd95d8fba3ef4f8afe90689e",
-        "timestamp": 1759262985138
-      },
-      {
-        "type": "photo",
-        "id": 1759264745180.2253,
-        "albumId": 1759150560197,
-        "title": "",
-        "description": "",
-        "path": "memory/photos/1759150560197-1759264738801.jpg",
-        "sha": "34a5240d698f4ebddd95d8fba3ef4f8afe90689e",
-        "timestamp": 1759264745180
       }
     ]
   }
