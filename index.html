@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V9.7.0 "DragDrop Final & Music Sync"] */
+        /* [CSS - V9.7.1 "DragDrop Final Reconstruction II"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -72,7 +72,7 @@
         .nav-btn.drag-source { transform: scale(1.05); opacity: 0.4 !important; animation: none !important; cursor: grabbing !important; }
         .nav-btn.drag-over { transform: scale(1.03); box-shadow: 0 0 0 3px var(--hold-border), 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day) !important; }
         body.dark-mode .nav-btn.drag-over { box-shadow: 0 0 0 3px var(--hold-border), 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night) !important; }
-        .drag-ghost { position: fixed; pointer-events: none; z-index: 9999; opacity: 0.8; transform-origin: center center; backdrop-filter: blur(4px); transition: none; animation: none !important; }
+        .drag-ghost { position: fixed; pointer-events: none; z-index: 9999; opacity: 0.8; transform-origin: center center; backdrop-filter: blur(4px); transition: none; animation: none !important; touch-action: none; }
         @keyframes wiggle { from { transform: rotate(-0.5deg); } to { transform: rotate(0.5deg); } }
         .fab-container { position: fixed; right: 30px; bottom: 30px; z-index: 100; }
         .fab-main, .fab-drawer-item { position: relative; width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 22px; display: flex; align-items: center; justify-content: center; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -624,7 +624,7 @@
     </div>
 
     <script>
-    // [JS - V9.7.0 "DragDrop Final & Music Sync"]
+    // [JS - V9.7.1 "DragDrop Final Reconstruction II"]
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
@@ -770,18 +770,18 @@
     fabMainBtn.addEventListener('touchstart', e => { e.preventDefault(); fabMainBtn.dispatchEvent(new MouseEvent('mousedown')); }, { passive: false });
     fabMainBtn.addEventListener('touchend', e => { e.preventDefault(); fabMainBtn.dispatchEvent(new MouseEvent('mouseup')); }, { passive: false });
     
-    function updateButtonOrderAndSave(commitMessage) { const newOrder = []; document.querySelectorAll('.nav-btn').forEach(btn => newOrder.push({ text: btn.textContent.replace('×', '').trim(), href: btn.dataset.href })); currentConfig.buttons = newOrder; saveGlobalConfig(commitMessage); }
+    function updateButtonOrderAndSave(commitMessage) { const newOrder = []; document.querySelectorAll('.nav-btn').forEach(btn => newOrder.push({ text: btn.firstChild.textContent.trim(), href: btn.dataset.href })); currentConfig.buttons = newOrder; saveGlobalConfig(commitMessage); }
     
     function attachButtonListeners(btn) {
         btn.addEventListener('click', function(e) { if (isManagementMode) { e.preventDefault(); return; } const href = this.dataset.href; if (!href) return; if (href.startsWith('http')) { e.preventDefault(); openIframeModal(href); } else { window.location.href = href; } });
     }
 
     document.getElementById('enterManageModeBtn').addEventListener('click', () => { document.getElementById('addNavModal').classList.remove('show'); setTimeout(() => toggleManagementMode(true), 150); });
-    navContainer.addEventListener('click', async (e) => { if (!e.target.classList.contains('delete-icon')) return; const btnToDelete = e.target.closest('.nav-btn'); const buttonName = btnToDelete.textContent.replace('×', '').trim(); if (!confirm(`确定要删除 "${buttonName}" 吗？\n警告：如果这是上传的项目，其在GitHub上的整个文件夹都将被永久删除！`)) return; btnToDelete.style.cssText = 'transition: all 0.3s ease; transform: scale(0.8); opacity: 0;'; setTimeout(async () => { btnToDelete.remove(); const href = btnToDelete.dataset.href; const isExternalLink = href.startsWith('http'); if (!isExternalLink && href.includes('/')) { const folderPath = href.substring(0, href.lastIndexOf('/')); const success = await deleteGithubFolder(folderPath); if (!success) { alert('删除云端文件夹失败!'); location.reload(); return; } } updateButtonOrderAndSave(`Delete button: ${buttonName}`); }, 300); });
+    navContainer.addEventListener('click', async (e) => { if (!e.target.classList.contains('delete-icon')) return; const btnToDelete = e.target.closest('.nav-btn'); const buttonName = btnToDelete.firstChild.textContent.trim(); if (!confirm(`确定要删除 "${buttonName}" 吗？\n警告：如果这是上传的项目，其在GitHub上的整个文件夹都将被永久删除！`)) return; btnToDelete.style.cssText = 'transition: all 0.3s ease; transform: scale(0.8); opacity: 0;'; setTimeout(async () => { btnToDelete.remove(); const href = btnToDelete.dataset.href; const isExternalLink = href.startsWith('http'); if (!isExternalLink && href.includes('/')) { const folderPath = href.substring(0, href.lastIndexOf('/')); const success = await deleteGithubFolder(folderPath); if (!success) { alert('删除云端文件夹失败!'); location.reload(); return; } } updateButtonOrderAndSave(`Delete button: ${buttonName}`); }, 300); });
     document.getElementById('title').addEventListener('click', () => { if(isManagementMode) return; const newTitle = prompt('新标题：', currentConfig.title); if (newTitle?.trim() && newTitle.trim() !== currentConfig.title) { document.getElementById('title').textContent = newTitle.trim(); currentConfig.title = newTitle.trim(); saveGlobalConfig('Update main title'); } });
     document.getElementById('subtitle').addEventListener('click', () => { if(isManagementMode) return; const newSubtitle = prompt('新描述：', currentConfig.subtitle); if (newSubtitle !== null && newSubtitle.trim() !== currentConfig.subtitle) { document.getElementById('subtitle').textContent = newSubtitle.trim(); currentConfig.subtitle = newSubtitle.trim(); saveGlobalConfig('Update subtitle'); } });
     
-    // ===== [START] DRAG AND DROP RECONSTRUCTION =====
+    // ===== [START] DRAG AND DROP RECONSTRUCTION II (FINAL) =====
     function initializeDragAndDrop(container) {
         let sourceEl = null, ghostEl = null;
         let startX, startY, offsetX, offsetY;
@@ -798,12 +798,12 @@
 
             longPressTimer = setTimeout(() => startDrag(target, e), 200);
 
-            document.addEventListener('pointermove', onPointerMoveEarly);
+            document.addEventListener('pointermove', onPointerMoveEarly, { passive: true });
             document.addEventListener('pointerup', onPointerUpEarly, { once: true });
         };
 
         const onPointerMoveEarly = (e) => {
-            if (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) {
+            if (Math.abs(e.clientX - startX) > 10 || Math.abs(e.clientY - startY) > 10) {
                 clearTimeout(longPressTimer);
                 document.removeEventListener('pointermove', onPointerMoveEarly);
                 document.removeEventListener('pointerup', onPointerUpEarly);
@@ -842,18 +842,23 @@
         const onPointerMove = (e) => {
             if (!ghostEl) return;
             
+            e.preventDefault(); // Prevents edge scrolling/selection on mobile
+
             requestAnimationFrame(() => {
                 ghostEl.style.transform = `translate(${e.clientX - offsetX}px, ${e.clientY - offsetY}px) scale(1.05)`;
             });
 
             const currentOver = document.querySelector('.drag-over');
-            if (currentOver) currentOver.classList.remove('drag-over');
-
+            
             ghostEl.hidden = true;
             const elementUnder = document.elementFromPoint(e.clientX, e.clientY);
             ghostEl.hidden = false;
 
             const dropTarget = elementUnder ? elementUnder.closest('.nav-btn:not(.drag-source)') : null;
+            
+            if (currentOver && currentOver !== dropTarget) {
+                currentOver.classList.remove('drag-over');
+            }
             if (dropTarget) {
                 dropTarget.classList.add('drag-over');
             }
@@ -865,35 +870,17 @@
 
             const dropTarget = document.querySelector('.drag-over');
             
-            if (dropTarget) {
-                const sourceHref = sourceEl.dataset.href;
-                const sourceText = sourceEl.textContent;
-                const targetHref = dropTarget.dataset.href;
-                const targetText = dropTarget.textContent;
+            if (dropTarget && sourceEl) {
+                const sourceNextSibling = sourceEl.nextSibling;
+                const dropTargetNextSibling = dropTarget.nextSibling;
 
-                sourceEl.dataset.href = targetHref;
-                sourceEl.textContent = targetText;
-                
-                dropTarget.dataset.href = sourceHref;
-                dropTarget.textContent = sourceText;
-
-                // Re-attach delete icons if they exist
-                if (isManagementMode) {
-                    [sourceEl, dropTarget].forEach(btn => {
-                        if (!btn.querySelector('.delete-icon')) {
-                            const icon = document.createElement('span');
-                            icon.className = 'delete-icon';
-                            icon.innerHTML = '&times;';
-                            icon.title = '删除此按钮';
-                            btn.appendChild(icon);
-                        }
-                    });
-                }
+                container.insertBefore(sourceEl, dropTargetNextSibling);
+                container.insertBefore(dropTarget, sourceNextSibling);
                 
                 updateButtonOrderAndSave('Reorder buttons');
-                dropTarget.classList.remove('drag-over');
             }
             
+            if (dropTarget) dropTarget.classList.remove('drag-over');
             if (sourceEl) sourceEl.classList.remove('drag-source');
             if (ghostEl) ghostEl.remove();
 
@@ -902,7 +889,7 @@
 
         container.addEventListener('pointerdown', onPointerDown);
     }
-    // ===== [END] DRAG AND DROP RECONSTRUCTION =====
+    // ===== [END] DRAG AND DROP RECONSTRUCTION II (FINAL) =====
 
     function applyAllBackgrounds() {
         const isDark = document.body.classList.contains('dark-mode');
@@ -1002,7 +989,7 @@
     function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){const e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e=!0){return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据云盘 -> 标题旁⚙️)"),!1):!0}
     async function loadInitialData() { navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>'; const fetchedConfig = await fetchConfigFromGithub(); currentConfig = { ...getDefaultConfig(), ...fetchedConfig }; document.getElementById('title').textContent = currentConfig.title; document.getElementById('subtitle').textContent = currentConfig.subtitle; document.querySelector('.editable-title').style.opacity = 1; document.querySelector('.editable-subtitle').style.opacity = 1; navContainer.innerHTML = ''; if (!currentConfig.buttons || currentConfig.buttons.length === 0) { navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">配置为空，请添加导航按钮。</p>'; } else { currentConfig.buttons.forEach(item => addNewButtonToDOM(item.text, item.href, false)); } loadColorState(); }
     async function deleteGithubFolder(folderPath) { if (!checkConfig(true)) return false; const contentsUrl = withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${folderPath}`); try { const contentsResponse = await fetch(contentsUrl, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` } }); if (contentsResponse.status === 404) { console.log(`Folder "${folderPath}" not found, nothing to delete.`); return true; } if (!contentsResponse.ok) throw new Error(`Could not list folder: ${contentsResponse.statusText}`); const files = await contentsResponse.json(); const deletePromises = files.map(file => fetch(withCacheBust(file.url), { method: 'DELETE', headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, body: JSON.stringify({ message: `Delete file: ${file.path}`, sha: file.sha, branch: 'main' }) })); await Promise.all(deletePromises); return true; } catch (error) { console.error(`Failed to delete folder "${folderPath}":`, error); return false; } }
-    syncModalElements.saveSettingsBtn.addEventListener("click",async()=>{const[e,t]=syncModalElements.githubRepoInput.value.trim().split("/").map(e=>e.trim()),n=syncModalElements.githubTokenInput.value.trim();if(e&&t&&n){saveGithubConfig({owner:e,repo:t,token:n,branch:"main"}),alert("配置已保存！刷新页面加载云端配置。"),document.getElementById("settingsModal").classList.remove("show"),await loadInitialData()}else{alert("请填写完整信息。")}});function populateButtonSelector(){const e=syncModalElements.buttonSelector.value;syncModalElements.buttonSelector.innerHTML="",document.querySelectorAll(".nav-btn").forEach(t=>{const n=t.textContent.replace("×","").trim(),o=document.createElement("option");o.value=o.textContent=n,syncModalElements.buttonSelector.appendChild(o)}),Array.from(syncModalElements.buttonSelector.options).some(t=>t.value===e)&&(syncModalElements.buttonSelector.value=e)}
+    syncModalElements.saveSettingsBtn.addEventListener("click",async()=>{const[e,t]=syncModalElements.githubRepoInput.value.trim().split("/").map(e=>e.trim()),n=syncModalElements.githubTokenInput.value.trim();if(e&&t&&n){saveGithubConfig({owner:e,repo:t,token:n,branch:"main"}),alert("配置已保存！刷新页面加载云端配置。"),document.getElementById("settingsModal").classList.remove("show"),await loadInitialData()}else{alert("请填写完整信息。")}});function populateButtonSelector(){const e=syncModalElements.buttonSelector.value;syncModalElements.buttonSelector.innerHTML="",document.querySelectorAll(".nav-btn").forEach(t=>{const n=t.firstChild.textContent.trim(),o=document.createElement("option");o.value=o.textContent=n,syncModalElements.buttonSelector.appendChild(o)}),Array.from(syncModalElements.buttonSelector.options).some(t=>t.value===e)&&(syncModalElements.buttonSelector.value=e)}
     syncModalElements.buttonSelector.addEventListener("change",fetchFilesForSelectedButton); syncModalElements.selectFileBtn.addEventListener('click', () => syncModalElements.fileUploader.click());
     syncModalElements.fileUploader.addEventListener("change",()=>{ if(syncModalElements.fileUploader.files.length>0){ const file = syncModalElements.fileUploader.files[0]; syncModalElements.fileNameInput.value=file.name; syncModalElements.selectedFileName.textContent = file.name; } else { syncModalElements.selectedFileName.textContent = "未选择任何文件"; }});
     async function fetchFilesForSelectedButton(){const e=syncModalElements.buttonSelector.value;if(syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="flex",!e)return void(syncModalElements.fileListStatus.textContent="请选择一个分类");if(!checkConfig(!0))return void(syncModalElements.fileListStatus.innerHTML="尚未配置GitHub信息<br>请点击标题旁 ⚙️");syncModalElements.fileListStatus.textContent="正在加载...";const t=withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${e}`);try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`}});if(404===n.status)return void(syncModalElements.fileListStatus.textContent="该分类下暂无文件");if(!n.ok)throw new Error(`HTTP ${n.status}`);const o=await n.json();if(0===o.length)syncModalElements.fileListStatus.textContent="该分类下暂无文件";else{const l=await Promise.all(o.map(async e=>({...e,commitDate:await getLatestCommitDate(e.path)})));l.sort((e,t)=>new Date(t.commitDate)-new Date(e.commitDate)),syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="none",l.forEach(e=>{const t=document.createElement("li"),n=document.createElement("div");n.className="file-info",n.dataset.downloadUrl=e.download_url,n.dataset.fileName=e.name;const o=document.createElement("span");o.className="file-name",o.textContent=e.name;const l=document.createElement("span");l.className="file-timestamp",l.textContent=(new Date(e.commitDate)).toLocaleString("zh-CN",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}),n.append(o,l);const a=document.createElement("button");a.className="delete-btn",a.innerHTML="&times;",a.title="删除文件",t.append(n,a),syncModalElements.fileList.appendChild(t),n.addEventListener("click",t=>forceDownload(t.currentTarget.dataset.downloadUrl,t.currentTarget.dataset.fileName,n)),a.addEventListener("click",()=>deleteFile(e.path,e.sha,t))})}}catch(n){console.error("获取文件列表失败:",n),syncModalElements.fileListStatus.textContent="加载失败，请检查网络或配置。"}}
@@ -1010,7 +997,7 @@
     function uploadFileWithProgress(url, fileContent, token, commitMessage, sha) { return new Promise((resolve, reject) => { const body = { message: commitMessage, content: fileContent, branch: "main" }; if(sha) body.sha = sha; const xhr = new XMLHttpRequest(); xhr.open("PUT", url, true); xhr.setRequestHeader("Authorization", `token ${token}`); xhr.setRequestHeader("Content-Type", "application/json"); xhr.upload.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = (event.loaded / event.total) * 100; syncModalElements.progressBar.style.width = percentComplete + '%'; WanderView.updateUploadProgress(percentComplete); } }; xhr.onload = () => { if (xhr.status >= 200 && xhr.status < 301) { resolve(JSON.parse(xhr.responseText)); } else { reject(new Error(`上传失败: ${xhr.statusText} - ${xhr.responseText}`)); } }; xhr.onerror = () => reject(new Error("网络错误，上传失败。")); xhr.send(JSON.stringify(body)); }); }
     syncModalElements.uploadBtn.addEventListener("click", async () => { if (!checkConfig()) return; const category = syncModalElements.buttonSelector.value; const file = syncModalElements.fileUploader.files[0]; let fileName = syncModalElements.fileNameInput.value.trim() || (file && file.name); if (!category || !file || !fileName) { return alert("请选择分类、文件，并确保文件名不为空。"); } syncModalElements.uploadBtn.disabled = true; syncModalElements.uploadBtn.textContent = "上传中..."; syncModalElements.progressContainer.style.display = 'block'; syncModalElements.progressBar.style.width = '0%'; try { const content = await fileToBase64(file); const url = withCacheBust(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${category}/${fileName}`); await uploadFileWithProgress(url, content, GITHUB_CONFIG.token, `Upload ${fileName}`); syncModalElements.uploadBtn.textContent = '正在处理...'; setTimeout(() => { alert("上传成功！"); syncModalElements.fileUploader.value = ""; syncModalElements.fileNameInput.value = ""; syncModalElements.selectedFileName.textContent = '未选择任何文件'; fetchFilesForSelectedButton(); }, 200); } catch (error) { console.error("上传失败:", error); alert(`上传失败: ${error.message}`); } finally { setTimeout(() => { syncModalElements.uploadBtn.disabled = false; syncModalElements.uploadBtn.textContent = "上传文件"; syncModalElements.progressContainer.style.display = 'none'; }, 1000); } });
     const addNavModalElements={typeLinkRadio:document.getElementById("type-link"),typeUploadRadio:document.getElementById("type-upload"),linkSection:document.getElementById("link-section"),uploadSection:document.getElementById("upload-section"),nameInput:document.getElementById("newButtonNameInput"),urlInput:document.getElementById("newButtonUrlInput"),filePickerBtn:document.getElementById("filePickerBtn"),projectHtmlPicker:document.getElementById("projectHtmlPicker"),fileStatus:document.getElementById("file-picker-status"),createBtn:document.getElementById("createNavBtn"),uploadStatus:document.getElementById("upload-status"),stayOpenToggle:document.getElementById("stayOpenToggle")};
-    function addNewButtonToDOM(text, href, save=true) { navContainer.querySelector("#loading-status")?.remove(); const btn = document.createElement("button"); btn.className = "nav-btn"; btn.textContent = text; btn.dataset.href = href; navContainer.appendChild(btn); attachButtonListeners(btn); if (isManagementMode) { const icon = document.createElement('span'); icon.className = 'delete-icon'; icon.innerHTML = '&times;'; icon.title = '删除此按钮'; btn.appendChild(icon); } if (save) { if(!currentConfig.buttons) currentConfig.buttons = []; currentConfig.buttons.push({text, href}); saveGlobalConfig(`Add button: ${text}`); } }
+    function addNewButtonToDOM(text, href, save=true) { navContainer.querySelector("#loading-status")?.remove(); const btn = document.createElement("button"); btn.className = "nav-btn"; btn.dataset.href = href; const textNode = document.createTextNode(text); btn.appendChild(textNode); navContainer.appendChild(btn); attachButtonListeners(btn); if (isManagementMode) { const icon = document.createElement('span'); icon.className = 'delete-icon'; icon.innerHTML = '&times;'; icon.title = '删除此按钮'; btn.appendChild(icon); } if (save) { if(!currentConfig.buttons) currentConfig.buttons = []; currentConfig.buttons.push({text, href}); saveGlobalConfig(`Add button: ${text}`); } }
     function resetAddNavForm() { addNavModalElements.nameInput.value = ""; addNavModalElements.urlInput.value = ""; addNavModalElements.fileStatus.textContent = "未选择任何文件"; addNavModalElements.uploadStatus.textContent = ""; addNavModalElements.projectHtmlPicker.value = ""; }
     
     document.querySelectorAll('input[name="nav-type"]').forEach(radio => {
@@ -1714,7 +1701,7 @@
             updateContent();
             loadCloudPlaylist().then(() => {
                 if (localStorage.getItem('wanderAutoplay') === 'true' && state.playlist.length > 0) {
-                    playTrack(0);
+                    playTrack(state.currentTrackIndex > -1 ? state.currentTrackIndex : 0);
                 }
             });
         }
@@ -1935,7 +1922,12 @@
             ui.player.audio.src = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${track.musicPath}`;
             
             state.lyrics = [];
-            ui.player.displayArea.textContent = track.name;
+            ui.player.displayArea.innerHTML = '';
+            const progressEl = document.createElement('div');
+            progressEl.className = 'player-progress-container';
+            progressEl.innerHTML = '<div id="player-progress-bar" style="width: 0%;"></div>';
+            ui.player.displayArea.appendChild(progressEl);
+
             if (track.lrcPath) {
                 try {
                     const response = await fetch(`https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${track.lrcPath}`);
@@ -1945,10 +1937,8 @@
                     }
                 } catch (e) { console.error("Could not fetch lyrics", e); }
             }
-            if(state.lyrics.length === 0) {
-                ui.player.progressContainer.style.display = 'block';
-            } else {
-                ui.player.progressContainer.style.display = 'none';
+            if(state.lyrics.length > 0) {
+                 ui.player.displayArea.textContent = track.name.replace('.mp3', '');
             }
             
             ui.player.audio.play().catch(e => console.error("Audio play failed:", e));
@@ -1966,15 +1956,15 @@
         function parseLRC(lrc) {
             const lines = lrc.split('\n');
             const result = [];
-            const timeRegex = /\[(\d{2}):(\d{2})\.(\d{2,3})\]/;
+            const timeRegex = /\[(\d{2}):(\d{2})[.:](\d{2,3})\]/g;
             for (const line of lines) {
-                const match = line.match(timeRegex);
-                if (match) {
-                    const minutes = parseInt(match[1], 10);
-                    const seconds = parseInt(match[2], 10);
-                    const milliseconds = parseInt(match[3].padEnd(3, '0'), 10);
+                let lastMatch;
+                while((lastMatch = timeRegex.exec(line)) !== null) {
+                    const minutes = parseInt(lastMatch[1], 10);
+                    const seconds = parseInt(lastMatch[2], 10);
+                    const milliseconds = parseInt(lastMatch[3].padEnd(3, '0'), 10);
                     const time = minutes * 60 + seconds + milliseconds / 1000;
-                    const text = line.replace(timeRegex, '').trim();
+                    const text = line.substring(line.lastIndexOf(']') + 1).trim();
                     if (text) result.push({ time, text });
                 }
             }
@@ -1984,15 +1974,22 @@
         function updateLyrics(currentTime) {
             if (state.lyrics.length === 0) return;
             let currentLine = '';
+            let nextLine = '...';
+            let found = false;
             for (let i = 0; i < state.lyrics.length; i++) {
-                if (currentTime >= state.lyrics[i].time) {
+                if (currentTime >= state.lyrics[i].time && (i + 1 >= state.lyrics.length || currentTime < state.lyrics[i+1].time)) {
                     currentLine = state.lyrics[i].text;
-                } else {
+                    nextLine = state.lyrics[i+1] ? state.lyrics[i+1].text : '';
+                    found = true;
                     break;
                 }
             }
-            if (ui.player.displayArea.textContent !== currentLine) {
-                ui.player.displayArea.textContent = currentLine;
+            if (!found && state.lyrics.length > 0) currentLine = '...';
+            
+            const displayHTML = `<div style="font-weight:bold;">${currentLine}</div><div style="font-size:0.8em; opacity:0.6;">${nextLine}</div>`;
+
+            if (ui.player.displayArea.innerHTML !== displayHTML) {
+                ui.player.displayArea.innerHTML = displayHTML;
             }
         }
         
