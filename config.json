@@ -16,6 +16,10 @@
       ]
     }
   ],
+  "settings": {
+    "showCategories": true,
+    "lastSelectedCategory": "小手机"
+  },
   "themePresets": [],
   "buttons": [
     {
