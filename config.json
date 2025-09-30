@@ -4,7 +4,12 @@
   "categories": [
     {
       "name": "全部",
-      "buttons": []
+      "buttons": [
+        {
+          "text": "33",
+          "href": "https://raw.githack.com/iixye827-bit/111phone/main/projects/33/index.html"
+        }
+      ]
     },
     {
       "name": "小手机",
@@ -18,7 +23,8 @@
   ],
   "settings": {
     "showCategories": true,
-    "lastSelectedCategory": "全部"
+    "lastSelectedCategory": "全部",
+    "paginationEnabled": true
   },
   "themePresets": [],
   "buttons": [
