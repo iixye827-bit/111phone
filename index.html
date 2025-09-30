@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V9.2.0 "Final Fixes & Polish"] */
+        /* [CSS - V9.3.0 "Photo Sets & Final DragDrop Fix"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -68,8 +68,7 @@
         .management-active .nav-btn { cursor: grab; animation: wiggle 0.2s ease-in-out infinite alternate; pointer-events: auto !important; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
         .management-active .nav-btn:active { cursor: grabbing; }
         .management-active .nav-btn > .delete-icon { display: block; }
-        .nav-btn.dragging { opacity: 0.5; }
-        .nav-btn.drag-over { border: 2px dashed var(--hold-border); background: rgba(91, 153, 226, 0.1); }
+        .nav-btn.dragging { opacity: 0.5; z-index: 1000; }
         @keyframes wiggle { from { transform: rotate(-0.5deg); } to { transform: rotate(0.5deg); } }
         .fab-container { position: fixed; right: 30px; bottom: 30px; z-index: 100; }
         .fab-main, .fab-drawer-item { position: relative; width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 22px; display: flex; align-items: center; justify-content: center; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -195,12 +194,18 @@
         #memoryModal .album-item .folder-icon { font-size: 32px; }
         #memoryModal .album-info { font-size: 12px; color: #889; }
         #memoryModal #photo-list-container { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
-        #memoryModal .photo-item { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,0.7); cursor: pointer; transition: transform 0.2s ease; background-color: rgba(128,128,128,0.1); }
+        #memoryModal .photo-item, .photo-item-set { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,0.7); cursor: pointer; transition: transform 0.2s ease; background-color: rgba(128,128,128,0.1); }
         #memoryModal .photo-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
-        #memoryModal .photo-title-overlay { position: absolute; top: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); color: white; font-size: 12px; padding: 4px 8px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .photo-item-set .photo-stack-img { position: absolute; top: 10%; left: 10%; width: 80%; height: 80%; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s ease; }
+        .photo-item-set .photo-stack-img:nth-child(1) { transform: rotate(-8deg); z-index: 1; }
+        .photo-item-set .photo-stack-img:nth-child(2) { transform: rotate(2deg); z-index: 2; }
+        .photo-item-set .photo-stack-img:nth-child(3) { transform: rotate(10deg); z-index: 3; }
+        #memoryModal .photo-title-overlay { position: absolute; top: 0; left: 0; right: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); color: white; font-size: 12px; padding: 4px 8px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px solid rgba(255,255,255,0.2); z-index: 5; }
+        .photo-item-set .count-overlay { position: absolute; bottom: 5px; right: 8px; background: rgba(0,0,0,0.5); color: white; padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 4px; z-index: 5; }
         #memoryPhotoViewerOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 5000; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         #memoryPhotoViewerOverlay.active { opacity: 1; pointer-events: auto; }
-        #memoryPhotoViewerOverlay .viewer-header { flex-shrink: 0; display: flex; justify-content: flex-end; padding: 20px; color: white; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); }
+        #memoryPhotoViewerOverlay .viewer-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 20px; color: white; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); }
+        #memoryPhotoViewerOverlay .viewer-header .counter { font-size: 16px; font-weight: bold; }
         #memoryPhotoViewerOverlay .viewer-btn { background: rgba(40,40,40,0.5); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; transition: background-color 0.2s; }
         #memoryPhotoViewerOverlay .viewer-btn:hover { background: rgba(60,60,60,0.7); }
         #memoryPhotoViewerOverlay .viewer-content { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
@@ -208,7 +213,7 @@
         #memoryPhotoViewerOverlay #viewer-img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .viewer-mode-view #viewer-img-container { padding: 40px; }
         .viewer-mode-wander #viewer-img-container { padding: 0; }
-        #memoryPhotoViewerOverlay .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; font-size: 24px; opacity: 0.6; }
+        #memoryPhotoViewerOverlay .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; font-size: 24px; opacity: 0.6; display: flex; align-items: center; justify-content: center; }
         .viewer-mode-wander .nav-arrow { display: none; }
         #memoryPhotoViewerOverlay .nav-arrow:hover { opacity: 1; }
         #prev-photo-btn { left: 15px; } #next-photo-btn { right: 15px; }
@@ -234,7 +239,8 @@
         #memoryModal #note-content-textarea{flex-grow:1;resize:none;line-height:1.6}
         #memoryModal #note-title-input:focus,#memoryModal #note-content-textarea:focus{outline:none}
         #memoryFolderModal .modal-content, #memoryPhotoDetailsModal .modal-content { max-width: 400px; }
-        #memoryPhotoDetailsModal #upload-thumbnail { max-width: 100px; max-height: 100px; border-radius: 8px; margin: 0 auto; object-fit: cover; }
+        #memoryPhotoDetailsModal #upload-thumbnail { max-width: 100px; max-height: 100px; border-radius: 8px; margin: 10px auto; object-fit: cover; }
+        #memoryPhotoDetailsModal #photoset-toggle-container { display: none; padding: 10px; border-bottom: 1px solid rgba(128,128,128,0.2); }
         #memoryPhotoDetailsModal .modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
         #memoryPhotoDetailsModal .modal-button.primary { color: var(--hold-border); }
         #memoryModal .pin-btn { position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 20px; cursor: pointer; opacity: 0.3; transition: opacity 0.2s, transform 0.2s; z-index: 5; }
@@ -244,11 +250,11 @@
         body.dark-mode .management-controls { background: var(--bg-night-element); }
         .management-controls.active { display: flex; }
         .management-controls .modal-button { flex-grow: 1; margin: 0; padding: 12px; }
-        .folder-item.manage-mode, .album-item.manage-mode, .photo-item.manage-mode { cursor: pointer; }
-        .folder-item .manage-checkbox, .album-item .manage-checkbox, .photo-item .manage-checkbox { display: none; position: absolute; top: 10px; left: 10px; width: 22px; height: 22px; z-index: 5; }
-        .folder-item.manage-mode .manage-checkbox, .album-item.manage-mode .manage-checkbox, .photo-item.manage-mode .manage-checkbox { display: block; }
-        .folder-item.manage-selected, .album-item.manage-selected, .photo-item.manage-selected { border: 2px solid var(--hold-border); box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day) !important; }
-        body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-selected, body.dark-mode .photo-item.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
+        .folder-item.manage-mode, .album-item.manage-mode, .photo-item.manage-mode, .photo-item-set.manage-mode { cursor: pointer; }
+        .folder-item .manage-checkbox, .album-item .manage-checkbox, .photo-item .manage-checkbox, .photo-item-set .manage-checkbox { display: none; position: absolute; top: 10px; left: 10px; width: 22px; height: 22px; z-index: 5; }
+        .folder-item.manage-mode .manage-checkbox, .album-item.manage-mode .manage-checkbox, .photo-item.manage-mode .manage-checkbox, .photo-item-set.manage-mode .manage-checkbox { display: block; }
+        .folder-item.manage-selected, .album-item.manage-selected, .photo-item.manage-selected, .photo-item-set.manage-selected { border: 2px solid var(--hold-border); box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day) !important; }
+        body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-selected, body.dark-mode .photo-item.manage-selected, body.dark-mode .photo-item-set.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
         /* ===== [END] MEMORY MODAL STYLES ===== */
     </style>
 </head>
@@ -449,13 +455,19 @@
         <div class="modal-content">
             <div id="photo-details-modal-title" class="modal-header">添加照片信息</div>
             <div class="modal-body">
+                <div id="photoset-toggle-container">
+                    <label class="header-toggle-group">
+                        <input type="checkbox" id="create-photoset-toggle">
+                        <span>创建照片集</span>
+                    </label>
+                </div>
                 <img id="upload-thumbnail" src="" alt="upload thumbnail">
                 <input type="text" id="photo-title-input" class="modal-input" placeholder="标题 (选填)">
                 <textarea id="photo-desc-input" class="modal-textarea" placeholder="描述 (选填)"></textarea>
             </div>
             <div class="modal-footer">
                 <button data-action="skip-photo-details" class="modal-button">跳过</button>
-                <button data-action="save-photo-details" class="modal-button primary">保存并继续</button>
+                <button data-action="save-photo-details" class="modal-button primary">保存</button>
             </div>
         </div>
     </div>
@@ -463,7 +475,10 @@
 
     <!-- 全屏照片查看器 -->
     <div id="memoryPhotoViewerOverlay">
-        <div class="viewer-header"> <button data-action="close-viewer" class="viewer-btn">✕</button> </div>
+        <div class="viewer-header"> 
+            <span class="counter" id="viewer-counter"></span>
+            <button data-action="close-viewer" class="viewer-btn">✕</button> 
+        </div>
         <div class="viewer-content">
             <button data-action="prev-photo" id="prev-photo-btn" class="viewer-btn nav-arrow">&#10094;</button>
             <div id="viewer-img-container"><img id="viewer-img" src="" alt="Photo view"></div>
@@ -493,7 +508,7 @@
     </div>
 
     <script>
-    // [JS - V9.2.0 "Final Fixes & Polish"]
+    // [JS - V9.3.0 "Photo Sets & Final DragDrop Fix"]
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
@@ -651,19 +666,75 @@
     document.getElementById('title').addEventListener('click', () => { if(isManagementMode) return; const newTitle = prompt('新标题：', currentConfig.title); if (newTitle?.trim() && newTitle.trim() !== currentConfig.title) { document.getElementById('title').textContent = newTitle.trim(); currentConfig.title = newTitle.trim(); saveGlobalConfig('Update main title'); } });
     document.getElementById('subtitle').addEventListener('click', () => { if(isManagementMode) return; const newSubtitle = prompt('新描述：', currentConfig.subtitle); if (newSubtitle !== null && newSubtitle.trim() !== currentConfig.subtitle) { document.getElementById('subtitle').textContent = newSubtitle.trim(); currentConfig.subtitle = newSubtitle.trim(); saveGlobalConfig('Update subtitle'); } });
     
-    // Universal Drag and Drop Logic (Mouse & Touch)
-    let draggedItem = null;
-    function getDragAfterElement(container, y) { const draggableElements = [...container.querySelectorAll('.nav-btn:not(.dragging)')]; return draggableElements.reduce((closest, child) => { const box = child.getBoundingClientRect(); const offset = y - box.top - box.height / 2; if (offset < 0 && offset > closest.offset) { return { offset: offset, element: child }; } else { return closest; } }, { offset: Number.NEGATIVE_INFINITY }).element; }
-    const handleDragStart = (e) => { if (!isManagementMode) return; draggedItem = e.target.closest('.nav-btn'); if (draggedItem) { setTimeout(() => draggedItem.classList.add('dragging'), 0); } };
-    const handleDragMove = (e) => { if (!draggedItem) return; e.preventDefault(); const clientY = e.touches ? e.touches[0].clientY : e.clientY; const afterElement = getDragAfterElement(navContainer, clientY); if (afterElement == null) { navContainer.appendChild(draggedItem); } else { navContainer.insertBefore(draggedItem, afterElement); } };
-    const handleDragEnd = () => { if (!draggedItem) return; draggedItem.classList.remove('dragging'); updateButtonOrderAndSave('Reorder buttons'); draggedItem = null; };
-    navContainer.addEventListener('dragstart', handleDragStart);
-    navContainer.addEventListener('dragend', handleDragEnd);
-    navContainer.addEventListener('dragover', e => e.preventDefault());
-    navContainer.addEventListener('drop', handleDragEnd);
-    navContainer.addEventListener('touchstart', handleDragStart, { passive: true });
-    navContainer.addEventListener('touchmove', handleDragMove, { passive: false });
-    navContainer.addEventListener('touchend', handleDragEnd);
+    // Universal Drag-and-Drop Implementation (Rewritten for Touch & Mouse)
+    function initializeDragAndDrop(container) {
+        let draggedEl = null;
+        let isDragging = false;
+
+        const onDragStart = (e) => {
+            if (!isManagementMode) return;
+            draggedEl = e.target.closest('.nav-btn');
+            if (!draggedEl) return;
+            
+            isDragging = true;
+            // For touch, we prevent default to avoid scrolling
+            if (e.type === 'touchstart') e.preventDefault();
+
+            setTimeout(() => {
+                if(draggedEl) draggedEl.classList.add('dragging');
+            }, 0);
+
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('touchmove', onDragMove, { passive: false });
+            document.addEventListener('mouseup', onDragEnd);
+            document.addEventListener('touchend', onDragEnd);
+        };
+
+        const onDragMove = (e) => {
+            if (!isDragging || !draggedEl) return;
+            e.preventDefault();
+
+            const y = e.touches ? e.touches[0].clientY : e.clientY;
+            const afterElement = getDragAfterElement(container, y);
+            
+            if (afterElement == null) {
+                container.appendChild(draggedEl);
+            } else {
+                container.insertBefore(draggedEl, afterElement);
+            }
+        };
+
+        const onDragEnd = () => {
+            if (!isDragging || !draggedEl) return;
+            
+            isDragging = false;
+            draggedEl.classList.remove('dragging');
+            updateButtonOrderAndSave('Reorder buttons');
+            draggedEl = null;
+
+            document.removeEventListener('mousemove', onDragMove);
+            document.removeEventListener('touchmove', onDragMove);
+            document.removeEventListener('mouseup', onDragEnd);
+            document.removeEventListener('touchend', onDragEnd);
+        };
+
+        container.addEventListener('mousedown', onDragStart);
+        container.addEventListener('touchstart', onDragStart, { passive: false });
+    }
+
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.nav-btn:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
 
     function applyAllBackgrounds() {
         const isDark = document.body.classList.contains('dark-mode');
@@ -850,7 +921,7 @@
         let memoryDataSha = null;
         let isSaving = false;
         let saveTimeout = null;
-        let lastWanderedPhotoId = null;
+        let lastWanderedItemId = null;
 
         const ui = {
             modal: document.getElementById('memoryModal'),
@@ -867,6 +938,8 @@
             folderModal: document.getElementById('memoryFolderModal'),
             photoDetailsModal: document.getElementById('memoryPhotoDetailsModal'),
             photoViewer: document.getElementById('memoryPhotoViewerOverlay'),
+            photosetToggleContainer: document.getElementById('photoset-toggle-container'),
+            photosetToggle: document.getElementById('create-photoset-toggle'),
         };
 
         const state = {
@@ -876,14 +949,14 @@
             isPhotoManageMode: false, photosToDelete: [],
             currentMemoFolderId: null, currentNoteId: null, currentAlbumId: null,
             folderModalContext: null, // 'memo' or 'album'
-            viewerContext: { photos: [], index: -1, mode: 'view' },
+            viewerContext: { photos: [], index: -1, mode: 'view', isSet: false },
             photoUploadQueue: [],
         };
 
         function getInitialData() {
             return {
                 memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] },
-                album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], photos: [] }
+                album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] }
             };
         }
 
@@ -898,7 +971,12 @@
             memoryDataSha = result.sha;
             updateStatus('已同步');
             if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
-            if (!memoryCache.album) memoryCache.album = { folders: [], photos: [] };
+            if (!memoryCache.album) memoryCache.album = { folders: [], items: [] };
+            // Migration for old data structure
+            if (memoryCache.album.photos && !memoryCache.album.items) {
+                memoryCache.album.items = memoryCache.album.photos.map(p => ({...p, type: 'photo'}));
+                delete memoryCache.album.photos;
+            }
         }
 
         function scheduleSave() {
@@ -950,45 +1028,71 @@
         function renderAlbumFolders() {
             ui.albumList.innerHTML = '';
             memoryCache.album.folders.forEach(folder => {
-                const photoCount = memoryCache.album.photos.filter(p => p.albumId === folder.id).length;
+                const itemCount = memoryCache.album.items.filter(p => p.albumId === folder.id).length;
                 const isSelected = state.albumFoldersToDelete.includes(folder.id);
                 const el = document.createElement('div');
                 el.className = `album-item ${state.isAlbumManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
                 el.dataset.albumId = folder.id;
                 el.dataset.action = "open-album-folder";
-                el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">🖼️</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${photoCount} 张照片</div>`;
+                el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">🖼️</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${itemCount} 个项目</div>`;
                 ui.albumList.appendChild(el);
             });
             if (memoryCache.album.folders.length === 0) ui.albumList.innerHTML = `<p class="empty-list-placeholder">没有相册</p>`;
         }
         function renderPhotos() {
             ui.photoList.innerHTML = '';
-            const photosInAlbum = memoryCache.album.photos.filter(p => p.albumId === state.currentAlbumId).sort((a, b) => b.timestamp - a.timestamp);
-            photosInAlbum.forEach(photo => {
-                const isSelected = state.photosToDelete.includes(photo.id);
+            const itemsInAlbum = memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId).sort((a, b) => b.timestamp - a.timestamp);
+            itemsInAlbum.forEach(item => {
+                const isSelected = state.photosToDelete.includes(item.id);
                 const el = document.createElement('div');
-                el.className = `photo-item ${state.isPhotoManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
-                el.dataset.photoId = photo.id;
-                el.dataset.action = "open-photo";
-                const photoUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${photo.path}`;
-                const title = (photo.title || '无标题').substring(0, 10);
-                el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><img src="${photoUrl}" alt="${photo.title || ''}" loading="lazy"><div class="photo-title-overlay">${title}</div>`;
+                el.dataset.itemId = item.id;
+                
+                if (item.type === 'photoset') {
+                    el.className = `photo-item-set ${state.isPhotoManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
+                    el.dataset.action = "open-photoset";
+                    let stackHtml = '';
+                    item.photos.slice(0, 3).forEach(photo => {
+                        const photoUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${photo.path}`;
+                        stackHtml += `<img src="${photoUrl}" class="photo-stack-img" loading="lazy">`;
+                    });
+                    const title = (item.title || '无标题').substring(0, 10);
+                    el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}>${stackHtml}<div class="photo-title-overlay">${title}</div><div class="count-overlay">${item.photos.length} 张</div>`;
+                } else {
+                    el.className = `photo-item ${state.isPhotoManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
+                    el.dataset.action = "open-photo";
+                    const photoUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${item.path}`;
+                    const title = (item.title || '无标题').substring(0, 10);
+                    el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><img src="${photoUrl}" alt="${item.title || ''}" loading="lazy"><div class="photo-title-overlay">${title}</div>`;
+                }
                 ui.photoList.appendChild(el);
             });
-            if (photosInAlbum.length === 0) ui.photoList.innerHTML = `<p class="empty-list-placeholder">没有照片</p>`;
+            if (itemsInAlbum.length === 0) ui.photoList.innerHTML = `<p class="empty-list-placeholder">没有照片</p>`;
         }
 
-        function openPhotoViewer(photoId, photoSet, mode = 'view') {
-            const photos = photoSet || memoryCache.album.photos.filter(p => p.albumId === state.currentAlbumId);
-            const index = photos.findIndex(p => p.id === photoId);
-            if (index === -1) return;
-            state.viewerContext = { photos, index, mode };
+        function openPhotoViewer(itemId, albumId, mode = 'view') {
+            const item = memoryCache.album.items.find(i => i.id === itemId && i.albumId === albumId);
+            if (!item) return;
+
+            let photosToShow, initialIndex, isSetViewer;
+            if (item.type === 'photoset') {
+                photosToShow = item.photos;
+                initialIndex = 0;
+                isSetViewer = true;
+            } else {
+                photosToShow = memoryCache.album.items.filter(i => i.albumId === albumId && i.type === 'photo');
+                initialIndex = photosToShow.findIndex(p => p.id === itemId);
+                isSetViewer = false;
+            }
+            if (initialIndex === -1) return;
+
+            state.viewerContext = { photos: photosToShow, index: initialIndex, mode, isSet: isSetViewer };
             ui.photoViewer.className = `viewer-mode-${mode}`;
             updatePhotoViewerContent();
             ui.photoViewer.classList.add('active');
         }
+
         function updatePhotoViewerContent() {
-            const { photos, index } = state.viewerContext;
+            const { photos, index, isSet, mode } = state.viewerContext;
             if (!photos || photos.length === 0 || index < 0) { closePhotoViewer(); return; }
             const photo = photos[index];
             const photoUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${photo.path}`;
@@ -996,15 +1100,37 @@
             ui.photoViewer.querySelector('#viewer-title').textContent = photo.title || '';
             ui.photoViewer.querySelector('#viewer-description').textContent = photo.description || '';
             ui.photoViewer.querySelector('#viewer-timestamp').textContent = new Date(photo.timestamp).toLocaleString('zh-CN');
+            
+            const prevBtn = document.getElementById('prev-photo-btn');
+            const nextBtn = document.getElementById('next-photo-btn');
+            const counter = document.getElementById('viewer-counter');
+
+            if (isSet) {
+                prevBtn.style.display = (index === 0) ? 'flex' : 'none';
+                nextBtn.style.display = (index === photos.length - 1) ? 'flex' : 'none';
+                counter.textContent = `${index + 1} / ${photos.length}`;
+                counter.style.display = 'block';
+            } else {
+                prevBtn.style.display = 'flex';
+                nextBtn.style.display = 'flex';
+                counter.style.display = 'none';
+            }
+            
+            if (mode === 'wander') {
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            }
         }
         function closePhotoViewer() { ui.photoViewer.classList.remove('active'); }
         function changePhoto(direction) {
             const { photos, index } = state.viewerContext;
             let newIndex = index + direction;
-            if (newIndex < 0) newIndex = photos.length - 1;
-            if (newIndex >= photos.length) newIndex = 0;
-            state.viewerContext.index = newIndex;
-            updatePhotoViewerContent();
+            if (newIndex < 0) newIndex = 0;
+            if (newIndex >= photos.length) newIndex = photos.length - 1;
+            if (newIndex !== index) {
+                state.viewerContext.index = newIndex;
+                updatePhotoViewerContent();
+            }
         }
 
         const actions = {
@@ -1044,14 +1170,15 @@
                 showView('note-editor-view', 'memo-section');
             },
             'open-photo': (target) => {
-                const photoId = Number(target.dataset.photoId);
+                const itemId = Number(target.dataset.itemId);
                 if (state.isPhotoManageMode) {
-                    state.photosToDelete = state.photosToDelete.includes(photoId) ? state.photosToDelete.filter(id => id !== photoId) : [...state.photosToDelete, photoId];
+                    state.photosToDelete = state.photosToDelete.includes(itemId) ? state.photosToDelete.filter(id => id !== itemId) : [...state.photosToDelete, itemId];
                     renderPhotos();
                 } else {
-                    openPhotoViewer(photoId, null, 'view');
+                    openPhotoViewer(itemId, state.currentAlbumId, 'view');
                 }
             },
+            'open-photoset': (target) => actions['open-photo'](target),
             'add-memo-folder': () => { state.folderModalContext = 'memo'; document.getElementById('folder-name-input').value = ''; ui.folderModal.classList.add('show'); },
             'add-album-folder': () => { state.folderModalContext = 'album'; document.getElementById('folder-name-input').value = ''; ui.folderModal.classList.add('show'); },
             'close-folder-modal': () => { ui.folderModal.classList.remove('show'); },
@@ -1099,14 +1226,20 @@
             },
             'delete-selected-album': async () => {
                 if (state.albumFoldersToDelete.length === 0) return;
-                if (confirm(`确定删除选中的 ${state.albumFoldersToDelete.length} 个相册及其所有照片吗？此操作会删除云端文件！`)) {
-                    const photosToDelete = memoryCache.album.photos.filter(p => state.albumFoldersToDelete.includes(p.albumId));
+                if (confirm(`确定删除选中的 ${state.albumFoldersToDelete.length} 个相册及其所有项目吗？此操作会删除云端文件！`)) {
+                    const itemsInFolders = memoryCache.album.items.filter(i => state.albumFoldersToDelete.includes(i.albumId));
+                    let photosToDelete = [];
+                    itemsInFolders.forEach(item => {
+                        if (item.type === 'photoset') photosToDelete.push(...item.photos);
+                        else photosToDelete.push(item);
+                    });
+
                     updateStatus('正在删除云端照片...');
                     const deletionPromises = photosToDelete.map(p => deleteFromGithub(p.path, `Delete photo ${p.path}`, p.sha));
                     await Promise.all(deletionPromises);
                     
                     memoryCache.album.folders = memoryCache.album.folders.filter(f => !state.albumFoldersToDelete.includes(f.id));
-                    memoryCache.album.photos = memoryCache.album.photos.filter(p => !state.albumFoldersToDelete.includes(p.albumId));
+                    memoryCache.album.items = memoryCache.album.items.filter(i => !state.albumFoldersToDelete.includes(i.albumId));
                     state.albumFoldersToDelete = [];
                     scheduleSave(); renderAlbumFolders(); updateStatus('删除完成');
                 }
@@ -1149,18 +1282,25 @@
                 renderPhotos();
             },
             'select-all-photos': () => {
-                const allIds = memoryCache.album.photos.filter(p => p.albumId === state.currentAlbumId).map(p => p.id);
+                const allIds = memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId).map(p => p.id);
                 state.photosToDelete = state.photosToDelete.length === allIds.length ? [] : allIds;
                 renderPhotos();
             },
             'delete-selected-photos': async () => {
                 if (state.photosToDelete.length === 0) return;
-                if (confirm(`确定从云端永久删除选中的 ${state.photosToDelete.length} 张照片吗？`)) {
-                    const photosToRemove = memoryCache.album.photos.filter(p => state.photosToDelete.includes(p.id));
+                if (confirm(`确定从云端永久删除选中的 ${state.photosToDelete.length} 个项目吗？`)) {
+                    const itemsToRemove = memoryCache.album.items.filter(i => state.photosToDelete.includes(i.id));
+                    let photosToDelete = [];
+                    itemsToRemove.forEach(item => {
+                        if (item.type === 'photoset') photosToDelete.push(...item.photos);
+                        else photosToDelete.push(item);
+                    });
+
                     updateStatus('正在删除...');
-                    const deletionPromises = photosToRemove.map(p => deleteFromGithub(p.path, `Delete photo ${p.path}`, p.sha));
+                    const deletionPromises = photosToDelete.map(p => deleteFromGithub(p.path, `Delete photo ${p.path}`, p.sha));
                     await Promise.all(deletionPromises);
-                    memoryCache.album.photos = memoryCache.album.photos.filter(p => !state.photosToDelete.includes(p.id));
+
+                    memoryCache.album.items = memoryCache.album.items.filter(p => !state.photosToDelete.includes(p.id));
                     state.photosToDelete = [];
                     state.isPhotoManageMode = false;
                     ui.photoManageControls.classList.remove('active');
@@ -1169,25 +1309,25 @@
                 }
             },
             'wander-global': () => {
-                let photoPool = memoryCache.album.photos;
-                if (photoPool.length > 1) {
-                    photoPool = photoPool.filter(p => p.id !== lastWanderedPhotoId);
+                let itemPool = memoryCache.album.items;
+                if (itemPool.length > 1) {
+                    itemPool = itemPool.filter(p => p.id !== lastWanderedItemId);
                 }
-                if (photoPool.length > 0) {
-                    const randomPhoto = photoPool[Math.floor(Math.random() * photoPool.length)];
-                    lastWanderedPhotoId = randomPhoto.id;
-                    openPhotoViewer(randomPhoto.id, memoryCache.album.photos, 'wander');
+                if (itemPool.length > 0) {
+                    const randomItem = itemPool[Math.floor(Math.random() * itemPool.length)];
+                    lastWanderedItemId = randomItem.id;
+                    openPhotoViewer(randomItem.id, randomItem.albumId, 'wander');
                 }
             },
             'wander-local': () => {
-                let localPhotos = memoryCache.album.photos.filter(p => p.albumId === state.currentAlbumId);
-                if (localPhotos.length > 1) {
-                    localPhotos = localPhotos.filter(p => p.id !== lastWanderedPhotoId);
+                let localItems = memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId);
+                if (localItems.length > 1) {
+                    localItems = localItems.filter(p => p.id !== lastWanderedItemId);
                 }
-                if (localPhotos.length > 0) {
-                    const randomPhoto = localPhotos[Math.floor(Math.random() * localPhotos.length)];
-                    lastWanderedPhotoId = randomPhoto.id;
-                    openPhotoViewer(randomPhoto.id, memoryCache.album.photos.filter(p => p.albumId === state.currentAlbumId), 'wander');
+                if (localItems.length > 0) {
+                    const randomItem = localItems[Math.floor(Math.random() * localItems.length)];
+                    lastWanderedItemId = randomItem.id;
+                    openPhotoViewer(randomItem.id, randomItem.albumId, 'wander');
                 }
             },
             'close-viewer': closePhotoViewer,
@@ -1198,28 +1338,77 @@
         };
         
         async function saveUploadedPhoto(skip = false) {
+            if (ui.photosetToggle.checked) {
+                await saveUploadedPhotoSet();
+                return;
+            }
             const fileData = JSON.parse(ui.photoDetailsModal.dataset.fileData);
             const file = state.photoUploadQueue.find(f => f.name === fileData.name);
             if (!file) return;
+
             const title = skip ? '' : document.getElementById('photo-title-input').value.trim();
             const description = skip ? '' : document.getElementById('photo-desc-input').value.trim();
+            
             ui.photoDetailsModal.classList.remove('show');
             updateStatus('上传照片中...');
+            
             try {
                 const content_b64 = await fileToBase64(file);
                 const fileName = `${state.currentAlbumId}-${Date.now()}.${file.name.split('.').pop()}`;
                 const path = MEMORY_PHOTOS_PATH + fileName;
                 const result = await saveToGithub(path, content_b64, `Upload photo: ${fileName}`);
                 if (!result.sha) throw new Error("Upload failed");
-                memoryCache.album.photos.push({ id: Date.now() + Math.random(), albumId: state.currentAlbumId, title, description, path, sha: result.sha, timestamp: Date.now() });
+                memoryCache.album.items.push({ type: 'photo', id: Date.now() + Math.random(), albumId: state.currentAlbumId, title, description, path, sha: result.sha, timestamp: Date.now() });
                 scheduleSave();
                 state.photoUploadQueue.shift();
                 if (state.photoUploadQueue.length > 0) { processPhotoUploadQueue(); } 
                 else { renderPhotos(); renderAlbumFolders(); }
             } catch (error) { updateStatus('上传失败', true); console.error(error); }
         }
+
+        async function saveUploadedPhotoSet() {
+            const title = document.getElementById('photo-title-input').value.trim();
+            const description = document.getElementById('photo-desc-input').value.trim();
+            ui.photoDetailsModal.classList.remove('show');
+            updateStatus(`上传照片集 (0/${state.photoUploadQueue.length})`);
+            
+            const uploadedPhotos = [];
+            let counter = 0;
+            for (const file of state.photoUploadQueue) {
+                counter++;
+                updateStatus(`上传照片集 (${counter}/${state.photoUploadQueue.length})`);
+                try {
+                    const content_b64 = await fileToBase64(file);
+                    const fileName = `${state.currentAlbumId}-${Date.now()}-${counter}.${file.name.split('.').pop()}`;
+                    const path = MEMORY_PHOTOS_PATH + fileName;
+                    const result = await saveToGithub(path, content_b64, `Upload photo for set: ${fileName}`);
+                    if (!result.sha) continue; // Skip failed uploads
+                    uploadedPhotos.push({ title, description, path, sha: result.sha, timestamp: Date.now() });
+                } catch (error) { console.error(`Failed to upload ${file.name}:`, error); }
+            }
+
+            if (uploadedPhotos.length > 0) {
+                memoryCache.album.items.push({
+                    type: 'photoset',
+                    id: Date.now() + Math.random(),
+                    albumId: state.currentAlbumId,
+                    title, description,
+                    timestamp: Date.now(),
+                    photos: uploadedPhotos
+                });
+                scheduleSave();
+            }
+            state.photoUploadQueue = [];
+            renderPhotos();
+            renderAlbumFolders();
+        }
+
         function processPhotoUploadQueue() {
             if (state.photoUploadQueue.length === 0) return;
+            const isBatch = state.photoUploadQueue.length > 1;
+            ui.photosetToggleContainer.style.display = isBatch ? 'block' : 'none';
+            ui.photosetToggle.checked = false;
+
             const file = state.photoUploadQueue[0];
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -1227,7 +1416,9 @@
                 document.getElementById('photo-title-input').value = '';
                 document.getElementById('photo-desc-input').value = '';
                 ui.photoDetailsModal.dataset.fileData = JSON.stringify({ name: file.name });
-                document.getElementById('photo-details-modal-title').textContent = `添加照片信息 (${state.photoUploadQueue.length} 待处理)`;
+                const button = ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]');
+                button.textContent = isBatch ? '保存并继续' : '保存';
+                document.getElementById('photo-details-modal-title').textContent = isBatch ? `添加照片信息 (${state.photoUploadQueue.length} 待处理)` : '添加照片信息';
                 ui.photoDetailsModal.classList.add('show');
             };
             reader.readAsDataURL(file);
@@ -1236,10 +1427,9 @@
         let viewerTouchStartX = 0;
         let viewerTouchEndX = 0;
         ui.photoViewer.querySelector('#viewer-img-container').addEventListener('touchstart', e => {
-            if (state.viewerContext.mode === 'wander') viewerTouchStartX = e.changedTouches[0].screenX;
+            viewerTouchStartX = e.changedTouches[0].screenX;
         }, { passive: true });
         ui.photoViewer.querySelector('#viewer-img-container').addEventListener('touchend', e => {
-            if (state.viewerContext.mode !== 'wander') return;
             viewerTouchEndX = e.changedTouches[0].screenX;
             const swipeDiff = viewerTouchEndX - viewerTouchStartX;
             if (Math.abs(swipeDiff) > 50) { // Swipe threshold
@@ -1269,6 +1459,13 @@
                     processPhotoUploadQueue();
                     e.target.value = '';
                 });
+                ui.photosetToggle.addEventListener('change', e => {
+                    const isSet = e.target.checked;
+                    const button = ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]');
+                    const skipBtn = ui.photoDetailsModal.querySelector('[data-action="skip-photo-details"]');
+                    button.textContent = '保存';
+                    skipBtn.style.display = isSet ? 'none' : 'inline-block';
+                });
             }
         };
     })();
@@ -1280,6 +1477,7 @@
         await loadInitialData();
         setupModals();
         MemoryApp.init();
+        initializeDragAndDrop(navContainer);
         setupBgImageManager();
         setupColorSync(colorModal.pickerD1, colorModal.hexD1, 'dayColor1'); 
         setupColorSync(colorModal.pickerD2, colorModal.hexD2, 'dayColor2');
