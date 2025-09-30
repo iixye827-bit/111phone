@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V9.9.2 "UI/UX Polish & Z-Index Fix"] */
+        /* [CSS - V9.9.3 "Wander UI & Help Content"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -173,8 +173,9 @@
         #memoryModal .header-btn { font-size: 16px; font-weight: 600; cursor: pointer; padding: 8px 12px; border-radius: 10px; transition: background-color 0.2s; border: none; background: transparent; color: inherit; z-index: 5; }
         #memoryModal .header-btn:hover { background-color: rgba(0,0,0,0.05); } body.dark-mode #memoryModal .header-btn:hover { background-color: rgba(255,255,255,0.1); }
         #memoryModal .header-btn.back-btn { font-size: 24px; padding: 5px 10px; }
-        #memoryModal .header-btn.manage-btn, #memoryModal .header-btn.wander-btn { color: var(--hold-border); }
-        #memoryModal .header-controls { display: flex; gap: 4px; }
+        #memoryModal .header-btn.manage-btn { color: var(--hold-border); }
+        #memoryModal .header-btn.wander-btn { font-size: 20px; padding: 6px; }
+        #memoryModal .header-controls { display: flex; gap: 8px; align-items:center; }
         #memoryModal .list-container { flex-grow: 1; overflow-y: auto; padding: 0 15px 80px 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; align-content: flex-start; }
         #memoryModal #hub-view-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 30px; }
         #memoryModal .hub-btn { width: 80%; max-width: 300px; padding: 40px 20px; border: none; border-radius: 20px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 24px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
@@ -257,7 +258,7 @@
         body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-selected, body.dark-mode .photo-item.manage-selected, body.dark-mode .photo-item-set.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
         /* ===== [END] MEMORY MODAL STYLES ===== */
         
-        /* ===== [START] WANDER VIEW 3.2 STYLES (PLAYER UI FIX) ===== */
+        /* ===== [START] WANDER VIEW 3.3 STYLES (Upload & UI Fix) ===== */
         #wanderViewOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 6000; background: var(--bg-day-element); color: var(--text-day); display: none; flex-direction: column; opacity: 0; transition: opacity 0.4s ease; }
         body.dark-mode #wanderViewOverlay { background: var(--bg-night-element); color: var(--text-night); }
         #wanderViewOverlay.active { display: flex; opacity: 1; }
@@ -332,9 +333,6 @@
         .music-upload-section, .music-playlist-section { border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; display: flex; flex-direction: column; gap: 15px; }
         .music-upload-section .confirm-upload-wrapper { display: flex; justify-content: center; padding-top: 5px; }
         body.dark-mode .music-upload-section, body.dark-mode .music-playlist-section { border-color: rgba(255,255,255,0.1); }
-        #musicSettingsModal .progress-container { display: none; height: 12px; background:var(--bg-day-element); border-radius: 6px; box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day); padding: 2px; margin-top: 10px; }
-        body.dark-mode #musicSettingsModal .progress-container { box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night); }
-        #musicSettingsModal .progress-bar { width: 0%; height: 100%; border-radius: 4px; background-color: var(--hold-border); transition: width 0.2s linear; }
         #music-playlist-container { max-height: 200px; overflow-y: auto; list-style: none; padding: 0; margin: 0; }
         #music-playlist-container li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 6px; }
         #music-playlist-container li:hover { background: rgba(0,0,0,0.05); } body.dark-mode #music-playlist-container li:hover { background: rgba(255,255,255,0.08); }
@@ -355,6 +353,16 @@
         #help-tab-2:checked ~ .help-content-wrapper > #help-page-2,
         #help-tab-3:checked ~ .help-content-wrapper > #help-page-3 { display: block; }
         
+        details { border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; margin-bottom: 12px; }
+        summary { cursor: pointer; padding: 12px 15px; font-weight: bold; font-size: 1.1em; list-style: none; }
+        summary::-webkit-details-marker { display: none; }
+        summary::before { content: '▶'; margin-right: 8px; display: inline-block; transition: transform 0.2s; }
+        details[open] > summary::before { transform: rotate(90deg); }
+        .details-content { padding: 0 15px 15px 15px; border-top: 1px solid rgba(128,128,128,0.2); }
+        .details-content p, .details-content ul, .details-content div { margin-top: 10px; }
+        .details-content ul { padding-left: 20px; }
+        .details-content .sub-note { font-size: 0.9em; color: #889; }
+
         .update-header-info {
             padding: 10px 15px;
             background-color: rgba(128,128,128,0.1);
@@ -452,7 +460,7 @@
 
                 <div class="segmented-control four-segments">
                     <label for="help-tab-0">首次配置</label>
-                    <label for="help-tab-1">功能详解</label>
+                    <label for="help-tab-1">功能介绍</label>
                     <label for="help-tab-2">更新公告</label>
                     <label for="help-tab-3">免责声明</label>
                     <div class="slider-indicator"></div>
@@ -466,7 +474,65 @@
                         <h4>步骤 4：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌜 按钮展开菜单 → 点击 <strong>☁️ (数据云盘)</strong> → 点击标题旁的 <strong>⚙️ (设置)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤3</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，并采用了最高效的架构。</p>
                     </div>
                     <div id="help-page-1" class="help-page-content">
-                        <h3>功能详解</h3><h4>1. 导航管理</h4><p><strong>添加新手机</strong>：长按主菜单 → 点击 📱 图标。可选择添加`外部链接`或`上传项目`。</p><p><strong>管理与删除</strong>：在“管理小手机”弹窗内，点击`进入管理模式`，即可对现有按钮进行删除。**（排序功能已移除）**</p><h4>2. 主题与个性化</h4><p><strong>实时调色</strong>：长按主菜单 → 点击 🎨 图标。可实时调整日间/夜间模式的背景渐变色，以及**日间/夜间模式下的标题卡片背景图片**。</p><p><strong>色彩预设</strong>：您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能。</p><h4>3. 文件云盘与同步状态</h4><p><strong>访问与管理</strong>：长按主菜单 → 点击 ☁️ 图标。您可以分门别类地管理与“上传项目”相关联的所有文件。建议用来存储备份文件。</p><p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p><ul><li><strong>🟢 绿点</strong>: `已同步` - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: `同步中` - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: `同步失败` - 发生错误，请点击图标查看失败原因，通常是网络问题或PAT失效。</li></ul><h4>4. 基础操作</h4><p><strong>编辑标题</strong>：直接点击页面上的主标题或副标题即可修改。</p><p><strong>访问链接与返回</strong>：对于外部链接，会在应用内全屏打开。您可以从屏幕**最左侧边缘向右滑动**来关闭当前页面并返回中心。</p><p><strong>切换主题</strong>：**单击 (短按)** 右下角的 🌞/🌜 按钮。</p><h4>5. 危险区域</h4><div class="warning"><p><strong>清空所有数据</strong>：在 `GitHub 配置` (⚙️) 弹窗的最下方。此操作会 **永久删除** 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
+                        <h3>功能介绍</h3>
+                        <details>
+                            <summary>核心操作</summary>
+                            <div class="details-content">
+                                <p><strong>编辑标题/副标题</strong>: 直接点击页面上的主标题或副标题即可修改。</p>
+                                <p><strong>切换主题</strong>: <strong>单击 (短按)</strong> 右下角的 🌞/🌜 按钮。</p>
+                                <p><strong>打开功能菜单</strong>: <strong>长按</strong> 右下角的 🌞/🌜 按钮。</p>
+                                <p><strong>访问链接与返回</strong>: 对于外部链接，会在应用内全屏打开。您可以从屏幕**最左侧边缘向右滑动**来关闭当前页面并返回中心。</p>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>📱 导航管理</summary>
+                            <div class="details-content">
+                                <p><strong>添加新手机</strong>：可选择添加`外部链接`或`上传项目`。上传的项目会直接托管在您的GitHub数据仓库中。</p>
+                                <p><strong>管理与删除</strong>：在“管理小手机”弹窗内，点击`进入管理模式`，即可对现有按钮进行删除。删除“上传项目”类型的按钮会同时删除云端文件。</p>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>🎨 主题与个性化</summary>
+                            <div class="details-content">
+                                <p><strong>实时调色</strong>：可实时调整日间/夜间模式的背景渐变色，以及标题卡片的背景图片。</p>
+                                <p class="sub-note"><em>请注意：渐变色设置的是页面背景，而按钮、卡片等元素的颜色会使用相反模式的颜色以形成对比（如日间模式下，按钮背景色取自夜间模式的颜色）。</em></p>
+                                <p><strong>色彩预设</strong>：您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能，在每次启动时随机应用一个已保存的预设。</p>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>☁️ 文件云盘</summary>
+                            <div class="details-content">
+                                <p><strong>访问与管理</strong>：您可以分门别类地管理与“上传项目”相关联的所有文件。建议用来存储备份文件。</p>
+                                <p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p>
+                                <ul><li><strong>🟢 绿点</strong>: `已同步` - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: `同步中` - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: `同步失败` - 发生错误，请点击图标查看失败原因。</li></ul>
+                            </div>
+                        </details>
+                        <details>
+                            <summary>📷 记忆功能</summary>
+                            <div class="details-content">
+                                <p>一个集成了备忘录和相册的私人空间，所有数据都安全地存储在您的GitHub私有仓库中。</p>
+                                <h4>备忘录</h4>
+                                <ul>
+                                    <li><strong>管理</strong>: 可以创建、删除文件夹，对笔记进行批量管理。</li>
+                                    <li><strong>添加</strong>: 在任意文件夹中创建新的笔记。</li>
+                                    <li><strong>置顶</strong>: 点击笔记右上角的图钉图标 📌，可将其置顶显示。</li>
+                                </ul>
+                                <h4>相册</h4>
+                                <ul>
+                                    <li><strong>管理</strong>: 创建、删除相册，并可对相册内的照片或照片集进行批量删除。</li>
+                                    <li><strong>添加</strong>: 上传单张照片或多张照片。</li>
+                                    <li><strong>照片集</strong>: 当一次性选择多张照片上传时，可以选择将它们创建为一个“照片集”，方便归类。</li>
+                                </ul>
+                                <h4>💫 漫游模式</h4>
+                                <ul>
+                                    <li><strong>全屏体验</strong>: 点击照片可进入全屏模式，再次点击退出。</li>
+                                    <li><strong>轻松切换</strong>: 在非全屏模式下，左右滑动可随机切换到下一张照片。</li>
+                                    <li><strong>音乐播放器</strong>: 底部配有音乐播放器，您可以上传自己的歌曲和歌词，在漫游时享受沉浸式体验。</li>
+                                </ul>
+                            </div>
+                        </details>
+
+                        <div class="warning"><p><strong>危险操作</strong>：在 `GitHub 配置` (⚙️) 弹窗的最下方有“清空所有数据”按钮。此操作会 **永久删除** 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
                     </div>
                     <div id="help-page-2" class="help-page-content">
                         <div class="update-header-info">
@@ -606,7 +672,7 @@
                             <button data-action="back-to-hub" class="header-btn back-btn">&#10094;</button>
                             <h1 class="title">我的相册</h1>
                             <div class="header-controls">
-                                <button data-action="wander-global" class="header-btn wander-btn">漫游</button>
+                                <button data-action="wander-global" class="header-btn wander-btn">💫</button>
                                 <button data-action="toggle-album-manage" class="header-btn manage-btn">管理</button>
                             </div>
                         </div>
@@ -622,7 +688,7 @@
                             <button data-action="back-to-album-folders" class="header-btn back-btn">&#10094;</button>
                             <h1 id="photo-grid-title" class="title">相册</h1>
                             <div class="header-controls">
-                                <button data-action="wander-local" class="header-btn wander-btn">漫游</button>
+                                <button data-action="wander-local" class="header-btn wander-btn">💫</button>
                                 <button data-action="toggle-photo-manage" class="header-btn manage-btn">管理</button>
                             </div>
                         </div>
@@ -690,7 +756,7 @@
         </div>
     </div>
 
-    <!-- Wander View 3.2 -->
+    <!-- Wander View 3.3 -->
     <div id="wanderViewOverlay">
         <div class="wander-header">
             <button class="close-btn" data-action="close-wander-view">&times;</button>
@@ -758,9 +824,6 @@
                     <div class="confirm-upload-wrapper">
                         <button id="confirm-upload-btn" class="modal-button">确认上传</button>
                     </div>
-                    <div class="progress-container" id="musicUploadProgressContainer" style="display: none;">
-                        <div id="musicUploadProgressBar" class="progress-bar"></div>
-                    </div>
                     <input type="file" id="music-file-picker" accept=".mp3" hidden>
                     <input type="file" id="lrc-file-picker" accept=".lrc" hidden>
                 </div>
@@ -790,13 +853,14 @@
     </div>
 
     <script>
-    // [JS - V9.9.2 "UI/UX Polish & Z-Index Fix"]
+    // [JS - V9.9.3 "Wander UI & Help Content"]
     const CURRENT_APP_VERSION = '2.0.0';
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
     const syncErrorModal = document.getElementById('syncErrorModal');
     const iframeModal = document.getElementById('iframeModal'), iframeModalContent = iframeModal.querySelector('.iframe-modal-content'), iframeEl = document.getElementById('iframeContent'), swipeHint = document.getElementById('swipeHint'), returnConfirmationToast = document.getElementById('returnConfirmationToast');
+    let activeUploadXHR = null; // For cancellable uploads
 
     const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按🌞打开工具栏 | By淡季水母', buttons: [], themePresets: [] });
     let currentConfig = getDefaultConfig();
@@ -816,7 +880,8 @@
             }, 3000);
             syncErrorModal.classList.remove('show');
         } else if (status === 'error') {
-            document.getElementById('sync-error-message').textContent = message;
+            const cleanMessage = String(message).replace(/<[^>]*>?/gm, ''); // Sanitize error message
+            document.getElementById('sync-error-message').textContent = cleanMessage;
             syncErrorModal.classList.add('show');
         }
     }
@@ -1050,8 +1115,8 @@
     syncModalElements.fileUploader.addEventListener("change",()=>{ if(syncModalElements.fileUploader.files.length>0){ const file = syncModalElements.fileUploader.files[0]; syncModalElements.fileNameInput.value=file.name; syncModalElements.selectedFileName.textContent = file.name; } else { syncModalElements.selectedFileName.textContent = "未选择任何文件"; }});
     async function fetchFilesForSelectedButton(){const e=syncModalElements.buttonSelector.value;if(syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="flex",!e)return void(syncModalElements.fileListStatus.textContent="请选择一个分类");if(!checkConfig(!0))return void(syncModalElements.fileListStatus.innerHTML="尚未配置GitHub信息<br>请点击标题旁 ⚙️");syncModalElements.fileListStatus.textContent="正在加载...";const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${e}`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(404===n.status)return void(syncModalElements.fileListStatus.textContent="该分类下暂无文件");if(!n.ok)throw new Error(`HTTP ${n.status}`);const o=await n.json();if(0===o.length)syncModalElements.fileListStatus.textContent="该分类下暂无文件";else{const l=await Promise.all(o.map(async e=>({...e,commitDate:await getLatestCommitDate(e.path)})));l.sort((e,t)=>new Date(t.commitDate)-new Date(e.commitDate)),syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="none",l.forEach(e=>{const t=document.createElement("li"),n=document.createElement("div");n.className="file-info",n.dataset.downloadUrl=e.download_url,n.dataset.fileName=e.name;const o=document.createElement("span");o.className="file-name",o.textContent=e.name;const l=document.createElement("span");l.className="file-timestamp",l.textContent=(new Date(e.commitDate)).toLocaleString("zh-CN",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}),n.append(o,l);const a=document.createElement("button");a.className="delete-btn",a.innerHTML="&times;",a.title="删除文件",t.append(n,a),syncModalElements.fileList.appendChild(t),n.addEventListener("click",t=>forceDownload(t.currentTarget.dataset.downloadUrl,t.currentTarget.dataset.fileName,n)),a.addEventListener("click",()=>deleteFile(e.path,e.sha,t))})}}catch(n){console.error("获取文件列表失败:",n),syncModalElements.fileListStatus.textContent="加载失败，请检查网络或配置。"}}
     async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";const o=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${e}`;try{const l=await fetch(o,{method:"DELETE",headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},body:JSON.stringify({message:`Delete file: ${e}`,sha:t,branch:"main"}),cache:"no-cache"});if(!l.ok)throw new Error(`删除失败: ${(await l.json()).message}`);n.remove(),0===syncModalElements.fileList.children.length&&(syncModalElements.fileListStatus.textContent="该分类下暂无文件",syncModalElements.fileListStatus.style.display="block")}catch(l){console.error("删除文件失败:",l),alert(`删除文件失败: ${l.message}`),n.style.opacity="1"}}async function forceDownload(e,t,n){const o=n.querySelector(".file-name").textContent;n.querySelector(".file-name").textContent="准备下载...";n.style.pointerEvents="none";try{const l=await fetch(e);if(!l.ok)throw new Error(`下载请求失败: ${l.statusText}`);const a=await l.blob(),c=document.createElement("a");c.href=window.URL.createObjectURL(a),c.download=t,document.body.appendChild(c),c.click(),c.remove(),window.URL.revokeObjectURL(c.href)}catch(l){console.error("Download error:",l),alert(`下载出错: ${l.message}`)}finally{n.querySelector(".file-name").textContent=o,n.style.pointerEvents="auto"}}
-    function uploadFileWithProgress(url, file, token, commitMessage, sha) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = (e) => { const content = e.target.result.split(',')[1]; const body = { message: commitMessage, content: content, branch: "main" }; if(sha) body.sha = sha; const xhr = new XMLHttpRequest(); xhr.open("PUT", url, true); xhr.setRequestHeader("Authorization", `token ${token}`); xhr.setRequestHeader("Content-Type", "application/json"); xhr.upload.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = (event.loaded / event.total) * 100; WanderView.updateUploadProgress(percentComplete, file.name); } }; xhr.onload = () => { if (xhr.status >= 200 && xhr.status < 301) { resolve(JSON.parse(xhr.responseText)); } else { reject(new Error(`上传失败: ${xhr.statusText} - ${xhr.responseText}`)); } }; xhr.onerror = () => reject(new Error("网络错误，上传失败。")); xhr.send(JSON.stringify(body)); }; reader.onerror = (error) => reject(error); reader.readAsDataURL(file); }); }
-    syncModalElements.uploadBtn.addEventListener("click", async () => { if (!checkConfig()) return; const category = syncModalElements.buttonSelector.value; const file = syncModalElements.fileUploader.files[0]; let fileName = syncModalElements.fileNameInput.value.trim() || (file && file.name); if (!category || !file || !fileName) { return alert("请选择分类、文件，并确保文件名不为空。"); } syncModalElements.uploadBtn.disabled = true; syncModalElements.uploadBtn.textContent = "上传中..."; syncModalElements.progressContainer.style.display = 'block'; syncModalElements.progressBar.style.width = '0%'; try { const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${category}/${fileName}`; await uploadFileWithProgress(url, file, GITHUB_CONFIG.token, `Upload ${fileName}`); syncModalElements.uploadBtn.textContent = '正在处理...'; setTimeout(() => { alert("上传成功！"); syncModalElements.fileUploader.value = ""; syncModalElements.fileNameInput.value = ""; syncModalElements.selectedFileName.textContent = '未选择任何文件'; fetchFilesForSelectedButton(); }, 200); } catch (error) { console.error("上传失败:", error); alert(`上传失败: ${error.message}`); } finally { setTimeout(() => { syncModalElements.uploadBtn.disabled = false; syncModalElements.uploadBtn.textContent = "上传文件"; syncModalElements.progressContainer.style.display = 'none'; }, 1000); } });
+    function uploadFileWithProgress({ url, file, token, commitMessage, sha, onProgress }) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = (e) => { const content = e.target.result.split(',')[1]; const body = { message: commitMessage, content: content, branch: "main" }; if(sha) body.sha = sha; activeUploadXHR = new XMLHttpRequest(); activeUploadXHR.open("PUT", url, true); activeUploadXHR.setRequestHeader("Authorization", `token ${token}`); activeUploadXHR.setRequestHeader("Content-Type", "application/json"); activeUploadXHR.upload.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = (event.loaded / event.total) * 100; onProgress(percentComplete); } }; activeUploadXHR.onload = () => { activeUploadXHR = null; if (activeUploadXHR && activeUploadXHR.status >= 200 && activeUploadXHR.status < 301) { resolve(JSON.parse(activeUploadXHR.responseText)); } else { reject(new Error(`上传失败: ${activeUploadXHR.statusText} - ${activeUploadXHR.responseText}`)); } }; activeUploadXHR.onerror = () => { activeUploadXHR = null; reject(new Error("网络错误，上传失败。")); }; activeUploadXHR.onabort = () => { activeUploadXHR = null; reject(new Error("上传已取消。")); }; activeUploadXHR.send(JSON.stringify(body)); }; reader.onerror = (error) => reject(error); reader.readAsDataURL(file); }); }
+    syncModalElements.uploadBtn.addEventListener("click", async () => { if (activeUploadXHR) { activeUploadXHR.abort(); return; } if (!checkConfig()) return; const category = syncModalElements.buttonSelector.value; const file = syncModalElements.fileUploader.files[0]; let fileName = syncModalElements.fileNameInput.value.trim() || (file && file.name); if (!category || !file || !fileName) { return alert("请选择分类、文件，并确保文件名不为空。"); } syncModalElements.uploadBtn.disabled = true; syncModalElements.uploadBtn.textContent = "上传中 (0%)..."; syncModalElements.progressContainer.style.display = 'block'; syncModalElements.progressBar.style.width = '0%'; try { const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${category}/${fileName}`; await uploadFileWithProgress({ url, file, token: GITHUB_CONFIG.token, commitMessage: `Upload ${fileName}`, onProgress: (percent) => { syncModalElements.progressBar.style.width = `${percent}%`; if (percent < 100) { syncModalElements.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; } else { syncModalElements.uploadBtn.textContent = '正在处理...'; } } }); alert("上传成功！"); syncModalElements.fileUploader.value = ""; syncModalElements.fileNameInput.value = ""; syncModalElements.selectedFileName.textContent = '未选择任何文件'; fetchFilesForSelectedButton(); } catch (error) { console.error("上传失败:", error); if (error.message !== "上传已取消。") alert(`上传失败: ${error.message}`); } finally { syncModalElements.uploadBtn.disabled = false; syncModalElements.uploadBtn.textContent = "上传文件"; syncModalElements.progressContainer.style.display = 'none'; } });
     const addNavModalElements={typeLinkRadio:document.getElementById("type-link"),typeUploadRadio:document.getElementById("type-upload"),linkSection:document.getElementById("link-section"),uploadSection:document.getElementById("upload-section"),nameInput:document.getElementById("newButtonNameInput"),urlInput:document.getElementById("newButtonUrlInput"),filePickerBtn:document.getElementById("filePickerBtn"),projectHtmlPicker:document.getElementById("projectHtmlPicker"),fileStatus:document.getElementById("file-picker-status"),createBtn:document.getElementById("createNavBtn"),uploadStatus:document.getElementById("upload-status"),stayOpenToggle:document.getElementById("stayOpenToggle")};
     function addNewButtonToDOM(text, href, save=true) { navContainer.querySelector("#loading-status")?.remove(); const btn = document.createElement("button"); btn.className = "nav-btn"; btn.dataset.href = href; const textNode = document.createTextNode(text); btn.appendChild(textNode); navContainer.appendChild(btn); attachButtonListeners(btn); if (isManagementMode) { const icon = document.createElement('span'); icon.className = 'delete-icon'; icon.innerHTML = '&times;'; icon.title = '删除此按钮'; btn.appendChild(icon); } if (save) { if(!currentConfig.buttons) currentConfig.buttons = []; currentConfig.buttons.push({text, href}); saveGlobalConfig(`Add button: ${text}`); } }
     function resetAddNavForm() { addNavModalElements.nameInput.value = ""; addNavModalElements.urlInput.value = ""; addNavModalElements.fileStatus.textContent = "未选择任何文件"; addNavModalElements.uploadStatus.textContent = ""; addNavModalElements.projectHtmlPicker.value = ""; }
@@ -1065,7 +1130,7 @@
 
     addNavModalElements.filePickerBtn.addEventListener("click", () => addNavModalElements.projectHtmlPicker.click()); addNavModalElements.projectHtmlPicker.addEventListener("change", () => { if (addNavModalElements.projectHtmlPicker.files.length > 0) { const projectFile = addNavModalElements.projectHtmlPicker.files[0]; addNavModalElements.fileStatus.textContent = `已选择: ${projectFile.name}`; } else { addNavModalElements.fileStatus.textContent = '未选择任何文件'; }});
     function fileToBase64(e){return new Promise((t,n)=>{const o=new FileReader;o.onload=()=>t(o.result.split(",")[1]),o.onerror=n,o.readAsDataURL(e)})}
-    addNavModalElements.createBtn.addEventListener("click",async()=>{const name=addNavModalElements.nameInput.value.trim();if(!name)return void alert("请输入按钮名称。");const type=document.querySelector('input[name="nav-type"]:checked').value;addNavModalElements.createBtn.disabled=!0;addNavModalElements.createBtn.textContent="处理中...";try{let newButtonData;if("link"===type){const url=addNavModalElements.urlInput.value.trim();if(!url)return void alert("请输入网址链接。");newButtonData={text:name,href:url}}else if("upload"===type){if(!checkConfig())return;const projectFile = addNavModalElements.projectHtmlPicker.files[0]; if(!projectFile)return void alert("请选择一个HTML文件。");addNavModalElements.uploadStatus.textContent="正在上传文件...";const path=name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-")||`project-${Date.now()}`;const u=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}/index.html`;await uploadFileWithProgress(u,projectFile,GITHUB_CONFIG.token,`Create project: ${name}`);addNavModalElements.uploadStatus.textContent="正在处理...";newButtonData={text:name,href:`${path}/index.html`};alert("项目上传发布成功！")} addNewButtonToDOM(newButtonData.text, newButtonData.href); resetAddNavForm(); if(!addNavModalElements.stayOpenToggle.checked) { document.getElementById("addNavModal").classList.remove("show"); } }catch(o){console.error("创建失败:",o),alert(`操作失败: ${o.message}`),addNavModalElements.uploadStatus.textContent="操作失败!"}finally{addNavModalElements.createBtn.disabled=!1,addNavModalElements.createBtn.textContent="加入新手机"}});
+    addNavModalElements.createBtn.addEventListener("click",async()=>{const name=addNavModalElements.nameInput.value.trim();if(!name)return void alert("请输入按钮名称。");const type=document.querySelector('input[name="nav-type"]:checked').value;addNavModalElements.createBtn.disabled=!0;addNavModalElements.createBtn.textContent="处理中...";try{let newButtonData;if("link"===type){const url=addNavModalElements.urlInput.value.trim();if(!url)return void alert("请输入网址链接。");newButtonData={text:name,href:url}}else if("upload"===type){if(!checkConfig())return;const projectFile = addNavModalElements.projectHtmlPicker.files[0]; if(!projectFile)return void alert("请选择一个HTML文件。");addNavModalElements.uploadStatus.textContent="正在上传文件...";const path=name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-")||`project-${Date.now()}`;const u=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}/index.html`;await uploadFileWithProgress({url: u, file: projectFile, token: GITHUB_CONFIG.token, commitMessage: `Create project: ${name}`, onProgress: (p) => { addNavModalElements.uploadStatus.textContent = `上传中: ${Math.round(p)}%`; } });addNavModalElements.uploadStatus.textContent="正在处理...";newButtonData={text:name,href:`${path}/index.html`};alert("项目上传发布成功！")} addNewButtonToDOM(newButtonData.text, newButtonData.href); resetAddNavForm(); if(!addNavModalElements.stayOpenToggle.checked) { document.getElementById("addNavModal").classList.remove("show"); } }catch(o){console.error("创建失败:",o),alert(`操作失败: ${o.message}`),addNavModalElements.uploadStatus.textContent="操作失败!"}finally{addNavModalElements.createBtn.disabled=!1,addNavModalElements.createBtn.textContent="加入新手机"}});
     
     // --- Iframe Modal and Confirmation Logic ---
     function openIframeModal(url) { if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } iframeEl.src = url; iframeModal.classList.add('active'); }
@@ -1694,7 +1759,7 @@
     })();
     // ===== [END] MEMORY APP LOGIC =====
 
-    // ===== [START] WANDER VIEW 3.2 LOGIC (PLAYER UI FIX) =====
+    // ===== [START] WANDER VIEW 3.3 LOGIC (Upload & UI Fix) =====
     const WanderView = (() => {
         const MUSIC_DATA_PATH = 'memory/music_data.json';
         const MUSIC_FILES_PATH = 'memory/music/';
@@ -1758,7 +1823,7 @@
             loopAll: '<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>',
             loopOne: '<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v3H13z"/></svg>',
             shuffle: '<svg viewBox="0 0 24 24"><path d="M10.59 9.17 5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>',
-            settings: '<svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49 1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49.42l.38-2.65c.61-.25 1.17-.59 1.69.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22-.07.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>',
+            settings: '<svg viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49 1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49.42l.38-2.65c.61-.25 1.17-.59 1.69.98l2.49 1c.23.09.49 0 .61.22l2-3.46c.12-.22-.07.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>',
             delete: '<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
             playlist: '<svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>',
         };
@@ -1887,7 +1952,13 @@
                     sm.lrcStatus.textContent = state.pendingLrcFile.name;
                 }
             });
-            sm.confirmUploadBtn.addEventListener('click', uploadPendingFiles);
+            sm.confirmUploadBtn.addEventListener('click', () => {
+                if (activeUploadXHR) {
+                    activeUploadXHR.abort();
+                } else {
+                    uploadPendingFiles();
+                }
+            });
 
             p.playPauseBtn.addEventListener('click', () => {
                 if (state.playlist.length === 0) { sm.modal.classList.add('show'); return; }
@@ -2136,6 +2207,10 @@
         async function uploadPendingFiles() {
             const sm = ui.settingsModal;
             if (!state.pendingMusicFile) { alert("请先选择一个音乐文件。"); return; }
+            if (state.pendingMusicFile.size > 70 * 1024 * 1024) { // ~70MB limit for safety with base64
+                alert(`文件过大 (${(state.pendingMusicFile.size / 1024 / 1024).toFixed(1)}MB)。由于API限制，请上传小于70MB的文件。`);
+                return;
+            }
             
             const displayName = sm.renameInput.value.trim();
             if (!displayName) { alert("请输入歌曲名称。"); return; }
@@ -2144,17 +2219,16 @@
             const finalLrcFilename = displayName + '.lrc';
 
             sm.confirmUploadBtn.disabled = true;
-            sm.confirmUploadBtn.textContent = "上传中...";
+            sm.confirmUploadBtn.textContent = "取消上传 (0%)";
 
             try {
                 const musicPath = MUSIC_FILES_PATH + finalMusicFilename;
-                const musicResult = await uploadFileWithProgress(musicPath, state.pendingMusicFile, GITHUB_CONFIG.token, `Upload music: ${finalMusicFilename}`);
-                if (!musicResult.sha) throw new Error("音乐文件上传失败。");
+                const musicResult = await uploadFileWithProgress({ url: musicPath, file: state.pendingMusicFile, token: GITHUB_CONFIG.token, commitMessage: `Upload music: ${finalMusicFilename}`, onProgress: (percent) => { if (percent < 100) { sm.confirmUploadBtn.textContent = `取消上传 (${Math.round(percent)}%)`; } else { sm.confirmUploadBtn.textContent = '正在处理...'; } } });
 
                 let lrcResult = { sha: null, path: null };
                 if (state.pendingLrcFile) {
                     const lrcPath = MUSIC_FILES_PATH + finalLrcFilename;
-                    lrcResult = await uploadFileWithProgress(lrcPath, state.pendingLrcFile, GITHUB_CONFIG.token, `Upload lyric: ${finalLrcFilename}`);
+                    lrcResult = await uploadFileWithProgress({ url: lrcPath, file: state.pendingLrcFile, token: GITHUB_CONFIG.token, commitMessage: `Upload lyric: ${finalLrcFilename}`, onProgress: () => {} });
                     if (!lrcResult.sha) alert("歌词文件上传失败，但音乐已成功上传。");
                 }
                 
@@ -2170,7 +2244,7 @@
                 resetUploadForm();
                 alert(`"${displayName}" 上传成功！`);
             } catch (e) {
-                alert("上传失败: " + e.message);
+                if (e.message !== "上传已取消。") alert("上传失败: " + e.message);
             } finally {
                 sm.confirmUploadBtn.disabled = false;
                 sm.confirmUploadBtn.textContent = "确认上传";
@@ -2208,24 +2282,6 @@
                 const isCollapsed = ui.player.container.classList.toggle('collapsed');
                 ui.player.mainContent.style.transform = isCollapsed ? `translateY(-${ui.player.container.offsetHeight - 30}px)` : 'translateY(0)';
             },
-            updateUploadProgress: (percent, filename) => {
-                const progressContainer = document.getElementById('musicUploadProgressContainer');
-                const progressBar = document.getElementById('musicUploadProgressBar');
-                const uploadBtn = ui.settingsModal.confirmUploadBtn;
-
-                if (progressContainer && progressBar) {
-                    progressContainer.style.display = 'block';
-                    progressBar.style.width = `${percent}%`;
-                }
-                uploadBtn.textContent = `上传中: ${Math.round(percent)}%`;
-
-                if (percent >= 100) {
-                    setTimeout(() => {
-                        if (progressContainer) progressContainer.style.display = 'none';
-                        uploadBtn.textContent = '确认上传';
-                    }, 1000);
-                }
-            }
         };
     })();
     // ===== [END] WANDER VIEW LOGIC =====
