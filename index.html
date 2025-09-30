@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V9.9.5 "Lyric & Icon Fix"] */
+        /* [CSS - V9.9.8 "Robustness"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -154,7 +154,8 @@
         .swipe-hint.show { opacity: 1; }
         .swipe-hint .arrow { width: 16px; height: 16px; border-right: 3px solid white; border-bottom: 3px solid white; transform: rotate(-45deg); animation: hint-pulse 1.5s infinite; margin-right: 10px; }
         @keyframes hint-pulse { 0% { opacity: 0.3; } 50% { opacity: 1; transform: rotate(-45deg) scale(1.1); } 100% { opacity: 0.3; } }
-        #gestureCaptureZone { position: fixed; top: 0; left: 0; width: 50px; height: 100%; z-index: 2002; }
+        #gestureCaptureZone { position: fixed; top: 0; left: 0; width: 50px; height: 100%; z-index: 2002; pointer-events: none; } /* BUGFIX: Set pointer-events to none */
+        #gestureCaptureZone.active { pointer-events: auto; } /* Activated by JS during swipe */
         #returnConfirmationToast { position: fixed; top: 0; left: 50%; transform: translate(-50%, -120%); width: calc(100% - 30px); max-width: 400px; background: var(--bg-night-element); color: var(--text-night); padding: 12px 16px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 2003; display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
         #returnConfirmationToast.show { transform: translate(-50%, 0); }
         .toast-btn { background: transparent; border: none; color: white; font-size: 15px; font-weight: 600; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
@@ -197,7 +198,7 @@
         #memoryModal .album-info { font-size: 12px; color: #889; }
         #memoryModal #photo-list-container { grid-template-columns: repeat(3, 1fr); gap: 15px; }
         #memoryModal .photo-item, .photo-item-set { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,0.7); cursor: pointer; transition: transform 0.2s ease; background-color: rgba(128,128,128,0.1); }
-        #memoryModal .photo-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+        #memoryModal .photo-item img, .photo-item-set img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
         .photo-item-set .photo-stack-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s ease; border: 2px solid var(--bg-day-element); }
         body.dark-mode .photo-item-set .photo-stack-img { border-color: var(--bg-night-element); }
         .photo-item-set .photo-stack-img:nth-child(1) { transform: translate(6px, 6px); z-index: 1; }
@@ -258,7 +259,12 @@
         body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-selected, body.dark-mode .photo-item.manage-selected, body.dark-mode .photo-item-set.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
         /* ===== [END] MEMORY MODAL STYLES ===== */
         
-        /* ===== [START] WANDER VIEW 3.5 STYLES (Lyric & Icon Fix) ===== */
+        /* ===== [START] WANDER VIEW 3.8 STYLES (Robustness) ===== */
+        @keyframes breathing-glow {
+            0% { box-shadow: 0 0 8px 1px var(--handle-color); }
+            50% { box-shadow: 0 0 16px 4px var(--handle-color); }
+            100% { box-shadow: 0 0 8px 1px var(--handle-color); }
+        }
         #wanderViewOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 6000; background: var(--bg-day-element); color: var(--text-day); display: none; flex-direction: column; opacity: 0; transition: opacity 0.4s ease; }
         body.dark-mode #wanderViewOverlay { background: var(--bg-night-element); color: var(--text-night); }
         #wanderViewOverlay.active { display: flex; opacity: 1; }
@@ -299,24 +305,13 @@
         #lyrics-ul { list-style: none; transition: transform 0.5s ease; padding: 0; margin: 0;}
         #lyrics-ul li { line-height: 1.5em; opacity: 0.5; transition: opacity 0.5s ease; }
         #lyrics-ul li.current-lyric { opacity: 1; font-weight: bold; }
-        .player-progress-track { position: relative; height: 16px; margin: 10px 0 0 0; cursor: pointer; }
+        .player-progress-track { position: relative; height: 16px; margin: 10px 0 0 0; cursor: pointer; --handle-color: var(--handle-color-day); }
+        body.dark-mode .player-progress-track { --handle-color: var(--handle-color-night); }
         .player-progress-bar-bg { position: absolute; top: 50%; transform: translateY(-50%); left:0; right: 0; height: 3px; background-color: rgba(128,128,128,0.2); border-radius: 1.5px; }
-        #player-progress-bar { position: absolute; top: 50%; transform: translateY(-50%); left:0; height: 3px; background-color: var(--hold-border); border-radius: 1.5px; width: 0; }
-        #player-progress-handle {
-            --handle-color: var(--handle-color-day);
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 14px;
-            height: 14px;
-            background-color: var(--handle-color);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px 2px var(--handle-color);
-            transition: box-shadow 0.3s ease;
-        }
-        body.dark-mode #player-progress-handle { --handle-color: var(--handle-color-night); }
-        #player-progress-handle:hover { box-shadow: 0 0 16px 5px var(--handle-color); }
+        #player-progress-bar { position: absolute; top: 50%; transform: translateY(-50%); left:0; height: 3px; background-color: var(--handle-color); border-radius: 1.5px; width: 0; }
+        #player-progress-handle { position: absolute; top: 50%; left: 0; width: 14px; height: 14px; transform: translate(-50%, -50%); background-color: var(--handle-color); border-radius: 50%; box-shadow: 0 0 8px 1px var(--handle-color); transition: box-shadow 0.3s ease; }
+        #player-progress-handle.playing { animation: breathing-glow 2s ease-in-out infinite; }
+        .player-progress-track:hover #player-progress-handle { box-shadow: 0 0 12px 3px var(--handle-color); }
         .player-popover { display: none; position: absolute; bottom: calc(100% + 10px); left: 15px; width: 250px; background: var(--bg-day-element); border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); padding: 10px; border: 1px solid rgba(0,0,0,0.05); z-index: 20; }
         .player-popover.active { display: block; }
         body.dark-mode .player-popover { background: var(--bg-night-element); border-color: rgba(255,255,255,0.1); }
@@ -467,11 +462,10 @@
                 </div>
                 <div class="help-content-wrapper">
                     <div id="help-page-0" class="help-page-content">
-                        <h3>从零开始 (必需)</h3><p>此流程将创建一个安全的“钥匙”(PAT)和两个云端“仓库”（一个用于代码，一个用于数据），让本应用可以为您安全地存储和同步所有数据。</p>
+                        <h3>从零开始 (必需)</h3><p>本应用的代码已托管，您无需关心。此流程仅需您创建一个安全的“钥匙”(PAT)和一个云端“私人数据仓库”，让本应用可以为您安全地存储和同步所有数据。</p>
                         <h4>步骤 1：创建 GitHub 个人访问令牌 (PAT)</h4><p>这个令牌是应用访问您私人云仓库的专属安全密码。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub Token 创建页面</a>。</li><li><strong>填写基本信息</strong>：备注(Note)填写 <code>JellyfishCenterToken</code>，有效期(Expiration)选择 <code>No expiration</code> (永不过期)。</li><li><strong>分配权限 (关键)</strong>：只需 <strong>勾选 <code>repo</code></strong> 这一项。</li><li><strong>生成并复制</strong>：滑动到页面最底部，点击 <strong><code>Generate token</code></strong> 按钮。<strong>【⚠️极其重要⚠️】</strong> GitHub 只会显示这一次完整的 Token。请 <strong>立即点击复制按钮</strong> 将其保存到安全的地方，下一步会马上用到。它应该以 <code>ghp_</code> 开头。</li></ol>
-                        <h4>步骤 2：复刻 (Fork) 应用代码仓库</h4><p>此步骤会将应用的核心代码复制一份到您的账户下，用于网站托管服务（如Netlify）进行构建。</p><ol><li><strong>访问仓库页面</strong>：在浏览器中打开 <a href="https://github.com/Yeexein/JellyfishPhones" target="_blank" rel="noopener noreferrer">https://github.com/Yeexein/JellyfishPhones</a>。</li><li><strong>执行 Fork 操作</strong>：<ul><li><strong>电脑端</strong>：在页面右上角，您会看到 `Watch`、 `Fork`、 `Star` 等按钮。点击 <strong><code>Fork</code></strong>。</li><li><strong>手机端</strong>：在页面顶部仓库名称下方，找到并点击 <strong><code>...</code> (更多选项)</strong> 菜单，然后在弹出的菜单中选择 <strong><code>Fork</code></strong>。</li></ul></li><li><strong>完成复刻</strong>：在接下来的页面中，您无需修改任何设置。直接点击 <strong><code>Create fork</code></strong> 按钮即可。</li></ol>
-                        <h4>步骤 3：创建私人数据仓库</h4><p>此步骤将创建一个独立的、完全私密的仓库，专门用来存放您的所有配置和文件。这可以避免因数据更新导致网站被频繁重新构建，是**一劳永逸的最佳实践**。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub 仓库创建页面</a>。</li><li><strong>填写仓库信息</strong>：<ul><li><strong>Repository name (仓库名称)</strong>：起一个清晰的名字，例如 <code>My-Jellyfish-Data</code>。</li><li><strong>关键：选择 <code>Private</code> (私有)</strong>。这是您的私人数据，必须设为私有。</li><li><strong>勾选 <code>Add a README file</code></strong>：确保仓库被成功初始化。</li></ul></li><li><strong>点击 <code>Create repository</code></strong> 按钮完成创建。</li></ol>
-                        <h4>步骤 4：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌜 按钮展开菜单 → 点击 <strong>☁️ (数据云盘)</strong> → 点击标题旁的 <strong>⚙️ (设置)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤3</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，并采用了最高效的架构。</p>
+                        <h4>步骤 2：创建私人数据仓库</h4><p>此步骤将创建一个独立的、完全私密的仓库，专门用来存放您的所有配置和文件。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub 仓库创建页面</a>。</li><li><strong>填写仓库信息</strong>：<ul><li><strong>Repository name (仓库名称)</strong>：起一个清晰的名字，例如 <code>My-Jellyfish-Data</code>。</li><li><strong>关键：选择 <code>Private</code> (私有)</strong>。这是您的私人数据，必须设为私有。</li><li><strong>勾选 <code>Add a README file</code></strong>：确保仓库被成功初始化。</li></ul></li><li><strong>点击 <code>Create repository</code></strong> 按钮完成创建。</li></ol>
+                        <h4>步骤 3：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌜 按钮展开菜单 → 点击 <strong>☁️ (数据云盘)</strong> → 点击标题旁的 <strong>⚙️ (设置)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤2</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，可以开始使用了！</p>
                     </div>
                     <div id="help-page-1" class="help-page-content">
                         <details>
@@ -755,7 +749,7 @@
         </div>
     </div>
 
-    <!-- Wander View 3.5 -->
+    <!-- Wander View -->
     <div id="wanderViewOverlay">
         <div class="wander-header">
             <button class="close-btn" data-action="close-wander-view">&times;</button>
@@ -852,20 +846,58 @@
     </div>
 
     <script>
-    // [JS - V9.9.5 "Lyric Scrolling & Icon Fixes"]
+    // [JS - V9.9.8 "Robustness"]
     const CURRENT_APP_VERSION = '2.0.0';
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
     const syncErrorModal = document.getElementById('syncErrorModal');
     const iframeModal = document.getElementById('iframeModal'), iframeModalContent = iframeModal.querySelector('.iframe-modal-content'), iframeEl = document.getElementById('iframeContent'), swipeHint = document.getElementById('swipeHint'), returnConfirmationToast = document.getElementById('returnConfirmationToast');
-    let activeUploadXHR = null; // For cancellable uploads
+    let activeUploadXHR = null;
+    const secureImageCache = new Map(); // BUGFIX: Cache for private images
 
     const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按🌞打开工具栏 | By淡季水母', buttons: [], themePresets: [] });
     let currentConfig = getDefaultConfig();
     
     const utf8_to_b64 = (str) => btoa(unescape(encodeURIComponent(str)));
     const b6_to_utf8 = (str) => decodeURIComponent(escape(atob(str)));
+
+    // BUGFIX: Helper to convert base64 to Blob
+    function b64toBlob(b64Data, contentType = '', sliceSize = 512) {
+        const byteCharacters = atob(b64Data);
+        const byteArrays = [];
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            const slice = byteCharacters.slice(offset, offset + sliceSize);
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+        return new Blob(byteArrays, { type: contentType });
+    }
+
+    // BUGFIX: Centralized user-friendly error handler
+    function handleApiError(error, context = '操作') {
+        let userMessage = `${context}失败，请稍后重试。`;
+        const errorMessage = error.message || String(error);
+
+        if (errorMessage.includes('401') || errorMessage.includes('403')) {
+            userMessage = `认证失败。请检查您的 Personal Access Token 是否正确且拥有 'repo' 权限。`;
+        } else if (errorMessage.includes('404')) {
+            userMessage = `操作失败：找不到对应的文件或仓库。请检查您的仓库配置是否正确。`;
+        } else if (errorMessage.includes('422')) {
+             userMessage = `操作失败：云端可能已存在同名文件或数据冲突。请刷新后重试。`;
+        } else if (errorMessage.toLowerCase().includes('failed to fetch') || errorMessage.toLowerCase().includes('networkerror')) {
+            userMessage = '网络连接失败。请检查您的网络并重试。';
+        } else if (errorMessage.includes('rate limit exceeded')) {
+            userMessage = 'API请求频率过高，请稍等片刻再试。';
+        }
+        
+        console.error(`API Error in context "${context}":`, error);
+        return userMessage;
+    }
 
     let syncStatusTimeout;
     function updateSyncStatus(status, message = '') {
@@ -879,29 +911,26 @@
             }, 3000);
             syncErrorModal.classList.remove('show');
         } else if (status === 'error') {
-            const cleanMessage = String(message).replace(/<[^>]*>?/gm, ''); // Sanitize error message
-            document.getElementById('sync-error-message').textContent = cleanMessage;
+            document.getElementById('sync-error-message').textContent = message;
             syncErrorModal.classList.add('show');
         }
     }
     
     async function fetchFromGithub(path) {
         if (!checkConfig(false)) return { data: null, sha: null, error: "GitHub未配置" };
-        updateSyncStatus('syncing', `正在从云端读取 ${path}...`);
+        updateSyncStatus('syncing', `正在从云端读取...`);
         const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
         try {
             const response = await fetch(url, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, cache: 'no-cache' });
-            if (response.status === 404) {
-                 return { data: null, sha: null, error: null };
-            }
+            if (response.status === 404) return { data: null, sha: null, error: null };
             if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
             const data = await response.json();
             updateSyncStatus('synced', '读取成功');
             return { data, sha: data.sha };
         } catch (error) {
-            console.error(`Failed to fetch ${path} from GitHub:`, error);
-            updateSyncStatus('error', `读取 ${path} 失败: ${error.message}`);
-            return { data: null, sha: null, error: error.message };
+            const userMessage = handleApiError(error, `读取 ${path}`);
+            updateSyncStatus('error', userMessage);
+            return { data: null, sha: null, error: userMessage };
         }
     }
 
@@ -921,9 +950,9 @@
             updateSyncStatus('synced', '同步成功！');
             return { sha: data.content.sha, error: null };
         } catch (error) {
-            console.error(`Failed to save ${path} to GitHub:`, error);
-            updateSyncStatus('error', `写入 ${path} 失败: ${error.message}`);
-            return { sha: null, error: error.message };
+            const userMessage = handleApiError(error, `写入 ${path}`);
+            updateSyncStatus('error', userMessage);
+            return { sha: null, error: userMessage };
         }
     }
 
@@ -943,14 +972,18 @@
             }
             return true;
         } catch (error) {
-            console.error(`Failed to delete ${path}:`, error);
-            alert(`删除文件 ${path.split('/').pop()} 失败: ${error.message}`);
+            const userMessage = handleApiError(error, `删除文件 ${path.split('/').pop()}`);
+            alert(userMessage);
             return false;
         }
     }
 
     async function fetchConfigFromGithub() {
-        const { data } = await fetchFromGithub('config.json');
+        const { data, error } = await fetchFromGithub('config.json');
+        if (error && error !== "GitHub未配置") {
+             navContainer.innerHTML = `<p id="loading-status" style="text-align: center; color: #e53e3e;">加载配置失败：${error}</p>`;
+             return getDefaultConfig();
+        }
         if (data) {
             configSha = data.sha;
             return JSON.parse(b6_to_utf8(data.content));
@@ -1007,7 +1040,7 @@
     }
 
     document.getElementById('enterManageModeBtn').addEventListener('click', () => { document.getElementById('addNavModal').classList.remove('show'); setTimeout(() => toggleManagementMode(true), 150); });
-    navContainer.addEventListener('click', async (e) => { if (!e.target.classList.contains('delete-icon')) return; const btnToDelete = e.target.closest('.nav-btn'); const buttonName = btnToDelete.firstChild.textContent.trim(); if (!confirm(`确定要删除 "${buttonName}" 吗？\n警告：如果这是上传的项目，其在GitHub上的整个文件夹都将被永久删除！`)) return; btnToDelete.style.cssText = 'transition: all 0.3s ease; transform: scale(0.8); opacity: 0;'; setTimeout(async () => { btnToDelete.remove(); const href = btnToDelete.dataset.href; const isExternalLink = href.startsWith('http'); if (!isExternalLink && href.includes('/')) { const folderPath = href.substring(0, href.lastIndexOf('/')); const success = await deleteGithubFolder(folderPath); if (!success) { alert('删除云端文件夹失败!'); location.reload(); return; } } updateButtonOrderAndSave(`Delete button: ${buttonName}`); }, 300); });
+    navContainer.addEventListener('click', async (e) => { if (!e.target.classList.contains('delete-icon')) return; const btnToDelete = e.target.closest('.nav-btn'); const buttonName = btnToDelete.firstChild.textContent.trim(); if (!confirm(`确定要删除 "${buttonName}" 吗？\n警告：如果这是上传的项目，其在GitHub上的整个文件夹都将被永久删除！`)) return; btnToDelete.style.cssText = 'transition: all 0.3s ease; transform: scale(0.8); opacity: 0;'; setTimeout(async () => { btnToDelete.remove(); const href = btnToDelete.dataset.href; const isExternalLink = href.startsWith('http'); if (!isExternalLink && href.includes('/')) { const folderPath = href.split('/').slice(4, -1).join('/'); const success = await deleteGithubFolder(folderPath); if (!success) { alert('删除云端文件夹失败!'); location.reload(); return; } } updateButtonOrderAndSave(`Delete button: ${buttonName}`); }, 300); });
     document.getElementById('title').addEventListener('click', () => { if(isManagementMode) return; const newTitle = prompt('新标题：', currentConfig.title); if (newTitle?.trim() && newTitle.trim() !== currentConfig.title) { document.getElementById('title').textContent = newTitle.trim(); currentConfig.title = newTitle.trim(); saveGlobalConfig('Update main title'); } });
     document.getElementById('subtitle').addEventListener('click', () => { if(isManagementMode) return; const newSubtitle = prompt('新描述：', currentConfig.subtitle); if (newSubtitle !== null && newSubtitle.trim() !== currentConfig.subtitle) { document.getElementById('subtitle').textContent = newSubtitle.trim(); currentConfig.subtitle = newSubtitle.trim(); saveGlobalConfig('Update subtitle'); } });
     
@@ -1112,10 +1145,32 @@
     syncModalElements.saveSettingsBtn.addEventListener("click",async()=>{const[e,t]=syncModalElements.githubRepoInput.value.trim().split("/").map(e=>e.trim()),n=syncModalElements.githubTokenInput.value.trim();if(e&&t&&n){saveGithubConfig({owner:e,repo:t,token:n,branch:"main"}),alert("配置已保存！刷新页面加载云端配置。"),document.getElementById("settingsModal").classList.remove("show"),await loadInitialData()}else{alert("请填写完整信息。")}});function populateButtonSelector(){const e=syncModalElements.buttonSelector.value;syncModalElements.buttonSelector.innerHTML="",document.querySelectorAll(".nav-btn").forEach(t=>{const n=t.firstChild.textContent.trim(),o=document.createElement("option");o.value=o.textContent=n,syncModalElements.buttonSelector.appendChild(o)}),Array.from(syncModalElements.buttonSelector.options).some(t=>t.value===e)&&(syncModalElements.buttonSelector.value=e)}
     syncModalElements.buttonSelector.addEventListener("change",fetchFilesForSelectedButton); syncModalElements.selectFileBtn.addEventListener('click', () => syncModalElements.fileUploader.click());
     syncModalElements.fileUploader.addEventListener("change",()=>{ if(syncModalElements.fileUploader.files.length>0){ const file = syncModalElements.fileUploader.files[0]; syncModalElements.fileNameInput.value=file.name; syncModalElements.selectedFileName.textContent = file.name; } else { syncModalElements.selectedFileName.textContent = "未选择任何文件"; }});
-    async function fetchFilesForSelectedButton(){const e=syncModalElements.buttonSelector.value;if(syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="flex",!e)return void(syncModalElements.fileListStatus.textContent="请选择一个分类");if(!checkConfig(!0))return void(syncModalElements.fileListStatus.innerHTML="尚未配置GitHub信息<br>请点击标题旁 ⚙️");syncModalElements.fileListStatus.textContent="正在加载...";const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${e}`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(404===n.status)return void(syncModalElements.fileListStatus.textContent="该分类下暂无文件");if(!n.ok)throw new Error(`HTTP ${n.status}`);const o=await n.json();if(0===o.length)syncModalElements.fileListStatus.textContent="该分类下暂无文件";else{const l=await Promise.all(o.map(async e=>({...e,commitDate:await getLatestCommitDate(e.path)})));l.sort((e,t)=>new Date(t.commitDate)-new Date(e.commitDate)),syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="none",l.forEach(e=>{const t=document.createElement("li"),n=document.createElement("div");n.className="file-info",n.dataset.downloadUrl=e.download_url,n.dataset.fileName=e.name;const o=document.createElement("span");o.className="file-name",o.textContent=e.name;const l=document.createElement("span");l.className="file-timestamp",l.textContent=(new Date(e.commitDate)).toLocaleString("zh-CN",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}),n.append(o,l);const a=document.createElement("button");a.className="delete-btn",a.innerHTML="&times;",a.title="删除文件",t.append(n,a),syncModalElements.fileList.appendChild(t),n.addEventListener("click",t=>forceDownload(t.currentTarget.dataset.downloadUrl,t.currentTarget.dataset.fileName,n)),a.addEventListener("click",()=>deleteFile(e.path,e.sha,t))})}}catch(n){console.error("获取文件列表失败:",n),syncModalElements.fileListStatus.textContent="加载失败，请检查网络或配置。"}}
-    async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";const o=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${e}`;try{const l=await fetch(o,{method:"DELETE",headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},body:JSON.stringify({message:`Delete file: ${e}`,sha:t,branch:"main"}),cache:"no-cache"});if(!l.ok)throw new Error(`删除失败: ${(await l.json()).message}`);n.remove(),0===syncModalElements.fileList.children.length&&(syncModalElements.fileListStatus.textContent="该分类下暂无文件",syncModalElements.fileListStatus.style.display="block")}catch(l){console.error("删除文件失败:",l),alert(`删除文件失败: ${l.message}`),n.style.opacity="1"}}async function forceDownload(e,t,n){const o=n.querySelector(".file-name").textContent;n.querySelector(".file-name").textContent="准备下载...";n.style.pointerEvents="none";try{const l=await fetch(e);if(!l.ok)throw new Error(`下载请求失败: ${l.statusText}`);const a=await l.blob(),c=document.createElement("a");c.href=window.URL.createObjectURL(a),c.download=t,document.body.appendChild(c),c.click(),c.remove(),window.URL.revokeObjectURL(c.href)}catch(l){console.error("Download error:",l),alert(`下载出错: ${l.message}`)}finally{n.querySelector(".file-name").textContent=o,n.style.pointerEvents="auto"}}
-    function uploadFileWithProgress({ url, file, token, commitMessage, sha, onProgress }) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = (e) => { const content = e.target.result.split(',')[1]; const body = { message: commitMessage, content: content, branch: "main" }; if(sha) body.sha = sha; activeUploadXHR = new XMLHttpRequest(); activeUploadXHR.open("PUT", url, true); activeUploadXHR.setRequestHeader("Authorization", `token ${token}`); activeUploadXHR.setRequestHeader("Content-Type", "application/json"); activeUploadXHR.upload.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = (event.loaded / event.total) * 100; onProgress(percentComplete); } }; activeUploadXHR.onload = () => { if (activeUploadXHR.status >= 200 && activeUploadXHR.status < 301) { resolve(JSON.parse(activeUploadXHR.responseText)); } else { reject(new Error(`上传失败: ${activeUploadXHR.statusText} - ${activeUploadXHR.responseText}`)); } activeUploadXHR = null; }; activeUploadXHR.onerror = () => { reject(new Error("网络错误，上传失败。")); activeUploadXHR = null; }; activeUploadXHR.onabort = () => { reject(new Error("上传已取消。")); activeUploadXHR = null; }; activeUploadXHR.send(JSON.stringify(body)); }; reader.onerror = (error) => reject(error); reader.readAsDataURL(file); }); }
-    syncModalElements.uploadBtn.addEventListener("click", async () => { if (activeUploadXHR) { activeUploadXHR.abort(); return; } if (!checkConfig()) return; const category = syncModalElements.buttonSelector.value; const file = syncModalElements.fileUploader.files[0]; let fileName = syncModalElements.fileNameInput.value.trim() || (file && file.name); if (!category || !file || !fileName) { return alert("请选择分类、文件，并确保文件名不为空。"); } syncModalElements.uploadBtn.disabled = true; syncModalElements.uploadBtn.textContent = "上传中 (0%)..."; syncModalElements.progressContainer.style.display = 'block'; syncModalElements.progressBar.style.width = '0%'; try { const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${category}/${fileName}`; await uploadFileWithProgress({ url, file, token: GITHUB_CONFIG.token, commitMessage: `Upload ${fileName}`, onProgress: (percent) => { syncModalElements.progressBar.style.width = `${percent}%`; if (percent < 100) { syncModalElements.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; } else { syncModalElements.uploadBtn.textContent = '正在处理...'; } } }); alert("上传成功！"); syncModalElements.fileUploader.value = ""; syncModalElements.fileNameInput.value = ""; syncModalElements.selectedFileName.textContent = '未选择任何文件'; fetchFilesForSelectedButton(); } catch (error) { console.error("上传失败:", error); if (error.message !== "上传已取消。") alert(`上传失败: ${error.message}`); } finally { syncModalElements.uploadBtn.disabled = false; syncModalElements.uploadBtn.textContent = "上传文件"; syncModalElements.progressContainer.style.display = 'none'; } });
+    async function fetchFilesForSelectedButton(){const e=syncModalElements.buttonSelector.value;if(syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="flex",!e)return void(syncModalElements.fileListStatus.textContent="请选择一个分类");if(!checkConfig(!0))return void(syncModalElements.fileListStatus.innerHTML="尚未配置GitHub信息<br>请点击标题旁 ⚙️");syncModalElements.fileListStatus.textContent="正在加载...";const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${e}`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(404===n.status)return void(syncModalElements.fileListStatus.textContent="该分类下暂无文件");if(!n.ok)throw new Error(`HTTP ${n.status}: ${n.statusText}`);const o=await n.json();if(0===o.length)syncModalElements.fileListStatus.textContent="该分类下暂无文件";else{const l=await Promise.all(o.map(async e=>({...e,commitDate:await getLatestCommitDate(e.path)})));l.sort((e,t)=>new Date(t.commitDate)-new Date(e.commitDate)),syncModalElements.fileList.innerHTML="",syncModalElements.fileListStatus.style.display="none",l.forEach(e=>{const t=document.createElement("li"),n=document.createElement("div");n.className="file-info",n.dataset.filePath=e.path,n.dataset.fileName=e.name;const o=document.createElement("span");o.className="file-name",o.textContent=e.name;const l=document.createElement("span");l.className="file-timestamp",l.textContent=(new Date(e.commitDate)).toLocaleString("zh-CN",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}),n.append(o,l);const a=document.createElement("button");a.className="delete-btn",a.innerHTML="&times;",a.title="删除文件",t.append(n,a),syncModalElements.fileList.appendChild(t),n.addEventListener("click",t=>forceDownload(t.currentTarget.dataset.filePath,t.currentTarget.dataset.fileName,n)),a.addEventListener("click",()=>deleteFile(e.path,e.sha,t))})}}catch(n){syncModalElements.fileListStatus.textContent=handleApiError(n, "获取文件列表")}}
+    async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";const o=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${e}`;try{const l=await fetch(o,{method:"DELETE",headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},body:JSON.stringify({message:`Delete file: ${e}`,sha:t,branch:"main"}),cache:"no-cache"});if(!l.ok)throw new Error(`删除失败: ${(await l.json()).message}`);n.remove(),0===syncModalElements.fileList.children.length&&(syncModalElements.fileListStatus.textContent="该分类下暂无文件",syncModalElements.fileListStatus.style.display="block")}catch(l){alert(handleApiError(l, "删除文件")),n.style.opacity="1"}}
+    async function forceDownload(path, filename, el) { // BUGFIX: Robust download
+        const originalText = el.querySelector(".file-name").textContent;
+        el.querySelector(".file-name").textContent = "准备下载...";
+        el.style.pointerEvents = "none";
+        try {
+            const result = await fetchFromGithub(path);
+            if (!result.data || !result.data.content) throw new Error("无法获取文件内容。");
+            const blob = b64toBlob(result.data.content);
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(link.href);
+        } catch (error) {
+            alert(handleApiError(error, "下载文件"));
+        } finally {
+            el.querySelector(".file-name").textContent = originalText;
+            el.style.pointerEvents = "auto";
+        }
+    }
+    function uploadFileWithProgress({ url, file, token, commitMessage, sha, onProgress }) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = (e) => { const content = e.target.result.split(',')[1]; const body = { message: commitMessage, content: content, branch: "main" }; if(sha) body.sha = sha; activeUploadXHR = new XMLHttpRequest(); activeUploadXHR.open("PUT", url, true); activeUploadXHR.setRequestHeader("Authorization", `token ${token}`); activeUploadXHR.setRequestHeader("Content-Type", "application/json"); activeUploadXHR.upload.onprogress = (event) => { if (event.lengthComputable) { const percentComplete = (event.loaded / event.total) * 100; onProgress(percentComplete); } }; activeUploadXHR.onload = () => { if (activeUploadXHR.status >= 200 && activeUploadXHR.status < 301) { resolve(JSON.parse(activeUploadXHR.responseText)); } else { reject(new Error(`${activeUploadXHR.status}: ${activeUploadXHR.statusText} - ${activeUploadXHR.responseText}`)); } activeUploadXHR = null; }; activeUploadXHR.onerror = () => { reject(new Error("网络错误，上传失败。")); activeUploadXHR = null; }; activeUploadXHR.onabort = () => { reject(new Error("上传已取消。")); activeUploadXHR = null; }; activeUploadXHR.send(JSON.stringify(body)); }; reader.onerror = (error) => reject(error); reader.readAsDataURL(file); }); }
+    syncModalElements.uploadBtn.addEventListener("click", async () => { if (activeUploadXHR) { activeUploadXHR.abort(); return; } if (!checkConfig()) return; const category = syncModalElements.buttonSelector.value; const file = syncModalElements.fileUploader.files[0]; let fileName = syncModalElements.fileNameInput.value.trim() || (file && file.name); if (!category || !file || !fileName) { return alert("请选择分类、文件，并确保文件名不为空。"); } syncModalElements.uploadBtn.disabled = true; syncModalElements.uploadBtn.textContent = "上传中 (0%)..."; syncModalElements.progressContainer.style.display = 'block'; syncModalElements.progressBar.style.width = '0%'; try { const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data_sync/${category}/${fileName}`; await uploadFileWithProgress({ url, file, token: GITHUB_CONFIG.token, commitMessage: `Upload ${fileName}`, onProgress: (percent) => { syncModalElements.progressBar.style.width = `${percent}%`; if (percent < 100) { syncModalElements.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; } else { syncModalElements.uploadBtn.textContent = '正在处理...'; } } }); alert("上传成功！"); syncModalElements.fileUploader.value = ""; syncModalElements.fileNameInput.value = ""; syncModalElements.selectedFileName.textContent = '未选择任何文件'; fetchFilesForSelectedButton(); } catch (error) { if (error.message !== "上传已取消。") alert(handleApiError(error, "上传文件")); } finally { syncModalElements.uploadBtn.disabled = false; syncModalElements.uploadBtn.textContent = "上传文件"; syncModalElements.progressContainer.style.display = 'none'; } });
     const addNavModalElements={typeLinkRadio:document.getElementById("type-link"),typeUploadRadio:document.getElementById("type-upload"),linkSection:document.getElementById("link-section"),uploadSection:document.getElementById("upload-section"),nameInput:document.getElementById("newButtonNameInput"),urlInput:document.getElementById("newButtonUrlInput"),filePickerBtn:document.getElementById("filePickerBtn"),projectHtmlPicker:document.getElementById("projectHtmlPicker"),fileStatus:document.getElementById("file-picker-status"),createBtn:document.getElementById("createNavBtn"),uploadStatus:document.getElementById("upload-status"),stayOpenToggle:document.getElementById("stayOpenToggle")};
     function addNewButtonToDOM(text, href, save=true) { navContainer.querySelector("#loading-status")?.remove(); const btn = document.createElement("button"); btn.className = "nav-btn"; btn.dataset.href = href; const textNode = document.createTextNode(text); btn.appendChild(textNode); navContainer.appendChild(btn); attachButtonListeners(btn); if (isManagementMode) { const icon = document.createElement('span'); icon.className = 'delete-icon'; icon.innerHTML = '&times;'; icon.title = '删除此按钮'; btn.appendChild(icon); } if (save) { if(!currentConfig.buttons) currentConfig.buttons = []; currentConfig.buttons.push({text, href}); saveGlobalConfig(`Add button: ${text}`); } }
     function resetAddNavForm() { addNavModalElements.nameInput.value = ""; addNavModalElements.urlInput.value = ""; addNavModalElements.fileStatus.textContent = "未选择任何文件"; addNavModalElements.uploadStatus.textContent = ""; addNavModalElements.projectHtmlPicker.value = ""; }
@@ -1129,7 +1184,7 @@
 
     addNavModalElements.filePickerBtn.addEventListener("click", () => addNavModalElements.projectHtmlPicker.click()); addNavModalElements.projectHtmlPicker.addEventListener("change", () => { if (addNavModalElements.projectHtmlPicker.files.length > 0) { const projectFile = addNavModalElements.projectHtmlPicker.files[0]; addNavModalElements.fileStatus.textContent = `已选择: ${projectFile.name}`; } else { addNavModalElements.fileStatus.textContent = '未选择任何文件'; }});
     function fileToBase64(e){return new Promise((t,n)=>{const o=new FileReader;o.onload=()=>t(o.result.split(",")[1]),o.onerror=n,o.readAsDataURL(e)})}
-    addNavModalElements.createBtn.addEventListener("click",async()=>{const name=addNavModalElements.nameInput.value.trim();if(!name)return void alert("请输入按钮名称。");const type=document.querySelector('input[name="nav-type"]:checked').value;addNavModalElements.createBtn.disabled=!0;addNavModalElements.createBtn.textContent="处理中...";try{let newButtonData;if("link"===type){const url=addNavModalElements.urlInput.value.trim();if(!url)return void alert("请输入网址链接。");newButtonData={text:name,href:url}}else if("upload"===type){if(!checkConfig())return;const projectFile = addNavModalElements.projectHtmlPicker.files[0]; if(!projectFile)return void alert("请选择一个HTML文件。");addNavModalElements.uploadStatus.textContent="正在上传文件...";const path=name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-")||`project-${Date.now()}`;const u=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}/index.html`;await uploadFileWithProgress({url: u, file: projectFile, token: GITHUB_CONFIG.token, commitMessage: `Create project: ${name}`, onProgress: (p) => { addNavModalElements.uploadStatus.textContent = `上传中: ${Math.round(p)}%`; } });addNavModalElements.uploadStatus.textContent="正在处理...";newButtonData={text:name,href:`${path}/index.html`};alert("项目上传发布成功！")} addNewButtonToDOM(newButtonData.text, newButtonData.href); resetAddNavForm(); if(!addNavModalElements.stayOpenToggle.checked) { document.getElementById("addNavModal").classList.remove("show"); } }catch(o){console.error("创建失败:",o),alert(`操作失败: ${o.message}`),addNavModalElements.uploadStatus.textContent="操作失败!"}finally{addNavModalElements.createBtn.disabled=!1,addNavModalElements.createBtn.textContent="加入新项目"}});
+    addNavModalElements.createBtn.addEventListener("click",async()=>{const name=addNavModalElements.nameInput.value.trim();if(!name)return void alert("请输入按钮名称。");const type=document.querySelector('input[name="nav-type"]:checked').value;addNavModalElements.createBtn.disabled=!0;addNavModalElements.createBtn.textContent="处理中...";try{let newButtonData;if("link"===type){const url=addNavModalElements.urlInput.value.trim();if(!url)return void alert("请输入网址链接。");newButtonData={text:name,href:url}}else if("upload"===type){if(!checkConfig())return;const projectFile = addNavModalElements.projectHtmlPicker.files[0]; if(!projectFile)return void alert("请选择一个HTML文件。");addNavModalElements.uploadStatus.textContent="正在上传文件...";const path=name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-")||`project-${Date.now()}`;const u=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}/index.html`;await uploadFileWithProgress({url: u, file: projectFile, token: GITHUB_CONFIG.token, commitMessage: `Create project: ${name}`, onProgress: (p) => { addNavModalElements.uploadStatus.textContent = `上传中: ${Math.round(p)}%`; } });addNavModalElements.uploadStatus.textContent="正在处理...";const webUrl = `https://raw.githack.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${path}/index.html`; newButtonData={text:name,href:webUrl};alert("项目上传发布成功！")} addNewButtonToDOM(newButtonData.text, newButtonData.href); resetAddNavForm(); if(!addNavModalElements.stayOpenToggle.checked) { document.getElementById("addNavModal").classList.remove("show"); } }catch(o){alert(handleApiError(o, "创建项目")),addNavModalElements.uploadStatus.textContent="操作失败!"}finally{addNavModalElements.createBtn.disabled=!1,addNavModalElements.createBtn.textContent="加入新项目"}});
     
     // --- Iframe Modal and Confirmation Logic ---
     function openIframeModal(url) { if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } iframeEl.src = url; iframeModal.classList.add('active'); }
@@ -1140,9 +1195,9 @@
     document.getElementById('cancelReturnBtn').addEventListener('click', hideReturnConfirmation);
 
     const gestureCaptureZone = document.getElementById('gestureCaptureZone'); let startX = 0, currentX = 0, isIframeDragging = false;
-    gestureCaptureZone.addEventListener('touchstart', (e) => { isIframeDragging = true; startX = e.touches[0].clientX; iframeModalContent.classList.add('dragging'); }, { passive: true });
+    gestureCaptureZone.addEventListener('touchstart', (e) => { isIframeDragging = true; startX = e.touches[0].clientX; iframeModalContent.classList.add('dragging'); gestureCaptureZone.classList.add('active'); }, { passive: true });
     window.addEventListener('touchmove', (e) => { if (!isIframeDragging || returnConfirmationToast.classList.contains('show')) return; e.preventDefault(); currentX = e.touches[0].clientX; const diffX = currentX - startX; if (diffX > 0) { iframeModalContent.style.transform = `translateX(${diffX}px)`; } }, { passive: false }); 
-    window.addEventListener('touchend', (e) => { if (!isIframeDragging) return; isIframeDragging = false; iframeModalContent.classList.remove('dragging'); iframeModalContent.style.transform = ''; const diffX = currentX - startX; const closeThreshold = window.innerWidth / 3.5; if (diffX > closeThreshold && !returnConfirmationToast.classList.contains('show')) { showReturnConfirmation(); } startX = 0; currentX = 0; });
+    window.addEventListener('touchend', (e) => { if (!isIframeDragging) return; isIframeDragging = false; iframeModalContent.classList.remove('dragging'); gestureCaptureZone.classList.remove('active'); iframeModalContent.style.transform = ''; const diffX = currentX - startX; const closeThreshold = window.innerWidth / 3.5; if (diffX > closeThreshold && !returnConfirmationToast.classList.contains('show')) { showReturnConfirmation(); } startX = 0; currentX = 0; });
 
     async function nukeAllData() {
         if (!checkConfig(true)) return;
@@ -1182,9 +1237,9 @@
             location.reload();
 
         } catch (error) {
-            console.error('Nuke operation failed:', error);
-            updateSyncStatus('error', `重置失败: ${error.message}`);
-            alert(`重置操作失败: ${error.message}`);
+            const userMessage = handleApiError(error, "重置操作");
+            updateSyncStatus('error', userMessage);
+            alert(userMessage);
         }
     }
     document.getElementById('nukeDataBtn').addEventListener('click', nukeAllData);
@@ -1317,10 +1372,11 @@
             });
             if (memoryCache.album.folders.length === 0) ui.albumList.innerHTML = `<p class="empty-list-placeholder">没有相册</p>`;
         }
-        function renderPhotos() {
+        async function renderPhotos() { // BUGFIX: Made async for secure loading
             ui.photoList.innerHTML = '';
             const itemsInAlbum = memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId).sort((a, b) => b.timestamp - a.timestamp);
-            itemsInAlbum.forEach(item => {
+            
+            for (const item of itemsInAlbum) {
                 const isSelected = state.photosToDelete.includes(item.id);
                 const el = document.createElement('div');
                 el.dataset.itemId = item.id;
@@ -1329,32 +1385,51 @@
                     el.className = `photo-item-set ${state.isPhotoManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
                     el.dataset.action = "open-item";
                     let stackHtml = '';
-                    item.photos.slice(0, 3).forEach(photo => {
-                        const photoUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${photo.path}`;
+                    for (const photo of item.photos.slice(0, 3)) {
+                        const photoUrl = await getSecureImageUrl(photo.path);
                         stackHtml += `<img src="${photoUrl}" class="photo-stack-img" loading="lazy">`;
-                    });
+                    }
                     const title = (item.title || '照片集');
                     el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}>${stackHtml}<div class="photo-title-overlay">${title}</div><div class="count-overlay">${item.photos.length} 张</div>`;
                 } else {
                     el.className = `photo-item ${state.isPhotoManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
                     el.dataset.action = "open-item";
-                    const photoUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${item.path}`;
+                    const photoUrl = await getSecureImageUrl(item.path);
                     const title = (item.title || '');
                     el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><img src="${photoUrl}" alt="${title}" loading="lazy"><div class="photo-title-overlay">${title}</div>`;
                 }
                 ui.photoList.appendChild(el);
-            });
+            }
             if (itemsInAlbum.length === 0) ui.photoList.innerHTML = `<p class="empty-list-placeholder">没有照片</p>`;
         }
+        
+        async function getSecureImageUrl(path) { // BUGFIX: Secure image loading
+            if (secureImageCache.has(path)) {
+                return secureImageCache.get(path);
+            }
+            try {
+                const result = await fetchFromGithub(path);
+                if (!result.data || !result.data.content) {
+                    throw new Error("Image content not found");
+                }
+                const blob = b64toBlob(result.data.content, result.data.type || 'image/jpeg');
+                const blobUrl = URL.createObjectURL(blob);
+                secureImageCache.set(path, blobUrl);
+                return blobUrl;
+            } catch (error) {
+                console.error(`Failed to load secure image for path: ${path}`, error);
+                return ''; // Return empty string for broken image icon
+            }
+        }
 
-        function openPhotoViewer(items, initialIndex) {
+        async function openPhotoViewer(items, initialIndex) {
             if (!items || items.length === 0) return;
             state.viewerContext = { items, index: initialIndex };
             ui.photoViewer.classList.add('active');
-            updatePhotoViewerContent();
+            await updatePhotoViewerContent();
         }
 
-        function updatePhotoViewerContent() {
+        async function updatePhotoViewerContent() {
             const { items, index } = state.viewerContext;
             if (!items || items.length === 0 || index < 0) { closePhotoViewer(); return; }
             
@@ -1377,7 +1452,7 @@
                 timestamp = photo.timestamp;
             }
 
-            const photoUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${photo.path}`;
+            const photoUrl = await getSecureImageUrl(photo.path); // BUGFIX
             ui.photoViewer.querySelector('#viewer-img').src = photoUrl;
             ui.photoViewer.querySelector('#viewer-title').textContent = title || '';
             ui.photoViewer.querySelector('#viewer-description').textContent = description || '';
@@ -1404,7 +1479,7 @@
             state.viewerContext.items.forEach(item => { if(item.type === 'photoset') delete item.internalIndex; });
             ui.photoViewer.classList.remove('active'); 
         }
-        function changePhoto(direction) {
+        async function changePhoto(direction) { // BUGFIX: Made async
             const { items, index } = state.viewerContext;
             const currentItem = items[index];
 
@@ -1414,15 +1489,15 @@
                 
                 if (newSetIndex >= 0 && newSetIndex < currentItem.photos.length) {
                     currentItem.internalIndex = newSetIndex;
-                    updatePhotoViewerContent();
+                    await updatePhotoViewerContent();
                 } else {
-                    changeItem(direction);
+                    await changeItem(direction);
                 }
             } else {
-                changeItem(direction);
+                await changeItem(direction);
             }
         }
-        function changeItem(direction) {
+        async function changeItem(direction) { // BUGFIX: Made async
             const { items, index } = state.viewerContext;
             let newIndex = index + direction;
             if (newIndex >= 0 && newIndex < items.length) {
@@ -1431,7 +1506,7 @@
                 if (newItem.type === 'photoset') {
                     newItem.internalIndex = direction > 0 ? 0 : newItem.photos.length - 1;
                 }
-                updatePhotoViewerContent();
+                await updatePhotoViewerContent();
             }
         }
 
@@ -1642,13 +1717,13 @@
                 const fileName = `${state.currentAlbumId}-${Date.now()}.${file.name.split('.').pop()}`;
                 const path = MEMORY_PHOTOS_PATH + fileName;
                 const result = await saveToGithub(path, content_b64, `Upload photo: ${fileName}`);
-                if (!result.sha) throw new Error("Upload failed");
+                if (!result.sha) throw new Error(result.error || "Upload failed");
                 memoryCache.album.items.push({ type: 'photo', id: Date.now() + Math.random(), albumId: state.currentAlbumId, title, description, path, sha: result.sha, timestamp: Date.now() });
                 scheduleSave();
                 state.photoUploadQueue.shift();
                 if (state.photoUploadQueue.length > 0) { processPhotoUploadQueue(); } 
                 else { renderPhotos(); renderAlbumFolders(); }
-            } catch (error) { updateStatus('上传失败', true, error.message); console.error(error); }
+            } catch (error) { const userMessage = handleApiError(error, "上传照片"); updateStatus(userMessage, true); console.error(error); }
         }
 
         async function saveUploadedPhotoSet() {
@@ -1758,7 +1833,7 @@
     })();
     // ===== [END] MEMORY APP LOGIC =====
 
-    // ===== [START] WANDER VIEW 3.5 LOGIC (Lyric & Icon Fix) =====
+    // ===== [START] WANDER VIEW 3.8 LOGIC (Robustness) =====
     const WanderView = (() => {
         const MUSIC_DATA_PATH = 'memory/music_data.json';
         const MUSIC_FILES_PATH = 'memory/music/';
@@ -1864,7 +1939,7 @@
             }
         }
 
-        function updateContent() {
+        async function updateContent() { // BUGFIX: Made async
             const item = state.items[state.currentIndex];
             if (!item) return;
 
@@ -1880,14 +1955,14 @@
                 description = item.description;
             }
             
-            const photoUrl = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${photo.path}`;
+            const photoUrl = await MemoryApp.getSecureImageUrl(photo.path); // BUGFIX: Use secure loader
             ui.img.src = photoUrl;
             ui.photoContainer.style.setProperty('--blur-bg', `url(${photoUrl})`);
             ui.title.textContent = title || '';
             ui.description.textContent = description || '';
         }
         
-        function changePhoto(direction) {
+        async function changePhoto(direction) { // BUGFIX: Made async
             const item = state.items[state.currentIndex];
             if (item.type === 'photoset' && !ui.photoContainer.classList.contains('fullscreen')) {
                 let nextIndex = (item.internalIndex || 0) + direction;
@@ -1899,7 +1974,7 @@
             } else {
                 changeItem(direction);
             }
-            updateContent();
+            await updateContent();
         }
 
         function changeItem(direction) {
@@ -1965,8 +2040,8 @@
                 else if (state.isPlaying) p.audio.pause(); 
                 else p.audio.play();
             });
-            p.audio.onplay = () => { state.isPlaying = true; p.playPauseBtn.innerHTML = icons.pause; p.playPauseBtn.title = "暂停"; };
-            p.audio.onpause = () => { state.isPlaying = false; p.playPauseBtn.innerHTML = icons.play; p.playPauseBtn.title = "播放"; };
+            p.audio.onplay = () => { state.isPlaying = true; p.playPauseBtn.innerHTML = icons.pause; p.playPauseBtn.title = "暂停"; p.progressHandle.classList.add('playing'); };
+            p.audio.onpause = () => { state.isPlaying = false; p.playPauseBtn.innerHTML = icons.play; p.playPauseBtn.title = "播放"; p.progressHandle.classList.remove('playing'); };
             p.audio.onloadedmetadata = () => updateProgressUI();
             p.audio.ontimeupdate = () => {
                 if (!state.isSeeking) updateProgressUI();
@@ -2039,7 +2114,9 @@
             if (index < 0 || index >= state.playlist.length) return;
             state.currentTrackIndex = index;
             const track = state.playlist[index];
-            ui.player.audio.src = `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${track.musicPath}`;
+            
+            const audioUrl = await MemoryApp.getSecureImageUrl(track.musicPath); // BUGFIX: Secure loading
+            ui.player.audio.src = audioUrl;
             
             state.lyrics = [];
             ui.player.displayArea.innerHTML = '';
@@ -2050,7 +2127,8 @@
 
             if (track.lrcPath) {
                 try {
-                    const response = await fetch(`https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${track.lrcPath}?v=${Date.now()}`);
+                    const lrcUrl = await MemoryApp.getSecureImageUrl(track.lrcPath);
+                    const response = await fetch(lrcUrl);
                     if(response.ok) {
                         const lrcText = await response.text();
                         state.lyrics = parseLRC(lrcText);
@@ -2131,7 +2209,7 @@
                 }
                 renderPlaylists();
 
-            } catch(e) { console.error("Delete failed", e); alert("删除失败: " + e.message); }
+            } catch(e) { alert(handleApiError(e, "删除歌曲")); }
         }
 
         function parseLRC(lrc) {
@@ -2213,7 +2291,7 @@
                 activeUploadXHR.setRequestHeader("Authorization", `token ${token}`);
                 activeUploadXHR.setRequestHeader("Content-Type", "application/json");
                 activeUploadXHR.upload.onprogress = (event) => { if (event.lengthComputable) onProgress((event.loaded / event.total) * 100); };
-                activeUploadXHR.onload = () => { if (activeUploadXHR.status === 201) resolve(JSON.parse(activeUploadXHR.responseText)); else reject(new Error(`Blob creation failed: ${activeUploadXHR.statusText} - ${activeUploadXHR.responseText}`)); };
+                activeUploadXHR.onload = () => { if (activeUploadXHR.status === 201) resolve(JSON.parse(activeUploadXHR.responseText)); else reject(new Error(`${activeUploadXHR.status}: ${activeUploadXHR.statusText} - ${activeUploadXHR.responseText}`)); };
                 activeUploadXHR.onerror = () => reject(new Error("Network error during blob creation."));
                 activeUploadXHR.onabort = () => reject(new Error("上传已取消。"));
                 activeUploadXHR.send(JSON.stringify({ content, encoding: "base64" }));
@@ -2263,7 +2341,7 @@
                 renderPlaylists();
                 resetUploadForm();
                 alert(`"${displayName}" 上传成功！`);
-            } catch (e) { if (e.message !== "上传已取消。") alert("上传失败: " + e.message); } 
+            } catch (e) { if (e.message !== "上传已取消。") alert(handleApiError(e, "上传歌曲")); } 
             finally { sm.confirmUploadBtn.textContent = "确认上传"; }
         }
         
