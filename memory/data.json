@@ -50,6 +50,16 @@
         "path": "memory/photos/1759150560197-1759255320203.jpeg",
         "sha": "e1c483d8dfa20843e2f3ad0c1103deccc9ac914e",
         "timestamp": 1759255322959
+      },
+      {
+        "type": "photo",
+        "id": 1759256001696.6292,
+        "albumId": 1759154069367,
+        "title": "",
+        "description": "",
+        "path": "memory/photos/1759154069367-1759255999749.jpeg",
+        "sha": "f270a14ee46dd4390cc442ad6849848c32f7e52d",
+        "timestamp": 1759256001696
       }
     ]
   }
