@@ -4,7 +4,13 @@
   "categories": [
     {
       "name": "全部",
-      "buttons": []
+      "buttons": [
+        {
+          "text": "章鱼喷墨机",
+          "href": "https://raw.githack.com/iixye827-bit/111phone/main/projects/章鱼喷墨机/index.html",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
