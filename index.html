@@ -1714,7 +1714,13 @@
                 const items = await rootContentsRes.json();
                 const folderPathsToDelete = items
                     .filter(item => item.type === 'dir' && 
+
+
+
 !['.github', 'icons'].includes(item.name)
+
+
+
 )
                     .map(dir => dir.path);
 
@@ -2830,72 +2836,51 @@
     })();
     // ===== [END] WANDER VIEW LOGIC =====
     
-    // ROBUST FILE FETCHER (V2 - 3-Tier Fallback)
+    // FILE FETCHER (V3 - Single-Path Robust)
     async function getSecureFileUrl(path) {
         if (!path) return '';
+
+        // Continue to use cache for efficiency. If URL is invalid, it will be handled by the catch block later.
         if (secureFileCache.has(path)) {
-            const cached = secureFileCache.get(path);
+            const cachedUrl = secureFileCache.get(path);
+             // A quick check to see if the blob URL is still somewhat valid. It's not perfect but can catch expired ones.
             try {
-                // Check if the blob URL is still valid
-                await fetch(cached);
-                return cached;
-            } catch (e) {
-                // Blob URL expired, remove from cache
-                URL.revokeObjectURL(cached);
-                secureFileCache.delete(path);
-            }
+                const response = await fetch(cachedUrl, { method: 'HEAD' });
+                if (response.ok) {
+                    return cachedUrl;
+                }
+            } catch (e) { /* Expired blob URL will throw error here */ }
+            // If check fails, remove from cache.
+            URL.revokeObjectURL(cachedUrl);
+            secureFileCache.delete(path);
         }
 
-        let blob;
-        const { data: contentsData, error } = await fetchFromGithub(path, 'contents');
-        if (error) { console.error(`Failed to get metadata for ${path}:`, error); return ''; }
-        if (!contentsData) { console.error(`No metadata found for ${path}`); return ''; }
+        // NEW SINGLE-PATH LOGIC:
+        try {
+            // 1. Get metadata to find the file's unique ID (SHA). This is necessary.
+            const { data: contentsData, error: contentsError } = await fetchFromGithub(path, 'contents');
+            if (contentsError || !contentsData || !contentsData.sha) {
+                throw new Error(contentsError || `Could not find metadata for ${path}.`);
+            }
 
-        // Tier 1: Try download_url (most efficient for large files)
-        if (contentsData.download_url) {
-            try {
-                const response = await fetch(contentsData.download_url, {
-                    headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }
-                });
-                if (!response.ok) throw new Error(`Download URL fetch failed: ${response.statusText}`);
-                blob = await response.blob();
-            } catch (e) {
-                console.warn(`Download URL for ${path} failed, falling back...`, e);
-                blob = null; // Ensure blob is null to trigger fallback
+            // 2. Use the file's SHA to directly request its raw content via the most reliable Git Data API.
+            const { data: blobData, error: blobError } = await fetchFromGithub(`git/blobs/${contentsData.sha}`, 'git');
+            if (blobError || !blobData || !blobData.content) {
+                throw new Error(blobError || "Git Blob API returned no content.");
             }
-        }
-        
-        // Tier 2: If download_url failed or doesn't exist, try inline content (for small files)
-        if (!blob && contentsData.content) {
-            try {
-                blob = b64toBlob(contentsData.content, 'application/octet-stream');
-            } catch(e) {
-                 console.warn(`Base64 decoding for ${path} failed, falling back...`, e);
-                 blob = null;
-            }
-        }
-
-        // Tier 3: If both above fail, use Git Data API (most reliable)
-        if (!blob && contentsData.sha) {
-            console.log(`Using Git Data API fallback for ${path}`);
-            try {
-                const { data: blobData } = await fetchFromGithub(`git/blobs/${contentsData.sha}`, 'git');
-                if (!blobData || !blobData.content) throw new Error("Git Blob API returned no content.");
-                blob = b64toBlob(blobData.content, 'application/octet-stream');
-            } catch (e) {
-                console.error(`Git Data API fallback for ${path} also failed.`, e);
-                return '';
-            }
-        }
-        
-        if (blob) {
+            
+            // 3. Convert the raw Base64 content into a usable Blob.
+            const blob = b64toBlob(blobData.content, 'application/octet-stream');
             const blobUrl = URL.createObjectURL(blob);
+            
+            // Store the new, valid URL in the cache for next time.
             secureFileCache.set(path, blobUrl);
             return blobUrl;
-        }
 
-        console.error(`All methods failed to retrieve file: ${path}`);
-        return '';
+        } catch (e) {
+            console.error(`[Robust Fetch] Failed to get secure URL for ${path}:`, e);
+            return ''; // Return empty string on any failure in the new robust path.
+        }
     }
 
     function checkAppUpdate() {
