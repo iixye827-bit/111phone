@@ -584,7 +584,7 @@
                 </div>
                 <div class="help-content-wrapper">
                     <div id="help-page-0" class="help-page-content">
-                        <h3>从零开始 (必需)</h3><p>本应用的代码已托管，您无需关心。此流程仅需您创建一个安全的“钥匙”(PAT)和一个云端“私人数据仓库”，让本应用可以为您安全地存储和同步所有数据。</p>
+                        <h3>从零开始 (必需)</h3><p>此流程仅需您创建一个安全的“钥匙”(PAT)和一个云端“私人数据仓库”，让本应用可以为您安全地存储和同步所有数据。</p>
                         <h4>步骤 1：创建 GitHub 个人访问令牌 (PAT)</h4><p>这个令牌是应用访问您私人云仓库的专属安全密码。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub Token 创建页面</a>。</li><li><strong>填写基本信息</strong>：备注(Note)填写 <code>JellyfishCenterToken</code>，有效期(Expiration)选择 <code>No expiration</code> (永不过期)。</li><li><strong>分配权限 (关键)</strong>：只需 <strong>勾选 <code>repo</code></strong> 这一项。</li><li><strong>生成并复制</strong>：滑动到页面最底部，点击 <strong><code>Generate token</code></strong> 按钮。<strong>【⚠️极其重要⚠️】</strong> GitHub 只会显示这一次完整的 Token。请 <strong>立即点击复制按钮</strong> 将其保存到安全的地方，下一步会马上用到。它应该以 <code>ghp_</code> 开头。</li></ol>
                         <h4>步骤 2：创建私人数据仓库</h4><p>此步骤将创建一个独立的、完全私密的仓库，专门用来存放您的所有配置和文件。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub 仓库创建页面</a>。</li><li><strong>填写仓库信息</strong>：<ul><li><strong>Repository name (仓库名称)</strong>：起一个清晰的名字，例如 <code>My-Jellyfish-Data</code>。</li><li><strong>关键：选择 <code>Private</code> (私有)</strong>。这是您的私人数据，必须设为私有。</li><li><strong>勾选 <code>Add a README file</code></strong>：确保仓库被成功初始化。</li></ul></li><li><strong>点击 <code>Create repository</code></strong> 按钮完成创建。</li></ol>
                         <h4>步骤 3：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌜 按钮展开菜单 → 点击 <strong>☁️ (数据云盘)</strong> → 点击标题旁的 <strong>⚙️ (设置)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤2</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，可以开始使用了！</p>
@@ -592,11 +592,14 @@
                     <div id="help-page-1" class="help-page-content">
                         <details>
                             <summary>核心操作</summary>
-                            <div class="details-content">
+                                <div class="details-content">
                                 <p><strong>编辑标题/副标题</strong>: 直接点击页面上的主标题或副标题即可修改。</p>
                                 <p><strong>切换主题</strong>: <strong>单击 (短按)</strong> 右下角的 🌞/🌜 按钮。</p>
                                 <p><strong>打开功能菜单</strong>: <strong>长按</strong> 右下角的 🌞/🌜 按钮。</p>
                                 <p><strong>访问链接与返回</strong>: 对于外部链接，默认在应用内全屏打开。您可以从屏幕**左侧中间区域向右滑动**来关闭当前页面并返回中心。您也可以在添加链接时选择“在新标签页中打开”，这样链接会直接通过系统浏览器打开。</p>
+                                <div class="important-note">
+                                    <p><strong>关于“在新标签页中打开”选项的说明：</strong><br>此选项主要用于解决部分与应用内浏览器不兼容的网站。启用此选项后，链接将通过系统默认浏览器打开。请注意，部分设备在该模式下可能无法隐藏底部工具栏，这是一个已知的系统限制，请您根据需求自行选择。</p>
+                                </div>
                             </div>
                         </details>
                         <details open>
@@ -647,16 +650,35 @@
                             <p><strong>QQ交流群:</strong> 563191005</p>
                         </div>
                         
-                        <div class="update-log-entry">
-                            <h4>v2.x.x Series Update <span class="update-date">- 2025.10.01</span></h4>
+                                               <div class="update-log-entry">
+                            <h4>v3.5.0 <span class="update-date">- 2025.10.01</span></h4>
                             <ul>
-                                <li><span class="tag new">主要功能</span> 新增**“磨砂玻璃”**全局主题，可在主题设置中与“全拟态”风格切换。</li>
-                                <li><span class="tag new">主要功能</span> 优化分类管理，加入**分页展示开关**、状态记忆及更精细的**分类删除选项**。</li>
-                                <li><span class="tag fix">核心修复</span> **彻底解决文件访问问题**：重构了文件获取逻辑，采用带活性校验的三层降级策略，确保云盘文件下载、相册照片加载和漫游模式音乐播放的长期稳定。</li>
-                                <li><span class="tag new">功能增强</span> 漫游模式音乐播放器功能完善，在音乐设置的播放列表中点击歌曲可直接进入漫游模式播放。</li>
-                                <li><span class="tag new">优化</span> 调整了应用内浏览器的返回手势触发区域，避免误触并优化了提示。</li>
-                                <li><span class="tag new">优化</span> 调整了分类按钮的UI样式，使其更简约。</li>
-                                <li><span class="tag release">版本</span> 标准化版本号迭代逻辑，并整合历史更新日志。</li>
+                                <li><span class="tag new">功能</span> 新增按钮分类功能，可创建自定义分类管理项目。</li>
+                                <li><span class="tag new">功能</span> 新增 “在新标签页中打开” 选项，用于兼容特殊外部链接。</li>
+                                <li><span class="tag new">功能</span> 新增 “磨砂半透明” 主题，提供全新视觉风格。</li>
+                                <li><span class="tag fix">修复</span> 解决了上传的本地HTML项目无法在应用内正确打开的问题。</li>
+                                <li><span class="tag fix">修复</span> 修复了在部分页面左上角返回按钮无法点击的Bug。</li>
+                                <li><span class="tag new">优化</span> 优化了应用内的错误与状态提示信息。</li>
+                                <li><span class="tag new">优化</span> 访问GitHub相关链接时，增加开启VPN的友好提示弹窗。</li>
+                            </ul>
+                        </div>
+                        <div class="update-log-entry">
+                            <h4>v2.0.0 <span class="update-date">- 2025.09.30</span></h4>
+                            <ul>
+                                <li><span class="tag new">功能</span> 极大简化了添加网址与上传文件项目的方式。</li>
+                                <li><span class="tag new">功能</span> 新增文件云盘功能，支持按分类上传和下载文件。</li>
+                                <li><span class="tag new">功能</span> 新增 “记忆” 功能模块，集成备忘录与相册。</li>
+                                <li><span class="tag new">功能</span> 相册内置 “漫游模式”，提供沉浸式看图体验。</li>
+                                <li><span class="tag new">功能</span> 支持自定义上传全局背景图片和标题卡片背景图片。</li>
+                                <li><span class="tag fix">优化</span> 优化iOS端全屏显示，左侧右滑返回时增加确认弹窗以防误触。</li>
+                            </ul>
+                        </div>
+                        <div class="update-log-entry">
+                            <h4>v1.0.0 <span class="update-date">- 2025.09.24</span></h4>
+                            <ul>
+                                <li><span class="tag release">正式发布</span> JellyfishCenter 导航正式上线。</li>
+                                <li><span class="tag new">功能</span> 新增日间/夜间模式一键切换。</li>
+                                <li><span class="tag new">功能</span> 新增自定义图标与卡片主题色功能。</li>
                             </ul>
                         </div>
                         
