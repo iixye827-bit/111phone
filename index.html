@@ -596,7 +596,7 @@
                                 <p><strong>编辑标题/副标题</strong>: 直接点击页面上的主标题或副标题即可修改。</p>
                                 <p><strong>切换主题</strong>: <strong>单击 (短按)</strong> 右下角的 🌞/🌜 按钮。</p>
                                 <p><strong>打开功能菜单</strong>: <strong>长按</strong> 右下角的 🌞/🌜 按钮。</p>
-                                <p><strong>访问链接与返回</strong>: 对于外部链接，会在应用内全屏打开。您可以从屏幕**左侧中间的一小块区域向右滑动**来关闭当前页面并返回中心。</p>
+                                <p><strong>访问链接与返回</strong>: 对于外部链接，默认在应用内全屏打开。您可以从屏幕**左侧中间区域向右滑动**来关闭当前页面并返回中心。您也可以在添加链接时选择“在新标签页中打开”，这样链接会直接通过系统浏览器打开。</p>
                             </div>
                         </details>
                         <details open>
@@ -648,28 +648,20 @@
                         </div>
                         
                         <div class="update-log-entry">
-                            <h4>v2.7.0 <span class="update-date">- 2025.10.03</span></h4>
+                            <h4>v2.x.x Series Update <span class="update-date">- 2025.10.01</span></h4>
                             <ul>
-                                <li><span class="tag new">新功能</span> 新增“磨砂玻璃”全局主题风格，可在主题设置中切换。</li>
-                                <li><span class="tag fix">修复</span> 彻底重构文件获取逻辑，采用三层降级策略，完全解决照片、云盘文件和音乐无法加载或下载的问题。</li>
-                                <li><span class="tag new">优化</span> 调整了帮助文档中的功能介绍文案，移除了版本相关的标注。</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="update-log-entry">
-                            <h4>v2.6.0 <span class="update-date">- 2025.10.02</span></h4>
-                            <ul>
-                                <li><span class="tag new">新功能</span> 优化分类管理：增加分页开关、状态记忆和更精细的分类删除选项。</li>
-                                <li><span class="tag fix">修复</span> 彻底修复因文件体积限制导致的数据云盘下载失败和音乐无法播放的问题。</li>
-                                <li><span class="tag new">新功能</span> 在音乐设置的播放列表中点击歌曲可直接进入漫游模式播放。</li>
-                                <li><span class="tag fix">修复</span> 调整了网页返回的手势触发区域，避免遮挡页面内按钮，并更新了提示。</li>
+                                <li><span class="tag new">主要功能</span> 新增**“磨砂玻璃”**全局主题，可在主题设置中与“全拟态”风格切换。</li>
+                                <li><span class="tag new">主要功能</span> 优化分类管理，加入**分页展示开关**、状态记忆及更精细的**分类删除选项**。</li>
+                                <li><span class="tag fix">核心修复</span> **彻底解决文件访问问题**：重构了文件获取逻辑，采用带活性校验的三层降级策略，确保云盘文件下载、相册照片加载和漫游模式音乐播放的长期稳定。</li>
+                                <li><span class="tag new">功能增强</span> 漫游模式音乐播放器功能完善，在音乐设置的播放列表中点击歌曲可直接进入漫游模式播放。</li>
+                                <li><span class="tag new">优化</span> 调整了应用内浏览器的返回手势触发区域，避免误触并优化了提示。</li>
                                 <li><span class="tag new">优化</span> 调整了分类按钮的UI样式，使其更简约。</li>
-                                <li><span class="tag new">优化</span> 精简了更新日志，并采用标准化的版本号迭代逻辑。</li>
+                                <li><span class="tag release">版本</span> 标准化版本号迭代逻辑，并整合历史更新日志。</li>
                             </ul>
                         </div>
                         
                         <footer class="update-footer">
-                            当前版本: v2.7.0
+                            当前版本: v2.7.1
                         </footer>
                     </div>
                     <div id="help-page-3" class="help-page-content">
@@ -680,7 +672,7 @@
         </div>
     </div>
     <div class="modal-overlay" id="syncErrorModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>⚠️ 同步失败</span></div><button class="close-btn" data-modal-id="syncErrorModal">&times;</button></div><div class="modal-body"><p>无法连接到云端。请检查您的网络连接或GitHub配置。</p><p><strong>失败原因:</strong></p><div id="sync-error-message"></div></div></div></div>
-    <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>管理项目</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入按钮管理模式</button><div class="toggle-section" style="margin-top: 10px;"><span>分页展示</span><label class="toggle-switch"><input type="checkbox" id="paginationToggle"><span class="slider"></span></label></div><div class="segmented-control two-segments"><input type="radio" id="type-link" name="nav-type" value="link" checked hidden><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload" hidden><label for="type-upload">上传项目</label><div class="slider-indicator"></div></div><div class="form-section"><label for="newButtonCategoryInput">分类名称</label><input type="text" id="newButtonCategoryInput" class="modal-input" placeholder="选择或创建分类" list="category-datalist"><datalist id="category-datalist"></datalist></div><div id="category-management-section" style="display: none;"><button id="deleteCategoryBtn" class="modal-button" style="color:#e53e3e;">删除当前分类</button></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section" class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div></div><button id="createNavBtn" class="modal-button">加入新项目</button><div class="status-text" id="upload-status"></div></div></div></div>
+    <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>管理项目</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入按钮管理模式</button><div class="toggle-section" style="margin-top: 10px;"><span>分页展示</span><label class="toggle-switch"><input type="checkbox" id="paginationToggle"><span class="slider"></span></label></div><div class="segmented-control two-segments"><input type="radio" id="type-link" name="nav-type" value="link" checked hidden><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload" hidden><label for="type-upload">上传项目</label><div class="slider-indicator"></div></div><div class="form-section"><label for="newButtonCategoryInput">分类名称</label><input type="text" id="newButtonCategoryInput" class="modal-input" placeholder="选择或创建分类" list="category-datalist"><datalist id="category-datalist"></datalist></div><div id="category-management-section" style="display: none;"><button id="deleteCategoryBtn" class="modal-button" style="color:#e53e3e;">删除当前分类</button></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section"><div class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div class="toggle-section" style="margin-top: 10px;"><span>在新标签页中打开</span><label class="toggle-switch"><input type="checkbox" id="openExternallyToggle"><span class="slider"></span></label></div></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div></div><button id="createNavBtn" class="modal-button">加入新项目</button><div class="status-text" id="upload-status"></div></div></div></div>
     <div class="modal-overlay" id="syncModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据云盘</span><button class="settings-btn" id="settingsBtn" title="设置GitHub信息">⚙️</button></div><button class="close-btn" data-modal-id="syncModal">&times;</button></div><div class="modal-body"><select id="buttonSelector" class="modal-select"></select><div class="file-upload-section"><input type="file" id="fileUploader"><div class="file-select-wrapper"><button id="selectFileBtn" class="modal-button">选择文件</button><span id="selectedFileName" class="status-text">未选择任何文件</span></div><input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）"><button id="uploadBtn" class="modal-button">上传文件</button><div id="progressContainer" class="progress-container"><div id="uploadProgressBar" class="progress-bar"></div></div></div><div id="file-list-container"><ul id="fileList"></ul><div id="fileListStatus" class="file-list-status">请选择一个分类</div></div></div></div></div>
     <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>GitHub 配置</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button><div class="nuke-section"><button id="nukeDataBtn" class="modal-button">清空所有云端及本地数据</button></div></div></div></div>
     <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body">
@@ -972,8 +964,8 @@
     </div>
 
     <script>
-    // [JS - V12.0.0 "Glass & Resilience"]
-    const CURRENT_APP_VERSION = '2.7.0';
+    // [JS - V12.1.0 "User-Choice & Polish"]
+    const CURRENT_APP_VERSION = '2.7.1';
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
@@ -1169,7 +1161,8 @@
             return true;
         } catch (error) {
             const userMessage = await handleApiError(`删除文件 ${path.split('/').pop()}`, error);
-            alert(userMessage);
+            // alert(userMessage); // Removed based on user feedback about incorrect error messages
+            console.error(userMessage); // Log it for debugging instead
             return false;
         }
     }
@@ -1230,7 +1223,40 @@
     fabMainBtn.addEventListener('touchend', e => { e.preventDefault(); fabMainBtn.dispatchEvent(new MouseEvent('mouseup')); }, { passive: false });
     
     function attachButtonListeners(btn) {
-        btn.addEventListener('click', function(e) { if (isManagementMode) { e.preventDefault(); return; } const href = this.dataset.href; if (!href) return; if (href.startsWith('http')) { e.preventDefault(); openIframeModal(href); } else { window.location.href = href; } });
+        btn.addEventListener('click', function(e) {
+            if (isManagementMode) { e.preventDefault(); return; }
+            const href = this.dataset.href;
+            if (!href) return;
+
+            // Check for GitHub domains and show VPN prompt
+            const githubDomains = ['github.com', 'raw.githack.com', 'github.io'];
+            try {
+                const url = new URL(href);
+                if (githubDomains.some(domain => url.hostname.includes(domain))) {
+                    if (!confirm("检测到 GitHub 相关链接，建议开启 VPN 以确保访问成功。\n\n点击“确定”继续访问。")) {
+                        return; // User canceled
+                    }
+                }
+            } catch (error) { /* Not a valid URL, ignore */ }
+
+            const buttonConfig = findButtonConfigByHref(href);
+            if (buttonConfig && buttonConfig.openExternally) {
+                window.open(href, '_blank', 'noopener,noreferrer');
+            } else if (href.startsWith('http')) {
+                e.preventDefault();
+                openIframeModal(href);
+            } else {
+                window.location.href = href;
+            }
+        });
+    }
+
+    function findButtonConfigByHref(href) {
+        for (const category of currentConfig.categories) {
+            const button = category.buttons.find(b => b.href === href);
+            if (button) return button;
+        }
+        return null;
     }
 
     document.getElementById('enterManageModeBtn').addEventListener('click', () => { document.getElementById('addNavModal').classList.remove('show'); setTimeout(() => toggleManagementMode(true), 150); });
@@ -1495,7 +1521,7 @@
     }
 
     syncModalElements.uploadBtn.addEventListener("click", async () => { if (activeUploadXHR) { activeUploadXHR.abort(); return; } if (!checkConfig()) return; const category = syncModalElements.buttonSelector.value; const file = syncModalElements.fileUploader.files[0]; let fileName = syncModalElements.fileNameInput.value.trim() || (file && file.name); if (!category || !file || !fileName) { return alert("请选择分类、文件，并确保文件名不为空。"); } syncModalElements.uploadBtn.disabled = true; syncModalElements.uploadBtn.textContent = "上传中 (0%)..."; syncModalElements.progressContainer.style.display = 'block'; syncModalElements.progressBar.style.width = '0%'; try { const path = `data_sync/${category}/${fileName}`; await uploadFileViaGitData({ file, path, commitMessage: `Upload ${fileName}`, onProgress: (percent) => { syncModalElements.progressBar.style.width = `${percent}%`; if (percent < 100) { syncModalElements.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; } else { syncModalElements.uploadBtn.textContent = '正在处理...'; } } }); alert("上传成功！"); syncModalElements.fileUploader.value = ""; syncModalElements.fileNameInput.value = ""; syncModalElements.selectedFileName.textContent = '未选择任何文件'; fetchFilesForSelectedButton(); } catch (error) { if (error.message !== "上传已取消。") alert(await handleApiError(`上传文件 ${fileName}`, error)); } finally { syncModalElements.uploadBtn.disabled = false; syncModalElements.uploadBtn.textContent = "上传文件"; syncModalElements.progressContainer.style.display = 'none'; } });
-    const addNavModalElements={typeLinkRadio:document.getElementById("type-link"),typeUploadRadio:document.getElementById("type-upload"),linkSection:document.getElementById("link-section"),uploadSection:document.getElementById("upload-section"),categoryInput:document.getElementById("newButtonCategoryInput"),nameInput:document.getElementById("newButtonNameInput"),urlInput:document.getElementById("newButtonUrlInput"),filePickerBtn:document.getElementById("filePickerBtn"),projectHtmlPicker:document.getElementById("projectHtmlPicker"),fileStatus:document.getElementById("file-picker-status"),createBtn:document.getElementById("createNavBtn"),uploadStatus:document.getElementById("upload-status"),stayOpenToggle:document.getElementById("stayOpenToggle"), paginationToggle: document.getElementById('paginationToggle'), categoryMgmtSection: document.getElementById('category-management-section'), deleteCategoryBtn: document.getElementById('deleteCategoryBtn')};
+    const addNavModalElements={typeLinkRadio:document.getElementById("type-link"),typeUploadRadio:document.getElementById("type-upload"),linkSection:document.getElementById("link-section"),uploadSection:document.getElementById("upload-section"),categoryInput:document.getElementById("newButtonCategoryInput"),nameInput:document.getElementById("newButtonNameInput"),urlInput:document.getElementById("newButtonUrlInput"),openExternallyToggle:document.getElementById("openExternallyToggle"),filePickerBtn:document.getElementById("filePickerBtn"),projectHtmlPicker:document.getElementById("projectHtmlPicker"),fileStatus:document.getElementById("file-picker-status"),createBtn:document.getElementById("createNavBtn"),uploadStatus:document.getElementById("upload-status"),stayOpenToggle:document.getElementById("stayOpenToggle"), paginationToggle: document.getElementById('paginationToggle'), categoryMgmtSection: document.getElementById('category-management-section'), deleteCategoryBtn: document.getElementById('deleteCategoryBtn')};
     
     function updateAddNavModalUI() {
         addNavModalElements.paginationToggle.checked = currentConfig.settings.paginationEnabled;
@@ -1565,24 +1591,8 @@
             icon.title = '删除此按钮'; 
             btn.appendChild(icon); 
         } 
-        if (save) { 
-            const categoryName = addNavModalElements.categoryInput.value.trim() || '全部';
-            let categoryObj = currentConfig.categories.find(c => c.name === categoryName);
-            if (!categoryObj) {
-                categoryObj = { name: categoryName, buttons: [] };
-                currentConfig.categories.push(categoryObj);
-            }
-            categoryObj.buttons.push({ text, href });
-            
-            const allCategory = currentConfig.categories.find(c => c.name === '全部');
-            if (allCategory && !allCategory.buttons.some(b => b.href === href)) {
-                 allCategory.buttons.push({ text, href });
-            }
-
-            saveGlobalConfig(`Add button: ${text} to ${categoryName}`); 
-        } 
     }
-    function resetAddNavForm() { addNavModalElements.nameInput.value = ""; addNavModalElements.urlInput.value = ""; addNavModalElements.fileStatus.textContent = "未选择任何文件"; addNavModalElements.uploadStatus.textContent = ""; addNavModalElements.projectHtmlPicker.value = ""; }
+    function resetAddNavForm() { addNavModalElements.nameInput.value = ""; addNavModalElements.urlInput.value = ""; addNavModalElements.openExternallyToggle.checked = false; addNavModalElements.fileStatus.textContent = "未选择任何文件"; addNavModalElements.uploadStatus.textContent = ""; addNavModalElements.projectHtmlPicker.value = ""; }
     
     function populateCategoryDatalist() {
         const datalist = document.getElementById('category-datalist');
@@ -1596,7 +1606,7 @@
 
     document.querySelectorAll('input[name="nav-type"]').forEach(radio => {
         radio.addEventListener('change', function() {
-            addNavModalElements.linkSection.style.display = this.value === 'link' ? 'flex' : 'none';
+            addNavModalElements.linkSection.style.display = this.value === 'link' ? 'block' : 'none';
             addNavModalElements.uploadSection.style.display = this.value === 'upload' ? 'flex' : 'none';
         });
     });
@@ -1614,7 +1624,7 @@
             if("link"===type){
                 const url=addNavModalElements.urlInput.value.trim();
                 if(!url)return void alert("请输入网址链接。");
-                newButtonData={text:name,href:url}
+                newButtonData = { text: name, href: url, openExternally: addNavModalElements.openExternallyToggle.checked };
             } else if("upload"===type){
                 if(!checkConfig())return;
                 const projectFile = addNavModalElements.projectHtmlPicker.files[0]; 
@@ -1624,10 +1634,20 @@
                 await uploadFileViaGitData({ file: projectFile, path, commitMessage: `Create project: ${name}`, onProgress: (p) => { addNavModalElements.uploadStatus.textContent = `上传中: ${Math.round(p)}%`; } });
                 addNavModalElements.uploadStatus.textContent="正在处理...";
                 const webUrl = `https://raw.githack.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${path}`; 
-                newButtonData={text:name,href:webUrl};
+                newButtonData={text:name,href:webUrl, openExternally: false }; // Uploaded projects should always open in iframe
                 alert("项目上传发布成功！")
             } 
-            addNewButtonToDOM(newButtonData.text, newButtonData.href); 
+            
+            // Save to config
+            let categoryObj = currentConfig.categories.find(c => c.name === categoryName);
+            if (!categoryObj) {
+                categoryObj = { name: categoryName, buttons: [] };
+                currentConfig.categories.push(categoryObj);
+            }
+            categoryObj.buttons.push(newButtonData);
+            await saveGlobalConfig(`Add button: ${name} to ${categoryName}`); 
+
+            addNewButtonToDOM(newButtonData.text, newButtonData.href, false); // Add to DOM, don't save again
             resetAddNavForm(); 
             renderCategories();
             populateCategoryDatalist();
@@ -1715,11 +1735,7 @@
                 const folderPathsToDelete = items
                     .filter(item => item.type === 'dir' && 
 
-
-
 !['.github', 'icons'].includes(item.name)
-
-
 
 )
                     .map(dir => dir.path);
@@ -2836,51 +2852,76 @@
     })();
     // ===== [END] WANDER VIEW LOGIC =====
     
-    // FILE FETCHER (V3 - Single-Path Robust)
+    // ROBUST FILE FETCHER (V2.1 - Liveness Check)
     async function getSecureFileUrl(path) {
         if (!path) return '';
-
-        // Continue to use cache for efficiency. If URL is invalid, it will be handled by the catch block later.
         if (secureFileCache.has(path)) {
             const cachedUrl = secureFileCache.get(path);
-             // A quick check to see if the blob URL is still somewhat valid. It's not perfect but can catch expired ones.
             try {
+                // Perform a quick HEAD request to check if the blob URL is still valid
                 const response = await fetch(cachedUrl, { method: 'HEAD' });
                 if (response.ok) {
-                    return cachedUrl;
+                    return cachedUrl; // It's alive!
                 }
-            } catch (e) { /* Expired blob URL will throw error here */ }
-            // If check fails, remove from cache.
+                // If not ok, it might have expired.
+            } catch (e) {
+                // Fetch failed, likely expired or network issue.
+            }
+            // If the check fails for any reason, revoke and delete from cache.
             URL.revokeObjectURL(cachedUrl);
             secureFileCache.delete(path);
         }
 
-        // NEW SINGLE-PATH LOGIC:
-        try {
-            // 1. Get metadata to find the file's unique ID (SHA). This is necessary.
-            const { data: contentsData, error: contentsError } = await fetchFromGithub(path, 'contents');
-            if (contentsError || !contentsData || !contentsData.sha) {
-                throw new Error(contentsError || `Could not find metadata for ${path}.`);
-            }
+        let blob;
+        const { data: contentsData, error } = await fetchFromGithub(path, 'contents');
+        if (error) { console.error(`Failed to get metadata for ${path}:`, error); return ''; }
+        if (!contentsData) { console.error(`No metadata found for ${path}`); return ''; }
 
-            // 2. Use the file's SHA to directly request its raw content via the most reliable Git Data API.
-            const { data: blobData, error: blobError } = await fetchFromGithub(`git/blobs/${contentsData.sha}`, 'git');
-            if (blobError || !blobData || !blobData.content) {
-                throw new Error(blobError || "Git Blob API returned no content.");
+        // Tier 1: Try download_url (most efficient for large files)
+        if (contentsData.download_url) {
+            try {
+                const response = await fetch(contentsData.download_url, {
+                    headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }
+                });
+                if (!response.ok) throw new Error(`Download URL fetch failed: ${response.statusText}`);
+                blob = await response.blob();
+            } catch (e) {
+                console.warn(`Download URL for ${path} failed, falling back...`, e);
+                blob = null; // Ensure blob is null to trigger fallback
             }
-            
-            // 3. Convert the raw Base64 content into a usable Blob.
-            const blob = b64toBlob(blobData.content, 'application/octet-stream');
+        }
+        
+        // Tier 2: If download_url failed or doesn't exist, try inline content (for small files)
+        if (!blob && contentsData.content) {
+            try {
+                blob = b64toBlob(contentsData.content, 'application/octet-stream');
+            } catch(e) {
+                 console.warn(`Base64 decoding for ${path} failed, falling back...`, e);
+                 blob = null;
+            }
+        }
+
+        // Tier 3: If both above fail, use Git Data API (most reliable)
+        if (!blob && contentsData.sha) {
+            console.log(`Using Git Data API fallback for ${path}`);
+            try {
+                const { data: blobData } = await fetchFromGithub(`git/blobs/${contentsData.sha}`, 'git');
+                if (!blobData || !blobData.content) throw new Error("Git Blob API returned no content.");
+                blob = b64toBlob(blobData.content, 'application/octet-stream');
+            } catch (e) {
+                console.error(`Git Data API fallback for ${path} also failed.`, e);
+                return '';
+            }
+        }
+        
+        if (blob) {
             const blobUrl = URL.createObjectURL(blob);
-            
-            // Store the new, valid URL in the cache for next time.
             secureFileCache.set(path, blobUrl);
             return blobUrl;
-
-        } catch (e) {
-            console.error(`[Robust Fetch] Failed to get secure URL for ${path}:`, e);
-            return ''; // Return empty string on any failure in the new robust path.
         }
+
+        console.error(`All methods failed to retrieve file: ${path}`);
+        return '';
     }
 
     function checkAppUpdate() {
