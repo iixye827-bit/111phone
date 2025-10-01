@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水母论坛 - 手机版</title>
+    <!-- 引入一个轻量级CSS框架作为基础 -->
+    <link rel="stylesheet" href="https://unpkg.com/sakura.css/css/sakura.css" type="text/css">
+    <!-- 引入 Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- 所有自定义样式集中在此 -->
+    <style>
+        /* === 全局与布局 === */
+        :root {
+            --primary-color: #7b4397; /* 主题色 */
+            --light-primary-color: #f0eaf6;
+            --border-color: #ddd;
+            --tooltip-bg: #333;
+            --tooltip-text: #fff;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            padding-bottom: 70px;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .page-section { display: none; padding: 15px; animation: fadeIn 0.5s ease; }
+        .page-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; font-size: 1.8em; }
+        
+        /* === 底部固定导航栏 === */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background-color: #ffffff; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 5px rgba(0,0,0,0.05); z-index: 1000; }
+        .nav-item { cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #888; text-decoration: none; flex: 1; height: 100%; transition: color 0.2s ease; }
+        .nav-item .icon { font-size: 24px; }
+        .nav-item .label { font-size: 12px; margin-top: 2px; }
+        .nav-item.active { color: var(--primary-color); }
+        
+        /* === 论坛页面 === */
+        .forum-tabs { display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
+        .tab-btn { padding: 10px 20px; border: none; background: none; cursor: pointer; font-size: 1em; color: #888; border-bottom: 3px solid transparent; transition: color 0.2s, border-bottom 0.2s; }
+        .tab-btn.active { color: var(--primary-color); border-bottom: 3px solid var(--primary-color); }
+        .forum-content { display: none; }
+        .forum-content.active { display: block; }
+        
+        .post-card { border: 1px solid #e1e1e1; padding: 15px; margin-bottom: 15px; border-radius: 8px; background-color: #fff; }
+        .post-meta { font-size: 0.8em; color: #555; margin-bottom: 10px; }
+        .post-tags span { background-color: var(--light-primary-color); color: var(--primary-color); padding: 3px 10px; border-radius: 12px; font-size: 0.75em; margin-right: 5px; display: inline-block; margin-top: 5px; }
+        .post-actions { margin-top: 15px; display: flex; align-items: center; gap: 20px; font-size: 0.9em; }
+        .ai-icon-btn { background: none; border: none; font-size: 1.5em; cursor: pointer; padding: 0 5px; color: var(--primary-color); }
+        .report-btn { color: #aaa; font-size: 0.8em; cursor: pointer; text-decoration: none; margin-left: auto; }
+        .report-btn:hover { color: #d9534f; }
+
+        /* AI 评论模拟区 */
+        .ai-comment-block { margin-top: 20px; border-top: 1px dashed var(--border-color); padding-top: 15px; }
+        .ai-comment { background-color: #f7f7f7; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 0.9em; }
+        .ai-comment strong { color: var(--primary-color); }
+
+        /* === 记录页面 === (无改动) */
+        .timeline { position: relative; margin: 20px 0; padding-left: 25px; border-left: 2px solid var(--border-color); }
+        .timeline-item { position: relative; margin-bottom: 30px; }
+        .timeline-item::before { content: ''; position: absolute; left: -34px; top: 5px; width: 15px; height: 15px; border-radius: 50%; background-color: var(--primary-color); border: 2px solid white; }
+        .timeline-date { font-weight: bold; color: #555; margin-bottom: 5px; }
+        .timeline-content { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
+        .timeline-content h4 { margin-top: 0; }
+
+        /* === 个人主页 === */
+        .profile-header { text-align: center; margin-bottom: 30px; }
+        .avatar-label { cursor: pointer; display: inline-block; } /* 使头像可点击 */
+        .avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color); margin-bottom: 10px; }
+        #avatar-upload { display: none; } /* 隐藏原生文件上传按钮 */
+
+        .settings-section { border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; margin-top: 20px; background-color: #fff; }
+        .settings-section h3 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; flex-wrap: wrap; }
+        .setting-item label { font-weight: normal; margin-right: 15px; flex-shrink: 0; }
+        
+        /* AI 人设多选样式 */
+        .personality-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+        .personality-item { display: flex; align-items: center; position: relative; } /* 为 tooltip 定位 */
+        .personality-item input { margin-right: 8px; }
+        .delete-personality-btn { cursor: pointer; color: #d9534f; margin-left: auto; padding: 0 5px; font-weight: bold; }
+
+        /* Tooltip 样式 */
+        .tooltip { visibility: hidden; width: 160px; background-color: var(--tooltip-bg); color: var(--tooltip-text); text-align: center; border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -80px; opacity: 0; transition: opacity 0.3s; }
+        .tooltip::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: var(--tooltip-bg) transparent transparent transparent; }
+        .personality-item:hover .tooltip { visibility: visible; opacity: 1; }
+
+        .custom-ai-form { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .custom-ai-form input, .custom-ai-form textarea { width: 100%; }
+        
+        /* API 预设样式 */
+        .api-preset-manager { display: flex; flex-direction: column; gap: 10px; }
+        .api-preset-controls { display: flex; gap: 10px; flex-wrap: wrap; }
+        .api-preset-controls select, .api-preset-controls button { flex-grow: 1; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <!-- 1. 论坛页面 -->
+        <section id="forum-page" class="page-section active">
+            <h2>论坛</h2>
+            <div class="forum-tabs">
+                <button class="tab-btn active" data-tab="public">公共论坛</button>
+                <button class="tab-btn" data-tab="private">私人论坛</button>
+            </div>
+
+            <div id="public-forum" class="forum-content active">
+                <div class="post-card">
+                    <h3>关于水母的一些冷知识</h3>
+                    <div class="post-meta">作者: <strong>海洋学家</strong></div>
+                    <p>水母其实没有大脑，它们的行为由一个简单的神经网络控制...</p>
+                    <div class="post-tags"><span>科普</span><span>海洋生物</span></div>
+                    <div class="post-actions">
+                        <span>👍 88</span> <span>💬 12</span> <span>⭐ 收藏</span>
+                        <button class="ai-icon-btn" title="呼叫AI评论团"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                        <a href="#" class="report-btn">举报</a>
+                    </div>
+                    <div class="ai-comment-block"></div>
+                </div>
+            </div>
+
+            <div id="private-forum" class="forum-content">
+                <div class="post-card">
+                    <h3>这是一个仅自己可见的帖子标题</h3>
+                    <div class="post-meta">作者: <strong>我</strong></div>
+                    <p>这里记录一些我的个人想法和项目笔记，作为私密空间使用...</p>
+                    <div class="post-tags"><span>技术</span><span>个人笔记</span></div>
+                    <div class="post-actions">
+                        <span>👍 123</span> <span>💬 45</span> <span>⭐ 收藏</span>
+                        <button class="ai-icon-btn" title="呼叫AI评论团"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                    </div>
+                    <div class="ai-comment-block"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 记录页面 -->
+        <section id="records-page" class="page-section">
+            <h2>我的记录</h2>
+            <!-- 内容无变化 -->
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">2025年10月01日</div>
+                    <div class="timeline-content"><h4><a href="#">这是一个仅自己可见的帖子标题</a></h4><p>内容预览：这里记录一些我的个人想法...</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 个人主页页面 -->
+        <section id="profile-page" class="page-section">
+            <h2>个人主页</h2>
+            <div class="profile-header">
+                <label for="avatar-upload" class="avatar-label">
+                    <img src="https://via.placeholder.com/100" alt="用户头像" class="avatar" id="avatar-preview">
+                </label>
+                <input type="file" id="avatar-upload" accept="image/*">
+                <h3>我的账号名</h3>
+            </div>
+
+            <div class="settings-section">
+                <h3>🤖 AI 设置</h3>
+                <label>选择呼叫的AI人设 (可多选):</label>
+                <div class="personality-grid" id="personality-grid">
+                    <div class="personality-item">
+                        <input type="checkbox" id="p1" name="personality"><label for="p1">杠精</label>
+                        <span class="tooltip">无论你说什么，总能找到角度反驳。</span>
+                    </div>
+                    <div class="personality-item">
+                        <input type="checkbox" id="p2" name="personality"><label for="p2">夸夸怪</label>
+                        <span class="tooltip">花式彩虹屁，用各种华丽辞藻赞美你。</span>
+                    </div>
+                    <!-- 更多预设人设... -->
+                </div>
+                <hr>
+                <h4>自定义 AI 人设</h4>
+                <div class="custom-ai-form">
+                    <input type="text" id="custom-personality-name" placeholder="人设名称 (如: 赛博禅师)">
+                    <textarea id="custom-personality-prompt" placeholder="人设提示词 (如: 用佛经和代码解释一切)"></textarea>
+                    <button id="add-personality-btn">添加/更新人设</button>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>🔌 API 预设管理</h3>
+                <div class="api-preset-manager">
+                    <div class="api-preset-controls">
+                        <select id="api-preset-select"><option value="">选择预设</option></select>
+                        <button id="delete-preset-btn">删除选中</button>
+                    </div>
+                    <input type="text" id="api-preset-name" placeholder="保存为新预设名称">
+                    <input type="text" id="api-endpoint" placeholder="API 端点">
+                    <input type="password" id="api-key" placeholder="API 密钥">
+                    <button id="save-preset-btn">保存当前设置为预设</button>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3>🎨 外观设置</h3>
+                <div class="setting-item">
+                    <label for="bg-color-picker">界面背景色:</label>
+                    <input type="color" id="bg-color-picker" value="#f9f9f9">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="bottom-nav">
+        <!-- 导航项无变化 -->
+        <a href="#forum-page" class="nav-item active"><span class="icon">💬</span><span class="label">论坛</span></a>
+        <a href="#records-page" class="nav-item"><span class="icon">📜</span><span class="label">记录</span></a>
+        <a href="#profile-page" class="nav-item"><span class="icon">👤</span><span class="label">主页</span></a>
+    </nav>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- 核心导航与标签页逻辑 (无改动) ---
+        const navItems = document.querySelectorAll('.nav-item');
+        const pages = document.querySelectorAll('.page-section');
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                navItems.forEach(nav => nav.classList.remove('active'));
+                pages.forEach(page => page.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(this.getAttribute('href')).classList.add('active');
+            });
+        });
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const forumContents = document.querySelectorAll('.forum-content');
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                forumContents.forEach(content => content.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelector(`#${this.getAttribute('data-tab')}-forum`).classList.add('active');
+            });
+        });
+
+        // --- 1. 头像上传 ---
+        const avatarUpload = document.getElementById('avatar-upload');
+        const avatarPreview = document.getElementById('avatar-preview');
+        avatarUpload.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                avatarPreview.src = URL.createObjectURL(file);
+            }
+        });
+
+        // --- 2. AI 人设管理 (CRUD) ---
+        const personalityGrid = document.getElementById('personality-grid');
+        const addPersonalityBtn = document.getElementById('add-personality-btn');
+        const customNameInput = document.getElementById('custom-personality-name');
+        const customPromptInput = document.getElementById('custom-personality-prompt');
+
+        const createPersonalityElement = (name, prompt) => {
+            const id = `p-${Date.now()}`;
+            const newItem = document.createElement('div');
+            newItem.className = 'personality-item';
+            newItem.innerHTML = `
+                <input type="checkbox" id="${id}" name="personality">
+                <label for="${id}">${name}</label>
+                <span class="tooltip">${prompt}</span>
+                <span class="delete-personality-btn" title="删除此人设">×</span>
+            `;
+            newItem.querySelector('label').addEventListener('click', (e) => {
+                // 点击标签时，填充修改框
+                e.preventDefault();
+                customNameInput.value = name;
+                customPromptInput.value = prompt;
+            });
+            return newItem;
+        };
+
+        addPersonalityBtn.addEventListener('click', () => {
+            const name = customNameInput.value.trim();
+            const prompt = customPromptInput.value.trim();
+            if (!name || !prompt) {
+                alert('请输入人设名称和提示词！');
+                return;
+            }
+            
+            // 检查是否已存在同名人设，如果存在则更新
+            let existingLabel = Array.from(personalityGrid.querySelectorAll('label')).find(l => l.textContent === name);
+            if(existingLabel) {
+                 existingLabel.parentElement.querySelector('.tooltip').textContent = prompt;
+                 alert(`人设 "${name}" 的提示词已更新！`);
+            } else {
+                 const newElement = createPersonalityElement(name, prompt);
+                 personalityGrid.appendChild(newElement);
+            }
+            customNameInput.value = '';
+            customPromptInput.value = '';
+        });
+
+        personalityGrid.addEventListener('click', (event) => {
+            if (event.target.classList.contains('delete-personality-btn')) {
+                event.target.parentElement.remove();
+            }
+        });
+
+
+        // --- 3. 模拟 AI 评论生成 ---
+        const aiButtons = document.querySelectorAll('.ai-icon-btn');
+        const randomUsernames = ['赛博水母', '代码诗人', '逻辑奇点', '像素探险家', '数据游侠'];
+
+        aiButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const postCard = this.closest('.post-card');
+                const commentBlock = postCard.querySelector('.ai-comment-block');
+                commentBlock.innerHTML = ''; // 清空旧评论
+
+                const checkedPersonalities = document.querySelectorAll('input[name="personality"]:checked');
+                if (checkedPersonalities.length === 0) {
+                    alert('请先在个人主页勾选至少一个 AI 人设！');
+                    return;
+                }
+                
+                const commentCount = Math.floor(Math.random() * 10) + 1; // 随机1-10条
+                
+                for (let i = 0; i < commentCount; i++) {
+                    const randomPersonality = checkedPersonalities[Math.floor(Math.random() * checkedPersonalities.length)];
+                    const style = randomPersonality.nextElementSibling.textContent;
+                    const username = randomUsernames[Math.floor(Math.random() * randomUsernames.length)];
+                    
+                    const commentEl = document.createElement('div');
+                    commentEl.className = 'ai-comment';
+                    commentEl.innerHTML = `<strong>${username} (${style}风格):</strong><p>这是一条由AI模拟生成的评论，旨在展示 “${style}” 的风格特点。</p>`;
+                    commentBlock.appendChild(commentEl);
+                }
+            });
+        });
+
+        // --- 4. API 预设管理 (使用 localStorage) ---
+        const presetSelect = document.getElementById('api-preset-select');
+        const presetNameInput = document.getElementById('api-preset-name');
+        const endpointInput = document.getElementById('api-endpoint');
+        const keyInput = document.getElementById('api-key');
+        const saveBtn = document.getElementById('save-preset-btn');
+        const deleteBtn = document.getElementById('delete-preset-btn');
+        const storageKey = 'apiPresets';
+
+        const loadPresets = () => JSON.parse(localStorage.getItem(storageKey)) || {};
+        const savePresets = (presets) => localStorage.setItem(storageKey, JSON.stringify(presets));
+
+        function populatePresetDropdown() {
+            const presets = loadPresets();
+            presetSelect.innerHTML = '<option value="">选择或加载预设</option>';
+            for (const name in presets) {
+                const option = new Option(name, name);
+                presetSelect.add(option);
+            }
+        }
+        
+        presetSelect.addEventListener('change', () => {
+            const presets = loadPresets();
+            const selectedName = presetSelect.value;
+            if (presets[selectedName]) {
+                presetNameInput.value = selectedName;
+                endpointInput.value = presets[selectedName].endpoint;
+                keyInput.value = presets[selectedName].key;
+            } else {
+                 presetNameInput.value = '';
+                 endpointInput.value = '';
+                 keyInput.value = '';
+            }
+        });
+
+        saveBtn.addEventListener('click', () => {
+            const name = presetNameInput.value.trim();
+            const endpoint = endpointInput.value.trim();
+            const key = keyInput.value.trim();
+            if (!name) {
+                alert('请输入预设名称！');
+                return;
+            }
+            const presets = loadPresets();
+            presets[name] = { endpoint, key };
+            savePresets(presets);
+            populatePresetDropdown();
+            presetSelect.value = name; // 自动选中刚保存的
+            alert(`预设 "${name}" 已保存！`);
+        });
+
+        deleteBtn.addEventListener('click', () => {
+            const selectedName = presetSelect.value;
+            if (!selectedName || selectedName === "") {
+                alert('请先选择一个要删除的预设！');
+                return;
+            }
+            if (confirm(`确定要删除预设 "${selectedName}" 吗？`)) {
+                const presets = loadPresets();
+                delete presets[selectedName];
+                savePresets(presets);
+                populatePresetDropdown();
+                // 清空输入框
+                presetNameInput.value = '';
+                endpointInput.value = '';
+                keyInput.value = '';
+                alert(`预设 "${selectedName}" 已删除！`);
+            }
+        });
+        
+        // --- 5. 外观设置 (无改动) ---
+        const bgColorPicker = document.getElementById('bg-color-picker');
+        bgColorPicker.addEventListener('input', function() {
+            document.body.style.backgroundColor = this.value;
+        });
+
+        // --- 初始化 ---
+        populatePresetDropdown();
+    });
+    </script>
+</body>
+</html>
