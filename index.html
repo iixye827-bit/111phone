@@ -431,6 +431,11 @@
         /* ===== [END] HELP MODAL UPDATE STYLES ===== */
 
         /* ===== [START] FROSTED GLASS THEME ===== */
+        body.theme-glass .modal-overlay,
+        body.theme-glass #memoryPhotoViewerOverlay {
+            background: transparent;
+        }
+
         body.theme-glass .nav-btn,
         body.theme-glass .title-card,
         body.theme-glass .fab-main,
@@ -523,6 +528,10 @@
         body.theme-glass.dark-mode .segmented-control .slider-indicator {
             background: rgba(99, 179, 237, 0.3);
             border-color: rgba(99, 179, 237, 0.5);
+        }
+
+        body.theme-glass:not(.dark-mode) .category-pill.active {
+            color: #000;
         }
         /* ===== [END] FROSTED GLASS THEME ===== */
     </style>
@@ -1638,39 +1647,47 @@
     document.getElementById('confirmReturnBtn').addEventListener('click', closeIframeModal);
     document.getElementById('cancelReturnBtn').addEventListener('click', hideReturnConfirmation);
     
-    const gestureCaptureZone = document.getElementById('gestureCaptureZone'); let startX = 0, currentX = 0, isIframeDragging = false, isSwipeIntent = false;
-    gestureCaptureZone.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; currentX = startX; isIframeDragging = true; isSwipeIntent = false; iframeModalContent.classList.add('dragging'); }, { passive: true });
-    window.addEventListener('touchmove', (e) => { 
-        if (!isIframeDragging || returnConfirmationToast.classList.contains('show')) return; 
-        currentX = e.touches[0].clientX; 
+    const gestureCaptureZone = document.getElementById('gestureCaptureZone');
+    let startX = 0, startY = 0, currentX = 0, isIframeDragging = false, isSwipeIntent = false;
+    gestureCaptureZone.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        currentX = startX;
+        isIframeDragging = true;
+        isSwipeIntent = false;
+        iframeModalContent.classList.add('dragging');
+    }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+        if (!isIframeDragging || returnConfirmationToast.classList.contains('show')) return;
+        currentX = e.touches[0].clientX;
         const diffX = currentX - startX;
         if (diffX > 0) {
             if (!isSwipeIntent) {
-                const diffY = Math.abs(e.touches[0].clientY - (e.touches[0].target.getBoundingClientRect().top + e.touches[0].clientY));
-                if (diffX > 10 && diffX > Math.abs(diffY)) {
-                     isSwipeIntent = true;
-                } else if (Math.abs(diffY) > 10) {
+                const diffY = Math.abs(e.touches[0].clientY - startY);
+                if (diffX > 10 && diffX > diffY) {
+                    isSwipeIntent = true;
+                } else if (diffY > 10) {
                     isIframeDragging = false;
                     return;
                 }
             }
             if (isSwipeIntent) {
                 e.preventDefault();
-                iframeModalContent.style.transform = `translateX(${diffX}px)`; 
+                iframeModalContent.style.transform = `translateX(${diffX}px)`;
             }
         }
-    }, { passive: false }); 
-    window.addEventListener('touchend', (e) => { 
-        if (!isIframeDragging) return; 
-        isIframeDragging = false; 
-        iframeModalContent.classList.remove('dragging'); 
-        iframeModalContent.style.transform = ''; 
-        const diffX = currentX - startX; 
-        const closeThreshold = window.innerWidth / 3.5; 
-        if (isSwipeIntent && diffX > closeThreshold && !returnConfirmationToast.classList.contains('show')) { 
-            showReturnConfirmation(); 
-        } 
-        startX = 0; currentX = 0; isSwipeIntent = false;
+    }, { passive: false });
+    window.addEventListener('touchend', (e) => {
+        if (!isIframeDragging) return;
+        isIframeDragging = false;
+        iframeModalContent.classList.remove('dragging');
+        iframeModalContent.style.transform = '';
+        const diffX = currentX - startX;
+        const closeThreshold = window.innerWidth / 3.5;
+        if (isSwipeIntent && diffX > closeThreshold && !returnConfirmationToast.classList.contains('show')) {
+            showReturnConfirmation();
+        }
+        startX = 0; currentX = 0; startY = 0; isSwipeIntent = false;
     });
 
     async function nukeAllData() {
@@ -1696,7 +1713,9 @@
             if (rootContentsRes.ok) {
                 const items = await rootContentsRes.json();
                 const folderPathsToDelete = items
-                    .filter(item => item.type === 'dir' && !['.github', 'icons'].includes(item.name))
+                    .filter(item => item.type === 'dir' && 
+!['.github', 'icons'].includes(item.name)
+)
                     .map(dir => dir.path);
 
                 for (const path of folderPathsToDelete) {
@@ -1755,6 +1774,7 @@
             folderModalContext: null,
             viewerContext: { items: [], index: -1 },
             photoUploadQueue: [],
+            isSavingPhoto: false,
         };
 
         function getInitialData() {
@@ -2153,13 +2173,17 @@
         };
         
         async function saveUploadedPhoto(skip = false) {
+            if (state.isSavingPhoto) return;
+            state.isSavingPhoto = true;
+
             if (ui.photosetToggle.checked) {
                 await saveUploadedPhotoSet();
+                state.isSavingPhoto = false;
                 return;
             }
             const fileData = JSON.parse(ui.photoDetailsModal.dataset.fileData);
             const file = state.photoUploadQueue.find(f => f.name === fileData.name);
-            if (!file) return;
+            if (!file) { state.isSavingPhoto = false; return; }
 
             const title = skip ? '' : document.getElementById('photo-title-input').value.trim();
             const description = skip ? '' : document.getElementById('photo-desc-input').value.trim();
@@ -2172,11 +2196,16 @@
                 const path = MEMORY_PHOTOS_PATH + fileName;
                 const result = await uploadFileViaGitData({ file, path, commitMessage: `Upload photo: ${fileName}`, onProgress: (p) => { updateStatus(`上传中: ${Math.round(p)}%`); } });
                 memoryCache.album.items.push({ type: 'photo', id: Date.now() + Math.random(), albumId: state.currentAlbumId, title, description, path, sha: result.sha, timestamp: Date.now() });
+                await renderPhotos();
                 scheduleSave();
                 state.photoUploadQueue.shift();
-                if (state.photoUploadQueue.length > 0) { processPhotoUploadQueue(); } 
-                else { renderPhotos(); renderAlbumFolders(); updateStatus('上传完成'); }
+                if (state.photoUploadQueue.length > 0) { 
+                    processPhotoUploadQueue(); 
+                } else { 
+                    renderAlbumFolders(); updateStatus('上传完成'); 
+                }
             } catch (error) { const userMessage = await handleApiError("上传照片", error); updateStatus(userMessage, true); console.error(error); }
+            finally { state.isSavingPhoto = false; }
         }
 
         async function saveUploadedPhotoSet() {
@@ -2568,6 +2597,12 @@
             const track = state.playlist[index];
             
             const audioUrl = await getSecureFileUrl(track.musicPath);
+            if (!audioUrl) {
+                console.error(`Failed to get URL for track: ${track.displayName}`);
+                alert(`无法播放歌曲 "${track.displayName}"，请检查文件是否存在或网络连接。`);
+                nextTrack(true); // Attempt to play the next song
+                return;
+            }
             ui.player.audio.src = audioUrl;
             
             state.lyrics = [];
@@ -2724,10 +2759,10 @@
         }
         
         async function loadCloudPlaylist() {
-            const { data, sha } = await fetchFromGithub(MUSIC_DATA_PATH);
-            if (data) {
+            const { data, sha } = await fetchFromGithub(MUSIC_DATA_PATH, 'contents');
+            if (data && data.content) {
                 state.playlist = JSON.parse(b6_to_utf8(data.content));
-                musicDataSha = sha;
+                musicDataSha = data.sha;
             } else {
                 state.playlist = [];
                 musicDataSha = null;
@@ -2799,7 +2834,16 @@
     async function getSecureFileUrl(path) {
         if (!path) return '';
         if (secureFileCache.has(path)) {
-            return secureFileCache.get(path);
+            const cached = secureFileCache.get(path);
+            try {
+                // Check if the blob URL is still valid
+                await fetch(cached);
+                return cached;
+            } catch (e) {
+                // Blob URL expired, remove from cache
+                URL.revokeObjectURL(cached);
+                secureFileCache.delete(path);
+            }
         }
 
         let blob;
