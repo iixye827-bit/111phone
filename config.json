@@ -24,7 +24,7 @@
   "settings": {
     "showCategories": true,
     "lastSelectedCategory": "全部",
-    "paginationEnabled": false
+    "paginationEnabled": true
   },
   "themePresets": [],
   "buttons": [
