@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V12.2.0 "Refinement & Edit"] */
+        /* [CSS - V12.3.0 "Migration Ready"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -607,6 +607,7 @@
                             <div class="details-content">
                                 <p><strong>配置同步</strong>: 此功能用于设置您的私有GitHub仓库信息，是整个应用数据同步的核心。配置完成后，所有更改都将自动保存至云端。</p>
                                 <p><strong>手动同步与修复</strong>: 在“数据同步”弹窗内，提供了一个手动同步按钮。此功能会强制从云端获取最新的配置文件，并与应用内置的最新模板进行对比。如果您的配置文件因版本更新而缺少了某些新功能的设置项，此功能会自动为您补全，确保应用正常运行。</p>
+                                <div class="important-note"><p><strong>新增智能迁移</strong>：该功能现在可以自动识别并修复旧版本（无分类功能）的配置文件，将其无缝升级为最新格式。</p></div>
                                 <p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p>
                                 <ul><li><strong>🟢 绿点</strong>: <code>已同步</code> - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: <code>同步中</code> - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: <code>同步失败</code> - 发生错误，请点击图标查看失败原因。</li></ul>
                             </div>
@@ -651,7 +652,15 @@
                             <p><strong>QQ交流群:</strong> 563191005</p>
                         </div>
                         
-                                               <div class="update-log-entry">
+                        <div class="update-log-entry">
+                            <h4>v3.6.0 <span class="update-date">- 2025.10.01</span></h4>
+                            <ul>
+                                <li><span class="tag fix">重要修复</span> 彻底解决了旧版无分类的 `config.json` 文件无法在新版应用中显示按钮的问题。</li>
+                                <li><span class="tag new">新功能</span> “手动同步与修复” 现已集成**智能数据迁移**功能，可自动将旧版配置文件无缝升级为最新、最兼容的格式。</li>
+                                <li><span class="tag new">优化</span> 应用在首次加载云端数据时，也会自动执行数据迁移检查，确保老用户平滑过渡。</li>
+                            </ul>
+                        </div>
+                        <div class="update-log-entry">
                             <h4>v3.5.0 <span class="update-date">- 2025.10.01</span></h4>
                             <ul>
                                 <li><span class="tag new">功能</span> 新增按钮分类功能，可创建自定义分类管理项目。</li>
@@ -684,7 +693,7 @@
                         </div>
                         
                         <footer class="update-footer">
-                            当前版本: v2.7.1
+                            当前版本: v3.6.0
                         </footer>
                     </div>
                     <div id="help-page-3" class="help-page-content">
@@ -1013,8 +1022,8 @@
     </div>
 
     <script>
-    // [JS - V12.2.0 "Refinement & Edit"]
-    const CURRENT_APP_VERSION = '2.7.2';
+    // [JS - V12.3.0 "Migration Ready"]
+    const CURRENT_APP_VERSION = '3.6.0';
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false, isEditingButton = false, editingButtonData = null;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
@@ -1514,19 +1523,102 @@
         }
         return mergeDeep(target, ...sources);
     }
+    
+        /**
+     * [FIX V2 - ROBUST MIGRATION] Smartly migrates all legacy and hybrid config formats.
+     * It ensures categories exist, finds orphaned root buttons, merges them without duplication,
+     * and finally cleans up the legacy structure.
+     * @param {object} config - The fetched configuration object.
+     * @returns {{migratedConfig: object, wasMigrated: boolean}} - The updated config and a flag indicating if migration occurred.
+     */
+    function migrateLegacyConfig(config) {
+        if (!config) return { migratedConfig: config, wasMigrated: false };
+
+        let wasModified = false;
+
+        // Step 1: Ensure the modern base structure exists.
+        if (!Array.isArray(config.categories)) {
+            config.categories = [];
+            wasModified = true;
+            console.log("Migration: 'categories' array not found, created a new one.");
+        }
+
+        let allCategory = config.categories.find(c => c.name === '全部');
+        if (!allCategory) {
+            allCategory = { name: '全部', buttons: [] };
+            config.categories.unshift(allCategory); // Ensure '全部' is first
+            wasModified = true;
+            console.log("Migration: Default '全部' category not found, created a new one.");
+        }
+
+        // Step 2: Find, merge, and de-duplicate orphaned buttons from the root level.
+        if (Array.isArray(config.buttons) && config.buttons.length > 0) {
+            console.log(`Migration: Found ${config.buttons.length} orphaned buttons at the root level. Merging...`);
+            const allCategoryButtonHrefs = new Set(allCategory.buttons.map(b => b.href));
+
+            config.buttons.forEach(orphanButton => {
+                // Only add if a button with the same link doesn't already exist in the '全部' category
+                if (!allCategoryButtonHrefs.has(orphanButton.href)) {
+                    allCategory.buttons.push(orphanButton);
+                    console.log(`  -> Merged button: "${orphanButton.text}"`);
+                } else {
+                    console.log(`  -> Skipped duplicate button: "${orphanButton.text}"`);
+                }
+            });
+            
+            wasModified = true;
+        }
+
+        // Step 3: Clean up the legacy root 'buttons' property.
+        if (config.hasOwnProperty('buttons')) {
+            delete config.buttons;
+            console.log("Migration: Cleaned up legacy root 'buttons' array.");
+        }
+
+        if (wasModified) {
+            console.log("Migration process completed. Configuration has been standardized.");
+        }
+
+        return { migratedConfig: config, wasMigrated: wasModified };
+    }
+
 
     async function loadInitialData() { 
         navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>'; 
-        const fetchedConfig = await fetchConfigFromGithub(); 
+        let fetchedConfig = await fetchConfigFromGithub(); 
         
+        let needsSave = false;
+        let wasMigrated = false;
+
+        if (fetchedConfig) {
+            const migrationResult = migrateLegacyConfig(fetchedConfig);
+            fetchedConfig = migrationResult.migratedConfig;
+            if (migrationResult.wasMigrated) {
+                needsSave = true;
+                wasMigrated = true;
+                console.log("Config was migrated, scheduling an auto-save.");
+            }
+        }
+
         let mergedConfig = getDefaultConfig();
         if (fetchedConfig) {
+            // Merge fetched config into the default structure to add any new features/settings.
             currentConfig = mergeDeep({}, mergedConfig, fetchedConfig);
+            // Check if merging added new properties that need to be saved back.
+            if (JSON.stringify(currentConfig) !== JSON.stringify(fetchedConfig)) {
+                needsSave = true;
+                console.log("Config updated with new fields from default template.");
+            }
         } else {
+            // No config found on GitHub, use the default and save it.
             console.log('Config.json not found or invalid. Using default and attempting to create.');
             currentConfig = mergedConfig;
             configSha = null;
-            await saveGlobalConfig('Auto-create initial config.json');
+            needsSave = true;
+        }
+
+        if (needsSave) {
+            await saveGlobalConfig(wasMigrated ? 'Auto-migrate legacy config format' : 'Auto-create or repair config.json');
         }
 
         document.getElementById('title').textContent = currentConfig.title; 
@@ -1545,6 +1637,9 @@
     
     function renderCategories() {
         const navContainer = document.getElementById('categoryNavContainer');
+        if (!currentConfig.settings || currentConfig.settings.paginationEnabled === undefined) {
+            currentConfig.settings = { ...currentConfig.settings, paginationEnabled: true };
+        }
         navContainer.style.display = currentConfig.settings.paginationEnabled ? 'block' : 'none';
         
         const categoryNav = document.getElementById('categoryNav');
@@ -1606,16 +1701,21 @@
         btn.disabled = true;
         btn.textContent = "同步中...";
         try {
-            const fetchedConfig = await fetchConfigFromGithub();
+            let fetchedConfig = await fetchConfigFromGithub();
             const defaultConfig = getDefaultConfig();
             let needsSave = false;
+            let wasMigrated = false;
             
             if (fetchedConfig) {
+                 const migrationResult = migrateLegacyConfig(fetchedConfig);
+                 fetchedConfig = migrationResult.migratedConfig;
+                 wasMigrated = migrationResult.wasMigrated;
+
                  const mergedConfig = mergeDeep({}, defaultConfig, fetchedConfig);
-                 if (JSON.stringify(mergedConfig) !== JSON.stringify(fetchedConfig)) {
+                 if (JSON.stringify(mergedConfig) !== JSON.stringify(fetchedConfig) || wasMigrated) {
                      currentConfig = mergedConfig;
                      needsSave = true;
-                     console.log("Config updated with new fields.");
+                     console.log("Config updated with new fields or migrated.");
                  } else {
                      console.log("Config is up to date.");
                  }
@@ -1627,7 +1727,7 @@
             }
             
             if (needsSave) {
-                 await saveGlobalConfig('Manual sync and repair');
+                 await saveGlobalConfig(wasMigrated ? 'Manual sync: Migrated legacy config' : 'Manual sync and repair');
                  alert("同步与修复完成！页面将刷新以应用最新配置。");
                  location.reload();
             } else {
@@ -1666,11 +1766,11 @@
         if (choice === '1') {
             const categoryObj = currentConfig.categories.find(c => c.name === categoryNameToDelete);
             if (categoryObj) {
-                 // Move items to '全部' category
+                 // The items remain, they will just not be in a specific category anymore but visible under "All".
             }
             currentConfig.categories = currentConfig.categories.filter(c => c.name !== categoryNameToDelete);
-            await saveGlobalConfig(`Reassign category: ${categoryNameToDelete}`);
-            alert(`分类 "${categoryNameToDelete}" 已删除，其项目已移至“全部”。`);
+            await saveGlobalConfig(`Delete category (keep items): ${categoryNameToDelete}`);
+            alert(`分类 "${categoryNameToDelete}" 已删除，其项目现在仅在“全部”中显示。`);
         } else if (choice === '2') {
             if (confirm(`⚠️ 再次确认：\n您确定要永久删除分类 "${categoryNameToDelete}" 以及其中的所有项目吗？此操作不可逆！`)) {
                 currentConfig.categories = currentConfig.categories.filter(c => c.name !== categoryNameToDelete);
@@ -1760,10 +1860,13 @@
             
             let commitMsg;
             if (isEditingButton && editingButtonData) {
-                // Find and remove old button data
+                // Find and remove old button data from its original category
                 const oldCategory = currentConfig.categories.find(c => c.name === editingButtonData.categoryName);
                 if (oldCategory) {
                     oldCategory.buttons = oldCategory.buttons.filter(b => b.href !== editingButtonData.href);
+                     if (oldCategory.buttons.length === 0 && oldCategory.name !== '全部') {
+                        currentConfig.categories = currentConfig.categories.filter(c => c.name !== oldCategory.name);
+                    }
                 }
                 commitMsg = `Edit button: ${name}`;
             } else {
@@ -1780,8 +1883,8 @@
             await saveGlobalConfig(commitMsg); 
             
             resetAddNavForm(); 
+            populateCategoryDatalist();
             renderCategories();
-            renderButtonsForCategory(currentCategory);
             
             if(!addNavModalElements.stayOpenToggle.checked || isEditingButton) { 
                 addNavModalElements.modal.classList.remove("show");
@@ -1923,7 +2026,9 @@
                 const items = await rootContentsRes.json();
                 const folderPathsToDelete = items
                     .filter(item => item.type === 'dir' && 
+
 !['.github', 'icons'].includes(item.name)
+
 )
                     .map(dir => dir.path);
 
@@ -2938,7 +3043,7 @@
         function parseLRC(lrc) {
             const lines = lrc.split('\n');
             const result = [];
-            const timeRegex = /\[(\d{2}):(\d{2})[.:](\d{2,3})\]/g;
+            const timeRegex = /$$(\d{2}):(\d{2})[.:](\d{2,3})$$/g;
             for (const line of lines) {
                 let lastMatch;
                 while((lastMatch = timeRegex.exec(line)) !== null) {
@@ -2998,13 +3103,7 @@
             renderPlaylists();
         }
 
-        async function saveCloudPlaylist() {
-            const content = utf8_to_b64(JSON.stringify(state.playlist, null, 2));
-            const result = await saveToGithub(MUSIC_DATA_PATH, content, 'Update music playlist', musicDataSha);
-            if (result.sha) musicDataSha = result.sha;
-        }
-        
-        async function uploadPendingFiles() {
+               async function uploadPendingFiles() {
             const sm = ui.settingsModal;
             if (!state.pendingMusicFile) { alert("请先选择一个音乐文件。"); return; }
             const displayName = sm.renameInput.value.trim();
