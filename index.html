@@ -2708,7 +2708,7 @@
             categorySelector.innerHTML = '<option value="">选择分类...</option>';
             const categoriesWithUploads = new Set();
             currentConfig.categories.forEach(cat => {
-                if (cat.buttons.some(btn => btn.href.includes('raw.githack.com'))) {
+                if (cat.name !== '全部') {
                     categoriesWithUploads.add(cat.name);
                 }
             });
