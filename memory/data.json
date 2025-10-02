@@ -91,6 +91,26 @@
         "path": "memory/photos/1759414098705-1759414176545.png",
         "sha": "60f6bae3a1fe01eb35a03c8aa368eaae8038170f",
         "timestamp": 1759414182268
+      },
+      {
+        "type": "photoset",
+        "id": 1759414217409.4836,
+        "albumId": 1759414098705,
+        "title": "脂肪肝",
+        "description": "",
+        "timestamp": 1759414217409,
+        "photos": [
+          {
+            "path": "memory/photos/1759414098705-1759414204511-1.png",
+            "sha": "c1ec71cc5383aa466282d8befed7e7e6fa58fd09",
+            "timestamp": 1759414211975
+          },
+          {
+            "path": "memory/photos/1759414098705-1759414211976-2.png",
+            "sha": "66c5abd900cdbedc89117a69cf331e00a851ae80",
+            "timestamp": 1759414217409
+          }
+        ]
       }
     ]
   }
