@@ -15,6 +15,16 @@
           "openExternally": false
         }
       ]
+    },
+    {
+      "name": "12",
+      "buttons": [
+        {
+          "text": "2",
+          "href": "3",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
