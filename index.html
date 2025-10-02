@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V12.3.0 "Migration Ready"] */
+        /* [CSS - V12.4.0 "Layout Fix"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -67,17 +67,22 @@
         .category-nav { display: flex; flex-wrap: nowrap; gap: 12px; padding: 0 20px; }
         .category-pill { flex-shrink: 0; padding: 8px 18px; border: none; border-radius: 20px; background: var(--bg-day-element); box-shadow: none; color: var(--text-day); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; opacity: 0.6; }
         body.dark-mode .category-pill { background: var(--bg-night-element); color: var(--text-night); }
-        .category-pill.active { color: white; background: var(--hold-border); opacity: 1; transform: scale(1.05); }
+        .category-pill.active { background: var(--hold-border); color: white; opacity: 1; transform: scale(1.05); }
+        body:not(.dark-mode):not(.theme-glass) .category-pill.active { background: var(--bg-day-element); color: var(--text-day); font-weight: 700; box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
+        body.dark-mode:not(.theme-glass) .category-pill.active { background: var(--bg-night-element); color: var(--text-night); font-weight: 700; box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
+        body.theme-glass .category-pill.active { background: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.5); color: #000; }
+        body.theme-glass.dark-mode .category-pill.active { background: rgba(255,255,255,0.2); color: white; border-color: rgba(255,255,255,0.3); }
+
         
         .nav-container { width: 100%; max-width: 1200px; margin: 10px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; padding: 20px; position: relative; z-index: 10; touch-action: pan-y; }
         .nav-btn { position: relative; padding: 22px 16px; border: none; border-radius: 14px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background: var(--bg-day-element); backdrop-filter: blur(8px); font-size: 17px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent; }
         .nav-btn.hold { border: 2px solid var(--hold-border); transform: scale(1.02); z-index: 5; box-shadow: 8px 8px 16px rgba(174, 190, 212, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(91, 153, 226, 0.3); }
         body.dark-mode .nav-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
-        body.dark-mode .nav-btn:active { box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.25), inset -6px -6px 12px var(--shadow-dark-night); }
+        body.dark-mode .nav-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-night), inset -6px -6px 12px var(--shadow-light-night); }
         body.dark-mode .nav-btn.hold { box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4), -8px -8px 16px rgba(40, 52, 79, 0.8), 0 0 0 2px rgba(99, 179, 237, 0.3); }
         .nav-btn:hover { transform: translateY(-3px); filter: brightness(1.05); }
         .nav-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-day), inset -6px -6px 12px var(--shadow-light-day); transform: translateY(0); }
-        body.dark-mode .nav-btn:active { box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.25), inset -6px -6px 12px rgba(40, 52, 79, 0.8); }
+        body.dark-mode .nav-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-night), inset -6px -6px 12px var(--shadow-light-night); }
         .delete-icon { display: none; position: absolute; top: -5px; right: -5px; width: 24px; height: 24px; background-color: #f56565; color: white; border-radius: 50%; border: 2px solid white; font-size: 16px; font-weight: bold; line-height: 20px; text-align: center; cursor: pointer; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .page-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px); z-index: 99; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
         .page-overlay.show { opacity: 1; pointer-events: auto; }
@@ -131,10 +136,10 @@
         .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; } .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; } .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--hold-border); } input:checked + .slider:before { transform: translateX(18px); }
-        #file-list-container{overflow-y:auto;border-radius:10px;padding:5px;background:var(--bg-day-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day);flex-grow:0;flex-shrink:1;min-height:auto}body.dark-mode #file-list-container{background:var(--bg-night-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}#file-list-container ul{list-style:none;display:flex;flex-wrap:wrap;gap:10px;padding:5px}#file-list-container li{position:relative;flex-direction:column;align-items:start;background:var(--bg-day-element);box-shadow:4px 4px 8px var(--shadow-dark-day),-4px -4px 8px var(--shadow-light-day);padding:10px;width:120px;text-align:center;border-radius:8px;display:flex;justify-content:space-between;align-items:center;transition:background .2s;gap:10px}body.dark-mode #file-list-container li{box-shadow:4px 4px 8px var(--shadow-dark-night),-4px -4px 8px var(--shadow-light-night)}#file-list-container li:hover{background-color:rgba(0,0,0,0.05)}body.dark-mode #file-list-container li:hover{background-color:rgba(255,255,255,0.08)}
+        #file-list-container{border-radius:10px;padding:5px;background:var(--bg-day-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day);width:100%}body.dark-mode #file-list-container{background:var(--bg-night-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}#file-list-container ul{list-style:none;padding:5px;width:100%}#file-list-container li{padding:8px 15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;transition:background .2s;gap:10px;position:relative}#file-list-container li:hover{background-color:rgba(0,0,0,0.05)}body.dark-mode #file-list-container li:hover{background-color:rgba(255,255,255,0.08)}
         #fileListStatus{text-align:center;color:#a0aec0;padding:10px;display:flex;align-items:center;justify-content:center;min-height:50px}
         body.dark-mode #fileListStatus {color:#889;}
-        .file-info{flex-grow:1;cursor:pointer;min-width:0;width:100%}.file-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px;text-align:center;width:100%}.delete-btn{background:transparent;border:none;cursor:pointer;padding:0;position:absolute;top:-5px;right:-5px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s,color .2s;color:#bbb;font-size:22px;font-weight:bold;line-height:1}.delete-btn:hover{background:#f0f0f0;color:#e53e3e}body.dark-mode .delete-btn{color:#889}body.dark-mode .delete-btn:hover{background:rgba(255,255,255,0.1);color:#fc8181}
+        .file-info{flex-grow:1;cursor:pointer;min-width:0}.file-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px}.file-size{font-size:12px;font-weight:300;color:#9A86A4}.delete-btn{background:transparent;border:none;cursor:pointer;padding:0;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s,color .2s;color:#bbb;font-size:22px;font-weight:bold;line-height:1}.delete-btn:hover{background:#f0f0f0;color:#e53e3e}body.dark-mode .delete-btn{color:#889}body.dark-mode .delete-btn:hover{background:rgba(255,255,255,0.1);color:#fc8181}
         #settingsModal .modal-content,#addNavModal .modal-content, #musicSettingsModal .modal-content {max-width:400px}
         #settingsModal .modal-body .form-section,#addNavModal .modal-body .form-section{display:flex;flex-direction:column;gap:8px}#settingsModal label,#addNavModal label{font-size:14px;color:#5a6778}body.dark-mode #settingsModal label,body.dark-mode #addNavModal label{color:#c0c6cc}
         .segmented-control { position: relative; display: flex; border-radius: 12px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
@@ -184,11 +189,14 @@
         @media (max-width: 480px) { .editable-title { font-size: 28px; } .editable-subtitle { font-size: 14px; } .title-card { padding: 30px 15px; } .nav-container { grid-template-columns: 1fr 1fr; gap: 18px; padding: 10px; } .nav-btn { padding: 18px 10px; font-size: 15px; } .fab-container { right: 20px; bottom: 20px; } .fab-main, .fab-drawer-item { width: 44px; height: 44px; font-size: 20px; } .fab-drawer { bottom: 55px; } .segmented-control label { font-size: 13px; padding: 8px 5px; } .category-nav { padding: 0 15px; } }
         
         /* ===== [START] MEMORY MODAL STYLES ===== */
-        #memoryModal .modal-content { max-width: 800px; height: calc(100vh - 40px); padding: 0; display: flex; flex-direction: column; overflow: hidden; }
+        #memoryModal .modal-content { max-width: 800px; height: auto; max-height: calc(100vh - 40px); padding: 0; display: flex; flex-direction: column; overflow: hidden; }
         #memoryModal .modal-header { padding: 0 15px; margin-top: 15px; margin-bottom: 10px; }
-        #memoryModal .app-container { width: 100%; flex-grow: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-        #memoryModal .page { width: 100%; height: 100%; display: none; flex-direction: column; position: absolute; top: 0; left: 0; opacity: 0; transform: scale(0.98); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; }
-        #memoryModal .page.active { display: flex; opacity: 1; transform: scale(1); pointer-events: auto; z-index: 10; }
+        #memoryModal .app-container { width: 100%; display: flex; flex-direction: column; position: relative; }
+        #memoryModal .page { width: 100%; display: none; flex-direction: column; position: absolute; top: 0; left: 0; opacity: 0; transform: scale(0.98); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; }
+        #memoryModal .page.active { display: flex; opacity: 1; transform: scale(1); pointer-events: auto; z-index: 10; position: relative; }
+        #memoryModal #cloud-drive-section.page { height: auto; overflow: visible; }
+        #memoryModal #cloud-drive-section .list-container { flex-grow: 0; overflow: visible; align-items: stretch; }
+        
         #memoryModal .page-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; flex-shrink: 0; position: relative; }
         #memoryModal .page-header .title { position: absolute; left: 50%; transform: translateX(-50%); font-size: 20px; font-weight: 700; white-space: nowrap; }
         #memoryModal .header-btn { font-size: 16px; font-weight: 600; cursor: pointer; padding: 8px 12px; border-radius: 10px; transition: background-color 0.2s; border: none; background: transparent; color: inherit; z-index: 5; }
@@ -198,12 +206,14 @@
         #memoryModal .header-btn.wander-btn { font-size: 20px; padding: 6px; }
         #memoryModal .header-controls { display: flex; gap: 8px; align-items:center; }
         #memoryModal .list-container { flex-grow: 1; overflow-y: auto; padding: 0 15px 80px 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; align-content: flex-start; }
-        #memoryModal #hub-view-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 30px; }
+        #memoryModal #hub-view-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 30px; padding: 40px 0; }
+        #memoryModal #hub-view.page { height: 100%;}
+
         #memoryModal .hub-btn { width: 80%; max-width: 300px; padding: 40px 20px; border: none; border-radius: 20px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 24px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
         body.dark-mode #memoryModal .hub-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
         #memoryModal .hub-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-day), inset -6px -6px 12px var(--shadow-light-day); } body.dark-mode #memoryModal .hub-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-night), inset -6px -6px 12px var(--shadow-light-night); }
         #memoryModal #notes-list-container { grid-template-columns: 1fr; }
-        #memoryModal .folder-item, #memoryModal .album-item { margin-bottom: 10px; position: relative; padding: 20px 15px; border: none; border-radius: 14px; box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); background: var(--bg-day-element); font-size: 16px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; user-select: none; -webkit-tap-highlight-color: transparent; text-align: left; }
+        #memoryModal .folder-item, #memoryModal .album-item { margin-bottom: 10px; position: relative; padding: 20px 15px; border: none; border-radius: 14px; box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); background: var(--bg-day-element); font-size: 16px; font-weight: 600 color: var(--text-day); cursor: pointer; transition: all 0.3s ease; user-select: none; -webkit-tap-highlight-color: transparent; text-align: left; }
         #memoryModal .note-item { position: relative; padding: 20px 15px; border: none; border-radius: 14px; box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); background: var(--bg-day-element); font-size: 16px; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; user-select: none; -webkit-tap-highlight-color: transparent; text-align: left; }
         body.dark-mode #memoryModal .folder-item, body.dark-mode #memoryModal .note-item, body.dark-mode #memoryModal .album-item { box-shadow: 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
         #memoryModal .folder-item:active, #memoryModal .note-item:active, #memoryModal .album-item:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); transform: translateY(0); }
@@ -410,7 +420,8 @@
         }
         .tag.new { background-color: #769fcd; } /* Morandi Blue */
         .tag.fix { background-color: #93b5b3; } /* Morandi Green */
-        .tag.release { background-color: #d1a787; } /* Morandi Orange/Brown */
+        .tag.opt { background-color: #d1a787; } /* Morandi Orange/Brown */
+        .tag.release { background-color: #b091a2; }
         .update-footer {
             position: sticky;
             bottom: -1px;
@@ -541,10 +552,6 @@
              background: rgba(200, 200, 200, 0.3);
              border-color: rgba(255, 255, 255, 0.2);
         }
-
-        body.theme-glass:not(.dark-mode) .category-pill.active {
-            color: #000;
-        }
         /* ===== [END] FROSTED GLASS THEME ===== */
     </style>
 </head>
@@ -665,11 +672,25 @@
                         </div>
                         
                         <div class="update-log-entry">
+                            <h4>v3.7.0 <span class="update-date">- 2025.10.02</span></h4>
+                            <ul>
+                                <li><span class="tag opt">优化</span> 对相册的底层加载逻辑进行了重构，引入懒加载技术，彻底解决了开启、浏览和管理相册时的各种卡顿、图片错乱和重复显示问题。</li>
+                                <li><span class="tag fix">修复</span> 彻底修复了文件在某些情况下无法下载的问题。</li>
+                                <li><span class="tag fix">修复</span> 修复了从内嵌网页跳转后，可能导致数据导出功能异常的Bug。</li>
+                                <li><span class="tag fix">修复</span> 修复了可能导致音乐无法正常加载播放和退出漫游后仍在后台播放的Bug。</li>
+                                <li><span class="tag fix">修复</span> 解决了因加载逻辑问题导致的相册照片无法显示的问题。</li>
+                                <li><span class="tag fix">修复</span> 修正了分页逻辑，现在关闭分页模式后，所有分类下的所有按钮都会被正确显示。</li>
+                                <li><span class="tag fix">修复</span> 修复了在漫游模式下照片无法左右滑动切换的问题。</li>
+                                <li><span class="tag opt">优化</span> 全拟态夜间模式下的立体阴影颜色调整为更深邃的黑色，增强了视觉层次感。</li>
+                                <li><span class="tag opt">优化</span> 移除了磨砂玻璃风格下按钮和悬浮窗的多余蓝调，使其色彩表现更纯净、更通透。</li>
+                            </ul>
+                        </div>
+                        <div class="update-log-entry">
                             <h4>v3.6.0 <span class="update-date">- 2025.10.01</span></h4>
                             <ul>
                                 <li><span class="tag fix">重要修复</span> 彻底解决了旧版无分类的 `config.json` 文件无法在新版应用中显示按钮的问题。</li>
                                 <li><span class="tag new">新功能</span> “手动同步与修复” 现已集成**智能数据迁移**功能，可自动将旧版配置文件无缝升级为最新、最兼容的格式。</li>
-                                <li><span class="tag new">优化</span> 应用在首次加载云端数据时，也会自动执行数据迁移检查，确保老用户平滑过渡。</li>
+                                <li><span class="tag opt">优化</span> 应用在首次加载云端数据时，也会自动执行数据迁移检查，确保老用户平滑过渡。</li>
                             </ul>
                         </div>
                         <div class="update-log-entry">
@@ -680,8 +701,8 @@
                                 <li><span class="tag new">功能</span> 新增 “磨砂半透明” 主题，提供全新视觉风格。</li>
                                 <li><span class="tag fix">修复</span> 解决了上传的本地HTML项目无法在应用内正确打开的问题。</li>
                                 <li><span class="tag fix">修复</span> 修复了在部分页面左上角返回按钮无法点击的Bug。</li>
-                                <li><span class="tag new">优化</span> 优化了应用内的错误与状态提示信息。</li>
-                                <li><span class="tag new">优化</span> 访问GitHub相关链接时，增加开启VPN的友好提示弹窗。</li>
+                                <li><span class="tag opt">优化</span> 优化了应用内的错误与状态提示信息。</li>
+                                <li><span class="tag opt">优化</span> 访问GitHub相关链接时，增加开启VPN的友好提示弹窗。</li>
                             </ul>
                         </div>
                         <div class="update-log-entry">
@@ -705,7 +726,7 @@
                         </div>
                         
                         <footer class="update-footer">
-                            当前版本: v3.6.0
+                            当前版本: v3.7.0
                         </footer>
                     </div>
                     <div id="help-page-3" class="help-page-content">
@@ -862,7 +883,7 @@
                         <button data-action="back-to-hub" class="header-btn back-btn">&#10094;</button>
                         <h1 class="title">文件夹</h1>
                     </div>
-                    <div class="list-container" style="display: flex; flex-direction: column; gap: 15px; padding: 15px; overflow-y: hidden; align-items: start;">
+                    <div class="list-container" style="display: flex; flex-direction: column; gap: 15px; padding: 15px; grid-template-columns: 1fr; overflow-y: visible;">
                         <select id="buttonSelector" class="modal-select"></select>
                         <div class="file-upload-section">
                             <input type="file" id="fileUploader">
@@ -1034,8 +1055,8 @@
     </div>
 
        <script>
-    // [JS - V12.3.1 "Download Fix"]
-    const CURRENT_APP_VERSION = '3.6.0';
+    // [JS - V12.4.0 "Layout Fix"]
+    const CURRENT_APP_VERSION = '3.7.0';
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false, isEditingButton = false, editingButtonData = null;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
@@ -2240,8 +2261,7 @@
                 const el = document.createElement('div');
                 el.dataset.itemId = item.id;
                 
-                let
-         imgSrc = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Placeholder
+                let imgSrc = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Placeholder
                 let firstPhotoPath = '';
                 
                 if (item.type === 'photoset') {
@@ -2710,6 +2730,14 @@
             buttonSelector.value = savedValue || "";
         }
 
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
         async function fetchFilesForSelectedCategory(){
             const selectedButtonHref = ui.buttonSelector.value;
 
@@ -2749,16 +2777,11 @@
             }
             
             const displayFiles = files.filter(f => f.name !== 'index.html');
-            const fileDetails = await Promise.all(displayFiles.map(async file => ({
-                ...file,
-                commitDate: await getLatestCommitDate(file.path)
-            })));
-            
-            fileDetails.sort((a,b) => new Date(b.commitDate) - new Date(a.commitDate));
 
             ui.fileList.innerHTML = "";
             ui.fileListStatus.style.display = "none";
-            fileDetails.forEach(file => {
+            
+            displayFiles.forEach(file => {
                 const li = document.createElement('li');
                 
                 const fileInfo = document.createElement('div');
@@ -2770,7 +2793,12 @@
                 fileName.className = "file-name";
                 fileName.textContent = file.name;
 
-                fileInfo.append(fileName);
+                const fileSize = document.createElement("span");
+                fileSize.className = "file-size";
+                fileSize.textContent = formatFileSize(file.size);
+
+                fileInfo.append(fileName, fileSize);
+                
                 const deleteBtn = document.createElement("button");
                 deleteBtn.className = "delete-btn";
                 deleteBtn.innerHTML = "&times;";
