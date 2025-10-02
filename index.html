@@ -45,6 +45,12 @@
             background-image: linear-gradient(135deg, var(--night-color1) 0%, var(--night-color2) 100%); 
             --hold-border: #63b3ed; color: var(--text-night); 
         }
+        body.dark-mode .nav-btn {
+            box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night);
+        }
+        body.dark-mode.theme-glass .nav-btn {
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
         .title-card { width: 100%; max-width: 800px; padding: 40px 20px; margin: 20px 0; border-radius: 16px; box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); background: var(--bg-day-element); backdrop-filter: blur(8px); text-align: center; transition: all 0.5s ease; background-size: cover; background-position: center; }
         body.dark-mode .title-card { box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night); background: var(--bg-night-element); }
         .editable-title, .editable-subtitle { opacity: 0; transition: opacity 0.5s ease; background-color: rgba(255,255,255,0.1); backdrop-filter: blur(4px); } /* FOUC Fix */
@@ -67,7 +73,7 @@
         .nav-btn { position: relative; padding: 22px 16px; border: none; border-radius: 14px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background: var(--bg-day-element); backdrop-filter: blur(8px); font-size: 17px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent; }
         .nav-btn.hold { border: 2px solid var(--hold-border); transform: scale(1.02); z-index: 5; box-shadow: 8px 8px 16px rgba(174, 190, 212, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(91, 153, 226, 0.3); }
         body.dark-mode .nav-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
-        body.dark-mode .nav-btn:active { box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.25), inset -6px -6px 12px var(--shadow-light-night); }
+        body.dark-mode .nav-btn:active { box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.25), inset -6px -6px 12px var(--shadow-dark-night); }
         body.dark-mode .nav-btn.hold { box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4), -8px -8px 16px rgba(40, 52, 79, 0.8), 0 0 0 2px rgba(99, 179, 237, 0.3); }
         .nav-btn:hover { transform: translateY(-3px); filter: brightness(1.05); }
         .nav-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-day), inset -6px -6px 12px var(--shadow-light-day); transform: translateY(0); }
@@ -125,10 +131,10 @@
         .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; } .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; } .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--hold-border); } input:checked + .slider:before { transform: translateX(18px); }
-        #file-list-container{flex-grow:1;overflow-y:auto;border-radius:10px;padding:5px;margin-top:10px;background:var(--bg-day-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day);display:flex;flex-direction:column}body.dark-mode #file-list-container{background:var(--bg-night-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}#file-list-container ul{list-style:none;padding:5px}#file-list-container li{padding:8px 15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;transition:background .2s;gap:10px}#file-list-container li:hover{background-color:rgba(0,0,0,0.05)}body.dark-mode #file-list-container li:hover{background-color:rgba(255,255,255,0.08)}
-        #fileListStatus{text-align:center;color:#a0aec0;padding:10px;display:flex;align-items:center;justify-content:center;flex-grow:1;min-height:100px}
+        #file-list-container{overflow-y:auto;border-radius:10px;padding:5px;background:var(--bg-day-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day);flex-grow:0;flex-shrink:1;min-height:auto}body.dark-mode #file-list-container{background:var(--bg-night-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}#file-list-container ul{list-style:none;display:flex;flex-wrap:wrap;gap:10px;padding:5px}#file-list-container li{position:relative;flex-direction:column;align-items:start;background:var(--bg-day-element);box-shadow:4px 4px 8px var(--shadow-dark-day),-4px -4px 8px var(--shadow-light-day);padding:10px;width:120px;text-align:center;border-radius:8px;display:flex;justify-content:space-between;align-items:center;transition:background .2s;gap:10px}body.dark-mode #file-list-container li{box-shadow:4px 4px 8px var(--shadow-dark-night),-4px -4px 8px var(--shadow-light-night)}#file-list-container li:hover{background-color:rgba(0,0,0,0.05)}body.dark-mode #file-list-container li:hover{background-color:rgba(255,255,255,0.08)}
+        #fileListStatus{text-align:center;color:#a0aec0;padding:10px;display:flex;align-items:center;justify-content:center;min-height:50px}
         body.dark-mode #fileListStatus {color:#889;}
-        .file-info{flex-grow:1;cursor:pointer;min-width:0}.file-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px}.file-timestamp{font-size:12px;font-weight:300;color:#9A86A4}.delete-btn{background:transparent;border:none;cursor:pointer;padding:0;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s,color .2s;color:#bbb;font-size:22px;font-weight:bold;line-height:1}.delete-btn:hover{background:#f0f0f0;color:#e53e3e}body.dark-mode .delete-btn{color:#889}body.dark-mode .delete-btn:hover{background:rgba(255,255,255,0.1);color:#fc8181}
+        .file-info{flex-grow:1;cursor:pointer;min-width:0;width:100%}.file-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px;text-align:center;width:100%}.delete-btn{background:transparent;border:none;cursor:pointer;padding:0;position:absolute;top:-5px;right:-5px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s,color .2s;color:#bbb;font-size:22px;font-weight:bold;line-height:1}.delete-btn:hover{background:#f0f0f0;color:#e53e3e}body.dark-mode .delete-btn{color:#889}body.dark-mode .delete-btn:hover{background:rgba(255,255,255,0.1);color:#fc8181}
         #settingsModal .modal-content,#addNavModal .modal-content, #musicSettingsModal .modal-content {max-width:400px}
         #settingsModal .modal-body .form-section,#addNavModal .modal-body .form-section{display:flex;flex-direction:column;gap:8px}#settingsModal label,#addNavModal label{font-size:14px;color:#5a6778}body.dark-mode #settingsModal label,body.dark-mode #addNavModal label{color:#c0c6cc}
         .segmented-control { position: relative; display: flex; border-radius: 12px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
@@ -164,9 +170,10 @@
         .iframe-modal-content { width: 100%; height: 100%; background: #fff; box-shadow: -5px 0 15px rgba(0,0,0,0.2); transition: transform 0.3s ease-out; }
         .iframe-modal-content.dragging { transition: none; }
         .iframe-modal-content iframe { width: 100%; height: 100%; border: none; }
-        .swipe-hint { position: fixed; left: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; background: rgba(0,0,0,0.6); color: white; padding: 10px 15px 10px 10px; border-radius: 0 8px 8px 0; z-index: 2001; opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
+        .swipe-hint { position: fixed; left: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.6); color: white; padding: 15px 8px; border-radius: 0 8px 8px 0; z-index: 2001; opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
         .swipe-hint.show { opacity: 1; }
-        .swipe-hint .arrow { width: 16px; height: 16px; border-right: 3px solid white; border-bottom: 3px solid white; transform: rotate(-45deg); animation: hint-pulse 1.5s infinite; margin-right: 10px; }
+        .swipe-hint .arrow { width: 16px; height: 16px; border-right: 3px solid white; border-bottom: 3px solid white; transform: rotate(-45deg); animation: hint-pulse 1.5s infinite; margin-bottom: 10px; }
+        .swipe-hint span { writing-mode: vertical-rl; }
         @keyframes hint-pulse { 0% { opacity: 0.3; } 50% { opacity: 1; transform: rotate(-45deg) scale(1.1); } 100% { opacity: 0.3; } }
         #gestureCaptureZone { position: fixed; top: 50%; left: 0; width: 20px; height: 200px; transform: translateY(-50%); z-index: 2002; } /* REFINED: Gesture Area */
         #returnConfirmationToast { position: fixed; top: 0; left: 50%; transform: translate(-50%, -120%); width: calc(100% - 30px); max-width: 400px; background: var(--bg-night-element); color: var(--text-night); padding: 12px 16px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 2003; display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
@@ -347,6 +354,8 @@
         #music-playlist-container li.playing { color: var(--hold-border); font-weight: bold; }
         #music-playlist-container .song-name { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
         #music-playlist-container .delete-song-btn { width: 28px; height: 28px; color: #aaa; } #music-playlist-container .delete-song-btn:hover { color: #f56565; background: rgba(229, 62, 62, 0.1); }
+        .music-loader{width:1.2em;height:1.2em;border:2px solid rgba(128,128,128,0.3);border-top-color:var(--hold-border);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto}
+        @keyframes spin{to{transform:rotate(360deg)}}
         /* ===== [END] WANDER VIEW STYLES ===== */
         
         /* ===== [START] HELP MODAL UPDATE STYLES ===== */
@@ -451,6 +460,7 @@
         body.theme-glass #memoryModal .album-item,
         body.theme-glass #memoryModal .fab,
         body.theme-glass #memoryModal .editor-btn,
+        body.theme-glass #memoryModal #note-editor-view,
         body.theme-glass .management-controls,
         body.theme-glass #returnConfirmationToast {
             background: rgba(255, 255, 255, 0.2);
@@ -474,6 +484,7 @@
         body.theme-glass.dark-mode #memoryModal .album-item,
         body.theme-glass.dark-mode #memoryModal .fab,
         body.theme-glass.dark-mode #memoryModal .editor-btn,
+        body.theme-glass.dark-mode #memoryModal #note-editor-view,
         body.theme-glass.dark-mode .management-controls,
         body.theme-glass.dark-mode #returnConfirmationToast {
             background: rgba(30, 30, 30, 0.35);
@@ -706,7 +717,7 @@
     </div>
     <div class="modal-overlay" id="syncErrorModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>⚠️ 同步失败</span></div><button class="close-btn" data-modal-id="syncErrorModal">&times;</button></div><div class="modal-body"><p>无法连接到云端。请检查您的网络连接或GitHub配置。</p><p><strong>失败原因:</strong></p><div id="sync-error-message"></div></div></div></div>
     <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span id="addNavModalTitle">管理项目</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入按钮管理模式</button><div class="toggle-section" style="margin-top: 10px;"><span>分页展示</span><label class="toggle-switch"><input type="checkbox" id="paginationToggle"><span class="slider"></span></label></div><div class="segmented-control two-segments"><input type="radio" id="type-link" name="nav-type" value="link" checked hidden><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload" hidden><label for="type-upload">上传项目</label><div class="slider-indicator"></div></div><div class="form-section"><label for="newButtonCategoryInput">分类名称</label><input type="text" id="newButtonCategoryInput" class="modal-input" placeholder="选择或创建分类" list="category-datalist"><datalist id="category-datalist"></datalist></div><div id="category-management-section" style="display: none;"><button id="deleteCategoryBtn" class="modal-button" style="color:#e53e3e;">删除当前分类</button></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section"><div class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div class="toggle-section" style="margin-top: 10px;"><span>在新标签页中打开</span><label class="toggle-switch"><input type="checkbox" id="openExternallyToggle"><span class="slider"></span></label></div></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div><div class="important-note" style="font-size: 13px; padding: 8px 12px; margin-top: 5px;"><p>上传的项目无法编辑链接，如需更新请删除后重新上传。</p></div></div><button id="createNavBtn" class="modal-button">加入新项目</button><div class="status-text" id="upload-status"></div></div></div></div>
-    <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据同步</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button><div class="form-section" style="margin-top:15px; border-top: 1px solid rgba(128,128,128,0.3); padding-top: 15px;"><button id="manualSyncBtn" class="modal-button" style="color:#5a6778;">手动同步与修复</button><span id="manual-sync-status" class="status-text" style="min-height: 20px; padding-top: 5px;"></span></div><div class="nuke-section"><button id="nukeDataBtn" class="modal-button">清空所有云端及本地数据</button></div></div></div></div>
+    <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据同步</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button><button id="manualSyncBtn" class="modal-button" style="color:#5a6778; margin-top: 10px;">手动同步与修复</button><div class="nuke-section"><button id="nukeDataBtn" class="modal-button">清空所有云端及本地数据</button></div></div></div></div>
     <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body">
         <div class="theme-style-selector">
             <label>主题风格</label>
@@ -851,7 +862,7 @@
                         <button data-action="back-to-hub" class="header-btn back-btn">&#10094;</button>
                         <h1 class="title">文件夹</h1>
                     </div>
-                    <div class="list-container" style="display: flex; flex-direction: column; gap: 15px; padding: 15px; overflow-y: hidden;">
+                    <div class="list-container" style="display: flex; flex-direction: column; gap: 15px; padding: 15px; overflow-y: hidden; align-items: start;">
                         <select id="buttonSelector" class="modal-select"></select>
                         <div class="file-upload-section">
                             <input type="file" id="fileUploader">
@@ -865,8 +876,8 @@
                                 <div id="uploadProgressBar" class="progress-bar"></div>
                             </div>
                         </div>
-                        <div id="file-list-container" style="margin-top:0; min-height: 100px; display: block; width: 100%; flex-grow:0;">
-                            <ul id="fileList" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 5px;"></ul>
+                        <div id="file-list-container">
+                            <ul id="fileList"></ul>
                             <div id="fileListStatus" class="file-list-status">请选择一个分类</div>
                         </div>
                     </div>
@@ -1019,7 +1030,7 @@
             <iframe id="iframeContent" src="about:blank" frameborder="0" allow="fullscreen" sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"></iframe>
         </div>
         <div id="gestureCaptureZone"></div>
-        <div class="swipe-hint" id="swipeHint"><div class="arrow"></div><span>从左侧中间区域向右滑动关闭</span></div>
+        <div class="swipe-hint" id="swipeHint"><div class="arrow"></div><span>从左侧向右滑动关闭</span></div>
     </div>
 
        <script>
@@ -1033,6 +1044,7 @@
     let activeUploadXHR = null;
     const secureFileCache = new Map();
     let currentCategory = '全部';
+    let photoObserver;
 
     const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按🌞打开工具栏 | By淡季水母', categories: [{ name: '全部', buttons: [] }], settings: { paginationEnabled: true }, themePresets: [] });
     let currentConfig = getDefaultConfig();
@@ -1449,9 +1461,8 @@
         const neumorphismSettings = document.getElementById('neumorphism-settings');
         if (styleName === 'glass') {
             document.body.classList.add('theme-glass');
-            document.body.classList.contains('dark-mode')
-                ? document.documentElement.style.setProperty('--shadow-dark-night', 'rgba(0, 0, 0, 0.1)')
-                : document.documentElement.style.setProperty('--shadow-dark-day', 'rgba(0, 0, 0, 0.1)');
+            document.documentElement.style.setProperty('--shadow-dark-night', 'rgba(0, 0, 0, 0.1)');
+            document.documentElement.style.setProperty('--shadow-dark-day', 'rgba(0, 0, 0, 0.1)');
 
             neumorphismSettings.classList.add('hidden');
             document.getElementById('theme-style-glass').checked = true;
@@ -1517,7 +1528,7 @@
         document.getElementById('nightTitleCardBgStatus').textContent = localStorage.getItem('nightTitleCardBgImageName') || '未设置';
     }
     
-    const settingsModalElements = { githubRepoInput: document.getElementById("githubRepoInput"), githubTokenInput: document.getElementById("githubTokenInput"), saveSettingsBtn: document.getElementById("saveSettingsBtn"), manualSyncBtn: document.getElementById('manualSyncBtn'), manualSyncStatus: document.getElementById('manual-sync-status') };
+    const settingsModalElements = { githubRepoInput: document.getElementById("githubRepoInput"), githubTokenInput: document.getElementById("githubTokenInput"), saveSettingsBtn: document.getElementById("saveSettingsBtn"), manualSyncBtn: document.getElementById('manualSyncBtn') };
     function setupModals(){document.querySelectorAll(".close-btn").forEach(e=>e.addEventListener("click",()=>{document.getElementById(e.dataset.modalId).classList.remove("show")})),document.querySelectorAll(".modal-overlay").forEach(e=>e.addEventListener("click",t=>e===t.target&&e.classList.remove("show"))),document.getElementById("helpBtn").addEventListener("click",()=>{document.getElementById("helpModal").classList.add("show"),toggleFabMenu(!1);localStorage.setItem('lastSeenVersion', CURRENT_APP_VERSION);document.getElementById('helpBtn').classList.remove('has-update');}),document.getElementById("dataSyncBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(settingsModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),settingsModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("addNavBtn").addEventListener("click",()=>{openAddModal(); toggleFabMenu(false);}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); })}
     function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){const e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e=!0){return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据同步)"),!1):!0}
     
@@ -1589,56 +1600,54 @@
     settingsModalElements.manualSyncBtn.addEventListener("click", async () => {
         if (!checkConfig(true)) return;
         const btn = settingsModalElements.manualSyncBtn;
-        const statusEl = settingsModalElements.manualSyncStatus;
-
+        const originalText = btn.textContent;
         btn.disabled = true;
-        btn.textContent = "同步中...";
-        statusEl.textContent = '正在从云端拉取配置文件...';
 
         try {
+            btn.textContent = '获取云端配置...';
             let fetchedConfig = await fetchConfigFromGithub();
-            statusEl.textContent = '云端配置已获取，正在解析与合并...';
-
+            
             const defaultConfig = getDefaultConfig();
             let needsSave = false;
             let wasMigrated = false;
             
             if (fetchedConfig) {
+                 btn.textContent = '解析与合并...';
                  const migrationResult = migrateLegacyConfig(fetchedConfig);
                  fetchedConfig = migrationResult.migratedConfig;
                  wasMigrated = migrationResult.wasMigrated;
-                 if (wasMigrated) statusEl.textContent = '检测到旧版配置，正在执行迁移...';
+                 if (wasMigrated) btn.textContent = '迁移旧版配置...';
 
                  const mergedConfig = mergeDeep({}, defaultConfig, fetchedConfig);
                  if (JSON.stringify(mergedConfig) !== JSON.stringify(fetchedConfig) || wasMigrated) {
                      currentConfig = mergedConfig;
                      needsSave = true;
-                     statusEl.textContent = '配置文件已更新/迁移，准备写回云端...';
-                 } else {
-                     statusEl.textContent = '配置文件已是最新，无需操作。';
                  }
             } else {
-                 statusEl.textContent = '云端无配置文件，将创建新的默认配置。';
+                 btn.textContent = '创建新配置...';
                  currentConfig = defaultConfig;
                  configSha = null;
                  needsSave = true;
             }
             
             if (needsSave) {
+                 btn.textContent = '正在保存...';
                  await saveGlobalConfig(wasMigrated ? 'Manual sync: Migrated legacy config' : 'Manual sync and repair');
-                 statusEl.textContent = '同步与修复完成！页面将刷新。';
+                 btn.textContent = '同步完成，即将刷新';
                  alert("同步与修复完成！页面将刷新以应用最新配置。");
                  location.reload();
             } else {
+                 btn.textContent = '配置已是最新';
                  alert("配置已是最新，无需修复。");
             }
         } catch (e) {
-            statusEl.textContent = `操作失败: ${e.message}`;
+            btn.textContent = '同步失败';
             alert(`手动同步失败: ${e.message}`);
         } finally {
-            btn.disabled = false;
-            btn.textContent = "手动同步与修复";
-            setTimeout(() => { statusEl.textContent = ''; }, 5000);
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }, 3000);
         }
     });
 
@@ -2025,10 +2034,16 @@
 
     async function nukeAllData() {
         if (!checkConfig(true)) return;
-        const confirmation = confirm("⚠️ 极度危险操作！\n\n这将永久删除您的所有数据，包括：\n\n- 所有本地设置 (主题、GitHub配置等)\n- GitHub仓库中的 `config.json` (所有按钮和设置)\n- GitHub仓库中的所有上传的项目和文件\n\n此操作不可逆，将使应用恢复到空白的初始状态。确定要继续吗？");
-        if (!confirmation) { return; }
+        const btn = document.getElementById('nukeDataBtn');
+        const originalText = btn.textContent;
 
+        const confirmation = confirm("⚠️ 极度危险操作！\n\n这将永久删除您的所有数据，包括：\n\n- 所有本地设置 (主题、GitHub配置等)\n- GitHub仓库中的 `config.json` (所有按钮和设置)\n- GitHub仓库中的所有上传的项目和文件\n\n此操作不可逆，将使应用恢复到空白的初始状态。确定要继续吗？");
+        if (!confirmation) return;
+        
+        btn.disabled = true;
+        
         try {
+            btn.textContent = '获取仓库内容...';
             updateSyncStatus('syncing', '正在执行重置...');
             
             const rootContentsUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/`;
@@ -2046,17 +2061,17 @@
             const items = await rootContentsRes.json();
             const foldersToNuke = ['projects', 'memory', 'data_sync'];
             
+            let i = 0;
             for (const item of items) {
+                i++;
+                btn.textContent = `删除中 (${i}/${items.length})...`;
                 if (item.path === 'config.json') {
-                    console.log('正在删除 config.json...');
                     await deleteFromGithub(item.path, 'NUKE: Deleting config file', item.sha, true);
                 } else if (item.type === 'dir' && foldersToNuke.includes(item.name)) {
-                    console.log(`正在删除文件夹: ${item.path}...`);
                     await deleteGithubFolder(item.path);
                 }
             }
-            console.log('所有目标云端数据已删除。');
-
+            btn.textContent = '正在清空本地...';
             localStorage.clear();
             
             alert('所有云端及本地数据已清空。页面将刷新。');
@@ -2066,6 +2081,12 @@
             const userMessage = await handleApiError("重置操作", error);
             updateSyncStatus('error', userMessage);
             alert(`重置失败: ${userMessage}`);
+            btn.textContent = '重置失败';
+        } finally {
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }, 3000);
         }
     }
     document.getElementById('nukeDataBtn').addEventListener('click', nukeAllData);
@@ -2200,35 +2221,55 @@
             });
             if (memoryCache.album.folders.length === 0) ui.albumList.innerHTML = `<p class="empty-list-placeholder">没有相册</p>`;
         }
-        async function renderPhotos() {
+        function renderPhotos() {
+            if (photoObserver) photoObserver.disconnect();
             ui.photoList.innerHTML = '';
-            const itemsInAlbum = memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId).sort((a, b) => b.timestamp - a.timestamp);
             
-            for (const item of itemsInAlbum) {
+            const itemsInAlbum = memoryCache.album.items
+                .filter(p => p.albumId === state.currentAlbumId)
+                .sort((a, b) => b.timestamp - a.timestamp);
+            
+            if (itemsInAlbum.length === 0) {
+                ui.photoList.innerHTML = `<p class="empty-list-placeholder">没有照片</p>`;
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            itemsInAlbum.forEach(item => {
                 const isSelected = state.photosToDelete.includes(item.id);
                 const el = document.createElement('div');
                 el.dataset.itemId = item.id;
+                
+                let
+         imgSrc = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Placeholder
+                let firstPhotoPath = '';
                 
                 if (item.type === 'photoset') {
                     el.className = `photo-item-set ${state.isPhotoManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
                     el.dataset.action = "open-item";
                     let stackHtml = '';
-                    for (const photo of item.photos.slice(0, 3)) {
-                        const photoUrl = await getSecureFileUrl(photo.path);
-                        stackHtml += `<img src="${photoUrl}" class="photo-stack-img" loading="lazy">`;
+                    const photosToDisplay = item.photos.slice(0, 3);
+                    firstPhotoPath = photosToDisplay.length > 0 ? photosToDisplay[photosToDisplay.length - 1].path : '';
+                     
+                    for (let i = photosToDisplay.length - 1; i >= 0; i--) {
+                        stackHtml += `<img data-src="${photosToDisplay[i].path}" class="photo-stack-img lazyload" loading="lazy" src="${imgSrc}">`;
                     }
                     const title = (item.title || '照片集');
                     el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}>${stackHtml}<div class="photo-title-overlay">${title}</div><div class="count-overlay">${item.photos.length} 张</div>`;
                 } else {
                     el.className = `photo-item ${state.isPhotoManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
                     el.dataset.action = "open-item";
-                    const photoUrl = await getSecureFileUrl(item.path);
+                    firstPhotoPath = item.path;
                     const title = (item.title || '');
-                    el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><img src="${photoUrl}" alt="${title}" loading="lazy"><div class="photo-title-overlay">${title}</div>`;
+                    el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><img data-src="${firstPhotoPath}" class="lazyload" alt="${title}" loading="lazy" src="${imgSrc}"><div class="photo-title-overlay">${title}</div>`;
                 }
-                ui.photoList.appendChild(el);
-            }
-            if (itemsInAlbum.length === 0) ui.photoList.innerHTML = `<p class="empty-list-placeholder">没有照片</p>`;
+                fragment.appendChild(el);
+            });
+
+            ui.photoList.appendChild(fragment);
+
+            const lazyImages = ui.photoList.querySelectorAll('.lazyload');
+            lazyImages.forEach(img => photoObserver.observe(img));
         }
         
         async function openPhotoViewer(items, initialIndex) {
@@ -2261,8 +2302,11 @@
                 timestamp = photo.timestamp;
             }
 
+            const viewerImg = ui.photoViewer.querySelector('#viewer-img');
+            viewerImg.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Placeholder
+            
             const photoUrl = await getSecureFileUrl(photo.path);
-            ui.photoViewer.querySelector('#viewer-img').src = photoUrl;
+            viewerImg.src = photoUrl;
             ui.photoViewer.querySelector('#viewer-title').textContent = title || '';
             ui.photoViewer.querySelector('#viewer-description').textContent = description || '';
             ui.photoViewer.querySelector('#viewer-timestamp').textContent = new Date(timestamp).toLocaleString('zh-CN');
@@ -2535,7 +2579,7 @@
                 const path = MEMORY_PHOTOS_PATH + fileName;
                 const result = await uploadFileViaGitData({ file, path, commitMessage: `Upload photo: ${fileName}`, onProgress: (p) => { updateStatus(`上传中: ${Math.round(p)}%`); } });
                 memoryCache.album.items.push({ type: 'photo', id: Date.now() + Math.random(), albumId: state.currentAlbumId, title, description, path, sha: result.sha, timestamp: Date.now() });
-                await renderPhotos();
+                renderPhotos(); // Re-render to show new photo
                 scheduleSave();
                 state.photoUploadQueue.shift();
                 if (state.photoUploadQueue.length > 0) { 
@@ -2631,8 +2675,8 @@
             currentConfig.categories.forEach(cat => {
                 if (cat.name === '全部') return;
                 cat.buttons.forEach(btn => {
-                    if (!btnMap.has(btn.href)) {
-                        btnMap.set(btn.href, { ...btn, category: cat.name });
+                    if (btn.href.includes('raw.githack.com') && !btnMap.has(btn.href)){
+                       btnMap.set(btn.href, { ...btn, category: cat.name });
                     }
                 });
             });
@@ -2691,7 +2735,7 @@
             
             const urlParts = buttonConfig.href.split('/');
             const projectFolder = urlParts.slice(5, -1).join('/');
-            const path = projectFolder;
+            const path = `projects/${projectFolder}`;
 
             const { data: files, error } = await fetchFromGithub(path);
 
@@ -2716,11 +2760,7 @@
             ui.fileListStatus.style.display = "none";
             fileDetails.forEach(file => {
                 const li = document.createElement('li');
-                li.style.cssText = `flex-direction: column; align-items: start; background: var(--bg-day-element); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); padding: 10px; width: 120px; text-align: center;`;
-                if(document.body.classList.contains('dark-mode')){
-                    li.style.boxShadow = `4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night)`;
-                }
-
+                
                 const fileInfo = document.createElement('div');
                 fileInfo.className = "file-info";
                 fileInfo.dataset.filePath = file.path;
@@ -2729,17 +2769,12 @@
                 const fileName = document.createElement("span");
                 fileName.className = "file-name";
                 fileName.textContent = file.name;
-                fileName.style.textAlign = 'center';
-                fileName.style.width = '100%';
 
                 fileInfo.append(fileName);
                 const deleteBtn = document.createElement("button");
                 deleteBtn.className = "delete-btn";
                 deleteBtn.innerHTML = "&times;";
                 deleteBtn.title = "删除文件";
-                deleteBtn.style.position = 'absolute';
-                deleteBtn.style.top = '-5px';
-                deleteBtn.style.right = '-5px';
 
                 li.append(fileInfo, deleteBtn);
                 ui.fileList.appendChild(li);
@@ -2836,7 +2871,7 @@
             ui.progressBar.style.width = '0%'; 
             
             try { 
-                const path = `${projectFolder}/${fileName}`;
+                const path = `projects/${projectFolder}/${fileName}`;
                 await uploadFileViaGitData({ file, path, commitMessage: `Upload ${fileName} to ${buttonConfig.text}`, onProgress: (percent) => { ui.progressBar.style.width = `${percent}%`; if (percent < 100) { ui.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; } else { ui.uploadBtn.textContent = '正在处理...'; } } }); 
                 alert("上传成功！"); 
                 ui.fileUploader.value = ""; 
@@ -2859,6 +2894,22 @@
                 if (!memoryCache) { syncWithGithub(); }
             },
             init: () => {
+                 photoObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            const src = img.dataset.src;
+                            if (src) {
+                                getSecureFileUrl(src).then(url => {
+                                    if(url) img.src = url;
+                                });
+                            }
+                            observer.unobserve(img);
+                        }
+                    });
+                }, { root: ui.photoList, rootMargin: "0px 0px 200px 0px" });
+
+
                 ui.appContainer.addEventListener('click', e => {
                     const target = e.target.closest('[data-action]');
                     if (target && actions[target.dataset.action]) {
@@ -2996,6 +3047,7 @@
             document.body.style.overflow = '';
             if (state.isPlaying) {
                 ui.player.audio.pause();
+                ui.player.audio.src = ''; // Force stop
             }
         }
 
@@ -3185,17 +3237,19 @@
             state.currentTrackIndex = index;
             const track = state.playlist[index];
             
+            ui.player.displayArea.innerHTML = `<div class="music-loader"></div>`;
             const audioUrl = await getSecureFileUrl(track.musicPath);
+
             if (!audioUrl) {
                 console.error(`Failed to get URL for track: ${track.displayName}`);
                 alert(`无法播放歌曲 "${track.displayName}"，请检查文件是否存在或网络连接。`);
+                ui.player.displayArea.innerHTML = `<div class="song-title-display">${track.displayName} (加载失败)</div>`;
                 nextTrack(true);
                 return;
             }
             ui.player.audio.src = audioUrl;
             
             state.lyrics = [];
-            ui.player.displayArea.innerHTML = '';
 
             const displaySongTitle = () => {
                 ui.player.displayArea.innerHTML = `<div class="song-title-display">${track.displayName}</div>`;
@@ -3427,38 +3481,45 @@
     async function getSecureFileUrl(path) {
         if (!path) return '';
         if (secureFileCache.has(path)) {
-            const cachedUrl = secureFileCache.get(path);
+            const cached = secureFileCache.get(path);
+            // Check if the cached item is a promise or a URL
+            if (typeof cached.then === 'function') {
+                return await cached; // It's a promise, wait for it
+            }
+            return cached; // It's already a URL
+        }
+
+        // Create a promise to represent the fetching process and cache it
+        const fetchPromise = new Promise(async (resolve, reject) => {
             try {
-                const response = await fetch(cachedUrl, { method: 'HEAD' });
-                if (response.ok) {
-                    return cachedUrl;
+                const { data: metaData, error: metaError } = await fetchFromGithub(path, 'contents');
+                if (metaError || !metaData || !metaData.sha) {
+                    throw new Error(`Could not get metadata for ${path}. ${metaError || 'No SHA found.'}`);
                 }
-            } catch (e) { /* Ignore */ }
-            URL.revokeObjectURL(cachedUrl);
-            secureFileCache.delete(path);
-        }
 
-        try {
-            const { data: metaData, error: metaError } = await fetchFromGithub(path, 'contents');
-            if (metaError || !metaData || !metaData.sha) {
-                throw new Error(`Could not get metadata for ${path}. ${metaError || 'No SHA found.'}`);
+                const { data: blobData, error: blobError } = await fetchFromGithub(`blobs/${metaData.sha}`, 'git');
+
+                if (blobError || !blobData || !blobData.content) {
+                    throw new Error(`Could not get blob content for ${path}. ${blobError || 'No content returned.'}`);
+                }
+                
+                const blob = b64toBlob(blobData.content, metaData.type);
+                const blobUrl = URL.createObjectURL(blob);
+                
+                // Once resolved, update the cache with the actual URL
+                secureFileCache.set(path, blobUrl);
+                resolve(blobUrl);
+
+            } catch (error) {
+                console.error(`Failed to retrieve file: ${path}`, error);
+                // Remove the failed promise from cache
+                secureFileCache.delete(path);
+                resolve(''); // Resolve with empty string on failure
             }
+        });
 
-            const { data: blobData, error: blobError } = await fetchFromGithub(`blobs/${metaData.sha}`, 'git');
-
-            if (blobError || !blobData || !blobData.content) {
-                throw new Error(`Could not get blob content for ${path}. ${blobError || 'No content returned.'}`);
-            }
-            
-            const blob = b64toBlob(blobData.content, metaData.type);
-            const blobUrl = URL.createObjectURL(blob);
-            secureFileCache.set(path, blobUrl);
-            return blobUrl;
-
-        } catch (error) {
-            console.error(`All methods failed to retrieve file: ${path}`, error);
-            return '';
-        }
+        secureFileCache.set(path, fetchPromise);
+        return await fetchPromise;
     }
 
 
