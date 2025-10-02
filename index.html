@@ -16,7 +16,7 @@
 
     <title>JellyfishCenter</title>
     <style>
-        /* [CSS - V12.5.0 "Interaction & Layout Refinement"] */
+        /* [CSS - V12.5.0 "Cascade Select"] */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
         :root {
             --day-color1: #f5f7fa; --day-color2: #e4eaf5;
@@ -62,29 +62,15 @@
         body.dark-mode .editable-subtitle { color: #c0c6cc; background-color: rgba(0,0,0,0.1); }
         .editable-subtitle:hover { background-color: rgba(255, 255, 255, 0.8); color: var(--text-day); } body.dark-mode .editable-subtitle:hover { background-color: rgba(50, 55, 75, 0.8); color: var(--text-night); }
         
-        /* REFINED: Category Navigation */
         .category-nav-container { width: 100%; max-width: 1200px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 10px 0; margin-bottom: 10px; }
         .category-nav-container::-webkit-scrollbar { display: none; }
         .category-nav { display: flex; flex-wrap: nowrap; gap: 12px; padding: 0 20px; }
         .category-pill { flex-shrink: 0; padding: 8px 18px; border: none; border-radius: 20px; background: var(--bg-day-element); box-shadow: none; color: var(--text-day); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; opacity: 0.6; }
         body.dark-mode .category-pill { background: var(--bg-night-element); color: var(--text-night); }
-        
-        body:not(.theme-glass) .category-pill.active {
-            color: var(--text-day); font-weight: 700;
-            box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day);
-            transform: none; opacity: 1;
-        }
-        body.dark-mode:not(.theme-glass) .category-pill.active {
-            color: var(--text-night);
-            box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night);
-        }
-        body.theme-glass .category-pill.active {
-             background: rgba(255, 255, 255, 0.4); border-color: rgba(255, 255, 255, 0.6);
-             opacity: 1; transform: scale(1.05); color: #000;
-        }
-        body.dark-mode.theme-glass .category-pill.active {
-            color: #fff; background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.3);
-        }
+        body:not(.theme-glass) .category-pill.active { background: var(--bg-day-element); color: var(--text-day); font-weight: 700; box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); opacity: 1; }
+        body.dark-mode:not(.theme-glass) .category-pill.active { color: var(--text-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
+        body.theme-glass .category-pill.active { background: rgba(255, 255, 255, 0.4); border-color: rgba(255, 255, 255, 0.6); opacity: 1; transform: scale(1.05); color: #000; }
+        body.dark-mode.theme-glass .category-pill.active { color: #fff; background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.3); }
 
         .nav-container { width: 100%; max-width: 1200px; margin: 10px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; padding: 20px; position: relative; z-index: 10; touch-action: pan-y; }
         .nav-btn { position: relative; padding: 22px 16px; border: none; border-radius: 14px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background: var(--bg-day-element); backdrop-filter: blur(8px); font-size: 17px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -148,14 +134,8 @@
         .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; } .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; } .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--hold-border); } input:checked + .slider:before { transform: translateX(18px); }
-        #cloud-drive-section .list-container { flex-grow: 1; display: flex; flex-direction: column; min-height: 0; overflow-y: hidden;}
-        #cloud-drive-section .file-upload-section { flex-shrink: 0; }
-        #file-list-container{border-radius:10px;padding:5px;background:var(--bg-day-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day); flex-grow: 1; overflow-y: auto; min-height: 50px;} 
-        body.dark-mode #file-list-container{background:var(--bg-night-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}
-        #file-list-container ul{list-style:none;padding:5px;width:100%}#file-list-container li{padding:8px 15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;transition:background .2s;gap:10px;position:relative}#file-list-container li:hover{background-color:rgba(0,0,0,0.05)}body.dark-mode #file-list-container li:hover{background-color:rgba(255,255,255,0.08)}
-        #fileListStatus{text-align:center;color:#a0aec0;padding:10px;display:flex;align-items:center;justify-content:center;height:100%}
-        body.dark-mode #fileListStatus {color:#889;}
-        .file-info{flex-grow:1;cursor:pointer;min-width:0}.file-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px}.file-size{font-size:12px;font-weight:300;color:#9A86A4}.delete-btn{background:transparent;border:none;cursor:pointer;padding:0;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s,color .2s;color:#bbb;font-size:22px;font-weight:bold;line-height:1}.delete-btn:hover{background:#f0f0f0;color:#e53e3e}body.dark-mode .delete-btn{color:#889}body.dark-mode .delete-btn:hover{background:rgba(255,255,255,0.1);color:#fc8181}
+        
+        #projectSelector.hidden { display: none; }
         #settingsModal .modal-content,#addNavModal .modal-content, #musicSettingsModal .modal-content {max-width:400px}
         #settingsModal .modal-body .form-section,#addNavModal .modal-body .form-section{display:flex;flex-direction:column;gap:8px}#settingsModal label,#addNavModal label{font-size:14px;color:#5a6778}body.dark-mode #settingsModal label,body.dark-mode #addNavModal label{color:#c0c6cc}
         .segmented-control { position: relative; display: flex; border-radius: 12px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
@@ -163,7 +143,7 @@
         .segmented-control label { position: relative; z-index: 1; flex: 1; text-align: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: color .3s ease; font-weight: 600; color: #889; font-size: 14px; }
         .segmented-control .slider-indicator { position: absolute; top: 5px; left: 5px; bottom: 5px; background: var(--bg-day-element); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); border-radius: 8px; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 0; }
         body.dark-mode .segmented-control .slider-indicator { background: var(--bg-night-element); box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); }
-        #addNavModal input[type="radio"]:checked + label, #helpModal input[type="radio"]:checked + label, #colorPaletteModal input[type="radio"]:checked + label { color: var(--hold-border); } body.dark-mode #addNavModal input[type="radio"]:checked + label, body.dark-mode #helpModal input[type="radio"]:checked + label, body.dark-mode #colorPaletteModal input[type="radio"]:checked + label { color: var(--hold-border); }
+        #addNavModal input[type="radio"]:checked + label, #helpModal input[type="radio"]:checked + label, #colorPaletteModal input[type="radio"]:checked + label { color: var(--hold-border); }
         #type-upload:checked ~ .slider-indicator { transform: translateX(100%); }
         #theme-style-glass:checked ~ .slider-indicator { transform: translateX(100%); }
         .segmented-control.two-segments .slider-indicator { width: calc(50% - 5px); }
@@ -172,7 +152,7 @@
         .header-toggle-group { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: normal; color: #5a6778; } body.dark-mode .header-toggle-group { color: #c0c6cc; }
         .file-select-wrapper { display: flex; align-items: center; gap: 10px; width: 100%; } .file-select-wrapper .modal-button { flex-shrink: 0; width: auto; padding: 10px 15px; font-size: 14px; }
         .file-select-wrapper .status-text { flex-grow: 1; font-size: 14px; color: #889; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .file-upload-section { display: flex; flex-direction: column; gap: 10px; } input[type="file"] { display: none; }
+        .file-upload-section { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; } input[type="file"] { display: none; }
         .progress-container { display: none; height: 12px; background:var(--bg-day-element); border-radius: 6px; box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day); padding: 2px; } body.dark-mode .progress-container { box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night); }
         .progress-bar { width: 0%; height: 100%; border-radius: 4px; background-color: #707899; transition: width 0.2s linear; }
         #helpModal .modal-body { gap: 0; padding-top: 15px; } #helpModal .modal-body > input[name="help-tab"] { display: none; } 
@@ -223,7 +203,6 @@
         #memoryModal .hub-btn { width: 80%; max-width: 300px; padding: 40px 20px; border: none; border-radius: 20px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 24px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
         body.dark-mode #memoryModal .hub-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
         #memoryModal .hub-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-day), inset -6px -6px 12px var(--shadow-light-day); } body.dark-mode #memoryModal .hub-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-night), inset -6px -6px 12px var(--shadow-light-night); }
-        #memoryModal #folder-list-container, #memoryModal #album-list-container { overflow-y: auto; }
         #memoryModal #notes-list-container { grid-template-columns: 1fr; }
         #memoryModal .folder-item, #memoryModal .album-item { margin-bottom: 10px; position: relative; padding: 20px 15px; border: none; border-radius: 14px; box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); background: var(--bg-day-element); font-size: 16px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; user-select: none; -webkit-tap-highlight-color: transparent; text-align: left; }
         #memoryModal .note-item { position: relative; padding: 20px 15px; border: none; border-radius: 14px; box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); background: var(--bg-day-element); font-size: 16px; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; user-select: none; -webkit-tap-highlight-color: transparent; text-align: left; }
@@ -300,6 +279,20 @@
         .folder-item.manage-mode .manage-checkbox, .album-item.manage-mode .manage-checkbox, .photo-item.manage-mode .manage-checkbox, .photo-item-set.manage-mode .manage-checkbox { display: block; }
         .folder-item.manage-selected, .album-item.manage-selected, .photo-item.manage-selected, .photo-item-set.manage-selected { border: 2px solid var(--hold-border); box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day) !important; }
         body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-selected, body.dark-mode .photo-item.manage-selected, body.dark-mode .photo-item-set.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
+        
+        #cloud-drive-section .list-container { display: flex; flex-direction: column; gap: 15px; padding: 15px; overflow-y: hidden; min-height: 0; }
+        #file-list-container { flex-shrink: 1; flex-grow: 1; min-height: 100px; overflow-y: auto; border-radius: 10px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); display: flex; flex-direction: column; }
+        body.dark-mode #file-list-container { background:var(--bg-night-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
+        #file-list-container ul { list-style:none; padding: 5px; }
+        #file-list-container li { padding: 8px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; transition: background .2s; gap: 10px; position: relative; }
+        #file-list-container li:hover { background-color: rgba(0,0,0,0.05); } body.dark-mode #file-list-container li:hover { background-color:rgba(255,255,255,0.08); }
+        #fileListStatus { flex-grow: 1; text-align: center; color: #a0aec0; display: flex; align-items: center; justify-content: center; min-height: 50px; } body.dark-mode #fileListStatus { color:#889; }
+        .file-info { flex-grow: 1; cursor: pointer; min-width: 0; }
+        .file-name { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 16px; }
+        .file-size { font-size: 12px; font-weight: 300; color: #9A86A4; }
+        .delete-btn { background:transparent; border:none; cursor:pointer; padding:0; flex-shrink:0; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:background .2s,color .2s; color:#bbb; font-size:22px; font-weight:bold; line-height:1; }
+        .delete-btn:hover { background:#f0f0f0; color:#e53e3e; } body.dark-mode .delete-btn { color:#889; } body.dark-mode .delete-btn:hover { background:rgba(255,255,255,0.1); color:#fc8181; }
+
         /* ===== [END] MEMORY MODAL STYLES ===== */
         
         /* ===== [START] WANDER VIEW 4.0 STYLES (Architecture) ===== */
@@ -673,13 +666,9 @@
                                     <li><strong>音乐播放</strong>: 您可以上传自己的音乐和歌词文件，在漫游模式中播放。</li>
                                     <li><strong>便捷播放</strong>: 在音乐设置的播放列表中，直接点击歌曲名即可自动进入漫游模式并开始播放。</li>
                                 </ul>
-                                <h4>📂 文件夹 (文件云盘)</h4>
-                                <ul>
-                                    <li><strong>两级选择</strong>: 现在您需要先选择一个“分类”，然后才能在下方新出现的选择框中看到该分类下的具体“项目”，从而管理文件。</li>
-                                    <li><strong>布局优化</strong>: 文件列表现在会根据文件数量自适应高度，超出范围时可独立滚动，布局更合理。</li>
-                                </ul>
                             </div>
                         </details>
+
                         <div class="warning"><p><strong>危险操作</strong>：在 <code>数据同步</code> (☁️) 弹窗的最下方有“清空所有数据”按钮。此操作会 <strong>永久删除</strong> 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
                     </div>
                     <div id="help-page-2" class="help-page-content">
@@ -688,15 +677,6 @@
                             <p><strong>QQ交流群:</strong> 563191005</p>
                         </div>
                         
-                        <div class="update-log-entry">
-                            <h4>v3.8.0 <span class="update-date">- 2025.10.02</span></h4>
-                            <ul>
-                                <li><span class="tag new">新功能</span> 在“记忆 > 文件夹”中，项目选择器升级为**两级联动**：先选分类，再选项目，逻辑更清晰。</li>
-                                <li><span class="tag opt">优化</span> 为备忘录和相册的文件夹列表增加了**内部滚动**，解决了内容过多时界面溢出的问题。</li>
-                                <li><span class="tag opt">优化</span> 微调了“文件夹”界面的布局，确保文件列表上下间距均衡，并在内容过多时**独立滚动**，提升了整体协调性。</li>
-                                <li><span class="tag fix">修复</span> 解决了当关闭分页模式时，应用可能无法正确显示所有按钮的逻辑错误。</li>
-                            </ul>
-                        </div>
                         <div class="update-log-entry">
                             <h4>v3.7.0 <span class="update-date">- 2025.10.02</span></h4>
                             <ul>
@@ -731,9 +711,28 @@
                                 <li><span class="tag opt">优化</span> 访问GitHub相关链接时，增加开启VPN的友好提示弹窗。</li>
                             </ul>
                         </div>
+                        <div class="update-log-entry">
+                            <h4>v2.0.0 <span class="update-date">- 2025.09.30</span></h4>
+                            <ul>
+                                <li><span class="tag new">功能</span> 极大简化了添加网址与上传文件项目的方式。</li>
+                                <li><span class="tag new">功能</span> 新增文件云盘功能，支持按分类上传和下载文件。</li>
+                                <li><span class="tag new">功能</span> 新增 “记忆” 功能模块，集成备忘录与相册。</li>
+                                <li><span class="tag new">功能</span> 相册内置 “漫游模式”，提供沉浸式看图体验。</li>
+                                <li><span class="tag new">功能</span> 支持自定义上传全局背景图片和标题卡片背景图片。</li>
+                                <li><span class="tag fix">优化</span> 优化iOS端全屏显示，左侧右滑返回时增加确认弹窗以防误触。</li>
+                            </ul>
+                        </div>
+                        <div class="update-log-entry">
+                            <h4>v1.0.0 <span class="update-date">- 2025.09.24</span></h4>
+                            <ul>
+                                <li><span class="tag release">正式发布</span> JellyfishCenter 导航正式上线。</li>
+                                <li><span class="tag new">功能</span> 新增日间/夜间模式一键切换。</li>
+                                <li><span class="tag new">功能</span> 新增自定义图标与卡片主题色功能。</li>
+                            </ul>
+                        </div>
                         
                         <footer class="update-footer">
-                            当前版本: v3.8.0
+                            当前版本: v3.7.0
                         </footer>
                     </div>
                     <div id="help-page-3" class="help-page-content">
@@ -890,16 +889,16 @@
                         <button data-action="back-to-hub" class="header-btn back-btn">&#10094;</button>
                         <h1 class="title">文件夹</h1>
                     </div>
-                    <div class="list-container" style="padding: 15px; gap: 15px;">
+                    <div class="list-container">
                         <select id="categorySelector" class="modal-select"></select>
-                        <select id="projectSelector" class="modal-select" style="display: none;"></select>
+                        <select id="projectSelector" class="modal-select hidden"></select>
                         <div class="file-upload-section">
-                            <input type="file" id="fileUploader">
+                            <input type="file" id="fileUploader"/>
                             <div class="file-select-wrapper">
                                 <button id="selectFileBtn" class="modal-button">选择文件</button>
                                 <span id="selectedFileName" class="status-text">未选择任何文件</span>
                             </div>
-                            <input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）">
+                            <input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）"/>
                             <button id="uploadBtn" class="modal-button">上传文件</button>
                             <div id="progressContainer" class="progress-container">
                                 <div id="uploadProgressBar" class="progress-bar"></div>
@@ -969,7 +968,7 @@
     <!-- Wander View -->
     <div id="wanderViewOverlay">
         <div class="wander-header">
-            <button class="close-btn" data-action="close-wander-view">&times;</button>
+           <button class="close-btn" data-action="close-wander-view">&times;</button>
         </div>
         <div class="wander-main-content">
             <div class="wander-photo-container" id="wander-photo-container">
@@ -1063,8 +1062,8 @@
     </div>
 
        <script>
-    // [JS - V12.5.0 "Interaction & Layout Refinement"]
-    const CURRENT_APP_VERSION = '3.8.0';
+    // [JS - V12.5.0 "Cascade Select"]
+    const CURRENT_APP_VERSION = '3.7.0';
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false, isEditingButton = false, editingButtonData = null;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
@@ -1773,16 +1772,10 @@
         let buttons = [];
 
         if (currentConfig.settings.paginationEnabled === false) {
-             const allButtons = new Map();
-            currentConfig.categories.forEach(cat => {
-                cat.buttons.forEach(btn => {
-                    if (!allButtons.has(btn.href)) {
-                        allButtons.set(btn.href, btn);
-                    }
-                });
-            });
-            buttons = Array.from(allButtons.values());
-        } else if (categoryName === '全部') {
+             categoryName = '全部';
+        }
+        
+        if (categoryName === '全部') {
             const allButtons = new Map();
             currentConfig.categories.forEach(cat => {
                 cat.buttons.forEach(btn => {
@@ -2411,8 +2404,8 @@
             'goto-memo': () => { state.currentSection = 'memo'; renderMemoFolders(); showView('folder-view', 'memo-section'); },
             'goto-album': () => { state.currentSection = 'album'; renderAlbumFolders(); showView('album-folder-view', 'album-section'); },
              'goto-cloud': () => {
-                populateDriveSelector();
-                fetchFilesForSelectedCategory();
+                populateDriveCategorySelector();
+                fetchFilesForSelectedProject();
                 showPage('cloud-drive-section');
             },
             'back-to-hub': () => { state.currentSection = null; showPage('hub-view'); },
@@ -2710,36 +2703,52 @@
             }
         });
         
-        function populateDriveSelector() {
-            ui.categorySelector.innerHTML = '';
-            ui.projectSelector.innerHTML = '';
-            ui.projectSelector.style.display = 'none';
-            
-            const categoriesWithProjects = currentConfig.categories
-                .map(cat => ({
-                    name: cat.name,
-                    projects: cat.buttons.filter(btn => btn.href.includes('raw.githack.com'))
-                }))
-                .filter(cat => cat.name !== '全部' && cat.projects.length > 0);
+        function populateDriveCategorySelector() {
+            const categorySelector = ui.categorySelector;
+            categorySelector.innerHTML = '<option value="">选择分类...</option>';
+            const categoriesWithUploads = new Set();
+            currentConfig.categories.forEach(cat => {
+                if (cat.buttons.some(btn => btn.href.includes('raw.githack.com'))) {
+                    categoriesWithUploads.add(cat.name);
+                }
+            });
 
-            const defaultCatOption = document.createElement("option");
-            defaultCatOption.value = "";
-            defaultCatOption.textContent = `选择分类... (${categoriesWithProjects.length})`;
-            ui.categorySelector.appendChild(defaultCatOption);
-
-            if (categoriesWithProjects.length === 0) {
-                const noUploadsOption = document.createElement("option");
-                noUploadsOption.value = "";
-                noUploadsOption.textContent = "没有可用的上传项目";
-                noUploadsOption.disabled = true;
-                ui.categorySelector.appendChild(noUploadsOption);
+            if (categoriesWithUploads.size === 0) {
+                categorySelector.innerHTML = '<option value="">没有可用的分类</option>';
             } else {
-                categoriesWithProjects.forEach(cat => {
+                categoriesWithUploads.forEach(catName => {
                     const option = document.createElement("option");
-                    option.value = cat.name;
-                    option.textContent = cat.name;
-                    ui.categorySelector.appendChild(option);
+                    option.value = catName;
+                    option.textContent = catName;
+                    categorySelector.appendChild(option);
                 });
+            }
+            populateDriveProjectSelector();
+        }
+
+        function populateDriveProjectSelector() {
+            const selectedCategory = ui.categorySelector.value;
+            const projectSelector = ui.projectSelector;
+            projectSelector.innerHTML = '<option value="">选择项目...</option>';
+
+            if (!selectedCategory) {
+                projectSelector.classList.add('hidden');
+                return;
+            }
+
+            const category = currentConfig.categories.find(c => c.name === selectedCategory);
+            const projects = category ? category.buttons.filter(btn => btn.href.includes('raw.githack.com')) : [];
+
+            if (projects.length > 0) {
+                projects.forEach(proj => {
+                    const option = document.createElement("option");
+                    option.value = proj.href;
+                    option.textContent = proj.text;
+                    projectSelector.appendChild(option);
+                });
+                projectSelector.classList.remove('hidden');
+            } else {
+                projectSelector.classList.add('hidden');
             }
         }
 
@@ -2751,14 +2760,14 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        async function fetchFilesForSelectedCategory(){
+        async function fetchFilesForSelectedProject(){
             const selectedProjectHref = ui.projectSelector.value;
 
             ui.fileList.innerHTML = "";
             ui.fileListStatus.style.display = "flex";
 
             if (!selectedProjectHref) {
-                ui.fileListStatus.textContent = "请选择一个项目";
+                ui.fileListStatus.textContent = ui.categorySelector.value ? "请选择一个项目" : "请选择一个分类";
                 return;
             }
             if (!checkConfig(false)) {
@@ -2767,8 +2776,8 @@
             }
 
             const projectConfig = findButtonConfigByHref(selectedProjectHref);
-            if (!projectConfig || !projectConfig.href.includes('raw.githack.com')) {
-                ui.fileListStatus.textContent = "此项目不支持文件夹功能";
+            if (!projectConfig) {
+                ui.fileListStatus.textContent = "项目配置无效";
                 return;
             }
 
@@ -2824,7 +2833,7 @@
                 deleteBtn.addEventListener("click", () => deleteFile(file.path, file.sha, li));
             });
         }
-        async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";try{ const success = await deleteFromGithub(e, `Delete file: ${e}`, t); if (success) { n.remove(); if(ui.fileList.children.length === 0) { ui.fileListStatus.textContent = '该项目下暂无文件'; ui.fileListStatus.style.display = 'block'; } } else { n.style.opacity = "1"; } } catch(err) { n.style.opacity = "1"; }}
+        async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";try{ const success = await deleteFromGithub(e, `Delete file: ${e}`, t); if (success) { n.remove(); if(ui.fileList.children.length === 0) { ui.fileListStatus.textContent = '该文件夹下暂无文件'; ui.fileListStatus.style.display = 'block'; } } else { n.style.opacity = "1"; } } catch(err) { n.style.opacity = "1"; }}
         async function forceDownload(path, filename, el) {
             const fileNameSpan = el.querySelector(".file-name");
             const originalText = fileNameSpan.textContent;
@@ -2899,8 +2908,8 @@
             if (!selectedProjectHref || !file || !fileName) { return alert("请选择要上传到的项目、文件，并确保文件名不为空。"); } 
             
             const projectConfig = findButtonConfigByHref(selectedProjectHref);
-            if (!projectConfig || !projectConfig.href.includes('raw.githack.com')) {
-                return alert("此项目不支持文件夹功能。");
+            if (!projectConfig) {
+                return alert("此项目配置无效。");
             }
             
             const urlParts = projectConfig.href.split('/');
@@ -2918,7 +2927,7 @@
                 ui.fileUploader.value = ""; 
                 ui.fileNameInput.value = ""; 
                 ui.selectedFileName.textContent = '未选择任何文件'; 
-                fetchFilesForSelectedCategory(); 
+                fetchFilesForSelectedProject(); 
             } catch (error) { 
                 if (error.message !== "上传已取消。") alert(await handleApiError(`上传文件 ${fileName}`, error)); 
             } finally { 
@@ -2976,30 +2985,10 @@
                 document.querySelector('[data-action="close-wander-view"]').addEventListener('click', actions['close-wander-view']);
                 document.querySelector('[data-action="toggle-player-collapse"]').addEventListener('click', actions['toggle-player-collapse']);
                 ui.categorySelector.addEventListener("change", () => {
-                    const selectedCategoryName = ui.categorySelector.value;
-                    ui.projectSelector.innerHTML = '';
-                    if (selectedCategoryName) {
-                        const category = currentConfig.categories.find(c => c.name === selectedCategoryName);
-                        const projects = category ? category.buttons.filter(btn => btn.href.includes('raw.githack.com')) : [];
-
-                        const defaultProjOption = document.createElement("option");
-                        defaultProjOption.value = "";
-                        defaultProjOption.textContent = `选择项目... (${projects.length})`;
-                        ui.projectSelector.appendChild(defaultProjOption);
-                        
-                        projects.forEach(proj => {
-                            const option = document.createElement("option");
-                            option.value = proj.href;
-                            option.textContent = proj.text;
-                            ui.projectSelector.appendChild(option);
-                        });
-                        ui.projectSelector.style.display = 'block';
-                    } else {
-                        ui.projectSelector.style.display = 'none';
-                    }
-                    fetchFilesForSelectedCategory();
+                   populateDriveProjectSelector();
+                   fetchFilesForSelectedProject();
                 });
-                ui.projectSelector.addEventListener("change", fetchFilesForSelectedCategory);
+                ui.projectSelector.addEventListener("change", fetchFilesForSelectedProject);
                 ui.selectFileBtn.addEventListener('click', () => ui.fileUploader.click());
                 ui.fileUploader.addEventListener("change",()=>{ if(ui.fileUploader.files.length>0){ const file = ui.fileUploader.files[0]; ui.fileNameInput.value=file.name; ui.selectedFileName.textContent = file.name; } else { ui.selectedFileName.textContent = "未选择任何文件"; }});
                 ui.uploadBtn.addEventListener("click", uploadFile);
@@ -3089,7 +3078,8 @@
                     const j = Math.floor(Math.random() * (i + 1));
                     [itemPool[i], itemPool[j]] = [itemPool[j], itemPool[i]];
                 }
-             } else {                itemPool = [...items];
+             } else {
+                itemPool = [...items];
              }
 
             state.items = itemPool;
@@ -3131,13 +3121,12 @@
                 description = item.description;
             }
             
-            // Show "Rendering..." text while loading
-            ui.img.src = ""; // Clear previous image
+            ui.img.src = ""; 
             ui.img.alt = "渲染中...";
 
             const photoUrl = await getSecureFileUrl(photo.path);
             ui.img.src = photoUrl;
-            ui.img.alt = title || description || "Wander view image"; // Set proper alt text
+            ui.img.alt = title || description || "Wander view image";
             ui.photoContainer.style.setProperty('--blur-bg', `url(${photoUrl})`);
             ui.title.textContent = title || '';
             ui.description.textContent = description || '';
@@ -3179,10 +3168,8 @@
                 if (Math.abs(swipeDiff) < 50) return;
                 
                 if (ui.photoContainer.classList.contains('fullscreen') && state.items[state.currentIndex].type !== 'photoset') {
-                    // Normal fullscreen swipe
                     changePhoto(swipeDiff > 0 ? -1 : 1);
                 } else {
-                    // Photoset or non-fullscreen swipe
                     changePhoto(swipeDiff > 0 ? -1 : 1);
                 }
             }, { passive: true });
@@ -3546,14 +3533,12 @@
         if (!path) return '';
         if (secureFileCache.has(path)) {
             const cached = secureFileCache.get(path);
-            // Check if the cached item is a promise or a URL
             if (typeof cached.then === 'function') {
-                return await cached; // It's a promise, wait for it
+                return await cached;
             }
-            return cached; // It's already a URL
+            return cached;
         }
 
-        // Create a promise to represent the fetching process and cache it
         const fetchPromise = new Promise(async (resolve, reject) => {
             try {
                 const { data: metaData, error: metaError } = await fetchFromGithub(path, 'contents');
@@ -3570,15 +3555,13 @@
                 const blob = b64toBlob(blobData.content, metaData.type);
                 const blobUrl = URL.createObjectURL(blob);
                 
-                // Once resolved, update the cache with the actual URL
                 secureFileCache.set(path, blobUrl);
                 resolve(blobUrl);
 
             } catch (error) {
                 console.error(`Failed to retrieve file: ${path}`, error);
-                // Remove the failed promise from cache
                 secureFileCache.delete(path);
-                resolve(''); // Resolve with empty string on failure
+                resolve('');
             }
         });
 
