@@ -140,7 +140,7 @@
         #settingsModal .modal-body .form-section,#addNavModal .modal-body .form-section{display:flex;flex-direction:column;gap:8px}#settingsModal label,#addNavModal label{font-size:14px;color:#5a6778}body.dark-mode #settingsModal label,body.dark-mode #addNavModal label{color:#c0c6cc}
         .segmented-control { position: relative; display: flex; border-radius: 12px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
         body.dark-mode .segmented-control { background:var(--bg-night-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
-        .segmented-control label { position: relative; z-index: 1; flex: 1; text-align: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: color .3s ease; font-weight: 600; color: #889; font-size: 14px; }
+        .segmented-control label { position: relative; z-index: 1; flex: 1; text-align: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: color .3s ease; font-weight: 600; }
         .segmented-control .slider-indicator { position: absolute; top: 5px; left: 5px; bottom: 5px; background: var(--bg-day-element); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); border-radius: 8px; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 0; }
         body.dark-mode .segmented-control .slider-indicator { background: var(--bg-night-element); box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); }
         #addNavModal input[type="radio"]:checked + label, #helpModal input[type="radio"]:checked + label, #colorPaletteModal input[type="radio"]:checked + label { color: var(--hold-border); }
@@ -560,7 +560,7 @@
         }
         /* ===== [END] FROSTED GLASS THEME ===== */
 
-        /* ===== [START] FLOATING JELLYFISH BALL STYLES ===== */
+        /* ===== [START] FLOATING JELLYFISH BALL STYLES (REVISED) ===== */
         @keyframes jelly-glow {
             0% { filter: drop-shadow(0 0 2px rgba(91, 153, 226, 0.7)); }
             50% { filter: drop-shadow(0 0 8px rgba(91, 153, 226, 1)); }
@@ -578,7 +578,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 22px;
             cursor: grab;
             user-select: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -606,16 +606,10 @@
         }
         .jelly-menu {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 1px;
-            height: 1px;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             pointer-events: none;
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        #floating-jellyfish-ball.menu-open .jelly-menu {
-            transform: translate(-50%, -50%) rotate(360deg);
         }
         .jelly-menu-btn {
             position: absolute;
@@ -633,13 +627,12 @@
             font-size: 20px;
             cursor: pointer;
             box-shadow: inherit;
-            transform: scale(0);
             opacity: 0;
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             pointer-events: none;
         }
         #floating-jellyfish-ball.menu-open .jelly-menu-btn {
-            transform: scale(1);
+            transform: var(--transform-end); /* This will be set by JS */
             opacity: 1;
             pointer-events: auto;
         }
@@ -856,7 +849,7 @@
                 <div class="slider-indicator"></div>
             </div>
         </div>
-        <div id="neumorphism-settings">
+        <div id="pneumorphism-settings">
             <div class="color-picker-grid"><div class="color-picker-group"><label>日间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="dayColor1Picker"><span class="hex-display" id="dayColor1Hex"></span></div></div><div class="color-picker-group"><label>日间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="dayColor2Picker"><span class="hex-display" id="dayColor2Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="nightColor1Picker"><span class="hex-display" id="nightColor1Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="nightColor2Picker"><span class="hex-display" id="nightColor2Hex"></span></div></div></div>
             <div class="preview-container"><div class="preview-box" id="dayPreview" data-label="Day"></div><div class="preview-box" id="nightPreview" data-label="Night"></div></div>
             <div class="preset-manager"><div class="preset-row"><input type="text" id="presetNameInput" class="modal-input" placeholder="为当前配色命名"><button id="savePresetBtn" class="modal-button save">保存</button><button id="updatePresetBtn" class="modal-button">更新</button></div><div class="preset-row"><select id="presetSelector" class="modal-select"></select><button id="deletePresetBtn" class="modal-button delete">删除</button></div></div>
@@ -1177,13 +1170,14 @@
     const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按🌞打开工具栏 | By淡季水母', categories: [{ name: '全部', buttons: [] }], settings: { paginationEnabled: true }, themePresets: [] });
     let currentConfig = getDefaultConfig();
     
-    // ===== [START] FLOATING JELLYFISH BALL LOGIC =====
+    // ===== [START] FLOATING JELLYFISH BALL LOGIC (REVISED) =====
     const FloatingBallManager = (() => {
         let ball = null;
         let isDragging = false;
         let offset = { x: 0, y: 0 };
         let idleTimer = null;
         let longPressTimer = null;
+        const LONG_PRESS_DURATION = 2000;
 
         function _create() {
             if (localStorage.getItem('jellyBallEnabled') !== 'true') return;
@@ -1192,7 +1186,6 @@
             ball = document.createElement('div');
             ball.id = 'floating-jellyfish-ball';
             ball.innerHTML = `<span>🎐</span><div class="jelly-menu"></div>`;
-            ball.classList.add('glowing');
             document.body.appendChild(ball);
              
             let startPos = localStorage.getItem('jellyBallPosition');
@@ -1205,7 +1198,6 @@
                 ball.style.left = '90%';
             }
 
-            // Menu buttons
             const menu = ball.querySelector('.jelly-menu');
             const buttons = [
                 { icon: '📷', "data-action": 'album', title: '相册' },
@@ -1214,15 +1206,12 @@
                 { icon: '↩️', "data-action": 'return', title: '返回主页' }
             ];
 
-            buttons.forEach((btn, i) => {
+            buttons.forEach(btn => {
                 const btnEl = document.createElement('button');
                 btnEl.className = 'jelly-menu-btn';
                 btnEl.innerHTML = btn.icon;
                 btnEl.title = btn.title;
                 btnEl.dataset.action = btn.action;
-                const angle = (i / buttons.length) * 2 * Math.PI - (Math.PI / 2); // Start from top
-                const radius = 55; // pixels
-                btnEl.style.transform = `scale(0) rotate(${angle}rad) translateY(-${radius}px) rotate(-${angle}rad)`;
                 menu.appendChild(btnEl);
             });
             
@@ -1231,10 +1220,7 @@
         }
 
         function _destroy() {
-            if (ball) {
-                ball.remove();
-                ball = null;
-            }
+            if (ball) { ball.remove(); ball = null; }
             clearTimeout(idleTimer);
             clearTimeout(longPressTimer);
         }
@@ -1243,40 +1229,30 @@
             ball.addEventListener('mousedown', _onDragStart);
             ball.addEventListener('touchstart', _onDragStart, { passive: false });
             
-            document.addEventListener('click', (e) => {
-                if(ball && !ball.contains(e.target)) {
-                    _closeMenu();
-                }
-            }, true);
+            document.addEventListener('click', (e) => { if(ball && !ball.contains(e.target)) _closeMenu(); }, true);
             
-            ball.querySelector('.jelly-menu').addEventListener('click', _onMenuClick);
+            ball.querySelector('.jelly-menu').addEventListener('click', _onMenuClick, true);
         }
 
         function _onDragStart(e) {
-            if(e.target.classList.contains('jelly-menu-btn')) return;
+            if (ball.classList.contains('menu-open') && e.target.classList.contains('jelly-menu-btn')) return;
             e.preventDefault();
             
             clearTimeout(idleTimer);
             ball.classList.remove('idle', 'snap-left', 'snap-right');
             
             isDragging = false;
-            let clientX, clientY;
-            if (e.type === 'touchstart') {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
 
             const rect = ball.getBoundingClientRect();
             offset.x = clientX - rect.left;
             offset.y = clientY - rect.top;
 
             longPressTimer = setTimeout(() => {
-                _toggleMenu();
+                if (!isDragging) { _toggleMenu(); }
                 longPressTimer = null;
-            }, 2000);
+            }, LONG_PRESS_DURATION);
 
             document.addEventListener('mousemove', _onDragMove);
             document.addEventListener('touchmove', _onDragMove, { passive: false });
@@ -1285,30 +1261,20 @@
         }
 
         function _onDragMove(e) {
-            e.preventDefault();
-            ball.classList.add('dragging');
-            if (!isDragging) { // first move
+            if (!ball.classList.contains('dragging')) ball.classList.add('dragging');
+            if (!isDragging) {
                  isDragging = true;
-                 if (longPressTimer) {
-                    clearTimeout(longPressTimer);
-                    longPressTimer = null;
-                 }
+                 if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
                  _closeMenu();
             }
 
-            let clientX, clientY;
-            if (e.type === 'touchmove') {
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
+            e.preventDefault();
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
 
             let newX = clientX - offset.x;
             let newY = clientY - offset.y;
 
-            // Constrain to viewport
             const ballSize = ball.offsetWidth;
             const maxX = window.innerWidth - ballSize;
             const maxY = window.innerHeight - ballSize;
@@ -1321,10 +1287,8 @@
         }
 
         function _onDragEnd(e) {
-            if (isDragging) {
-                 _snapToEdge();
-                 localStorage.setItem('jellyBallPosition', JSON.stringify({ x: ball.offsetLeft, y: ball.offsetTop }));
-            }
+            if (!isDragging) _closeMenu();
+            if (isDragging) _snapToEdge();
             
             ball.classList.remove('dragging');
             isDragging = false;
@@ -1339,23 +1303,27 @@
         }
         
         function _snapToEdge() {
-             const ballCenter = ball.offsetLeft + ball.offsetWidth / 2;
-             const screenCenter = window.innerWidth / 2;
-             if (ballCenter > screenCenter) {
-                 ball.style.left = `${window.innerWidth - ball.offsetWidth}px`;
-                 ball.classList.add('snap-right');
+            const rect = ball.getBoundingClientRect();
+             if ((rect.left + rect.width / 2) > window.innerWidth / 2) {
+                 ball.style.left = `${window.innerWidth - rect.width}px`;
              } else {
                  ball.style.left = '0px';
-                 ball.classList.add('snap-left');
              }
+             localStorage.setItem('jellyBallPosition', JSON.stringify({ x: ball.offsetLeft, y: ball.offsetTop }));
         }
 
         function _resetIdleTimer() {
             clearTimeout(idleTimer);
             ball.classList.remove('idle', 'snap-left', 'snap-right');
             idleTimer = setTimeout(() => {
-                _snapToEdge();
+                const rect = ball.getBoundingClientRect();
+                 if ((rect.left + rect.width / 2) > window.innerWidth / 2) {
+                     ball.classList.add('snap-right');
+                 } else {
+                     ball.classList.add('snap-left');
+                 }
                 ball.classList.add('idle');
+                _closeMenu();
             }, 3000);
         }
 
@@ -1363,67 +1331,62 @@
             const isOpen = ball.classList.toggle('menu-open');
             const menuBtns = ball.querySelectorAll('.jelly-menu-btn');
             
-            if(isOpen) {
-               menuBtns.forEach(btn => {
-                   const originalTransform = btn.style.transform;
-                   const noScaleTransform = originalTransform.replace(/scale\([\d.]+\)/, '');
-                   btn.style.transform = noScaleTransform + ' scale(1)';
-               });
-            } else {
-               menuBtns.forEach(btn => {
-                   const originalTransform = btn.style.transform;
-                   const noScaleTransform = originalTransform.replace(/scale\([\d.]+\)/, '');
-                   btn.style.transform = noScaleTransform + ' scale(0)';
-               });
+            if (isOpen) {
+                const rect = ball.getBoundingClientRect();
+                const numButtons = menuBtns.length;
+                const radius = 55;
+                const btnSize = 38;
+                const margin = 10;
+                
+                let startAngle = -Math.PI / 2;
+                let endAngle = startAngle + Math.PI;
+
+                if (rect.left < radius + margin) { startAngle = -Math.PI / 2; endAngle = Math.PI / 2; }
+                if (rect.right > window.innerWidth - radius - margin) { startAngle = Math.PI / 2; endAngle = 3 * Math.PI / 2; }
+                if (rect.top < radius + margin) { startAngle = 0; endAngle = Math.PI; }
+                if (rect.bottom > window.innerHeight - radius - margin) { startAngle = Math.PI; endAngle = 2 * Math.PI; }
+                
+                const angleStep = numButtons > 1 ? (endAngle - startAngle) / (numButtons - 1) : 0;
+                
+                menuBtns.forEach((btn, i) => {
+                    const angle = startAngle + (i * angleStep);
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    btn.style.setProperty('--transform-end', `translate(${x}px, ${y}px)`);
+                });
             }
         }
+        
         function _closeMenu(){
-            if(ball.classList.contains('menu-open')) {
-                _toggleMenu();
-            }
+            if(ball && ball.classList.contains('menu-open')) ball.classList.remove('menu-open');
         }
         
         function _onMenuClick(e){
             const button = e.target.closest('.jelly-menu-btn');
             if(!button) return;
-            const action = button.dataset.action;
+            e.stopPropagation();
 
+            const action = button.dataset.action;
             const memoryModal = document.getElementById('memoryModal');
-            const originalZIndex = memoryModal.style.zIndex;
+            const originalZIndex = memoryModal.style.zIndex || getComputedStyle(memoryModal).zIndex;
             
             function openMemoryAndSwitch(viewName) {
                 MemoryApp.open();
-                memoryModal.style.zIndex = '2010'; // Elevate over iframe
+                memoryModal.style.zIndex = '2010';
                 const closeBtn = memoryModal.querySelector('.close-btn');
-
-                // Ensure we only add the reset listener once
-                const resetZIndex = () => {
-                    memoryModal.style.zIndex = originalZIndex;
-                    closeBtn.removeEventListener('click', resetZIndex);
-                };
-                closeBtn.addEventListener('click', resetZIndex);
-
-                // Call the internal switch functions of MemoryApp
+                const resetZIndex = () => { memoryModal.style.zIndex = originalZIndex; closeBtn.removeEventListener('click', resetZIndex); };
+                closeBtn.addEventListener('click', resetZIndex, { once: true });
                 const hubAction = memoryModal.querySelector(`[data-action="goto-${viewName}"]`);
                 if(hubAction) hubAction.click();
-
-                _closeMenu();
             }
 
             switch(action) {
-                case 'album':
-                    openMemoryAndSwitch('album');
-                    break;
-                case 'memo':
-                    openMemoryAndSwitch('memo');
-                    break;
-                case 'folder':
-                    openMemoryAndSwitch('cloud');
-                    break;
-                case 'return':
-                    closeIframeModal();
-                    break;
+                case 'album': openMemoryAndSwitch('album'); break;
+                case 'memo': openMemoryAndSwitch('memo'); break;
+                case 'folder': openMemoryAndSwitch('cloud'); break;
+                case 'return': closeIframeModal(); break;
             }
+            _closeMenu();
         }
 
         return {
@@ -1433,31 +1396,24 @@
                 const cssTextarea = document.getElementById('jellyBallCssTextarea');
                 const applyCssBtn = document.getElementById('applyJellyBallCssBtn');
                 const customStyleTag = document.getElementById('custom-jelly-ball-styles');
-
                 const isEnabled = localStorage.getItem('jellyBallEnabled') === 'true';
                 toggle.checked = isEnabled;
                 cssSection.style.display = isEnabled ? 'flex' : 'none';
-
                 const savedCss = localStorage.getItem('jellyBallCustomCss') || '';
                 cssTextarea.value = savedCss;
                 customStyleTag.innerHTML = savedCss;
-                
-
                 toggle.addEventListener('change', () => {
                     const checked = toggle.checked;
                     localStorage.setItem('jellyBallEnabled', checked);
                     cssSection.style.display = checked ? 'flex' : 'none';
                 });
-
                 applyCssBtn.addEventListener('click', () => {
                    const cssCode = cssTextarea.value;
                    customStyleTag.innerHTML = cssCode;
                    localStorage.setItem('jellyBallCustomCss', cssCode);
                    alert('自定义样式已应用！');
                 });
-            },
-            create: _create,
-            destroy: _destroy
+            }, create: _create, destroy: _destroy
         };
     })();
     // ===== [END] FLOATING JELLYFISH BALL LOGIC =====
@@ -1871,19 +1827,19 @@
     };
 
     function setThemeStyle(styleName) {
-        const neumorphismSettings = document.getElementById('neumorphism-settings');
+        const pneumorphismSettings = document.getElementById('pneumorphism-settings');
         if (styleName === 'glass') {
             document.body.classList.add('theme-glass');
             document.documentElement.style.setProperty('--shadow-dark-night', 'rgba(0, 0, 0, 0.1)');
             document.documentElement.style.setProperty('--shadow-dark-day', 'rgba(0, 0, 0, 0.1)');
 
-            neumorphismSettings.classList.add('hidden');
+            pneumorphismSettings.classList.add('hidden');
             document.getElementById('theme-style-glass').checked = true;
         } else {
             document.body.classList.remove('theme-glass');
             document.documentElement.style.setProperty('--shadow-dark-day', 'rgba(174, 190, 212, 0.4)');
              document.documentElement.style.setProperty('--shadow-dark-night', 'rgba(0, 0, 0, 0.3)');
-            neumorphismSettings.classList.remove('hidden');
+            pneumorphismSettings.classList.remove('hidden');
             document.getElementById('theme-style-neumorphism').checked = true;
         }
         localStorage.setItem('themeStyle', styleName);
@@ -2764,459 +2720,416 @@
             state.viewerContext.items.forEach(item => { if(item.type === 'photoset') delete item.internalIndex; });
             ui.photoViewer.classList.remove('active'); 
         }
-        async function changePhoto(direction) {
+        async function changePhotoInViewer(direction) {
             const { items, index } = state.viewerContext;
             const currentItem = items[index];
-
+            
             if (currentItem.type === 'photoset') {
-                let setIndex = currentItem.internalIndex || 0;
-                let newSetIndex = setIndex + direction;
-                
+                const newSetIndex = (currentItem.internalIndex || 0) + direction;
                 if (newSetIndex >= 0 && newSetIndex < currentItem.photos.length) {
                     currentItem.internalIndex = newSetIndex;
-                    await updatePhotoViewerContent();
                 } else {
-                    await changeItem(direction);
+                    changeViewerItem(direction);
                 }
             } else {
-                await changeItem(direction);
+                changeViewerItem(direction);
             }
+            await updatePhotoViewerContent();
         }
-        async function changeItem(direction) {
-            const { items, index } = state.viewerContext;
-            let newIndex = index + direction;
-            if (newIndex >= 0 && newIndex < items.length) {
+
+        function changeViewerItem(direction) {
+            let newIndex = state.viewerContext.index + direction;
+            if (newIndex >= 0 && newIndex < state.viewerContext.items.length) {
                 state.viewerContext.index = newIndex;
-                const newItem = items[newIndex];
+                    const newItem = state.viewerContext.items[newIndex];
                 if (newItem.type === 'photoset') {
                     newItem.internalIndex = direction > 0 ? 0 : newItem.photos.length - 1;
                 }
-                await updatePhotoViewerContent();
             }
         }
-
+        
         const actions = {
-            'goto-memo': () => { state.currentSection = 'memo'; renderMemoFolders(); showView('folder-view', 'memo-section'); },
-            'goto-album': () => { state.currentSection = 'album'; renderAlbumFolders(); showView('album-folder-view', 'album-section'); },
-             'goto-cloud': () => {
-                populateDriveCategorySelector();
-                fetchFilesForSelectedProject();
-                showPage('cloud-drive-section');
-            },
-            'back-to-hub': () => { state.currentSection = null; showPage('hub-view'); },
-            'back-to-memo-folders': () => showView('folder-view', 'memo-section'),
-            'back-to-album-folders': () => showView('album-folder-view', 'album-section'),
-            'open-memo-folder': (target) => {
-                const folderId = Number(target.dataset.folderId);
-                if (state.isMemoManageMode) {
-                    state.memoFoldersToDelete = state.memoFoldersToDelete.includes(folderId) ? state.memoFoldersToDelete.filter(id => id !== folderId) : [...state.memoFoldersToDelete, folderId];
-                    renderMemoFolders();
+            'goto-memo': () => { showPage('memo-section'); state.currentSection = 'memo'; document.getElementById('memory-modal-title').textContent = '备忘录'; renderMemoFolders(); },
+            'goto-album': () => { showPage('album-section'); state.currentSection = 'album'; document.getElementById('memory-modal-title').textContent = '相册'; renderAlbumFolders(); },
+            'goto-cloud': () => { showPage('cloud-drive-section'); state.currentSection = 'cloud'; document.getElementById('memory-modal-title').textContent = '文件夹'; populateDriveProjectSelector(); fetchFilesForSelectedProject(); },
+            'back-to-hub': () => { showPage('hub-view'); state.currentSection = null; document.getElementById('memory-modal-title').textContent = '记忆'; },
+            'add-memo-folder': () => { state.folderModalContext = { type: 'memo', id: null }; document.getElementById('folder-modal-title').textContent = '新文件夹'; ui.folderModal.querySelector('#folder-name-input').value = ''; ui.folderModal.classList.add('show'); },
+            'add-album-folder': () => {
+                if (memoryCache.album.folders.length >= 100) { alert('相册数量已达上限（100个），请整理后再创建。'); return; }
+                state.folderModalContext = { type: 'album', id: null }; document.getElementById('folder-modal-title').textContent = '新相册'; ui.folderModal.querySelector('#folder-name-input').value = ''; ui.folderModal.classList.add('show'); },
+            'close-folder-modal': () => ui.folderModal.classList.remove('show'),
+            'save-folder': () => {
+                const { type, id } = state.folderModalContext;
+                const name = ui.folderModal.querySelector('#folder-name-input').value.trim();
+                if (!name) return alert('名称不能为空');
+                const list = memoryCache[type].folders;
+                if (id) {
+                    const item = list.find(f => f.id === id);
+                    if (item) item.name = name;
                 } else {
-                    state.currentMemoFolderId = folderId;
-                    document.getElementById('notes-view-title').textContent = memoryCache.memo.folders.find(f => f.id === folderId).name;
-                    renderNotes(); showView('notes-view', 'memo-section');
+                    list.push({ id: Date.now(), name });
                 }
+                ui.folderModal.classList.remove('show');
+                if (type === 'memo') renderMemoFolders(); else renderAlbumFolders();
+                scheduleSave();
+            },
+            'open-memo-folder': (target) => {
+                const folderId = parseInt(target.closest('[data-folder-id]').dataset.folderId, 10);
+                if (state.isMemoManageMode) {
+                    const index = state.memoFoldersToDelete.indexOf(folderId);
+                    if (index > -1) state.memoFoldersToDelete.splice(index, 1);
+                    else state.memoFoldersToDelete.push(folderId);
+                    renderMemoFolders();
+                    return;
+                }
+                state.currentMemoFolderId = folderId;
+                const folder = memoryCache.memo.folders.find(f => f.id === folderId);
+                if (folder) document.getElementById('notes-view-title').textContent = folder.name;
+                showView('notes-view', 'memo-section');
+                renderNotes();
             },
             'open-album-folder': (target) => {
-                const albumId = Number(target.dataset.albumId);
+                const albumId = parseInt(target.closest('[data-album-id]').dataset.albumId, 10);
                 if (state.isAlbumManageMode) {
-                    state.albumFoldersToDelete = state.albumFoldersToDelete.includes(albumId) ? state.albumFoldersToDelete.filter(id => id !== albumId) : [...state.albumFoldersToDelete, albumId];
+                    const index = state.albumFoldersToDelete.indexOf(albumId);
+                    if (index > -1) state.albumFoldersToDelete.splice(index, 1);
+                    else state.albumFoldersToDelete.push(albumId);
                     renderAlbumFolders();
+                    return;
+                }
+                state.currentAlbumId = albumId;
+                const folder = memoryCache.album.folders.find(f => f.id === albumId);
+                if (folder) document.getElementById('photo-grid-title').textContent = folder.name;
+                showView('photo-grid-view', 'album-section');
+                renderPhotos();
+            },
+            'back-to-memo-folders': () => {
+                if (document.getElementById('note-editor-view').classList.contains('active')) {
+                   actions['cancel-note']();
                 } else {
-                    state.currentAlbumId = albumId;
-                    document.getElementById('photo-grid-title').textContent = memoryCache.album.folders.find(f => f.id === albumId).name;
-                    renderPhotos(); showView('photo-grid-view', 'album-section');
+                   showView('folder-view', 'memo-section'); state.currentMemoFolderId = null;
                 }
             },
+            'back-to-album-folders': () => { showView('album-folder-view', 'album-section'); state.currentAlbumId = null; },
+            'add-note': () => { state.currentNoteId = null; document.getElementById('note-title-input').value = ''; document.getElementById('note-content-textarea').value = ''; document.getElementById('delete-note-btn').style.display = 'none'; showView('note-editor-view', 'memo-section'); },
             'open-note': (target) => {
-                state.currentNoteId = Number(target.dataset.noteId);
-                const note = memoryCache.memo.notes.find(n => n.id === state.currentNoteId);
-                document.getElementById('note-title-input').value = note.title || '';
-                document.getElementById('note-content-textarea').value = note.content || '';
-                document.querySelector('[data-action="delete-note"]').style.display = 'inline-block';
-                showView('note-editor-view', 'memo-section');
-            },
-            'open-item': (target) => {
-                const itemId = Number(target.dataset.itemId);
-                if (state.isPhotoManageMode) {
-                    state.photosToDelete = state.photosToDelete.includes(itemId) ? state.photosToDelete.filter(id => id !== itemId) : [...state.photosToDelete, itemId];
-                    renderPhotos();
-                } else {
-                    const itemsInAlbum = memoryCache.album.items.filter(i => i.albumId === state.currentAlbumId).sort((a,b) => b.timestamp - a.timestamp);
-                    const initialIndex = itemsInAlbum.findIndex(i => i.id === itemId);
-                    openPhotoViewer(itemsInAlbum, initialIndex);
-                }
-            },
-            'add-memo-folder': () => { state.folderModalContext = 'memo'; document.getElementById('folder-name-input').value = ''; ui.folderModal.classList.add('show'); },
-            'add-album-folder': () => { state.folderModalContext = 'album'; document.getElementById('folder-name-input').value = ''; ui.folderModal.classList.add('show'); },
-            'close-folder-modal': () => { ui.folderModal.classList.remove('show'); },
-            'save-folder': () => {
-                const name = document.getElementById('folder-name-input').value.trim();
-                if (!name) return;
-                const newFolder = { id: Date.now(), name };
-                if (state.folderModalContext === 'memo') { memoryCache.memo.folders.push(newFolder); renderMemoFolders(); } 
-                else { memoryCache.album.folders.push(newFolder); renderAlbumFolders(); }
-                scheduleSave();
-                ui.folderModal.classList.remove('show');
-            },
-            'toggle-memo-manage': (target) => {
-                state.isMemoManageMode = !state.isMemoManageMode;
-                ui.memoManageControls.classList.toggle('active', state.isMemoManageMode);
-                target.textContent = state.isMemoManageMode ? '完成' : '管理';
-                if (!state.isMemoManageMode) state.memoFoldersToDelete = [];
-                renderMemoFolders();
-            },
-            'toggle-album-manage': (target) => {
-                state.isAlbumManageMode = !state.isAlbumManageMode;
-                ui.albumManageControls.classList.toggle('active', state.isAlbumManageMode);
-                target.textContent = state.isAlbumManageMode ? '完成' : '管理';
-                if (!state.isAlbumManageMode) state.albumFoldersToDelete = [];
-                renderAlbumFolders();
-            },
-            'select-all-memo': () => {
-                const allIds = memoryCache.memo.folders.map(f => f.id);
-                state.memoFoldersToDelete = state.memoFoldersToDelete.length === allIds.length ? [] : allIds;
-                renderMemoFolders();
-            },
-            'delete-selected-memo': () => {
-                if (state.memoFoldersToDelete.length === 0) return;
-                if (confirm(`确定删除选中的 ${state.memoFoldersToDelete.length} 个文件夹及其所有笔记吗？`)) {
-                    memoryCache.memo.folders = memoryCache.memo.folders.filter(f => !state.memoFoldersToDelete.includes(f.id));
-                    memoryCache.memo.notes = memoryCache.memo.notes.filter(n => !state.memoFoldersToDelete.includes(n.folderId));
-                    state.memoFoldersToDelete = [];
-                    scheduleSave(); renderMemoFolders();
-                }
-            },
-            'select-all-album': () => {
-                const allIds = memoryCache.album.folders.map(f => f.id);
-                state.albumFoldersToDelete = state.albumFoldersToDelete.length === allIds.length ? [] : allIds;
-                renderAlbumFolders();
-            },
-            'delete-selected-album': async () => {
-                if (state.albumFoldersToDelete.length === 0) return;
-                if (confirm(`确定删除选中的 ${state.albumFoldersToDelete.length} 个相册及其所有项目吗？此操作会删除云端文件！`)) {
-                    const itemsInFolders = memoryCache.album.items.filter(i => state.albumFoldersToDelete.includes(i.albumId));
-                    let photosToDelete = [];
-                    itemsInFolders.forEach(item => {
-                        if (item.type === 'photoset') photosToDelete.push(...item.photos);
-                        else photosToDelete.push(item);
-                    });
-
-                    updateStatus('正在删除云端照片...');
-                    const deletionPromises = photosToDelete.map(p => deleteFromGithub(p.path, `Delete photo ${p.path}`, p.sha));
-                    await Promise.all(deletionPromises);
-                    
-                    memoryCache.album.folders = memoryCache.album.folders.filter(f => !state.albumFoldersToDelete.includes(f.id));
-                    memoryCache.album.items = memoryCache.album.items.filter(i => !state.albumFoldersToDelete.includes(i.albumId));
-                    state.albumFoldersToDelete = [];
-                    scheduleSave(); renderAlbumFolders(); updateStatus('删除完成');
-                }
-            },
-            'pin-note': (target) => {
-                const noteId = Number(target.dataset.noteId);
+                const noteId = parseInt(target.closest('[data-note-id]').dataset.noteId, 10);
                 const note = memoryCache.memo.notes.find(n => n.id === noteId);
-                if (note) { note.isPinned = !note.isPinned; scheduleSave(); renderNotes(); }
-            },
-            'add-note': () => {
-                state.currentNoteId = null;
-                document.getElementById('note-title-input').value = '';
-                document.getElementById('note-content-textarea').value = '';
-                document.querySelector('[data-action="delete-note"]').style.display = 'none';
-                showView('note-editor-view', 'memo-section');
+                if (note) {
+                    state.currentNoteId = note.id;
+                    document.getElementById('note-title-input').value = note.title;
+                    document.getElementById('note-content-textarea').value = note.content;
+                    document.getElementById('delete-note-btn').style.display = 'inline-block';
+                    showView('note-editor-view', 'memo-section');
+                }
             },
             'save-note': () => {
                 const title = document.getElementById('note-title-input').value.trim();
                 const content = document.getElementById('note-content-textarea').value.trim();
+                const now = Date.now();
                 if (state.currentNoteId) {
                     const note = memoryCache.memo.notes.find(n => n.id === state.currentNoteId);
-                    note.title = title; note.content = content; note.timestamp = Date.now();
+                    if (note) {
+                        note.title = title;
+                        note.content = content;
+                        note.timestamp = now;
+                    }
                 } else {
-                    if (!title && !content) { showView('notes-view', 'memo-section'); return; };
-                    memoryCache.memo.notes.push({ id: Date.now(), folderId: state.currentMemoFolderId, title, content, timestamp: Date.now(), isPinned: false });
+                    memoryCache.memo.notes.push({ id: now, folderId: state.currentMemoFolderId, title, content, timestamp: now, isPinned: false });
                 }
-                scheduleSave(); renderNotes(); showView('notes-view', 'memo-section');
+                showView('notes-view', 'memo-section');
+                renderNotes();
+                scheduleSave();
             },
-            'cancel-note': () => showView('notes-view', 'memo-section'),
+            'cancel-note': () => {
+                showView('notes-view', 'memo-section');
+            },
             'delete-note': () => {
-                if (!confirm('确定删除此笔记？')) return;
-                memoryCache.memo.notes = memoryCache.memo.notes.filter(n => n.id !== state.currentNoteId);
-                scheduleSave(); renderNotes(); showView('notes-view', 'memo-section');
+                if (state.currentNoteId && confirm('确定要删除这篇笔记吗？')) {
+                    memoryCache.memo.notes = memoryCache.memo.notes.filter(n => n.id !== state.currentNoteId);
+                    showView('notes-view', 'memo-section');
+                    renderNotes();
+                    scheduleSave();
+                }
+            },
+            'pin-note': (target) => {
+                const noteId = parseInt(target.dataset.noteId, 10);
+                const note = memoryCache.memo.notes.find(n => n.id === noteId);
+                if(note) { note.isPinned = !note.isPinned; }
+                renderNotes();
+                scheduleSave();
+            },
+
+            'toggle-memo-manage': (target) => {
+                state.isMemoManageMode = !state.isMemoManageMode;
+                target.textContent = state.isMemoManageMode ? '取消' : '管理';
+                ui.memoManageControls.classList.toggle('active', state.isMemoManageMode);
+                if (!state.isMemoManageMode) state.memoFoldersToDelete = [];
+                renderMemoFolders();
+            },
+            'select-all-memo': () => {
+                if (state.memoFoldersToDelete.length === memoryCache.memo.folders.length) {
+                    state.memoFoldersToDelete = [];
+                } else {
+                    state.memoFoldersToDelete = memoryCache.memo.folders.map(f => f.id);
+                }
+                renderMemoFolders();
+            },
+            'delete-selected-memo': () => {
+                if (state.memoFoldersToDelete.length === 0) return;
+                let notesToDeleteCount = 0;
+                memoryCache.memo.notes.forEach(note => {
+                    if (state.memoFoldersToDelete.includes(note.folderId)) {
+                        notesToDeleteCount++;
+                    }
+                });
+                if (confirm(`确定要删除选中的 ${state.memoFoldersToDelete.length} 个文件夹及其包含的 ${notesToDeleteCount} 篇笔记吗？`)) {
+                    memoryCache.memo.notes = memoryCache.memo.notes.filter(n => !state.memoFoldersToDelete.includes(n.folderId));
+                    memoryCache.memo.folders = memoryCache.memo.folders.filter(f => !state.memoFoldersToDelete.includes(f.id));
+                    state.memoFoldersToDelete = [];
+                    renderMemoFolders();
+                    scheduleSave();
+                }
+            },
+            'toggle-album-manage': (target) => {
+                state.isAlbumManageMode = !state.isAlbumManageMode;
+                target.textContent = state.isAlbumManageMode ? '取消' : '管理';
+                ui.albumManageControls.classList.toggle('active', state.isAlbumManageMode);
+                if (!state.isAlbumManageMode) state.albumFoldersToDelete = [];
+                renderAlbumFolders();
+            },
+            'select-all-album': () => {
+                if (state.albumFoldersToDelete.length === memoryCache.album.folders.length) {
+                    state.albumFoldersToDelete = [];
+                } else {
+                    state.albumFoldersToDelete = memoryCache.album.folders.map(f => f.id);
+                }
+                renderAlbumFolders();
+            },
+            'delete-selected-album': async () => {
+                if (state.albumFoldersToDelete.length === 0) return;
+                const itemsToDelete = memoryCache.album.items.filter(p => state.albumFoldersToDelete.includes(p.albumId));
+                let photoCount = 0;
+                itemsToDelete.forEach(item => { photoCount += item.type === 'photoset' ? item.photos.length : 1; });
+                if (confirm(`确定要删除选中的 ${state.albumFoldersToDelete.length} 个相册及其包含的 ${photoCount} 张照片吗？`)) {
+                    await Promise.all(itemsToDelete.map(item => {
+                        if (item.type === 'photoset') return Promise.all(item.photos.map(p => deleteFromGithub(p.path, `Delete photo from set`, p.sha, true)));
+                        else return deleteFromGithub(item.path, `Delete photo`, item.sha, true);
+                    }));
+                    memoryCache.album.items = memoryCache.album.items.filter(p => !state.albumFoldersToDelete.includes(p.albumId));
+                    memoryCache.album.folders = memoryCache.album.folders.filter(f => !state.albumFoldersToDelete.includes(f.id));
+                    state.albumFoldersToDelete = [];
+                    renderAlbumFolders();
+                    scheduleSave();
+                }
             },
             'toggle-photo-manage': (target) => {
                 state.isPhotoManageMode = !state.isPhotoManageMode;
+                target.textContent = state.isPhotoManageMode ? '取消' : '管理';
                 ui.photoManageControls.classList.toggle('active', state.isPhotoManageMode);
-                target.textContent = state.isPhotoManageMode ? '完成' : '管理';
                 if (!state.isPhotoManageMode) state.photosToDelete = [];
                 renderPhotos();
             },
-            'select-all-photos': () => {
-                const allIds = memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId).map(p => p.id);
-                state.photosToDelete = state.photosToDelete.length === allIds.length ? [] : allIds;
+             'select-all-photos': () => {
+                const currentAlbumItems = memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId);
+                if (state.photosToDelete.length === currentAlbumItems.length) {
+                    state.photosToDelete = [];
+                } else {
+                    state.photosToDelete = currentAlbumItems.map(p => p.id);
+                }
                 renderPhotos();
             },
             'delete-selected-photos': async () => {
                 if (state.photosToDelete.length === 0) return;
-                if (confirm(`确定从云端永久删除选中的 ${state.photosToDelete.length} 个项目吗？`)) {
-                    const itemsToRemove = memoryCache.album.items.filter(i => state.photosToDelete.includes(i.id));
-                    let photosToDelete = [];
-                    itemsToRemove.forEach(item => {
-                        if (item.type === 'photoset') photosToDelete.push(...item.photos);
-                        else photosToDelete.push(item);
-                    });
-
-                    updateStatus('正在删除...');
-                    const deletionPromises = photosToDelete.map(p => deleteFromGithub(p.path, `Delete photo ${p.path}`, p.sha));
-                    await Promise.all(deletionPromises);
-
+                const itemsToDelete = memoryCache.album.items.filter(p => state.photosToDelete.includes(p.id));
+                let photoCount = 0;
+                itemsToDelete.forEach(item => { photoCount += item.type === 'photoset' ? item.photos.length : 1; });
+                if (confirm(`确定要删除选中的 ${itemsToDelete.length} 个项目(共 ${photoCount} 张照片)吗？`)) {
+                    await Promise.all(itemsToDelete.map(item => {
+                        if (item.type === 'photoset') return Promise.all(item.photos.map(p => deleteFromGithub(p.path, `Delete photo from set`, p.sha, true)));
+                        else return deleteFromGithub(item.path, `Delete photo`, item.sha, true);
+                    }));
                     memoryCache.album.items = memoryCache.album.items.filter(p => !state.photosToDelete.includes(p.id));
                     state.photosToDelete = [];
-                    state.isPhotoManageMode = false;
-                    ui.photoManageControls.classList.remove('active');
-                    document.querySelector('[data-action="toggle-photo-manage"]').textContent = '管理';
-                    scheduleSave(); renderPhotos(); renderAlbumFolders(); updateStatus('删除完成');
+                    renderPhotos(); scheduleSave();
                 }
             },
+            'save-photo-details': () => { state.isSavingPhoto = true; },
+            'skip-photo-details': () => { state.isSavingPhoto = false; document.getElementById('photo-title-input').value = ''; document.getElementById('photo-desc-input').value = ''; },
+            'open-item': (target) => {
+                const itemId = parseInt(target.closest('[data-item-id]').dataset.itemId, 10);
+                 if (state.isPhotoManageMode) {
+                    const index = state.photosToDelete.indexOf(itemId);
+                    if (index > -1) state.photosToDelete.splice(index, 1);
+                    else state.photosToDelete.push(itemId);
+                    renderPhotos();
+                    return;
+                }
+                const itemsInAlbum = memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId).sort((a,b) => b.timestamp - a.timestamp);
+                const itemIndex = itemsInAlbum.findIndex(p => p.id === itemId);
+                openPhotoViewer(itemsInAlbum, itemIndex);
+            },
+            'close-viewer': () => closePhotoViewer(),
+            'prev-photo': () => changePhotoInViewer(-1),
+            'next-photo': () => changePhotoInViewer(1),
             'wander-global': () => WanderView.start(memoryCache.album.items),
-            'wander-local': () => WanderView.start(memoryCache.album.items.filter(i => i.albumId === state.currentAlbumId)),
-            'close-viewer': closePhotoViewer,
-            'prev-photo': () => changePhoto(-1),
-            'next-photo': () => changePhoto(1),
-            'skip-photo-details': () => saveUploadedPhoto(true),
-            'save-photo-details': () => saveUploadedPhoto(false),
+            'wander-local': () => WanderView.start(memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId)),
             'close-wander-view': () => WanderView.close(),
             'toggle-player-collapse': () => WanderView.togglePlayerCollapse(),
         };
-        
-        async function saveUploadedPhoto(skip = false) {
-            if (state.isSavingPhoto) return;
-            state.isSavingPhoto = true;
 
-            if (ui.photosetToggle.checked) {
-                await saveUploadedPhotoSet();
-                state.isSavingPhoto = false;
-                return;
-            }
-            const fileData = JSON.parse(ui.photoDetailsModal.dataset.fileData);
-            const file = state.photoUploadQueue.find(f => f.name === fileData.name);
-            if (!file) { state.isSavingPhoto = false; return; }
-
-            const title = skip ? '' : document.getElementById('photo-title-input').value.trim();
-            const description = skip ? '' : document.getElementById('photo-desc-input').value.trim();
-            
-            ui.photoDetailsModal.classList.remove('show');
-            updateStatus('上传照片中...');
-            
-            try {
-                const fileName = `${state.currentAlbumId}-${Date.now()}.${file.name.split('.').pop()}`;
-                const path = MEMORY_PHOTOS_PATH + fileName;
-                const result = await uploadFileViaGitData({ file, path, commitMessage: `Upload photo: ${fileName}`, onProgress: (p) => { updateStatus(`上传中: ${Math.round(p)}%`); } });
-                memoryCache.album.items.push({ type: 'photo', id: Date.now() + Math.random(), albumId: state.currentAlbumId, title, description, path, sha: result.sha, timestamp: Date.now() });
-                renderPhotos(); // Re-render to show new photo
-                scheduleSave();
-                state.photoUploadQueue.shift();
-                if (state.photoUploadQueue.length > 0) { 
-                    processPhotoUploadQueue(); 
-                } else { 
-                    renderAlbumFolders(); updateStatus('上传完成'); 
-                }
-            } catch (error) { const userMessage = await handleApiError("上传照片", error); updateStatus(userMessage, true); console.error(error); }
-            finally { state.isSavingPhoto = false; }
-        }
-
-        async function saveUploadedPhotoSet() {
-            const title = document.getElementById('photo-title-input').value.trim();
-            const description = document.getElementById('photo-desc-input').value.trim();
-            ui.photoDetailsModal.classList.remove('show');
-            updateStatus(`上传照片集 (0/${state.photoUploadQueue.length})`);
-            
-            const uploadedPhotos = [];
-            let counter = 0;
-            for (const file of state.photoUploadQueue) {
-                counter++;
-                updateStatus(`上传照片集 (${counter}/${state.photoUploadQueue.length})`);
-                try {
-                    const fileName = `${state.currentAlbumId}-${Date.now()}-${counter}.${file.name.split('.').pop()}`;
-                    const path = MEMORY_PHOTOS_PATH + fileName;
-                    const result = await uploadFileViaGitData({ file, path, commitMessage: `Upload photo for set: ${fileName}`, onProgress: () => {} });
-                    uploadedPhotos.push({ path, sha: result.sha, timestamp: Date.now() });
-                } catch (error) { console.error(`Failed to upload ${file.name}:`, error); }
-            }
-
-            if (uploadedPhotos.length > 0) {
-                memoryCache.album.items.push({
-                    type: 'photoset',
-                    id: Date.now() + Math.random(),
-                    albumId: state.currentAlbumId,
-                    title, description,
-                    timestamp: Date.now(),
-                    photos: uploadedPhotos
-                });
-                scheduleSave();
-            }
-            state.photoUploadQueue = [];
-            renderPhotos();
-            renderAlbumFolders();
-            updateStatus('照片集上传完成');
-        }
-
-        function processPhotoUploadQueue() {
+        async function processPhotoUploadQueue() {
             if (state.photoUploadQueue.length === 0) return;
-            const isBatch = state.photoUploadQueue.length > 1;
-            ui.photosetToggleContainer.style.display = isBatch ? 'block' : 'none';
-            ui.photosetToggle.checked = false;
+            const isSet = state.photoUploadQueue.length > 1;
+            ui.photosetToggleContainer.style.display = isSet ? 'block' : 'none';
+            ui.photosetToggle.checked = isSet;
 
-            const file = state.photoUploadQueue[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                document.getElementById('upload-thumbnail').src = e.target.result;
+            let photosetData = { id: Date.now(), albumId: state.currentAlbumId, type: 'photoset', title: '', description: '', timestamp: Date.now(), photos: [] };
+        
+            for (let i = 0; i < state.photoUploadQueue.length; i++) {
+                const file = state.photoUploadQueue[i];
+                ui.photoDetailsModal.querySelector('#upload-thumbnail').src = URL.createObjectURL(file);
+                ui.photoDetailsModal.querySelector('#photo-details-modal-title').textContent = isSet ? `上传照片集 (${i + 1}/${state.photoUploadQueue.length})` : '添加照片信息';
+                ui.photoDetailsModal.classList.add('show');
+
+                let savePromise = new Promise(resolve => {
+                    const saveHandler = () => { ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]').removeEventListener('click', saveHandler); resolve(); };
+                     ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]').addEventListener('click', saveHandler);
+                    const skipHandler = (e) => { e.stopPropagation(); ui.photoDetailsModal.removeEventListener('click', skipDelegation); resolve(); };
+                    const skipDelegation = (e) => { if (e.target.closest('[data-action="skip-photo-details"]')) skipHandler(e); };
+                    ui.photoDetailsModal.addEventListener('click', skipDelegation);
+                });
+                await savePromise;
+
+                const title = document.getElementById('photo-title-input').value.trim();
+                const description = document.getElementById('photo-desc-input').value.trim();
+                const createSet = document.getElementById('create-photoset-toggle').checked;
+                
+                ui.photoDetailsModal.classList.remove('show');
+                const photoData = await uploadPhoto(file, title, description);
+                if (photoData) {
+                    if (isSet && createSet) {
+                         photosetData.photos.push(photoData);
+                         if (!photosetData.title) photosetData.title = title;
+                         if (!photosetData.description) photosetData.description = description;
+                    } else {
+                        memoryCache.album.items.push({
+                            id: Date.now() + i, albumId: state.currentAlbumId, type: 'photo',
+                            title: title, description: description, timestamp: Date.now(),
+                            ...photoData
+                        });
+                    }
+                }
                 document.getElementById('photo-title-input').value = '';
                 document.getElementById('photo-desc-input').value = '';
-                ui.photoDetailsModal.dataset.fileData = JSON.stringify({ name: file.name });
-                const button = ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]');
-                button.textContent = isBatch && !ui.photosetToggle.checked ? '保存并继续' : '保存';
-                document.getElementById('photo-details-modal-title').textContent = isBatch && !ui.photosetToggle.checked ? `添加照片信息 (${state.photoUploadQueue.length} 待处理)` : '添加照片信息';
-                ui.photoDetailsModal.classList.add('show');
-            };
-            reader.readAsDataURL(file);
+            }
+            if (photosetData.photos.length > 0) memoryCache.album.items.push(photosetData);
+
+            state.photoUploadQueue = [];
+            renderPhotos();
+            scheduleSave();
         }
 
-        let viewerTouchStartX = 0;
-        let viewerTouchEndX = 0;
-        const viewerImgContainer = ui.photoViewer.querySelector('#viewer-img-container');
-        viewerImgContainer.addEventListener('touchstart', e => {
-            viewerTouchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
-        viewerImgContainer.addEventListener('touchend', e => {
-            viewerTouchEndX = e.changedTouches[0].screenX;
-            const swipeDiff = viewerTouchEndX - viewerTouchStartX;
-            if (Math.abs(swipeDiff) > 50) {
-                 if (swipeDiff < 0) {
-                    if(document.getElementById('next-photo-btn').style.display !== 'none') changePhoto(1);
-                 } else {
-                    if(document.getElementById('prev-photo-btn').style.display !== 'none') changePhoto(-1);
-                 }
+        async function uploadPhoto(file, title, description) {
+            try {
+                const path = `${MEMORY_PHOTOS_PATH}${Date.now()}_${file.name}`;
+                const result = await uploadFileViaGitData({ file, path, commitMessage: `Upload photo: ${file.name}`, onProgress: () => {} });
+                return { path: result.path, sha: result.sha };
+            } catch (error) {
+                alert(`上传照片 ${file.name} 失败: ${await handleApiError('上传照片', error)}`);
+                return null;
             }
-        });
+        }
         
-        function populateDriveCategorySelector() {
-            const categorySelector = ui.categorySelector;
-            categorySelector.innerHTML = '<option value="">选择分类...</option>';
-            const categoriesWithUploads = new Set();
-            currentConfig.categories.forEach(cat => {
-                if (cat.name !== '全部') {
-                    categoriesWithUploads.add(cat.name);
-                }
-            });
-
-            if (categoriesWithUploads.size === 0) {
-                categorySelector.innerHTML = '<option value="">没有可用的分类</option>';
-            } else {
-                categoriesWithUploads.forEach(catName => {
-                    const option = document.createElement("option");
-                    option.value = catName;
-                    option.textContent = catName;
-                    categorySelector.appendChild(option);
-                });
-            }
-            populateDriveProjectSelector();
-        }
-
         function populateDriveProjectSelector() {
             const selectedCategory = ui.categorySelector.value;
-            const projectSelector = ui.projectSelector;
-            projectSelector.innerHTML = '<option value="">选择项目...</option>';
-
-            if (!selectedCategory) {
-                projectSelector.classList.add('hidden');
-                return;
+            ui.projectSelector.innerHTML = '';
+            ui.projectSelector.classList.add('hidden');
+            if (currentConfig.categories && currentConfig.categories.length > 0) {
+                 const category = currentConfig.categories.find(c => c.name === selectedCategory);
+                 if (category && category.buttons.length > 0) {
+                     const uploadButtons = category.buttons.filter(b => b.href && b.href.includes('raw.githack.com'));
+                     if (uploadButtons.length > 0) {
+                        uploadButtons.forEach(btn => {
+                             const option = document.createElement('option');
+                             option.value = btn.href;
+                             option.textContent = btn.text;
+                             ui.projectSelector.appendChild(option);
+                         });
+                         ui.projectSelector.classList.remove('hidden');
+                     }
+                 }
             }
+        }
+        function fetchFilesForSelectedProject() {
+            const categoryName = ui.categorySelector.value;
+            const projectHref = ui.projectSelector.value;
+            ui.fileList.innerHTML = '';
+            ui.fileListStatus.style.display = 'block';
 
-            const category = currentConfig.categories.find(c => c.name === selectedCategory);
-            const projects = category ? category.buttons : [];
-
-            if (projects.length > 0) {
-                projects.forEach(proj => {
-                    const option = document.createElement("option");
-                    option.value = proj.href;
-                    option.textContent = proj.text;
-                    projectSelector.appendChild(option);
+            if (categoryName === 'memory-album-category') {
+                if (!memoryCache) { ui.fileListStatus.textContent = "记忆模块未加载，请先访问相册。"; return; }
+                ui.fileListStatus.textContent = '加载中...';
+                
+                const allPhotos = [];
+                memoryCache.album.items.forEach(item => {
+                    if (item.type === 'photoset') {
+                        item.photos.forEach(photo => allPhotos.push({ ...photo, albumName: memoryCache.album.folders.find(f => f.id === item.albumId)?.name || '未知相册' }));
+                    } else {
+                        allPhotos.push({ ...item, albumName: memoryCache.album.folders.find(f => f.id === item.albumId)?.name || '未知相册' });
+                    }
                 });
-                projectSelector.classList.remove('hidden');
+                
+                if (allPhotos.length === 0) {
+                     ui.fileListStatus.textContent = '相册中没有照片。';
+                     return;
+                }
+
+                ui.fileListStatus.style.display = 'none';
+                allPhotos.forEach(async photo => {
+                    const li = document.createElement("li");
+                    const sizeBytes = photo.size || 0;
+                    const sizeText = sizeBytes ? (sizeBytes / 1024).toFixed(1) + " KB" : (await getLatestCommitDate(photo.path)).split('T')[0];
+                    const filename = photo.path.split("/").pop();
+                    
+                    li.innerHTML = `<div class="file-info"><span class="file-name">${photo.title || filename}</span><span class="file-size">${photo.albumName} - ${sizeText}</span></div><button class="delete-btn">&times;</button>`;
+                    ui.fileList.appendChild(li);
+                    
+                    const fileInfo = li.querySelector(".file-info");
+                    fileInfo.addEventListener("click", () => forceDownload(photo.path, filename, li));
+                    const deleteBtn = li.querySelector(".delete-btn");
+                    deleteBtn.addEventListener("click", () => alert("请在相册中删除此照片。"));
+                });
             } else {
-                projectSelector.classList.add('hidden');
+                 if (!projectHref) {
+                    ui.fileListStatus.textContent = (categoryName && categoryName !== 'select...-category') ? "该分类下无上传项目" : '请选择一个分类';
+                    return;
+                }
+                fetchFilesFromGithubProject(projectHref);
             }
         }
 
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
+        async function fetchFilesFromGithubProject(projectHref) {
+            const urlParts = projectHref.split('/');
+            const owner = urlParts[2].split('.')[0];
+            const repo = urlParts[3];
+            const projectPath = `projects/${urlParts.slice(5, -1).join('/')}`;
+            ui.fileListStatus.textContent = "加载中...";
 
-        async function fetchFilesForSelectedProject(){
-            const selectedProjectHref = ui.projectSelector.value;
-
-            ui.fileList.innerHTML = "";
-            ui.fileListStatus.style.display = "flex";
-
-            if (!selectedProjectHref) {
-                ui.fileListStatus.textContent = ui.categorySelector.value ? "请选择一个项目" : "请选择一个分类";
-                return;
-            }
-            if (!checkConfig(false)) {
-                ui.fileListStatus.innerHTML = "尚未配置GitHub信息<br>请点击 ☁️ 进行配置";
-                return;
-            }
-
-            const projectConfig = findButtonConfigByHref(selectedProjectHref);
-            if (!projectConfig) {
-                ui.fileListStatus.textContent = "项目配置无效";
-                return;
-            }
-
-            ui.fileListStatus.textContent = "正在加载...";
+            const { data: files, error } = await fetchFromGithub(projectPath);
+            if (error) { ui.fileListStatus.textContent = `加载失败: ${error}`; return; }
+            if (!files || files.length === 0) { ui.fileListStatus.textContent = "该文件夹下暂无文件"; return; }
             
-            const urlParts = projectConfig.href.split('/');
-            const projectFolder = urlParts.slice(5, -1).join('/');
-            const path = `projects/${projectFolder}`;
-
-            const { data: files, error } = await fetchFromGithub(path);
-
-            if (error) {
-                ui.fileListStatus.textContent = await handleApiError("获取文件列表", new Error(error));
-                return;
-            }
-            if (!files || files.length === 0 || (files.length === 1 && files[0].name === 'index.html')) {
-                ui.fileListStatus.textContent = "该项目内暂无文件";
-                return;
-            }
-            
-            const displayFiles = files.filter(f => f.name !== 'index.html');
-
-            ui.fileList.innerHTML = "";
             ui.fileListStatus.style.display = "none";
-            
-            displayFiles.forEach(file => {
-                const li = document.createElement('li');
-                
-                const fileInfo = document.createElement('div');
-                fileInfo.className = "file-info";
-                fileInfo.dataset.filePath = file.path;
-                fileInfo.dataset.fileName = file.name;
-
-                const fileName = document.createElement("span");
-                fileName.className = "file-name";
-                fileName.textContent = file.name;
-
-                const fileSize = document.createElement("span");
-                fileSize.className = "file-size";
-                fileSize.textContent = formatFileSize(file.size);
-
-                fileInfo.append(fileName, fileSize);
-                
-                const deleteBtn = document.createElement("button");                deleteBtn.addEventListener("click", () => deleteFile(file.path, file.sha, li));
+            files.forEach(async (file) => {
+                if (file.name === 'index.html') return;
+                const li = document.createElement("li");
+                const sizeText = file.size ? (file.size / 1024).toFixed(1) + " KB" : (await getLatestCommitDate(file.path)).split('T')[0];
+                li.innerHTML = `<div class="file-info"><span class="file-name">${file.name}</span><span class="file-size">${sizeText}</span></div><button class="delete-btn">&times;</button>`;
+                ui.fileList.appendChild(li);
+                const fileInfo = li.querySelector(".file-info");
+                fileInfo.addEventListener("click", () => forceDownload(file.path, file.name, li));
+                const deleteBtn = li.querySelector(".delete-btn");                deleteBtn.addEventListener("click", () => deleteFile(file.path, file.sha, li));
             });
         }
         async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";try{ const success = await deleteFromGithub(e, `Delete file: ${e}`, t); if (success) { n.remove(); if(ui.fileList.children.length === 0) { ui.fileListStatus.textContent = '该文件夹下暂无文件'; ui.fileListStatus.style.display = 'block'; } } else { n.style.opacity = "1"; } } catch(err) { n.style.opacity = "1"; }}
@@ -3981,3 +3894,4 @@
     </script>
 </body>
 </html>
+
