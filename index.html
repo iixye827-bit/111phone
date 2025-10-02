@@ -2737,7 +2737,7 @@
             }
 
             const category = currentConfig.categories.find(c => c.name === selectedCategory);
-            const projects = category ? category.buttons.filter(btn => btn.href.includes('raw.githack.com')) : [];
+            const projects = category ? category.buttons : [];
 
             if (projects.length > 0) {
                 projects.forEach(proj => {
