@@ -559,7 +559,98 @@
              border-color: rgba(255, 255, 255, 0.15);
         }
         /* ===== [END] FROSTED GLASS THEME ===== */
+
+        /* ===== [START] FLOATING JELLYFISH BALL STYLES ===== */
+        @keyframes jelly-glow {
+            0% { filter: drop-shadow(0 0 2px rgba(91, 153, 226, 0.7)); }
+            50% { filter: drop-shadow(0 0 8px rgba(91, 153, 226, 1)); }
+            100% { filter: drop-shadow(0 0 2px rgba(91, 153, 226, 0.7)); }
+        }
+        #floating-jellyfish-ball {
+            position: fixed;
+            z-index: 2005;
+            width: 42px;
+            height: 42px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: grab;
+            user-select: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            animation: jelly-glow 2.5s infinite ease-in-out;
+        }
+        body.dark-mode #floating-jellyfish-ball {
+            background: rgba(30, 30, 30, 0.6);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+        #floating-jellyfish-ball.dragging {
+            cursor: grabbing;
+            transition: none;
+            transform: scale(1.1);
+        }
+        #floating-jellyfish-ball.idle {
+            opacity: 0.5;
+        }
+        #floating-jellyfish-ball.idle.snap-right {
+            transform: translateX(50%);
+        }
+        #floating-jellyfish-ball.idle.snap-left {
+            transform: translateX(-50%);
+        }
+        .jelly-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1px;
+            height: 1px;
+            pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #floating-jellyfish-ball.menu-open .jelly-menu {
+            transform: translate(-50%, -50%) rotate(360deg);
+        }
+        .jelly-menu-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 38px;
+            height: 38px;
+            margin: -19px 0 0 -19px;
+            background: inherit;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: inherit;
+            transform: scale(0);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+        #floating-jellyfish-ball.menu-open .jelly-menu-btn {
+            transform: scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .jelly-menu-btn:nth-child(1) { transition-delay: 0.05s; }
+        .jelly-menu-btn:nth-child(2) { transition-delay: 0.1s; }
+        .jelly-menu-btn:nth-child(3) { transition-delay: 0.15s; }
+        .jelly-menu-btn:nth-child(4) { transition-delay: 0.2s; }
+        /* ===== [END] FLOATING JELLYFISH BALL STYLES ===== */
+
     </style>
+    <style id="custom-jelly-ball-styles"></style>
 </head>
 <body>
     <div class="page-overlay" id="pageOverlay"></div>
@@ -609,8 +700,7 @@
                 </div>
                 <div class="help-content-wrapper">
                     <div id="help-page-0" class="help-page-content">
-                        <h3>从零开始 (必需)</h3><p>此流程仅需您创建一个安全的“钥匙”(PAT)和一个云端“私人数据仓库”，让本应用可以为您安全地存储和同步所有数据。</p>
-                        <h4>步骤 1：创建 GitHub 个人访问令牌 (PAT)</h4><p>这个令牌是应用访问您私人云仓库的专属安全密码。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub Token 创建页面</a>。</li><li><strong>填写基本信息</strong>：备注(Note)填写 <code>JellyfishCenterToken</code>，有效期(Expiration)选择 <code>No expiration</code> (永不过期)。</li><li><strong>分配权限 (关键)</strong>：只需 <strong>勾选 <code>repo</code></strong> 这一项。</li><li><strong>生成并复制</strong>：滑动到页面最底部，点击 <strong><code>Generate token</code></strong> 按钮。<strong>【⚠️极其重要⚠️】</strong> GitHub 只会显示这一次完整的 Token。请 <strong>立即点击复制按钮</strong> 将其保存到安全的地方，下一步会马上用到。它应该以 <code>ghp_</code> 开头。</li></ol>
+                        <h3>从零开始 (必需)</h3><p>此流程仅需您创建一个安全的“钥匙”(PAT)和一个云端“私人数据仓库”，让本应用可以为您安全地存储和同步所有数据。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub Token 创建页面</a>。</li><li><strong>填写基本信息</strong>：备注(Note)填写 <code>JellyfishCenterToken</code>，有效期(Expiration)选择 <code>No expiration</code> (永不过期)。</li><li><strong>分配权限 (关键)</strong>：只需 <strong>勾选 <code>repo</code></strong> 这一项。</li><li><strong>生成并复制</strong>：滑动到页面最底部，点击 <strong><code>Generate token</code></strong> 按钮。<strong>【⚠️极其重要⚠️】</strong> GitHub 只会显示这一次完整的 Token。请 <strong>立即点击复制按钮</strong> 将其保存到安全的地方，下一步会马上用到。它应该以 <code>ghp_</code> 开头。</li></ol>
                         <h4>步骤 2：创建私人数据仓库</h4><p>此步骤将创建一个独立的、完全私密的仓库，专门用来存放您的所有配置和文件。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub 仓库创建页面</a>。</li><li><strong>填写仓库信息</strong>：<ul><li><strong>Repository name (仓库名称)</strong>：起一个清晰的名字，例如 <code>My-Jellyfish-Data</code>。</li><li><strong>关键：选择 <code>Private</code> (私有)</strong>。这是您的私人数据，必须设为私有。</li><li><strong>勾选 <code>Add a README file</code></strong>：确保仓库被成功初始化。</li></ul></li><li><strong>点击 <code>Create repository</code></strong> 按钮完成创建。</li></ol>
                         <h4>步骤 3：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌜 按钮展开菜单 → 点击 <strong>☁️ (数据同步)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤2</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，可以开始使用了！</p>
                     </div>
@@ -746,6 +836,16 @@
     <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span id="addNavModalTitle">管理项目</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入按钮管理模式</button><div class="toggle-section" style="margin-top: 10px;"><span>分页展示</span><label class="toggle-switch"><input type="checkbox" id="paginationToggle"><span class="slider"></span></label></div><div class="segmented-control two-segments"><input type="radio" id="type-link" name="nav-type" value="link" checked hidden><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload" hidden><label for="type-upload">上传项目</label><div class="slider-indicator"></div></div><div class="form-section"><label for="newButtonCategoryInput">分类名称</label><input type="text" id="newButtonCategoryInput" class="modal-input" placeholder="选择或创建分类" list="category-datalist"><datalist id="category-datalist"></datalist></div><div id="category-management-section" style="display: none;"><button id="deleteCategoryBtn" class="modal-button" style="color:#e53e3e;">删除当前分类</button></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section"><div class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div class="toggle-section" style="margin-top: 10px;"><span>在新标签页中打开</span><label class="toggle-switch"><input type="checkbox" id="openExternallyToggle"><span class="slider"></span></label></div></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div><div class="important-note" style="font-size: 13px; padding: 8px 12px; margin-top: 5px;"><p>上传的项目无法编辑链接，如需更新请删除后重新上传。</p></div></div><button id="createNavBtn" class="modal-button">加入新项目</button><div class="status-text" id="upload-status"></div></div></div></div>
     <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据同步</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button><button id="manualSyncBtn" class="modal-button" style="color:#5a6778; margin-top: 10px;">手动同步与修复</button><div class="nuke-section"><button id="nukeDataBtn" class="modal-button">清空所有云端及本地数据</button></div></div></div></div>
     <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body">
+        
+        <div class="toggle-section" style="border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 20px; border-radius: 12px 12px 0 0; box-shadow: none;">
+            <span>网页内悬浮球</span><label class="toggle-switch"><input type="checkbox" id="jellyBallToggle"><span class="slider"></span></label>
+        </div>
+        <div id="jelly-ball-custom-css-section" style="display: none; flex-direction: column; gap: 10px; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 20px;">
+            <label for="jellyBallCssTextarea" style="font-size: 14px; color: #5a6778;">自定义悬浮球CSS</label>
+            <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="4" placeholder="#floating-jellyfish-ball {&#10;  background: #ff0000 !important;&#10;}"></textarea>
+            <button id="applyJellyBallCssBtn" class="modal-button">应用样式</button>
+        </div>
+
         <div class="theme-style-selector">
             <label>主题风格</label>
             <div class="segmented-control two-segments">
@@ -1077,6 +1177,291 @@
     const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按🌞打开工具栏 | By淡季水母', categories: [{ name: '全部', buttons: [] }], settings: { paginationEnabled: true }, themePresets: [] });
     let currentConfig = getDefaultConfig();
     
+    // ===== [START] FLOATING JELLYFISH BALL LOGIC =====
+    const FloatingBallManager = (() => {
+        let ball = null;
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+        let idleTimer = null;
+        let longPressTimer = null;
+
+        function _create() {
+            if (localStorage.getItem('jellyBallEnabled') !== 'true') return;
+            if (document.getElementById('floating-jellyfish-ball')) return;
+
+            ball = document.createElement('div');
+            ball.id = 'floating-jellyfish-ball';
+            ball.innerHTML = `<span>🎐</span><div class="jelly-menu"></div>`;
+            ball.classList.add('glowing');
+            document.body.appendChild(ball);
+             
+            let startPos = localStorage.getItem('jellyBallPosition');
+            if (startPos) {
+                startPos = JSON.parse(startPos);
+                ball.style.top = `${startPos.y}px`;
+                ball.style.left = `${startPos.x}px`;
+            } else {
+                ball.style.top = '80%';
+                ball.style.left = '90%';
+            }
+
+            // Menu buttons
+            const menu = ball.querySelector('.jelly-menu');
+            const buttons = [
+                { icon: '📷', "data-action": 'album', title: '相册' },
+                { icon: '📝', "data-action": 'memo', title: '备忘录' },
+                { icon: '📁', "data-action": 'folder', title: '文件夹' },
+                { icon: '↩️', "data-action": 'return', title: '返回主页' }
+            ];
+
+            buttons.forEach((btn, i) => {
+                const btnEl = document.createElement('button');
+                btnEl.className = 'jelly-menu-btn';
+                btnEl.innerHTML = btn.icon;
+                btnEl.title = btn.title;
+                btnEl.dataset.action = btn.action;
+                const angle = (i / buttons.length) * 2 * Math.PI - (Math.PI / 2); // Start from top
+                const radius = 55; // pixels
+                btnEl.style.transform = `scale(0) rotate(${angle}rad) translateY(-${radius}px) rotate(-${angle}rad)`;
+                menu.appendChild(btnEl);
+            });
+            
+            _addEventListeners();
+            _resetIdleTimer();
+        }
+
+        function _destroy() {
+            if (ball) {
+                ball.remove();
+                ball = null;
+            }
+            clearTimeout(idleTimer);
+            clearTimeout(longPressTimer);
+        }
+
+        function _addEventListeners() {
+            ball.addEventListener('mousedown', _onDragStart);
+            ball.addEventListener('touchstart', _onDragStart, { passive: false });
+            
+            document.addEventListener('click', (e) => {
+                if(ball && !ball.contains(e.target)) {
+                    _closeMenu();
+                }
+            }, true);
+            
+            ball.querySelector('.jelly-menu').addEventListener('click', _onMenuClick);
+        }
+
+        function _onDragStart(e) {
+            if(e.target.classList.contains('jelly-menu-btn')) return;
+            e.preventDefault();
+            
+            clearTimeout(idleTimer);
+            ball.classList.remove('idle', 'snap-left', 'snap-right');
+            
+            isDragging = false;
+            let clientX, clientY;
+            if (e.type === 'touchstart') {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            const rect = ball.getBoundingClientRect();
+            offset.x = clientX - rect.left;
+            offset.y = clientY - rect.top;
+
+            longPressTimer = setTimeout(() => {
+                _toggleMenu();
+                longPressTimer = null;
+            }, 2000);
+
+            document.addEventListener('mousemove', _onDragMove);
+            document.addEventListener('touchmove', _onDragMove, { passive: false });
+            document.addEventListener('mouseup', _onDragEnd);
+            document.addEventListener('touchend', _onDragEnd);
+        }
+
+        function _onDragMove(e) {
+            e.preventDefault();
+            ball.classList.add('dragging');
+            if (!isDragging) { // first move
+                 isDragging = true;
+                 if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                 }
+                 _closeMenu();
+            }
+
+            let clientX, clientY;
+            if (e.type === 'touchmove') {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            let newX = clientX - offset.x;
+            let newY = clientY - offset.y;
+
+            // Constrain to viewport
+            const ballSize = ball.offsetWidth;
+            const maxX = window.innerWidth - ballSize;
+            const maxY = window.innerHeight - ballSize;
+
+            newX = Math.max(0, Math.min(newX, maxX));
+            newY = Math.max(0, Math.min(newY, maxY));
+
+            ball.style.left = `${newX}px`;
+            ball.style.top = `${newY}px`;
+        }
+
+        function _onDragEnd(e) {
+            if (isDragging) {
+                 _snapToEdge();
+                 localStorage.setItem('jellyBallPosition', JSON.stringify({ x: ball.offsetLeft, y: ball.offsetTop }));
+            }
+            
+            ball.classList.remove('dragging');
+            isDragging = false;
+            
+            clearTimeout(longPressTimer);
+            _resetIdleTimer();
+
+            document.removeEventListener('mousemove', _onDragMove);
+            document.removeEventListener('touchmove', _onDragMove);
+            document.removeEventListener('mouseup', _onDragEnd);
+            document.removeEventListener('touchend', _onDragEnd);
+        }
+        
+        function _snapToEdge() {
+             const ballCenter = ball.offsetLeft + ball.offsetWidth / 2;
+             const screenCenter = window.innerWidth / 2;
+             if (ballCenter > screenCenter) {
+                 ball.style.left = `${window.innerWidth - ball.offsetWidth}px`;
+                 ball.classList.add('snap-right');
+             } else {
+                 ball.style.left = '0px';
+                 ball.classList.add('snap-left');
+             }
+        }
+
+        function _resetIdleTimer() {
+            clearTimeout(idleTimer);
+            ball.classList.remove('idle', 'snap-left', 'snap-right');
+            idleTimer = setTimeout(() => {
+                _snapToEdge();
+                ball.classList.add('idle');
+            }, 3000);
+        }
+
+        function _toggleMenu() {
+            const isOpen = ball.classList.toggle('menu-open');
+            const menuBtns = ball.querySelectorAll('.jelly-menu-btn');
+            
+            if(isOpen) {
+               menuBtns.forEach(btn => {
+                   const originalTransform = btn.style.transform;
+                   const noScaleTransform = originalTransform.replace(/scale\([\d.]+\)/, '');
+                   btn.style.transform = noScaleTransform + ' scale(1)';
+               });
+            } else {
+               menuBtns.forEach(btn => {
+                   const originalTransform = btn.style.transform;
+                   const noScaleTransform = originalTransform.replace(/scale\([\d.]+\)/, '');
+                   btn.style.transform = noScaleTransform + ' scale(0)';
+               });
+            }
+        }
+        function _closeMenu(){
+            if(ball.classList.contains('menu-open')) {
+                _toggleMenu();
+            }
+        }
+        
+        function _onMenuClick(e){
+            const button = e.target.closest('.jelly-menu-btn');
+            if(!button) return;
+            const action = button.dataset.action;
+
+            const memoryModal = document.getElementById('memoryModal');
+            const originalZIndex = memoryModal.style.zIndex;
+            
+            function openMemoryAndSwitch(viewName) {
+                MemoryApp.open();
+                memoryModal.style.zIndex = '2010'; // Elevate over iframe
+                const closeBtn = memoryModal.querySelector('.close-btn');
+
+                // Ensure we only add the reset listener once
+                const resetZIndex = () => {
+                    memoryModal.style.zIndex = originalZIndex;
+                    closeBtn.removeEventListener('click', resetZIndex);
+                };
+                closeBtn.addEventListener('click', resetZIndex);
+
+                // Call the internal switch functions of MemoryApp
+                const hubAction = memoryModal.querySelector(`[data-action="goto-${viewName}"]`);
+                if(hubAction) hubAction.click();
+
+                _closeMenu();
+            }
+
+            switch(action) {
+                case 'album':
+                    openMemoryAndSwitch('album');
+                    break;
+                case 'memo':
+                    openMemoryAndSwitch('memo');
+                    break;
+                case 'folder':
+                    openMemoryAndSwitch('cloud');
+                    break;
+                case 'return':
+                    closeIframeModal();
+                    break;
+            }
+        }
+
+        return {
+            init: () => {
+                const toggle = document.getElementById('jellyBallToggle');
+                const cssSection = document.getElementById('jelly-ball-custom-css-section');
+                const cssTextarea = document.getElementById('jellyBallCssTextarea');
+                const applyCssBtn = document.getElementById('applyJellyBallCssBtn');
+                const customStyleTag = document.getElementById('custom-jelly-ball-styles');
+
+                const isEnabled = localStorage.getItem('jellyBallEnabled') === 'true';
+                toggle.checked = isEnabled;
+                cssSection.style.display = isEnabled ? 'flex' : 'none';
+
+                const savedCss = localStorage.getItem('jellyBallCustomCss') || '';
+                cssTextarea.value = savedCss;
+                customStyleTag.innerHTML = savedCss;
+                
+
+                toggle.addEventListener('change', () => {
+                    const checked = toggle.checked;
+                    localStorage.setItem('jellyBallEnabled', checked);
+                    cssSection.style.display = checked ? 'flex' : 'none';
+                });
+
+                applyCssBtn.addEventListener('click', () => {
+                   const cssCode = cssTextarea.value;
+                   customStyleTag.innerHTML = cssCode;
+                   localStorage.setItem('jellyBallCustomCss', cssCode);
+                   alert('自定义样式已应用！');
+                });
+            },
+            create: _create,
+            destroy: _destroy
+        };
+    })();
+    // ===== [END] FLOATING JELLYFISH BALL LOGIC =====
+
     const utf8_to_b64 = (str) => btoa(unescape(encodeURIComponent(str)));
     const b64_to_utf8 = (str) => decodeURIComponent(escape(atob(str)));
 
@@ -2010,8 +2395,18 @@
         updateAddNavModalUI();
     }
     
-    function openIframeModal(url) { if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } iframeEl.src = url; iframeModal.classList.add('active'); }
-    function closeIframeModal() { hideReturnConfirmation(); iframeModal.classList.remove('active'); setTimeout(() => { iframeEl.src = 'about:blank'; }, 400); }
+    function openIframeModal(url) { 
+        if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } 
+        iframeEl.src = url; 
+        iframeModal.classList.add('active'); 
+        FloatingBallManager.create();
+    }
+    function closeIframeModal() { 
+        FloatingBallManager.destroy();
+        hideReturnConfirmation(); 
+        iframeModal.classList.remove('active'); 
+        setTimeout(() => { iframeEl.src = 'about:blank'; }, 400); 
+    }
     function showReturnConfirmation() { returnConfirmationToast.classList.add('show'); }
     function hideReturnConfirmation() { returnConfirmationToast.classList.remove('show'); }
     document.getElementById('confirmReturnBtn').addEventListener('click', closeIframeModal);
@@ -2821,16 +3216,7 @@
 
                 fileInfo.append(fileName, fileSize);
                 
-                const deleteBtn = document.createElement("button");
-                deleteBtn.className = "delete-btn";
-                deleteBtn.innerHTML = "&times;";
-                deleteBtn.title = "删除文件";
-
-                li.append(fileInfo, deleteBtn);
-                ui.fileList.appendChild(li);
-
-                fileInfo.addEventListener("click", ev => forceDownload(ev.currentTarget.dataset.filePath, ev.currentTarget.dataset.fileName, fileInfo));
-                deleteBtn.addEventListener("click", () => deleteFile(file.path, file.sha, li));
+                const deleteBtn = document.createElement("button");                deleteBtn.addEventListener("click", () => deleteFile(file.path, file.sha, li));
             });
         }
         async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";try{ const success = await deleteFromGithub(e, `Delete file: ${e}`, t); if (success) { n.remove(); if(ui.fileList.children.length === 0) { ui.fileListStatus.textContent = '该文件夹下暂无文件'; ui.fileListStatus.style.display = 'block'; } } else { n.style.opacity = "1"; } } catch(err) { n.style.opacity = "1"; }}
@@ -3585,6 +3971,7 @@
         setupModals();
         MemoryApp.init();
         WanderView.init();
+        FloatingBallManager.init();
         setupBgImageManager();
         setupColorSync(colorModal.pickerD1, colorModal.hexD1, 'dayColor1'); 
         setupColorSync(colorModal.pickerD2, colorModal.hexD2, 'dayColor2');
