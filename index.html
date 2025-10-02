@@ -1,1028 +1,5 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-
-    <!-- PWA & Mobile App Settings -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#16213e">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
-
-    <title>JellyfishCenter</title>
-    <style>
-        /* [CSS - V12.3.0 "Migration Ready"] */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', -apple-system, BlinkMacSystemFont, sans-serif; }
-        :root {
-            --day-color1: #f5f7fa; --day-color2: #e4eaf5;
-            --night-color1: #1f2a40; --night-color2: #16213e;
-            --hold-border: #5B99E2; --text-day: #2d3748; --text-night: #e0e6f0;
-            --handle-color-day: #5a6778; --handle-color-night: #ffffff;
-            --bg-day-element: linear-gradient(135deg, var(--day-color2), var(--day-color1));
-            --bg-night-element: linear-gradient(135deg, var(--night-color2), var(--night-color1));
-            --shadow-light-day: rgba(255, 255, 255, 0.9); --shadow-dark-day: rgba(174, 190, 212, 0.4);
-            --shadow-light-night: rgba(40, 52, 79, 0.9); --shadow-dark-night: rgba(0, 0, 0, 0.3);
-        }
-        body { 
-            min-height: 100vh; 
-            background-color: var(--day-color1);
-            background-image: linear-gradient(135deg, var(--day-color1) 0%, var(--day-color2) 100%); 
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            padding: 20px; 
-            display: flex; flex-direction: column; align-items: center; 
-            transition: background 0.5s ease; 
-            touch-action: manipulation; overflow-x: hidden; 
-        }
-        body.dark-mode { 
-            background-color: var(--night-color1);
-            background-image: linear-gradient(135deg, var(--night-color1) 0%, var(--night-color2) 100%); 
-            --hold-border: #63b3ed; color: var(--text-night); 
-        }
-        .title-card { width: 100%; max-width: 800px; padding: 40px 20px; margin: 20px 0; border-radius: 16px; box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); background: var(--bg-day-element); backdrop-filter: blur(8px); text-align: center; transition: all 0.5s ease; background-size: cover; background-position: center; }
-        body.dark-mode .title-card { box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night); background: var(--bg-night-element); }
-        .editable-title, .editable-subtitle { opacity: 0; transition: opacity 0.5s ease; background-color: rgba(255,255,255,0.1); backdrop-filter: blur(4px); } /* FOUC Fix */
-        .editable-title { font-size: 36px; font-weight: 700; color: var(--text-day); margin-bottom: 20px; cursor: pointer; padding: 6px 12px; border-radius: 8px; display: block; width: fit-content; margin: 0 auto 20px auto; user-select: none; }
-        body.dark-mode .editable-title { color: var(--text-night); background-color: rgba(0,0,0,0.1); }
-        .editable-title:hover { background-color: rgba(255, 255, 255, 0.8); } body.dark-mode .editable-title:hover { background-color: rgba(50, 55, 75, 0.8); }
-        .editable-subtitle { font-size: 16px; color: #5a6778; cursor: pointer; padding: 4px 8px; border-radius: 6px; display: block; width: fit-content; margin: 0 auto; line-height: 1.5; user-select: none; }
-        body.dark-mode .editable-subtitle { color: #c0c6cc; background-color: rgba(0,0,0,0.1); }
-        .editable-subtitle:hover { background-color: rgba(255, 255, 255, 0.8); color: var(--text-day); } body.dark-mode .editable-subtitle:hover { background-color: rgba(50, 55, 75, 0.8); color: var(--text-night); }
-        
-        /* REFINED: Category Navigation */
-        .category-nav-container { width: 100%; max-width: 1200px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 10px 0; margin-bottom: 10px; }
-        .category-nav-container::-webkit-scrollbar { display: none; }
-        .category-nav { display: flex; flex-wrap: nowrap; gap: 12px; padding: 0 20px; }
-        .category-pill { flex-shrink: 0; padding: 8px 18px; border: none; border-radius: 20px; background: var(--bg-day-element); box-shadow: none; color: var(--text-day); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; opacity: 0.6; }
-        body.dark-mode .category-pill { background: var(--bg-night-element); color: var(--text-night); }
-        .category-pill.active { color: white; background: var(--hold-border); opacity: 1; transform: scale(1.05); }
-        
-        .nav-container { width: 100%; max-width: 1200px; margin: 10px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; padding: 20px; position: relative; z-index: 10; touch-action: pan-y; }
-        .nav-btn { position: relative; padding: 22px 16px; border: none; border-radius: 14px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background: var(--bg-day-element); backdrop-filter: blur(8px); font-size: 17px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent; }
-        .nav-btn.hold { border: 2px solid var(--hold-border); transform: scale(1.02); z-index: 5; box-shadow: 8px 8px 16px rgba(174, 190, 212, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(91, 153, 226, 0.3); }
-        body.dark-mode .nav-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
-        body.dark-mode .nav-btn.hold { box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4), -8px -8px 16px rgba(40, 52, 79, 0.8), 0 0 0 2px rgba(99, 179, 237, 0.3); }
-        .nav-btn:hover { transform: translateY(-3px); filter: brightness(1.05); }
-        .nav-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-day), inset -6px -6px 12px var(--shadow-light-day); transform: translateY(0); }
-        body.dark-mode .nav-btn:active { box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.25), inset -6px -6px 12px rgba(40, 52, 79, 0.8); }
-        .delete-icon { display: none; position: absolute; top: -5px; right: -5px; width: 24px; height: 24px; background-color: #f56565; color: white; border-radius: 50%; border: 2px solid white; font-size: 16px; font-weight: bold; line-height: 20px; text-align: center; cursor: pointer; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .page-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px); z-index: 99; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
-        .page-overlay.show { opacity: 1; pointer-events: auto; }
-        .page-overlay.management-overlay { background: transparent; backdrop-filter: none; z-index: 5; }
-        .management-active .nav-btn { animation: wiggle 0.2s ease-in-out infinite alternate; pointer-events: auto !important; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-        .management-active .nav-btn > .delete-icon { display: block; }
-        @keyframes wiggle { from { transform: rotate(-0.5deg); } to { transform: rotate(0.5deg); } }
-        .fab-container { position: fixed; right: 30px; bottom: 30px; z-index: 100; }
-        .fab-main, .fab-drawer-item { position: relative; width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 22px; display: flex; align-items: center; justify-content: center; user-select: none; -webkit-tap-highlight-color: transparent; }
-        body.dark-mode .fab-main, body.dark-mode .fab-drawer-item { box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
-        .fab-main:active, .fab-drawer-item:active { transform: scale(0.95); }
-        .fab-container.active .fab-main { transform: rotate(45deg); }
-        .fab-drawer { position: absolute; bottom: 65px; left: 0; display: flex; flex-direction: column; gap: 15px; opacity: 0; transform: translateY(20px); transition: opacity 0.2s ease-out, transform 0.2s ease-out; pointer-events: none; }
-        .fab-container.active .fab-drawer { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        #sync-status-indicator { position: absolute; right: 5px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background-color: transparent; transition: all 0.3s ease; box-shadow: 0 0 5px rgba(0,0,0,0.2); }
-        #sync-status-indicator.synced { background-color: #28a745; } #sync-status-indicator.syncing { background-color: #ffc107; animation: pulse 1.5s infinite; } #sync-status-indicator.error { background-color: #dc3545; animation: none; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
-        .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:1000;opacity:0;transition:opacity .3s ease}.modal-overlay.show{display:flex;opacity:1}.modal-content{width:90%;background:var(--bg-day-element);color:var(--text-day);border-radius:16px;box-shadow:12px 12px 24px var(--shadow-dark-day),-12px -12px 24px var(--shadow-light-day);padding:12px;transition:transform .3s ease,background .5s ease,box-shadow .5s ease;transform:scale(.95);display:flex;flex-direction:column;max-height:90vh}.modal-overlay.show .modal-content{transform:scale(1)}body.dark-mode .modal-content{background:var(--bg-night-element);color:var(--text-night);box-shadow:12px 12px 24px var(--shadow-dark-night),-12px -12px 24px var(--shadow-light-night)}.modal-header{display:flex;justify-content:space-between;align-items:center;font-size:20px;font-weight:600;margin-bottom:20px;flex-shrink:0; padding: 0 3px;}.modal-title-group{display:flex;align-items:center;gap:8px}.modal-header .close-btn,.modal-header .settings-btn{cursor:pointer;border:none;background:transparent;color:inherit;padding:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s ease}.modal-header .close-btn{font-size:24px;font-weight:bold;width:36px;height:36px}.modal-header .settings-btn{font-size:20px;width:32px;height:32px}.modal-header .close-btn:hover,.modal-header .settings-btn:hover{background:rgba(0,0,0,0.05)}body.dark-mode .modal-header .close-btn:hover,body.dark-mode .modal-header .settings-btn:hover{background:rgba(255,255,255,0.08)}
-        .modal-body { overflow-y: auto; flex-grow: 1; display:flex; flex-direction:column; gap: 15px; margin-right: -5px; padding-right: 5px; scrollbar-width: none; -ms-overflow-style: none; }
-        .modal-body > * { margin-left: 3px; margin-right: 3px; width: calc(100% - 6px); }
-        .modal-body::-webkit-scrollbar { width: 0; background: transparent; }
-        .modal-input,.modal-select,.modal-textarea{padding:12px 15px;border:none;border-radius:10px;font-size:16px;background:var(--bg-day-element);color:var(--text-day);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day);transition:all .3s ease;caret-color:var(--hold-border)}body.dark-mode .modal-input,body.dark-mode .modal-select,body.dark-mode .modal-textarea{background:var(--bg-night-element);color:var(--text-night);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}.modal-input:focus,.modal-select:focus,.modal-textarea:focus{outline:none;box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day),0 0 0 2px var(--hold-border)}body.dark-mode .modal-input:focus,body.dark-mode .modal-select:focus,body.dark-mode .modal-textarea:focus{box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night),0 0 0 2px var(--hold-border)} .modal-textarea{resize:vertical;min-height:80px;}
-        .modal-button{padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;color:var(--hold-border);background:var(--bg-day-element);box-shadow:4px 4px 8px var(--shadow-dark-day),-4px -4px 8px var(--shadow-light-day);transition:all .2s ease}body.dark-mode .modal-button{color:var(--hold-border);background:var(--bg-night-element);box-shadow:4px 4px 8px var(--shadow-dark-night),-4px -4px 8px var(--shadow-light-night)}.modal-button:active{box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day)}body.dark-mode .modal-button:active{box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}.modal-button:disabled{color:#9db2c2;cursor:not-allowed;box-shadow:none;}
-        #nukeDataBtn { background: #e53e3e !important; color: white !important; box-shadow: 4px 4px 8px rgba(229, 62, 62, 0.5), -4px -4px 8px rgba(255, 255, 255, 0.9) !important; }
-        #nukeDataBtn:active { background: #c53030 !important; box-shadow: inset 4px 4px 8px rgba(155, 37, 37, 0.7) !important; }
-        #settingsModal .modal-body .nuke-section { margin: 15px 0 10px; border-top: 1px solid rgba(128,128,128,0.3); padding-top: 15px; display: flex; justify-content: center; }
-        #syncErrorModal .modal-content { max-width: 450px; } #sync-error-message { padding: 12px; border-radius: 8px; background: rgba(255, 0, 0, 0.1); border: 1px solid rgba(255, 0, 0, 0.2); font-family: monospace; font-size: 14px; word-wrap: break-word; user-select: text; } body.dark-mode #sync-error-message { background: rgba(252, 129, 129, 0.1); border-color: rgba(252, 129, 129, 0.2); }
-        #colorPaletteModal .modal-content, #helpModal .modal-content { max-width: 500px; } 
-        .theme-style-selector { border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 20px; margin-bottom: 20px; } body.dark-mode .theme-style-selector { border-color: rgba(255,255,255,0.1); }
-        .theme-style-selector label { font-size: 14px; color: #5a6778; display: block; margin-bottom: 8px; } body.dark-mode .theme-style-selector label { color: #c0c6cc; }
-        #neumorphism-settings.hidden { display: none; }
-        #colorPaletteModal .modal-body { gap: 20px; padding-bottom: 15px; }
-        .color-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .color-picker-group { display: flex; flex-direction: column; gap: 8px; }
-        .color-picker-group label { font-size: 14px; color: #5a6778; } body.dark-mode .color-picker-group label { color: #c0c6cc; }
-        .color-input-wrapper { display: flex; align-items: center; border-radius: 10px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); } body.dark-mode .color-input-wrapper { background:var(--bg-night-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
-        input[type="color"] { width: 36px; height: 30px; border: none; background: transparent; cursor: pointer; -webkit-appearance: none; padding: 0; flex-shrink: 0; }
-        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; } input[type="color"]::-webkit-color-swatch { border-radius: 6px; border: none; }
-        .hex-display { flex-grow: 1; text-align: right; padding: 0 10px; font-family: monospace; font-size: 16px; color: #889; }
-        .preview-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .preview-box { height: 40px; border-radius: 8px; position: relative; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-        .preview-box::before { content: attr(data-label); } #dayPreview { border: 2px solid var(--bg-day-element); color: var(--text-day); } body.dark-mode #dayPreview { border-color: rgba(255,255,255,0.1); }
-        #nightPreview { border: 2px solid var(--bg-night-element); color: var(--text-night); } body.dark-mode #nightPreview { border-color: rgba(255,255,255,0.2); }
-        .preset-manager, .background-image-manager { border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; display: flex; flex-direction: column; gap: 15px; }
-        body.dark-mode .preset-manager, body.dark-mode .background-image-manager { border-color: rgba(255,255,255,0.1); } 
-        .preset-row, .background-image-row { display: flex; align-items: center; gap: 10px; }
-        .preset-row .modal-input, .preset-row .modal-select { flex-grow: 1; }
-        .preset-row .modal-button, .background-image-row .modal-button { width: auto; padding: 12px 15px; flex-shrink: 0; font-size: 14px; }
-        .preset-row .modal-button.save { color: #28a745; } .preset-row .modal-button.delete, .background-image-row .modal-button.delete { color: #dc3545; }
-        .background-image-row .status { flex-grow: 1; font-size: 12px; color: #889; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .toggle-section { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 12px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
-        body.dark-mode .toggle-section { background:var(--bg-night-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
-        .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; } .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 22px; } .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--hold-border); } input:checked + .slider:before { transform: translateX(18px); }
-        #file-list-container{flex-grow:1;overflow-y:auto;border-radius:10px;padding:5px;margin-top:10px;background:var(--bg-day-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day);display:flex;flex-direction:column}body.dark-mode #file-list-container{background:var(--bg-night-element);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}#file-list-container ul{list-style:none;padding:5px}#file-list-container li{padding:8px 15px;border-radius:8px;display:flex;justify-content:space-between;align-items:center;transition:background .2s;gap:10px}#file-list-container li:hover{background-color:rgba(0,0,0,0.05)}body.dark-mode #file-list-container li:hover{background-color:rgba(255,255,255,0.08)}
-        #fileListStatus{text-align:center;color:#a0aec0;padding:10px;display:flex;align-items:center;justify-content:center;flex-grow:1;min-height:100px}
-        body.dark-mode #fileListStatus {color:#889;}
-        .file-info{flex-grow:1;cursor:pointer;min-width:0}.file-name{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px}.file-timestamp{font-size:12px;font-weight:300;color:#9A86A4}.delete-btn{background:transparent;border:none;cursor:pointer;padding:0;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s,color .2s;color:#bbb;font-size:22px;font-weight:bold;line-height:1}.delete-btn:hover{background:#f0f0f0;color:#e53e3e}body.dark-mode .delete-btn{color:#889}body.dark-mode .delete-btn:hover{background:rgba(255,255,255,0.1);color:#fc8181}
-        #settingsModal .modal-content,#addNavModal .modal-content, #musicSettingsModal .modal-content {max-width:400px}
-        #settingsModal .modal-body .form-section,#addNavModal .modal-body .form-section{display:flex;flex-direction:column;gap:8px}#settingsModal label,#addNavModal label{font-size:14px;color:#5a6778}body.dark-mode #settingsModal label,body.dark-mode #addNavModal label{color:#c0c6cc}
-        .segmented-control { position: relative; display: flex; border-radius: 12px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
-        body.dark-mode .segmented-control { background:var(--bg-night-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
-        .segmented-control label { position: relative; z-index: 1; flex: 1; text-align: center; padding: 10px; border-radius: 8px; cursor: pointer; transition: color .3s ease; font-weight: 600; color: #889; font-size: 14px; }
-        .segmented-control .slider-indicator { position: absolute; top: 5px; left: 5px; bottom: 5px; background: var(--bg-day-element); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); border-radius: 8px; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 0; }
-        body.dark-mode .segmented-control .slider-indicator { background: var(--bg-night-element); box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); }
-        #addNavModal input[type="radio"]:checked + label, #helpModal input[type="radio"]:checked + label, #colorPaletteModal input[type="radio"]:checked + label { color: var(--hold-border); }
-        #type-upload:checked ~ .slider-indicator { transform: translateX(100%); }
-        #theme-style-glass:checked ~ .slider-indicator { transform: translateX(100%); }
-        .segmented-control.two-segments .slider-indicator { width: calc(50% - 5px); }
-        .segmented-control.three-segments .slider-indicator { width: calc(33.33% - 4px); }
-        #addNavModal .status-text{text-align:center;font-size:14px;color:#889;min-height:20px} #addNavModal .modal-header { gap: 10px; } #addNavModal .modal-title-group { flex-grow: 1; }
-        .header-toggle-group { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: normal; color: #5a6778; } body.dark-mode .header-toggle-group { color: #c0c6cc; }
-        .file-select-wrapper { display: flex; align-items: center; gap: 10px; width: 100%; } .file-select-wrapper .modal-button { flex-shrink: 0; width: auto; padding: 10px 15px; font-size: 14px; }
-        .file-select-wrapper .status-text { flex-grow: 1; font-size: 14px; color: #889; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .file-upload-section { display: flex; flex-direction: column; gap: 10px; } input[type="file"] { display: none; }
-        .progress-container { display: none; height: 12px; background:var(--bg-day-element); border-radius: 6px; box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day); padding: 2px; } body.dark-mode .progress-container { box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night); }
-        .progress-bar { width: 0%; height: 100%; border-radius: 4px; background-color: #707899; transition: width 0.2s linear; }
-        #helpModal .modal-body { gap: 0; padding-top: 15px; } #helpModal .modal-body > input[name="help-tab"] { display: none; } 
-        .help-page-content { display: none; padding: 15px 5px 0 5px; overflow-x: hidden; }
-        .help-page-content h3 { font-size: 1.3em; margin: 20px 0 10px 0; padding-bottom: 5px; border-bottom: 1px solid rgba(128,128,128,0.3); } .help-page-content h4 { font-size: 1.1em; margin: 18px 0 8px 0; }
-        .help-page-content p, .help-page-content li, .help-page-content a { line-height: 1.7; color: #4a5568; margin-bottom: 8px; word-wrap: break-word; }
-        body.dark-mode .help-page-content p, body.dark-mode .help-page-content li, body.dark-mode .help-page-content a { color: #a0aec0; }
-        .help-page-content ul, .help-page-content ol { padding-left: 25px; } .help-page-content ol li { margin-bottom: 12px; }
-        .help-page-content strong { color: var(--hold-border); font-weight: 600; } .help-page-content code { background-color: rgba(128,128,128,0.15); padding: 2px 5px; border-radius: 4px; font-family: monospace; word-wrap: break-word; }
-        .help-page-content a { color: var(--hold-border); text-decoration: none; font-weight: 600; } .help-page-content a:hover { text-decoration: underline; }
-        .help-page-content .warning { background-color: rgba(229, 62, 62, 0.1); border-left: 4px solid #e53e3e; padding: 10px 15px; margin: 15px 0; border-radius: 0 8px 8px 0; }
-        .help-page-content .important-note { background-color: rgba(91, 153, 226, 0.1); border-left: 4px solid var(--hold-border); padding: 10px 15px; margin: 15px 0; border-radius: 0 8px 8px 0; }
-        /* == Iframe Modal & Confirmation Toast Styles == */
-        .iframe-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-        .iframe-modal-overlay.active { transform: translateX(0); }
-        .iframe-modal-content { width: 100%; height: 100%; background: #fff; box-shadow: -5px 0 15px rgba(0,0,0,0.2); transition: transform 0.3s ease-out; }
-        .iframe-modal-content.dragging { transition: none; }
-        .iframe-modal-content iframe { width: 100%; height: 100%; border: none; }
-        .swipe-hint { position: fixed; left: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; background: rgba(0,0,0,0.6); color: white; padding: 10px 15px 10px 10px; border-radius: 0 8px 8px 0; z-index: 2001; opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
-        .swipe-hint.show { opacity: 1; }
-        .swipe-hint .arrow { width: 16px; height: 16px; border-right: 3px solid white; border-bottom: 3px solid white; transform: rotate(-45deg); animation: hint-pulse 1.5s infinite; margin-right: 10px; }
-        @keyframes hint-pulse { 0% { opacity: 0.3; } 50% { opacity: 1; transform: rotate(-45deg) scale(1.1); } 100% { opacity: 0.3; } }
-        #gestureCaptureZone { position: fixed; top: 50%; left: 0; width: 20px; height: 200px; transform: translateY(-50%); z-index: 2002; } /* REFINED: Gesture Area */
-        #returnConfirmationToast { position: fixed; top: 0; left: 50%; transform: translate(-50%, -120%); width: calc(100% - 30px); max-width: 400px; background: var(--bg-night-element); color: var(--text-night); padding: 12px 16px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 2003; display: flex; justify-content: space-between; align-items: center; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
-        #returnConfirmationToast.show { transform: translate(-50%, 0); }
-        .toast-btn { background: transparent; border: none; color: white; font-size: 15px; font-weight: 600; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
-        .toast-btn-confirm { background-color: rgba(99, 179, 237, 0.8); } .toast-btn-confirm:hover { background-color: rgba(99, 179, 237, 1); }
-        .toast-btn-cancel { background-color: rgba(255, 255, 255, 0.2); } .toast-btn-cancel:hover { background-color: rgba(255, 255, 255, 0.3); }
-        @media (max-width: 480px) { .editable-title { font-size: 28px; } .editable-subtitle { font-size: 14px; } .title-card { padding: 30px 15px; } .nav-container { grid-template-columns: 1fr 1fr; gap: 18px; padding: 10px; } .nav-btn { padding: 18px 10px; font-size: 15px; } .fab-container { right: 20px; bottom: 20px; } .fab-main, .fab-drawer-item { width: 44px; height: 44px; font-size: 20px; } .fab-drawer { bottom: 55px; } .segmented-control label { font-size: 13px; padding: 8px 5px; } .category-nav { padding: 0 15px; } }
-        
-        /* ===== [START] MEMORY MODAL STYLES ===== */
-        #memoryModal .modal-content { max-width: 800px; height: calc(100vh - 40px); padding: 0; display: flex; flex-direction: column; overflow: hidden; }
-        #memoryModal .modal-header { padding: 0 15px; margin-top: 15px; margin-bottom: 10px; }
-        #memoryModal .app-container { width: 100%; flex-grow: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-        #memoryModal .page { width: 100%; height: 100%; display: none; flex-direction: column; position: absolute; top: 0; left: 0; opacity: 0; transform: scale(0.98); transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; }
-        #memoryModal .page.active { display: flex; opacity: 1; transform: scale(1); pointer-events: auto; z-index: 10; }
-        #memoryModal .page-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; flex-shrink: 0; position: relative; }
-        #memoryModal .page-header .title { position: absolute; left: 50%; transform: translateX(-50%); font-size: 20px; font-weight: 700; white-space: nowrap; }
-        #memoryModal .header-btn { font-size: 16px; font-weight: 600; cursor: pointer; padding: 8px 12px; border-radius: 10px; transition: background-color 0.2s; border: none; background: transparent; color: inherit; z-index: 5; }
-        #memoryModal .header-btn:hover { background-color: rgba(0,0,0,0.05); } body.dark-mode #memoryModal .header-btn:hover { background-color: rgba(255,255,255,0.1); }
-        #memoryModal .header-btn.back-btn { font-size: 24px; padding: 5px 10px; }
-        #memoryModal .header-btn.manage-btn { color: var(--hold-border); }
-        #memoryModal .header-btn.wander-btn { font-size: 20px; padding: 6px; }
-        #memoryModal .header-controls { display: flex; gap: 8px; align-items:center; }
-        #memoryModal .list-container { flex-grow: 1; overflow-y: auto; padding: 0 15px 80px 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; align-content: flex-start; }
-        #memoryModal #hub-view-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 30px; }
-        #memoryModal .hub-btn { width: 80%; max-width: 300px; padding: 40px 20px; border: none; border-radius: 20px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 24px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-        body.dark-mode #memoryModal .hub-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
-        #memoryModal .hub-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-day), inset -6px -6px 12px var(--shadow-light-day); } body.dark-mode #memoryModal .hub-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-night), inset -6px -6px 12px var(--shadow-light-night); }
-        #memoryModal #notes-list-container { grid-template-columns: 1fr; }
-        #memoryModal .folder-item, #memoryModal .album-item { margin-bottom: 10px; position: relative; padding: 20px 15px; border: none; border-radius: 14px; box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); background: var(--bg-day-element); font-size: 16px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; user-select: none; -webkit-tap-highlight-color: transparent; text-align: left; }
-        #memoryModal .note-item { position: relative; padding: 20px 15px; border: none; border-radius: 14px; box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); background: var(--bg-day-element); font-size: 16px; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; user-select: none; -webkit-tap-highlight-color: transparent; text-align: left; }
-        body.dark-mode #memoryModal .folder-item, body.dark-mode #memoryModal .note-item, body.dark-mode #memoryModal .album-item { box-shadow: 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
-        #memoryModal .folder-item:active, #memoryModal .note-item:active, #memoryModal .album-item:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); transform: translateY(0); }
-        body.dark-mode #memoryModal .folder-item:active, body.dark-mode #memoryModal .note-item:active, body.dark-mode #memoryModal .album-item:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
-        #memoryModal .folder-icon { font-size: 24px; margin-bottom: 10px; }
-        #memoryModal .note-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #memoryModal .note-preview { font-size: 14px; font-weight: normal; color: #6a7889; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        body.dark-mode #memoryModal .note-preview { color: #a0aec0; }
-        #memoryModal .note-timestamp { font-size: 12px; font-weight: 300; color: #9A86A4; margin-top: 12px; }
-        #memoryModal .album-item { aspect-ratio: 1 / 1; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; }
-        #memoryModal .album-item .folder-icon { font-size: 32px; }
-        #memoryModal .album-info { font-size: 12px; color: #889; }
-        #memoryModal #photo-list-container { grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        #memoryModal .photo-item, .photo-item-set { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,0.7); cursor: pointer; transition: transform 0.2s ease; background-color: rgba(128,128,128,0.1); }
-        #memoryModal .photo-item img, .photo-item-set img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
-        .photo-item-set .photo-stack-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s ease; border: 2px solid var(--bg-day-element); }
-        body.dark-mode .photo-item-set .photo-stack-img { border-color: var(--bg-night-element); }
-        .photo-item-set .photo-stack-img:nth-child(1) { transform: translate(6px, 6px); z-index: 1; }
-        .photo-item-set .photo-stack-img:nth-child(2) { transform: translate(3px, 3px); z-index: 2; }
-        .photo-item-set .photo-stack-img:nth-child(3) { transform: translate(0, 0); z-index: 3; }
-        .photo-item-set:hover .photo-stack-img:nth-child(1) { transform: translate(10px, 10px); }
-        .photo-item-set:hover .photo-stack-img:nth-child(2) { transform: translate(5px, 5px); }
-        #memoryModal .photo-title-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); color: white; font-size: 12px; padding: 12px 8px 4px 8px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 5; }
-        .photo-item-set .count-overlay { position: absolute; bottom: 5px; right: 8px; background: rgba(0,0,0,0.5); color: white; padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 4px; z-index: 5; }
-        #memoryPhotoViewerOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 5000; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-        #memoryPhotoViewerOverlay.active { opacity: 1; pointer-events: auto; }
-        #memoryPhotoViewerOverlay .viewer-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 20px; color: white; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); z-index: 10;}
-        #memoryPhotoViewerOverlay .viewer-header .counter { font-size: 16px; font-weight: bold; }
-        #memoryPhotoViewerOverlay .viewer-btn { background: rgba(40,40,40,0.5); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; transition: background-color 0.2s; }
-        #memoryPhotoViewerOverlay .viewer-btn:hover { background: rgba(60,60,60,0.7); }
-        #memoryPhotoViewerOverlay .viewer-content { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
-        #viewer-img-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: padding 0.3s ease; }
-        #memoryPhotoViewerOverlay #viewer-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        #memoryPhotoViewerOverlay .nav-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; font-size: 24px; opacity: 0.6; display: flex; align-items: center; justify-content: center; }
-        #memoryPhotoViewerOverlay .nav-arrow:hover { opacity: 1; }
-        #prev-photo-btn { left: 15px; } #next-photo-btn { right: 15px; }
-        #memoryPhotoViewerOverlay .viewer-footer { flex-shrink: 0; padding: 20px; color: white; text-align: center; background: linear-gradient(to top, rgba(0,0,0,0.5), transparent); z-index: 10;}
-        #viewer-title { font-size: 18px; font-weight: bold; margin-bottom: 5px; }
-        #viewer-description { font-size: 14px; margin-bottom: 8px; }
-        #viewer-timestamp { font-size: 12px; color: #ccc; }
-        #memoryModal .empty-list-placeholder { grid-column: 1 / -1; text-align: center; color: #889; margin-top: 50px; }
-        #memoryModal .fab { position: absolute; right: 25px; bottom: 25px; width: 50px; height: 50px; border-radius: 50%; border: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); background: var(--bg-day-element); color: var(--text-day); font-size: 28px; display: flex; align-items: center; justify-content: center; user-select: none; z-index: 100; }
-        body.dark-mode #memoryModal .fab { box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
-        #memoryModal .fab:active { transform: scale(0.95); }
-        #memoryModal #note-editor-view { background: var(--bg-day-element); z-index: 200; padding: 10px; transform: translateY(100%); }
-        body.dark-mode #memoryModal #note-editor-view { background: var(--bg-night-element); }
-        #memoryModal #note-editor-view.active { transform: translateY(0); }
-        #memoryModal .editor-header{display:flex;justify-content:space-between;align-items:center;padding:10px 5px;flex-shrink:0}
-        #memoryModal .editor-btn{padding:10px 18px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;color:var(--hold-border);background:var(--bg-day-element);box-shadow:4px 4px 8px var(--shadow-dark-day),-4px -4px 8px var(--shadow-light-day);transition:all .2s ease}body.dark-mode #memoryModal .editor-btn{color:var(--hold-border);background:var(--bg-night-element);box-shadow:4px 4px 8px var(--shadow-dark-night),-4px -4px 8px var(--shadow-light-night)}
-        #memoryModal .editor-btn:active{box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day)}body.dark-mode #memoryModal .editor-btn:active{box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}
-        #memoryModal #delete-note-btn{color:#f56565}
-        #memoryModal .editor-content{flex-grow:1;display:flex;flex-direction:column;gap:10px;padding:10px 5px}
-        #memoryModal #note-title-input,#memoryModal #note-content-textarea{width:100%;border:none;background:transparent;color:inherit;font-size:18px;padding:10px}
-        #memoryModal #note-title-input{font-size:24px;font-weight:bold;flex-shrink:0}
-        #memoryModal #note-content-textarea{flex-grow:1;resize:none;line-height:1.6}
-        #memoryModal #note-title-input:focus,#memoryModal #note-content-textarea:focus{outline:none}
-        #memoryFolderModal .modal-content, #memoryPhotoDetailsModal .modal-content { max-width: 400px; }
-        #memoryPhotoDetailsModal #upload-thumbnail { max-width: 100px; max-height: 100px; border-radius: 8px; margin: 10px auto; object-fit: cover; }
-        #memoryPhotoDetailsModal #photoset-toggle-container { display: none; padding: 10px; border-bottom: 1px solid rgba(128,128,128,0.2); }
-        #memoryPhotoDetailsModal .modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
-        #memoryPhotoDetailsModal .modal-button.primary { color: var(--hold-border); }
-        #memoryModal .pin-btn { position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 20px; cursor: pointer; opacity: 0.3; transition: opacity 0.2s, transform 0.2s; z-index: 5; }
-        #memoryModal .note-item.pinned .pin-btn { opacity: 1; color: var(--hold-border); }
-        #memoryModal .pin-btn:hover { transform: scale(1.2); }
-        .management-controls { display: none; position: absolute; bottom: 0; left: 0; right: 0; padding: 15px; background: var(--bg-day-element); box-shadow: 0 -4px 12px rgba(0,0,0,0.1); z-index: 101; flex-direction: row; justify-content: space-between; gap: 10px; border-radius: 16px 16px 0 0;}
-        body.dark-mode .management-controls { background: var(--bg-night-element); }
-        .management-controls.active { display: flex; }
-        .management-controls .modal-button { flex-grow: 1; margin: 0; padding: 12px; }
-        .folder-item.manage-mode, .album-item.manage-mode, .photo-item.manage-mode, .photo-item-set.manage-mode { cursor: pointer; }
-        .folder-item .manage-checkbox, .album-item .manage-checkbox, .photo-item .manage-checkbox, .photo-item-set .manage-checkbox { display: none; position: absolute; top: 10px; left: 10px; width: 22px; height: 22px; z-index: 5; }
-        .folder-item.manage-mode .manage-checkbox, .album-item.manage-mode .manage-checkbox, .photo-item.manage-mode .manage-checkbox, .photo-item-set.manage-mode .manage-checkbox { display: block; }
-        .folder-item.manage-selected, .album-item.manage-selected, .photo-item.manage-selected, .photo-item-set.manage-selected { border: 2px solid var(--hold-border); box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day) !important; }
-        body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-selected, body.dark-mode .photo-item.manage-selected, body.dark-mode .photo-item-set.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
-        /* ===== [END] MEMORY MODAL STYLES ===== */
-        
-        /* ===== [START] WANDER VIEW 4.0 STYLES (Architecture) ===== */
-        @keyframes breathing-glow {
-            0% { box-shadow: 0 0 8px 1px var(--handle-color); }
-            50% { box-shadow: 0 0 16px 4px var(--handle-color); }
-            100% { box-shadow: 0 0 8px 1px var(--handle-color); }
-        }
-        #wanderViewOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 6000; background: var(--bg-day-element); color: var(--text-day); display: none; flex-direction: column; opacity: 0; transition: opacity 0.4s ease; }
-        body.dark-mode #wanderViewOverlay { background: var(--bg-night-element); color: var(--text-night); }
-        #wanderViewOverlay.active { display: flex; opacity: 1; }
-        .wander-header { display: flex; justify-content: flex-end; padding: 5px; flex-shrink: 0; position: absolute; top: 0; right: 0; z-index: 10001; }
-        .wander-header .close-btn { font-size: 24px; font-weight: bold; width: 36px; height: 36px; cursor: pointer; border: none; background: transparent; color: inherit; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background .2s ease; }
-        .wander-header .close-btn:hover { background: rgba(0,0,0,0.05); } body.dark-mode .wander-header .close-btn:hover { background: rgba(255,255,255,0.08); }
-        .wander-main-content { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 20px; overflow: hidden; min-height: 0; transition: transform 0.4s ease; }
-        .wander-photo-container { position: relative; width: 100%; max-width: 500px; aspect-ratio: 0.85; display: flex; align-items: center; justify-content: center; transition: all 0.4s ease; margin: auto 0;
-            background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 4px; padding: 15px 15px 80px 15px;
-        }
-        #wander-img { cursor: pointer; width:100%; height:100%; object-fit: cover; }
-        .wander-info-container { position: absolute; bottom: 15px; left: 15px; right: 15px; text-align: center; }
-        #wander-title { font-size: 18px; font-weight: 700; margin-bottom: 5px; color: #333; }
-        #wander-description { font-size: 14px; color: #777; line-height: 1.5; }
-        .wander-photo-container.fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-width: none; z-index: 10000; padding: 0; background: transparent; box-shadow: none; border-radius: 0; }
-        .wander-photo-container.fullscreen::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: var(--blur-bg); background-size: cover; background-position: center; filter: blur(20px); transform: scale(1.1); opacity: 0.8; z-index: -1; }
-        .wander-photo-container.fullscreen #wander-img { padding: 0; background: transparent; box-shadow: none; border-radius: 0; width: 100%; height: 100%; object-fit: contain; }
-        .wander-photo-container.fullscreen .wander-info-container { display: none; }
-        .wander-music-player { position: relative; flex-shrink: 0; width: calc(100% - 20px); max-width: 400px; margin: 0 auto 15px auto; z-index: 15; transition: transform 0.4s ease; }
-        .wander-music-player.hidden { display: none; }
-        .player-handle-container { padding: 10px 0 5px; cursor: pointer; }
-        .player-handle { width: 40px; height: 5px; border-radius: 2.5px; background: #ccc; margin: 0 auto; } body.dark-mode .player-handle { background: #555; }
-        .wander-music-player.collapsed { transform: translateY(calc(100% - 30px)); }
-        .wander-music-player.collapsed .player-content { box-shadow: none; background: transparent; }
-        .wander-music-player.collapsed > *:not(.player-handle-container) { display: none; }
-        .player-content { padding: 15px; border-radius: 24px; background: var(--bg-day-element); box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day); }
-        body.dark-mode .player-content { background: var(--bg-night-element); box-shadow: 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night); }
-        .player-controls { display: flex; justify-content: space-between; align-items: center; gap: 5px; margin-top: 10px; }
-        .player-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: var(--bg-day-element); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); color: var(--text-day); font-size: 18px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
-        .player-btn svg { width: 1em; height: 1em; fill: currentColor; }
-        body.dark-mode .player-btn { background: var(--bg-night-element); box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night); color: var(--text-night); }
-        .player-btn:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); }
-        body.dark-mode .player-btn:active { box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
-        .player-btn#play-pause-btn { width: 52px; height: 52px; font-size: 22px; }
-        .player-display { margin: 10px 0; height: 1.5em; text-align: center; font-size: 14px; overflow: hidden; display: flex; flex-direction: column; justify-content: center; position: relative; }
-        .song-title-display { display: flex; align-items: center; justify-content: center; height: 100%; font-weight: 600; }
-        #lyrics-container { position: absolute; width: 100%; height: 1.5em; top: 0; left: 0; overflow: hidden; }
-        #lyrics-ul { list-style: none; transition: transform 0.5s ease; padding: 0; margin: 0;}
-        #lyrics-ul li { line-height: 1.5em; opacity: 0.5; transition: opacity 0.5s ease; }
-        #lyrics-ul li.current-lyric { opacity: 1; font-weight: bold; }
-        .player-progress-track { position: relative; height: 16px; margin: 10px 0 0 0; cursor: pointer; --handle-color: var(--handle-color-day); }
-        body.dark-mode .player-progress-track { --handle-color: var(--handle-color-night); }
-        .player-progress-bar-bg { position: absolute; top: 50%; transform: translateY(-50%); left:0; right: 0; height: 3px; background-color: rgba(128,128,128,0.2); border-radius: 1.5px; }
-        #player-progress-bar { position: absolute; top: 50%; transform: translateY(-50%); left:0; height: 3px; background-color: var(--handle-color); border-radius: 1.5px; width: 0; }
-        #player-progress-handle { position: absolute; top: 50%; left: 0; width: 14px; height: 14px; transform: translate(-50%, -50%); background-color: var(--handle-color); border-radius: 50%; box-shadow: 0 0 8px 1px var(--handle-color); transition: box-shadow 0.3s ease; }
-        #player-progress-handle.playing { animation: breathing-glow 2s ease-in-out infinite; }
-        .player-progress-track:hover #player-progress-handle { box-shadow: 0 0 12px 3px var(--handle-color); }
-        .player-popover { display: none; position: absolute; bottom: calc(100% + 10px); left: 15px; width: 250px; background: var(--bg-day-element); border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); padding: 10px; border: 1px solid rgba(0,0,0,0.05); z-index: 20; }
-        .player-popover.active { display: block; }
-        body.dark-mode .player-popover { background: var(--bg-night-element); border-color: rgba(255,255,255,0.1); }
-        .player-popover .popover-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 5px; }
-        .player-popover h4 { font-size: 16px; flex-grow: 1; }
-        .player-popover .settings-btn { width: 32px; height: 32px; font-size: 20px; flex-shrink: 0; }
-        .player-popover ul { list-style: none; max-height: 150px; overflow-y: auto; padding: 0; }
-        .player-popover li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 6px; cursor: pointer; }
-        .player-popover li:hover { background: rgba(0,0,0,0.05); } body.dark-mode .player-popover li:hover { background: rgba(255,255,255,0.08); }
-        .player-popover li.playing { color: var(--hold-border); font-weight: bold; }
-        .player-popover .playlist-item-name { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #musicSettingsModal.modal-overlay { z-index: 15000; }
-        #musicSettingsModal .modal-body { gap: 20px; }
-        .music-upload-section, .music-playlist-section { border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .music-upload-section .confirm-upload-wrapper { display: flex; justify-content: center; padding-top: 5px; }
-        body.dark-mode .music-upload-section, body.dark-mode .music-playlist-section { border-color: rgba(255,255,255,0.1); }
-        #music-playlist-container { max-height: 200px; overflow-y: auto; list-style: none; padding: 0; margin: 0; }
-        #music-playlist-container li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 6px; }
-        #music-playlist-container li:hover { background: rgba(0,0,0,0.05); } body.dark-mode #music-playlist-container li:hover { background: rgba(255,255,255,0.08); }
-        #music-playlist-container li.playing { color: var(--hold-border); font-weight: bold; }
-        #music-playlist-container .song-name { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
-        #music-playlist-container .delete-song-btn { width: 28px; height: 28px; color: #aaa; } #music-playlist-container .delete-song-btn:hover { color: #f56565; background: rgba(229, 62, 62, 0.1); }
-        /* ===== [END] WANDER VIEW STYLES ===== */
-        
-        /* ===== [START] HELP MODAL UPDATE STYLES ===== */
-        .segmented-control.four-segments .slider-indicator { width: calc(25% - 4px); }
-        #help-tab-0:checked ~ .segmented-control .slider-indicator { transform: translateX(0%); }
-        #help-tab-1:checked ~ .segmented-control .slider-indicator { transform: translateX(100%); }
-        #help-tab-2:checked ~ .segmented-control .slider-indicator { transform: translateX(200%); }
-        #help-tab-3:checked ~ .segmented-control .slider-indicator { transform: translateX(300%); }
-
-        #help-tab-0:checked ~ .help-content-wrapper > #help-page-0,
-        #help-tab-1:checked ~ .help-content-wrapper > #help-page-1,
-        #help-tab-2:checked ~ .help-content-wrapper > #help-page-2,
-        #help-tab-3:checked ~ .help-content-wrapper > #help-page-3 { display: block; }
-        
-        details { border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; margin-bottom: 12px; }
-        summary { cursor: pointer; padding: 12px 15px; font-weight: bold; font-size: 1.1em; list-style: none; }
-        summary::-webkit-details-marker { display: none; }
-        summary::before { content: '▶'; margin-right: 8px; display: inline-block; transition: transform 0.2s; }
-        details[open] > summary::before { transform: rotate(90deg); }
-        .details-content { padding: 0 15px 15px 15px; border-top: 1px solid rgba(128,128,128,0.2); }
-        .details-content p, .details-content ul, .details-content div { margin-top: 10px; }
-        .details-content ul { padding-left: 20px; }
-        .details-content .sub-note { font-size: 0.9em; color: #889; }
-
-        .update-header-info {
-            padding: 10px 15px;
-            background-color: rgba(128,128,128,0.1);
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 14px;
-        }
-        .update-header-info p { margin: 5px 0; color: inherit; }
-        .update-log-entry {
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(128,128,128,0.2);
-        }
-        .update-log-entry:last-of-type { border-bottom: none; }
-        .update-log-entry h4 { font-size: 1.2em; margin: 0 0 10px 0; }
-        .update-date { font-size: 0.8em; font-weight: normal; color: #889; }
-        .update-log-entry ul { list-style: none; padding-left: 5px; }
-        .update-log-entry li { margin-bottom: 8px; display: flex; align-items: flex-start; }
-        .tag {
-            flex-shrink: 0;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-right: 10px;
-            color: white;
-        }
-        .tag.new { background-color: #769fcd; } /* Morandi Blue */
-        .tag.fix { background-color: #93b5b3; } /* Morandi Green */
-        .tag.release { background-color: #d1a787; } /* Morandi Orange/Brown */
-        .update-footer {
-            position: sticky;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 12px;
-            color: #a0aec0;
-            padding: 10px 0 5px 0;
-            background: var(--bg-day-element);
-            margin: 15px -15px -15px -15px;
-        }
-        body.dark-mode .update-footer { background: var(--bg-night-element); }
-
-        .fab-drawer-item#helpBtn { position: relative; }
-        .fab-drawer-item.has-update::after {
-            content: '';
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            width: 8px;
-            height: 8px;
-            background-color: #e53e3e;
-            border-radius: 50%;
-            border: 1px solid white;
-            box-shadow: 0 0 5px #e53e3e;
-        }
-        /* ===== [END] HELP MODAL UPDATE STYLES ===== */
-
-        /* ===== [START] FROSTED GLASS THEME ===== */
-        body.theme-glass .modal-overlay,
-        body.theme-glass #memoryPhotoViewerOverlay {
-            background: transparent;
-        }
-
-        body.theme-glass .nav-btn,
-        body.theme-glass .title-card,
-        body.theme-glass .fab-main,
-        body.theme-glass .fab-drawer-item,
-        body.theme-glass .modal-content,
-        body.theme-glass .category-pill,
-        body.theme-glass .player-content,
-        body.theme-glass .player-popover,
-        body.theme-glass #memoryModal .hub-btn,
-        body.theme-glass #memoryModal .folder-item,
-        body.theme-glass #memoryModal .note-item,
-        body.theme-glass #memoryModal .album-item,
-        body.theme-glass #memoryModal .fab,
-        body.theme-glass #memoryModal .editor-btn,
-        body.theme-glass .management-controls,
-        body.theme-glass #returnConfirmationToast {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-        }
-        body.theme-glass.dark-mode .nav-btn,
-        body.theme-glass.dark-mode .title-card,
-        body.theme-glass.dark-mode .fab-main,
-        body.theme-glass.dark-mode .fab-drawer-item,
-        body.theme-glass.dark-mode .modal-content,
-        body.theme-glass.dark-mode .category-pill,
-        body.theme-glass.dark-mode .player-content,
-        body.theme-glass.dark-mode .player-popover,
-        body.theme-glass.dark-mode #memoryModal .hub-btn,
-        body.theme-glass.dark-mode #memoryModal .folder-item,
-        body.theme-glass.dark-mode #memoryModal .note-item,
-        body.theme-glass.dark-mode #memoryModal .album-item,
-        body.theme-glass.dark-mode #memoryModal .fab,
-        body.theme-glass.dark-mode #memoryModal .editor-btn,
-        body.theme-glass.dark-mode .management-controls,
-        body.theme-glass.dark-mode #returnConfirmationToast {
-            background: rgba(40, 52, 79, 0.25);
-            border-color: rgba(255, 255, 255, 0.18);
-        }
-
-        body.theme-glass .modal-input,
-        body.theme-glass .modal-select,
-        body.theme-glass .modal-textarea,
-        body.theme-glass .segmented-control,
-        body.theme-glass .toggle-section,
-        body.theme-glass #file-list-container,
-        body.theme-glass .color-input-wrapper {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: none;
-        }
-        body.theme-glass.dark-mode .modal-input,
-        body.theme-glass.dark-mode .modal-select,
-        body.theme-glass.dark-mode .modal-textarea,
-        body.theme-glass.dark-mode .segmented-control,
-        body.theme-glass.dark-mode .toggle-section,
-        body.theme-glass.dark-mode #file-list-container,
-        body.theme-glass.dark-mode .color-input-wrapper {
-            background: rgba(40, 52, 79, 0.15);
-            border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        body.theme-glass .modal-button {
-            background: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        body.theme-glass.dark-mode .modal-button {
-            background: rgba(40, 52, 79, 0.4);
-        }
-
-        body.theme-glass .nav-btn:active,
-        body.theme-glass .modal-button:active,
-        body.theme-glass .fab-main:active,
-        body.theme-glass .fab-drawer-item:active {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transform: translateY(1px);
-        }
-
-        body.theme-glass .segmented-control .slider-indicator {
-            background: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-        }
-        body.theme-glass.dark-mode .segmented-control .slider-indicator {
-            background: rgba(99, 179, 237, 0.3);
-            border-color: rgba(99, 179, 237, 0.5);
-        }
-
-        body.theme-glass:not(.dark-mode) .category-pill.active {
-            color: #000;
-        }
-        /* ===== [END] FROSTED GLASS THEME ===== */
-    </style>
-</head>
-<body>
-    <div class="page-overlay" id="pageOverlay"></div>
-    <div class="title-card" id="titleCard">
-        <h1 class="editable-title" id="title">JellyfishCenter</h1>
-        <div class="editable-subtitle" id="subtitle">长按🌞打开工具栏 | By淡季水母</div>
-    </div>
-    
-    <div class="category-nav-container" id="categoryNavContainer">
-        <div class="category-nav" id="categoryNav"></div>
-    </div>
-
-    <div class="nav-container" id="navContainer">
-        <p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>
-    </div>
-
-    <div class="fab-container" id="fabContainer">
-        <div class="fab-drawer" id="fabDrawer">
-            <button class="fab-drawer-item" id="helpBtn" title="使用指南">📧</button>
-            <button class="fab-drawer-item" id="dataSyncBtn" title="数据同步">☁️<span id="sync-status-indicator" title="云同步状态"></span></button>
-            <button class="fab-drawer-item" id="addNavBtn" title="管理项目">📱</button>
-            <button class="fab-drawer-item" id="colorBtn" title="主题设置">🎨</button>
-            <button class="fab-drawer-item" id="memoryBtn" title="记忆">📷</button>
-        </div>
-        <button class="fab-main theme-toggle" id="themeBtn" title="切换主题">🌞</button>
-    </div>
-    
-    <!-- Modals -->
-    <div class="modal-overlay" id="helpModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title-group"><span>使用指南</span></div>
-                <button class="close-btn" data-modal-id="helpModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <input type="radio" id="help-tab-0" name="help-tab" value="setup" checked hidden>
-                <input type="radio" id="help-tab-1" name="help-tab" value="features" hidden>
-                <input type="radio" id="help-tab-2" name="help-tab" value="updates" hidden>
-                <input type="radio" id="help-tab-3" name="help-tab" value="disclaimer" hidden>
-
-                <div class="segmented-control four-segments">
-                    <label for="help-tab-0">首次配置</label>
-                    <label for="help-tab-1">功能介绍</label>
-                    <label for="help-tab-2">更新公告</label>
-                    <label for="help-tab-3">免责声明</label>
-                    <div class="slider-indicator"></div>
-                </div>
-                <div class="help-content-wrapper">
-                    <div id="help-page-0" class="help-page-content">
-                        <h3>从零开始 (必需)</h3><p>此流程仅需您创建一个安全的“钥匙”(PAT)和一个云端“私人数据仓库”，让本应用可以为您安全地存储和同步所有数据。</p>
-                        <h4>步骤 1：创建 GitHub 个人访问令牌 (PAT)</h4><p>这个令牌是应用访问您私人云仓库的专属安全密码。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub Token 创建页面</a>。</li><li><strong>填写基本信息</strong>：备注(Note)填写 <code>JellyfishCenterToken</code>，有效期(Expiration)选择 <code>No expiration</code> (永不过期)。</li><li><strong>分配权限 (关键)</strong>：只需 <strong>勾选 <code>repo</code></strong> 这一项。</li><li><strong>生成并复制</strong>：滑动到页面最底部，点击 <strong><code>Generate token</code></strong> 按钮。<strong>【⚠️极其重要⚠️】</strong> GitHub 只会显示这一次完整的 Token。请 <strong>立即点击复制按钮</strong> 将其保存到安全的地方，下一步会马上用到。它应该以 <code>ghp_</code> 开头。</li></ol>
-                        <h4>步骤 2：创建私人数据仓库</h4><p>此步骤将创建一个独立的、完全私密的仓库，专门用来存放您的所有配置和文件。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub 仓库创建页面</a>。</li><li><strong>填写仓库信息</strong>：<ul><li><strong>Repository name (仓库名称)</strong>：起一个清晰的名字，例如 <code>My-Jellyfish-Data</code>。</li><li><strong>关键：选择 <code>Private</code> (私有)</strong>。这是您的私人数据，必须设为私有。</li><li><strong>勾选 <code>Add a README file</code></strong>：确保仓库被成功初始化。</li></ul></li><li><strong>点击 <code>Create repository</code></strong> 按钮完成创建。</li></ol>
-                        <h4>步骤 3：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌜 按钮展开菜单 → 点击 <strong>☁️ (数据同步)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤2</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，可以开始使用了！</p>
-                    </div>
-                    <div id="help-page-1" class="help-page-content">
-                        <details>
-                            <summary>核心操作</summary>
-                                <div class="details-content">
-                                <p><strong>编辑标题/副标题</strong>: 直接点击页面上的主标题或副标题即可修改。</p>
-                                <p><strong>切换主题</strong>: <strong>单击 (短按)</strong> 右下角的 🌞/🌜 按钮。</p>
-                                <p><strong>打开功能菜单</strong>: <strong>长按</strong> 右下角的 🌞/🌜 按钮。</p>
-                                <p><strong>访问链接与返回</strong>: 对于外部链接，默认在应用内全屏打开。您可以从屏幕**左侧中间区域向右滑动**来关闭当前页面并返回中心。您也可以在添加链接时选择“在新标签页中打开”，这样链接会直接通过系统浏览器打开。</p>
-                                <div class="important-note">
-                                    <p><strong>关于“在新标签页中打开”选项的说明：</strong><br>此选项主要用于解决部分与应用内浏览器不兼容的网站。启用此选项后，链接将通过系统默认浏览器打开。请注意，部分设备在该模式下可能无法隐藏底部工具栏，这是一个已知的系统限制，请您根据需求自行选择。</p>
-                                </div>
-                            </div>
-                        </details>
-                        <details>
-                            <summary>☁️ 数据同步</summary>
-                            <div class="details-content">
-                                <p><strong>配置同步</strong>: 此功能用于设置您的私有GitHub仓库信息，是整个应用数据同步的核心。配置完成后，所有更改都将自动保存至云端。</p>
-                                <p><strong>手动同步与修复</strong>: 在“数据同步”弹窗内，提供了一个手动同步按钮。此功能会强制从云端获取最新的配置文件，并与应用内置的最新模板进行对比。如果您的配置文件因版本更新而缺少了某些新功能的设置项，此功能会自动为您补全，确保应用正常运行。</p>
-                                <div class="important-note"><p><strong>新增智能迁移</strong>：该功能现在可以自动识别并修复旧版本（无分类功能）的配置文件，将其无缝升级为最新格式。</p></div>
-                                <p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p>
-                                <ul><li><strong>🟢 绿点</strong>: <code>已同步</code> - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: <code>同步中</code> - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: <code>同步失败</code> - 发生错误，请点击图标查看失败原因。</li></ul>
-                            </div>
-                        </details>
-                        <details open>
-                            <summary>📱 项目与分类管理</summary>
-                            <div class="details-content">
-                                <p><strong>分类导航</strong>: 您可以左右滑动顶部的分类导航栏来切换不同的项目分类。此导航栏可在“管理项目”中通过“分页展示”开关控制其显示或隐藏。</p>
-                                <p><strong>添加/编辑项目</strong>: 在"管理项目"弹窗中进行操作。进入“按钮管理模式”（在“管理项目”弹窗内点击）后，点击已存在的按钮即可进入编辑模式。</p>
-                                <p><strong>删除分类</strong>: 在“管理项目”弹窗中，选择一个分类后，即可看到“删除当前分类”按钮。您可以选择：</p>
-                                <ul>
-                                    <li><strong>仅删除分类</strong>: 项目将被保留并移至“全部”分类下。</li>
-                                    <li><strong>删除分类和所有项目</strong>: 永久删除该分类及其包含的所有项目（需二次确认）。</li>
-                                </ul>
-                            </div>
-                        </details>
-                        <details>
-                            <summary>🎨 主题与个性化</summary>
-                            <div class="details-content">
-                                <p><strong>主题风格</strong>：您现在可以在“全拟态”和“磨砂玻璃”两种视觉风格之间切换。选择“磨砂玻璃”后，界面元素将变为半透明质感，此时配色功能将关闭，但您仍可上传自定义背景图以搭配新风格。</p>
-                                <p><strong>实时调色</strong>：在“全拟态”风格下，可实时调整日间/夜间模式的背景渐变色，以及标题卡片的背景图片。</p>
-                                <p><strong>色彩预设</strong>：在“全拟态”风格下，您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能，在每次启动时随机应用一个已保存的预设。</p>
-                            </div>
-                        </details>
-                        <details>
-                            <summary>📷 记忆功能</summary>
-                            <div class="details-content">
-                                <p>一个集成了备忘录、相册和文件云盘的私人空间，所有数据都安全地存储在您的GitHub私有仓库中。您可以从主入口进入相应模块进行管理。</p>
-                                <h4>💫 漫游模式</h4>
-                                <ul>
-                                    <li><strong>音乐播放</strong>: 您可以上传自己的音乐和歌词文件，在漫游模式中播放。</li>
-                                    <li><strong>便捷播放</strong>: 在音乐设置的播放列表中，直接点击歌曲名即可自动进入漫游模式并开始播放。</li>
-                                </ul>
-                            </div>
-                        </details>
-
-                        <div class="warning"><p><strong>危险操作</strong>：在 <code>数据同步</code> (☁️) 弹窗的最下方有“清空所有数据”按钮。此操作会 <strong>永久删除</strong> 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
-                    </div>
-                    <div id="help-page-2" class="help-page-content">
-                        <div class="update-header-info">
-                            <p><strong>小红书ID:</strong> 淡季水母</p>
-                            <p><strong>QQ交流群:</strong> 563191005</p>
-                        </div>
-                        
-                        <div class="update-log-entry">
-                            <h4>v3.6.0 <span class="update-date">- 2025.10.01</span></h4>
-                            <ul>
-                                <li><span class="tag fix">重要修复</span> 彻底解决了旧版无分类的 `config.json` 文件无法在新版应用中显示按钮的问题。</li>
-                                <li><span class="tag new">新功能</span> “手动同步与修复” 现已集成**智能数据迁移**功能，可自动将旧版配置文件无缝升级为最新、最兼容的格式。</li>
-                                <li><span class="tag new">优化</span> 应用在首次加载云端数据时，也会自动执行数据迁移检查，确保老用户平滑过渡。</li>
-                            </ul>
-                        </div>
-                        <div class="update-log-entry">
-                            <h4>v3.5.0 <span class="update-date">- 2025.10.01</span></h4>
-                            <ul>
-                                <li><span class="tag new">功能</span> 新增按钮分类功能，可创建自定义分类管理项目。</li>
-                                <li><span class="tag new">功能</span> 新增 “在新标签页中打开” 选项，用于兼容特殊外部链接。</li>
-                                <li><span class="tag new">功能</span> 新增 “磨砂半透明” 主题，提供全新视觉风格。</li>
-                                <li><span class="tag fix">修复</span> 解决了上传的本地HTML项目无法在应用内正确打开的问题。</li>
-                                <li><span class="tag fix">修复</span> 修复了在部分页面左上角返回按钮无法点击的Bug。</li>
-                                <li><span class="tag new">优化</span> 优化了应用内的错误与状态提示信息。</li>
-                                <li><span class="tag new">优化</span> 访问GitHub相关链接时，增加开启VPN的友好提示弹窗。</li>
-                            </ul>
-                        </div>
-                        <div class="update-log-entry">
-                            <h4>v2.0.0 <span class="update-date">- 2025.09.30</span></h4>
-                            <ul>
-                                <li><span class="tag new">功能</span> 极大简化了添加网址与上传文件项目的方式。</li>
-                                <li><span class="tag new">功能</span> 新增文件云盘功能，支持按分类上传和下载文件。</li>
-                                <li><span class="tag new">功能</span> 新增 “记忆” 功能模块，集成备忘录与相册。</li>
-                                <li><span class="tag new">功能</span> 相册内置 “漫游模式”，提供沉浸式看图体验。</li>
-                                <li><span class="tag new">功能</span> 支持自定义上传全局背景图片和标题卡片背景图片。</li>
-                                <li><span class="tag fix">优化</span> 优化iOS端全屏显示，左侧右滑返回时增加确认弹窗以防误触。</li>
-                            </ul>
-                        </div>
-                        <div class="update-log-entry">
-                            <h4>v1.0.0 <span class="update-date">- 2025.09.24</span></h4>
-                            <ul>
-                                <li><span class="tag release">正式发布</span> JellyfishCenter 导航正式上线。</li>
-                                <li><span class="tag new">功能</span> 新增日间/夜间模式一键切换。</li>
-                                <li><span class="tag new">功能</span> 新增自定义图标与卡片主题色功能。</li>
-                            </ul>
-                        </div>
-                        
-                        <footer class="update-footer">
-                            当前版本: v3.6.0
-                        </footer>
-                    </div>
-                    <div id="help-page-3" class="help-page-content">
-                        <h3>免责声明与使用条款</h3><h4>1. 服务条款</h4><p>本应用 (JellyfishCenter) 按“现状”提供，不附带任何明示或暗示的保证。开发者不保证应用的持续可用性、功能完整性或无错误。所有因使用本应用导致的直接或间接风险与责任，均由用户自行承担。</p><h4>2. 数据安全</h4><p>用户需自行负责其GitHub个人访问令牌 (PAT) 的安全保管。任何因PAT泄露导致的数据丢失、篡改或账户安全问题，开发者概不负责。强烈建议为本应用创建独立的、具有最小必要权限 (<code>repo</code>) 的PAT。</p><h4>3. 知识产权与版权责任</h4><div class="important-note"><p>本应用可能被用于托管或链接至第三方项目。用户必须对所上传或链接的内容负全部法律责任，并确保拥有展示、使用和分发该内容的合法权利。<strong>用户必须尊重所有原创作者的知识产权，不得侵犯他人版权。</strong></p></div><h4>4. 使用与分发限制</h4><div class="warning"><p>本项目 (JellyfishCenter) 及其源代码仅供个人非商业性使用。严禁以下行为：</p><ul><li>对本项目的源代码进行任何形式的二次修改、再分发或公开发布（即“二传二改”）。</li><li>公开或私下分享通过本应用“上传项目”功能生成的任何网页链接或文件。此行为可能构成对原创内容的未授权分发。</li></ul></div><p>继续使用本应用，即表示您已阅读、理解并同意上述所有条款。</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal-overlay" id="syncErrorModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>⚠️ 同步失败</span></div><button class="close-btn" data-modal-id="syncErrorModal">&times;</button></div><div class="modal-body"><p>无法连接到云端。请检查您的网络连接或GitHub配置。</p><p><strong>失败原因:</strong></p><div id="sync-error-message"></div></div></div></div>
-    <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span id="addNavModalTitle">管理项目</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入按钮管理模式</button><div class="toggle-section" style="margin-top: 10px;"><span>分页展示</span><label class="toggle-switch"><input type="checkbox" id="paginationToggle"><span class="slider"></span></label></div><div class="segmented-control two-segments"><input type="radio" id="type-link" name="nav-type" value="link" checked hidden><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload" hidden><label for="type-upload">上传项目</label><div class="slider-indicator"></div></div><div class="form-section"><label for="newButtonCategoryInput">分类名称</label><input type="text" id="newButtonCategoryInput" class="modal-input" placeholder="选择或创建分类" list="category-datalist"><datalist id="category-datalist"></datalist></div><div id="category-management-section" style="display: none;"><button id="deleteCategoryBtn" class="modal-button" style="color:#e53e3e;">删除当前分类</button></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section"><div class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div class="toggle-section" style="margin-top: 10px;"><span>在新标签页中打开</span><label class="toggle-switch"><input type="checkbox" id="openExternallyToggle"><span class="slider"></span></label></div></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div><div class="important-note" style="font-size: 13px; padding: 8px 12px; margin-top: 5px;"><p>上传的项目无法编辑链接，如需更新请删除后重新上传。</p></div></div><button id="createNavBtn" class="modal-button">加入新项目</button><div class="status-text" id="upload-status"></div></div></div></div>
-    <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据同步</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="manualSyncBtn" class="modal-button" style="color:#5a6778;">手动同步与修复</button><button id="saveSettingsBtn" class="modal-button">保存配置</button><div class="nuke-section"><button id="nukeDataBtn" class="modal-button">清空所有云端及本地数据</button></div></div></div></div>
-    <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body">
-        <div class="theme-style-selector">
-            <label>主题风格</label>
-            <div class="segmented-control two-segments">
-                <input type="radio" id="theme-style-neumorphism" name="theme-style" value="neumorphism" checked hidden>
-                <label for="theme-style-neumorphism">全拟态</label>
-                <input type="radio" id="theme-style-glass" name="theme-style" value="glass" hidden>
-                <label for="theme-style-glass">磨砂玻璃</label>
-                <div class="slider-indicator"></div>
-            </div>
-        </div>
-        <div id="neumorphism-settings">
-            <div class="color-picker-grid"><div class="color-picker-group"><label>日间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="dayColor1Picker"><span class="hex-display" id="dayColor1Hex"></span></div></div><div class="color-picker-group"><label>日间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="dayColor2Picker"><span class="hex-display" id="dayColor2Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="nightColor1Picker"><span class="hex-display" id="nightColor1Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="nightColor2Picker"><span class="hex-display" id="nightColor2Hex"></span></div></div></div>
-            <div class="preview-container"><div class="preview-box" id="dayPreview" data-label="Day"></div><div class="preview-box" id="nightPreview" data-label="Night"></div></div>
-            <div class="preset-manager"><div class="preset-row"><input type="text" id="presetNameInput" class="modal-input" placeholder="为当前配色命名"><button id="savePresetBtn" class="modal-button save">保存</button><button id="updatePresetBtn" class="modal-button">更新</button></div><div class="preset-row"><select id="presetSelector" class="modal-select"></select><button id="deletePresetBtn" class="modal-button delete">删除</button></div></div>
-            <div class="toggle-section"><span>每次启动时随机应用预设</span><label class="toggle-switch"><input type="checkbox" id="randomPaletteToggle"><span class="slider"></span></label></div>
-        </div>
-        <!-- Background Image Manager -->
-        <div class="background-image-manager">
-            <div class="background-image-row">
-                <input type="file" id="dayBgImagePicker" accept="image/*" hidden>
-                <button id="uploadDayBgBtn" class="modal-button">导入日间背景</button>
-                <span id="dayBgStatus" class="status"></span>
-                <button id="clearDayBgBtn" class="modal-button delete">清除</button>
-            </div>
-            <div class="background-image-row">
-                <input type="file" id="nightBgImagePicker" accept="image/*" hidden>
-                <button id="uploadNightBgBtn" class="modal-button">导入夜间背景</button>
-                <span id="nightBgStatus" class="status"></span>
-                <button id="clearNightBgBtn" class="modal-button delete">清除</button>
-            </div>
-            <div class="background-image-row">
-                <input type="file" id="dayTitleCardBgImagePicker" accept="image/*" hidden>
-                <button id="uploadDayTitleCardBgBtn" class="modal-button">导入日间卡片</button>
-                <span id="dayTitleCardBgStatus" class="status"></span>
-                <button id="clearDayTitleCardBgBtn" class="modal-button delete">清除</button>
-            </div>
-            <div class="background-image-row">
-                <input type="file" id="nightTitleCardBgImagePicker" accept="image/*" hidden>
-                <button id="uploadNightTitleCardBgBtn" class="modal-button">导入夜间卡片</button>
-                <span id="nightTitleCardBgStatus" class="status"></span>
-                <button id="clearNightTitleCardBgBtn" class="modal-button delete">清除</button>
-            </div>
-        </div>
-    </div></div></div>
-    
-    <!-- ===== [START] MEMORY MODAL ===== -->
-    <div class="modal-overlay" id="memoryModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title-group">
-                    <span id="memory-modal-title">记忆</span>
-                    <span id="memory-sync-status" style="font-size: 12px; font-weight: normal; margin-left: 8px;"></span>
-                </div>
-                <button class="close-btn" data-modal-id="memoryModal">&times;</button>
-            </div>
-            <div class="app-container" id="memoryAppContainer">
-                <!-- HUB / 入口页面 -->
-                <div id="hub-view" class="page active">
-                    <div id="hub-view-content">
-                        <button data-action="goto-memo" class="hub-btn">备忘录</button>
-                        <button data-action="goto-album" class="hub-btn">相册</button>
-                        <button data-action="goto-cloud" class="hub-btn">文件夹</button>
-                    </div>
-                </div>
-                <!-- MEMO / 备忘录部分 -->
-                <div id="memo-section" class="page">
-                    <div id="folder-view" class="page active">
-                        <div class="page-header">
-                            <button data-action="back-to-hub" class="header-btn back-btn">&#10094;</button>
-                            <h1 class="title">我的备忘录</h1>
-                            <button data-action="toggle-memo-manage" class="header-btn manage-btn">管理</button>
-                        </div>
-                        <div id="folder-list-container" class="list-container"></div>
-                        <button data-action="add-memo-folder" class="fab">+</button>
-                        <div id="memo-management-controls" class="management-controls">
-                             <button data-action="select-all-memo" class="modal-button">全选</button>
-                             <button data-action="delete-selected-memo" class="modal-button" style="color:#f56565;">删除选中</button>
-                        </div>
-                    </div>
-                    <div id="notes-view" class="page">
-                        <div class="page-header">
-                            <button data-action="back-to-memo-folders" class="header-btn back-btn">&#10094;</button>
-                            <h1 id="notes-view-title" class="title">文件夹</h1>
-                        </div>
-                        <div id="notes-list-container" class="list-container"></div>
-                        <button data-action="add-note" class="fab">+</button>
-                    </div>
-                    <div id="note-editor-view" class="page">
-                        <div class="editor-header">
-                            <button data-action="cancel-note" class="editor-btn">取消</button>
-                            <div>
-                                <button data-action="delete-note" class="editor-btn" style="display: none;">删除</button>
-                                <button data-action="save-note" class="editor-btn">完成</button>
-                            </div>
-                        </div>
-                        <div class="editor-content">
-                            <input type="text" id="note-title-input" placeholder="标题">
-                            <textarea id="note-content-textarea" placeholder="在这里输入内容..."></textarea>
-                        </div>
-                    </div>
-                </div>
-                <!-- ALBUM / 相册部分 -->
-                <div id="album-section" class="page">
-                    <div id="album-folder-view" class="page active">
-                        <div class="page-header">
-                            <button data-action="back-to-hub" class="header-btn back-btn">&#10094;</button>
-                            <h1 class="title">我的相册</h1>
-                            <div class="header-controls">
-                                <button data-action="wander-global" class="header-btn wander-btn">💫</button>
-                                <button data-action="toggle-album-manage" class="header-btn manage-btn">管理</button>
-                            </div>
-                        </div>
-                        <div id="album-list-container" class="list-container"></div>
-                        <button data-action="add-album-folder" class="fab">+</button>
-                        <div id="album-management-controls" class="management-controls">
-                             <button data-action="select-all-album" class="modal-button">全选</button>
-                             <button data-action="delete-selected-album" class="modal-button" style="color:#f56565;">删除选中</button>
-                        </div>
-                    </div>
-                    <div id="photo-grid-view" class="page">
-                         <div class="page-header">
-                            <button data-action="back-to-album-folders" class="header-btn back-btn">&#10094;</button>
-                            <h1 id="photo-grid-title" class="title">相册</h1>
-                            <div class="header-controls">
-                                <button data-action="wander-local" class="header-btn wander-btn">💫</button>
-                                <button data-action="toggle-photo-manage" class="header-btn manage-btn">管理</button>
-                            </div>
-                        </div>
-                        <div id="photo-list-container" class="list-container"></div>
-                        <label for="photo-uploader" data-action="add-photo" class="fab">+</label>
-                        <input type="file" id="photo-uploader" multiple accept="image/*" style="display: none;">
-                        <div id="photo-management-controls" class="management-controls">
-                             <button data-action="select-all-photos" class="modal-button">全选</button>
-                             <button data-action="delete-selected-photos" class="modal-button" style="color:#f56565;">删除选中</button>
-                        </div>
-                    </div>
-                </div>
-                <!-- CLOUD DRIVE / 文件夹 -->
-                <div id="cloud-drive-section" class="page">
-                    <div class="page-header">
-                        <button data-action="back-to-hub" class="header-btn back-btn">&#10094;</button>
-                        <h1 class="title">文件夹</h1>
-                    </div>
-                    <div class="list-container" style="display: flex; flex-direction: column; gap: 15px; padding: 15px; overflow-y: hidden;">
-                        <select id="buttonSelector" class="modal-select"></select>
-                        <div class="file-upload-section">
-                            <input type="file" id="fileUploader">
-                            <div class="file-select-wrapper">
-                                <button id="selectFileBtn" class="modal-button">选择文件</button>
-                                <span id="selectedFileName" class="status-text">未选择任何文件</span>
-                            </div>
-                            <input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）">
-                            <button id="uploadBtn" class="modal-button">上传文件</button>
-                            <div id="progressContainer" class="progress-container">
-                                <div id="uploadProgressBar" class="progress-bar"></div>
-                            </div>
-                        </div>
-                        <div id="file-list-container" style="margin-top:0;">
-                            <ul id="fileList"></ul>
-                            <div id="fileListStatus" class="file-list-status">请选择一个分类</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- 文件夹(备忘录/相册)模态框 -->
-    <div id="memoryFolderModal" class="modal-overlay">
-        <div class="modal-content">
-            <div id="folder-modal-title" class="modal-header">新文件夹</div>
-            <div class="modal-body"> <input type="text" id="folder-name-input" class="modal-input" placeholder="文件夹名称"> </div>
-            <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-                <button data-action="close-folder-modal" class="modal-button">取消</button>
-                <button data-action="save-folder" class="modal-button" style="color:var(--hold-border)">保存</button>
-            </div>
-        </div>
-    </div>
-    <!-- 上传照片时编辑信息模态框 -->
-    <div id="memoryPhotoDetailsModal" class="modal-overlay">
-        <div class="modal-content">
-            <div id="photo-details-modal-title" class="modal-header">添加照片信息</div>
-            <div class="modal-body">
-                <div id="photoset-toggle-container">
-                    <label class="header-toggle-group">
-                        <input type="checkbox" id="create-photoset-toggle">
-                        <span>创建照片集</span>
-                    </label>
-                </div>
-                <img id="upload-thumbnail" src="" alt="upload thumbnail">
-                <input type="text" id="photo-title-input" class="modal-input" placeholder="标题 (选填)">
-                <textarea id="photo-desc-input" class="modal-textarea" placeholder="描述 (选填)"></textarea>
-            </div>
-            <div class="modal-footer">
-                <button data-action="skip-photo-details" class="modal-button">跳过</button>
-                <button data-action="save-photo-details" class="modal-button primary">保存</button>
-            </div>
-        </div>
-    </div>
-    <!-- ===== [END] MEMORY MODAL ===== -->
-
-    <!-- 全屏照片查看器 -->
-    <div id="memoryPhotoViewerOverlay">
-        <div class="viewer-header"> 
-            <span class="counter" id="viewer-counter"></span>
-            <button data-action="close-viewer" class="viewer-btn">✕</button> 
-        </div>
-        <div class="viewer-content">
-            <button data-action="prev-photo" id="prev-photo-btn" class="viewer-btn nav-arrow">&#10094;</button>
-            <div id="viewer-img-container"><img id="viewer-img" src="" alt="Photo view"></div>
-            <button data-action="next-photo" id="next-photo-btn" class="viewer-btn nav-arrow">&#10095;</button>
-        </div>
-        <div class="viewer-footer">
-            <h3 id="viewer-title"></h3>
-            <p id="viewer-description"></p>
-            <p id="viewer-timestamp"></p>
-        </div>
-    </div>
-
-    <!-- Wander View -->
-    <div id="wanderViewOverlay">
-        <div class="wander-header">
-            <button class="close-btn" data-action="close-wander-view">&times;</button>
-        </div>
-        <div class="wander-main-content">
-            <div class="wander-photo-container" id="wander-photo-container">
-                <img id="wander-img" src="" alt="Wander view">
-                <div class="wander-info-container">
-                    <h3 id="wander-title"></h3>
-                    <p id="wander-description"></p>
-                </div>
-            </div>
-        </div>
-        <div class="wander-music-player" id="wander-music-player">
-            <div class="player-handle-container" data-action="toggle-player-collapse"><div class="player-handle"></div></div>
-            <div class="player-content">
-                <div class="player-display" id="player-display-area"></div>
-                <div class="player-progress-track">
-                    <div class="player-progress-bar-bg"></div>
-                    <div id="player-progress-bar"></div>
-                    <div id="player-progress-handle"></div>
-                </div>
-                <div class="player-controls">
-                    <button class="player-btn" id="playlist-btn" title="音乐列表"></button>
-                    <button class="player-btn" id="prev-song-btn" title="上一首"></button>
-                    <button class="player-btn" id="play-pause-btn" title="播放"></button>
-                    <button class="player-btn" id="next-song-btn" title="下一首"></button>
-                    <button class="player-btn" id="loop-mode-btn" title="列表循环"></button>
-                </div>
-            </div>
-            <div class="player-popover" id="playlist-popover">
-                <div class="popover-header">
-                    <h4>播放列表</h4>
-                    <button id="open-music-settings-btn" class="player-btn settings-btn"></button>
-                </div>
-                <ul id="popover-playlist-ul"></ul>
-            </div>
-        </div>
-        <audio id="audio-player"></audio>
-    </div>
-
-    <!-- Music Settings Modal -->
-    <div class="modal-overlay" id="musicSettingsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title-group"><span>音乐设置</span></div>
-                <button class="close-btn" data-modal-id="musicSettingsModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="toggle-section">
-                    <span>进入漫游时自动播放</span>
-                    <label class="toggle-switch"><input type="checkbox" id="autoplay-toggle"><span class="slider"></span></label>
-                </div>
-                <div class="music-upload-section">
-                    <h4>上传新歌曲</h4>
-                    <div class="file-select-wrapper">
-                        <button id="upload-music-btn" class="modal-button">选择音乐 (.mp3)</button>
-                        <span id="upload-music-status" class="status-text"></span>
-                    </div>
-                     <input type="text" id="music-rename-input" class="modal-input" placeholder="歌曲名称 (自动填充)">
-                    <div class="file-select-wrapper">
-                        <button id="upload-lrc-btn" class="modal-button">选择歌词 (.lrc)</button>
-                        <span id="upload-lrc-status" class="status-text"></span>
-                    </div>
-                    <div class="confirm-upload-wrapper">
-                        <button id="confirm-upload-btn" class="modal-button">确认上传</button>
-                    </div>
-                    <input type="file" id="music-file-picker" accept=".mp3" hidden>
-                    <input type="file" id="lrc-file-picker" accept=".lrc" hidden>
-                </div>
-                <div class="music-playlist-section">
-                    <h4>播放列表管理</h4>
-                    <ul id="music-playlist-container"></ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- == Iframe Modal & Confirmation Toast == -->
-    <div class="iframe-modal-overlay" id="iframeModal">
-        <div id="returnConfirmationToast" class="return-toast">
-            <span>返回 JellyfishCenter?</span>
-            <div>
-                <button id="cancelReturnBtn" class="toast-btn toast-btn-cancel">取消</button>
-                <button id="confirmReturnBtn" class="toast-btn toast-btn-confirm">确认</button>
-            </div>
-        </div>
-        <div class="iframe-modal-content">
-            <iframe id="iframeContent" src="about:blank" frameborder="0" allow="fullscreen" sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts"></iframe>
-        </div>
-        <div id="gestureCaptureZone"></div>
-        <div class="swipe-hint" id="swipeHint"><div class="arrow"></div><span>从左侧中间区域向右滑动关闭</span></div>
-    </div>
-
     <script>
-    // [JS - V12.3.0 "Migration Ready"]
+    // [JS - V12.3.1 "Download Fix"]
     const CURRENT_APP_VERSION = '3.6.0';
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false, isEditingButton = false, editingButtonData = null;
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
@@ -1037,9 +14,10 @@
     let currentConfig = getDefaultConfig();
     
     const utf8_to_b64 = (str) => btoa(unescape(encodeURIComponent(str)));
-    const b6_to_utf8 = (str) => decodeURIComponent(escape(atob(str)));
+    const b64_to_utf8 = (str) => decodeURIComponent(escape(atob(str)));
 
     function b64toBlob(b64Data, contentType = '', sliceSize = 512) {
+        contentType = contentType || 'application/octet-stream';
         const byteCharacters = atob(b64Data);
         const byteArrays = [];
         for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
@@ -1068,7 +46,7 @@
                 } else if (errorJson.message.includes("requires authentication")) {
                     userMessage = `认证失败：此操作需要有效的 Personal Access Token。`;
                 } else if (errorJson.message.includes("sha doesn't match")) {
-                    userMessage = `同步冲突：云端数据已被更新，请刷新页面或使用“手动同步与修复”功能后再试。`;
+                    userMessage = `同步冲突：云端数据已被更新，请使用“手动同步与修复”功能后再试。`;
                 } else if (errorJson.message.includes("path exists")) {
                     userMessage = `${context}失败：云端已存在同名文件或文件夹。`;
                 } else {
@@ -1131,36 +109,43 @@
     }
 
     async function saveToGithub(path, content, commitMessage, sha = null) {
-        if (!checkConfig(true)) { updateSyncStatus('error', '配置不完整，无法同步。'); return { sha: null, error: "配置不完整" }; }
+        if (!checkConfig(true)) {
+            updateSyncStatus('error', '配置不完整，无法同步。');
+            return { sha: null, error: "配置不完整" };
+        }
         updateSyncStatus('syncing', `正在同步: ${commitMessage}`);
         const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
         const body = { message: commitMessage, content: content, branch: 'main' };
         if (sha) { body.sha = sha; }
+
         try {
-            const response = await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, body: JSON.stringify(body), cache: 'no-cache' });
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` },
+                body: JSON.stringify(body),
+                cache: 'no-cache'
+            });
+
             if (!response.ok) {
-                 const errorData = await response.json().catch(() => ({}));
-                 throw new Error(`${response.status}: ${JSON.stringify(errorData)}`);
+                const errorData = await response.json().catch(() => ({}));
+                if (response.status === 409 || (errorData.message && errorData.message.includes("sha doesn't match"))) {
+                    const conflictMessage = `同步冲突：云端数据已被更新，请使用“手动同步与修复”功能后再试。`;
+                    updateSyncStatus('error', conflictMessage);
+                    return { sha: null, error: conflictMessage };
+                }
+                throw new Error(`${response.status}: ${JSON.stringify(errorData)}`);
             }
+
             const data = await response.json();
             updateSyncStatus('synced', '同步成功！');
             return { sha: data.content.sha, error: null };
         } catch (error) {
             const userMessage = await handleApiError(`写入 ${path}`, error);
             updateSyncStatus('error', userMessage);
-            if (userMessage.includes('同步冲突')) {
-                 if(confirm('同步冲突！云端数据已被更改。是否删除云端冲突文件并强制覆盖？\n\n警告：此操作可能导致他人更改的数据丢失。如果不确定，请选择“取消”并联系开发者。')) {
-                    const deleteSuccess = await deleteFromGithub(path, 'Force delete due to SHA conflict', sha, true);
-                    if(deleteSuccess) {
-                        return saveToGithub(path, content, commitMessage, null);
-                    } else {
-                        return { sha: null, error: '删除冲突文件失败' };
-                    }
-                 }
-            }
             return { sha: null, error: userMessage };
         }
     }
+
     
     async function uploadFileViaGitData({ file, path, commitMessage, onProgress }) {
         if (!checkConfig(true)) throw new Error("GitHub未配置");
@@ -1246,7 +231,7 @@
         if (data) {
             configSha = data.sha;
             try {
-                return JSON.parse(b6_to_utf8(data.content));
+                return JSON.parse(b64_to_utf8(data.content));
             } catch (e) {
                 alert('云端 config.json 文件格式错误，请尝试使用“手动同步与修复”功能。');
                 return null;
@@ -1506,7 +491,6 @@
     function setupModals(){document.querySelectorAll(".close-btn").forEach(e=>e.addEventListener("click",()=>{document.getElementById(e.dataset.modalId).classList.remove("show")})),document.querySelectorAll(".modal-overlay").forEach(e=>e.addEventListener("click",t=>e===t.target&&e.classList.remove("show"))),document.getElementById("helpBtn").addEventListener("click",()=>{document.getElementById("helpModal").classList.add("show"),toggleFabMenu(!1);localStorage.setItem('lastSeenVersion', CURRENT_APP_VERSION);document.getElementById('helpBtn').classList.remove('has-update');}),document.getElementById("dataSyncBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(settingsModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),settingsModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("addNavBtn").addEventListener("click",()=>{openAddModal(); toggleFabMenu(false);}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); })}
     function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){const e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e=!0){return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据同步)"),!1):!0}
     
-    // Deep merge utility
     function isObject(item) { return (item && typeof item === 'object' && !Array.isArray(item)); }
     function mergeDeep(target, ...sources) {
         if (!sources.length) return target;
@@ -1524,19 +508,11 @@
         return mergeDeep(target, ...sources);
     }
     
-        /**
-     * [FIX V2 - ROBUST MIGRATION] Smartly migrates all legacy and hybrid config formats.
-     * It ensures categories exist, finds orphaned root buttons, merges them without duplication,
-     * and finally cleans up the legacy structure.
-     * @param {object} config - The fetched configuration object.
-     * @returns {{migratedConfig: object, wasMigrated: boolean}} - The updated config and a flag indicating if migration occurred.
-     */
     function migrateLegacyConfig(config) {
         if (!config) return { migratedConfig: config, wasMigrated: false };
 
         let wasModified = false;
 
-        // Step 1: Ensure the modern base structure exists.
         if (!Array.isArray(config.categories)) {
             config.categories = [];
             wasModified = true;
@@ -1546,18 +522,16 @@
         let allCategory = config.categories.find(c => c.name === '全部');
         if (!allCategory) {
             allCategory = { name: '全部', buttons: [] };
-            config.categories.unshift(allCategory); // Ensure '全部' is first
+            config.categories.unshift(allCategory);
             wasModified = true;
             console.log("Migration: Default '全部' category not found, created a new one.");
         }
 
-        // Step 2: Find, merge, and de-duplicate orphaned buttons from the root level.
         if (Array.isArray(config.buttons) && config.buttons.length > 0) {
             console.log(`Migration: Found ${config.buttons.length} orphaned buttons at the root level. Merging...`);
             const allCategoryButtonHrefs = new Set(allCategory.buttons.map(b => b.href));
 
             config.buttons.forEach(orphanButton => {
-                // Only add if a button with the same link doesn't already exist in the '全部' category
                 if (!allCategoryButtonHrefs.has(orphanButton.href)) {
                     allCategory.buttons.push(orphanButton);
                     console.log(`  -> Merged button: "${orphanButton.text}"`);
@@ -1569,7 +543,6 @@
             wasModified = true;
         }
 
-        // Step 3: Clean up the legacy root 'buttons' property.
         if (config.hasOwnProperty('buttons')) {
             delete config.buttons;
             console.log("Migration: Cleaned up legacy root 'buttons' array.");
@@ -1602,15 +575,12 @@
 
         let mergedConfig = getDefaultConfig();
         if (fetchedConfig) {
-            // Merge fetched config into the default structure to add any new features/settings.
             currentConfig = mergeDeep({}, mergedConfig, fetchedConfig);
-            // Check if merging added new properties that need to be saved back.
             if (JSON.stringify(currentConfig) !== JSON.stringify(fetchedConfig)) {
                 needsSave = true;
                 console.log("Config updated with new fields from default template.");
             }
         } else {
-            // No config found on GitHub, use the default and save it.
             console.log('Config.json not found or invalid. Using default and attempting to create.');
             currentConfig = mergedConfig;
             configSha = null;
@@ -1765,9 +735,6 @@
 
         if (choice === '1') {
             const categoryObj = currentConfig.categories.find(c => c.name === categoryNameToDelete);
-            if (categoryObj) {
-                 // The items remain, they will just not be in a specific category anymore but visible under "All".
-            }
             currentConfig.categories = currentConfig.categories.filter(c => c.name !== categoryNameToDelete);
             await saveGlobalConfig(`Delete category (keep items): ${categoryNameToDelete}`);
             alert(`分类 "${categoryNameToDelete}" 已删除，其项目现在仅在“全部”中显示。`);
@@ -1860,7 +827,6 @@
             
             let commitMsg;
             if (isEditingButton && editingButtonData) {
-                // Find and remove old button data from its original category
                 const oldCategory = currentConfig.categories.find(c => c.name === editingButtonData.categoryName);
                 if (oldCategory) {
                     oldCategory.buttons = oldCategory.buttons.filter(b => b.href !== editingButtonData.href);
@@ -2025,11 +991,7 @@
             if (rootContentsRes.ok) {
                 const items = await rootContentsRes.json();
                 const folderPathsToDelete = items
-                    .filter(item => item.type === 'dir' && 
-
-!['.github', 'icons'].includes(item.name)
-
-)
+                    .filter(item => item.type === 'dir' && !['.github', 'icons'].includes(item.name))
                     .map(dir => dir.path);
 
                 for (const path of folderPathsToDelete) {
@@ -2077,8 +1039,7 @@
             photoViewer: document.getElementById('memoryPhotoViewerOverlay'),
             photosetToggleContainer: document.getElementById('photoset-toggle-container'),
             photosetToggle: document.getElementById('create-photoset-toggle'),
-            // File Drive UI
-             buttonSelector: document.getElementById("buttonSelector"), fileList: document.getElementById("fileList"), fileListStatus: document.getElementById("fileListStatus"), fileUploader: document.getElementById("fileUploader"), selectFileBtn: document.getElementById("selectFileBtn"), selectedFileName: document.getElementById("selectedFileName"), fileNameInput: document.getElementById("fileNameInput"), uploadBtn: document.getElementById("uploadBtn"), progressContainer: document.getElementById("progressContainer"), progressBar: document.getElementById("uploadProgressBar")
+            buttonSelector: document.getElementById("buttonSelector"), fileList: document.getElementById("fileList"), fileListStatus: document.getElementById("fileListStatus"), fileUploader: document.getElementById("fileUploader"), selectFileBtn: document.getElementById("selectFileBtn"), selectedFileName: document.getElementById("selectedFileName"), fileNameInput: document.getElementById("fileNameInput"), uploadBtn: document.getElementById("uploadBtn"), progressContainer: document.getElementById("progressContainer"), progressBar: document.getElementById("uploadProgressBar")
         };
 
         const state = {
@@ -2107,7 +1068,7 @@
             updateStatus('同步中...');
             const { data, error } = await fetchFromGithub(MEMORY_DATA_PATH);
             if (error) { updateStatus('同步失败', true, error); return; }
-            memoryCache = data ? JSON.parse(b6_to_utf8(data.content)) : getInitialData();
+            memoryCache = data ? JSON.parse(b64_to_utf8(data.content)) : getInitialData();
             memoryDataSha = data ? data.sha : null;
             updateStatus('已同步');
             if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
@@ -2599,7 +1560,6 @@
             }
         });
         
-        // File Drive Functions
         function populateDriveSelector(){const e=ui.buttonSelector.value;ui.buttonSelector.innerHTML="";currentConfig.categories.forEach(t=>{const n=t.name,o=document.createElement("option");o.value=o.textContent=n,ui.buttonSelector.appendChild(o)}),Array.from(ui.buttonSelector.options).some(t=>t.value===e)&&(ui.buttonSelector.value=e)}
         async function fetchFilesForSelectedCategory(){const e=ui.buttonSelector.value;if(ui.fileList.innerHTML="",ui.fileListStatus.style.display="flex",!e)return void(ui.fileListStatus.textContent="请选择一个分类");if(!checkConfig(!1))return void(ui.fileListStatus.innerHTML="尚未配置GitHub信息<br>请点击 ☁️ 进行配置");ui.fileListStatus.textContent="正在加载...";const t=`data_sync/${e}`; const { data: o, error: n } = await fetchFromGithub(t); if (n) { ui.fileListStatus.textContent = await handleApiError("获取文件列表", new Error(n)); return; } if (!o || 0 === o.length) { ui.fileListStatus.textContent = "该分类下暂无文件"; return; } const l = await Promise.all(o.map(async e=>({...e,commitDate:await getLatestCommitDate(e.path)}))); l.sort((e,t)=>new Date(t.commitDate)-new Date(e.commitDate)),ui.fileList.innerHTML="",ui.fileListStatus.style.display="none",l.forEach(e=>{const t=document.createElement("li"),n=document.createElement("div");n.className="file-info",n.dataset.filePath=e.path,n.dataset.fileName=e.name;const o=document.createElement("span");o.className="file-name",o.textContent=e.name;const l=document.createElement("span");l.className="file-timestamp",l.textContent=(new Date(e.commitDate)).toLocaleString("zh-CN",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}),n.append(o,l);const a=document.createElement("button");a.className="delete-btn",a.innerHTML="&times;",a.title="删除文件",t.append(n,a),ui.fileList.appendChild(t),n.addEventListener("click",t=>forceDownload(t.currentTarget.dataset.filePath,t.currentTarget.dataset.fileName,n)),a.addEventListener("click",()=>deleteFile(e.path,e.sha,t))})}
         async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";try{ const success = await deleteFromGithub(e, `Delete file: ${e}`, t); if (success) { n.remove(); if(ui.fileList.children.length === 0) { ui.fileListStatus.textContent = '该分类下暂无文件'; ui.fileListStatus.style.display = 'block'; } } else { n.style.opacity = "1"; } } catch(err) { n.style.opacity = "1"; }}
@@ -2637,7 +1597,6 @@
                 });
                 document.querySelector('[data-action="close-wander-view"]').addEventListener('click', actions['close-wander-view']);
                 document.querySelector('[data-action="toggle-player-collapse"]').addEventListener('click', actions['toggle-player-collapse']);
-                // Drive listeners
                 ui.buttonSelector.addEventListener("change",fetchFilesForSelectedCategory); 
                 ui.selectFileBtn.addEventListener('click', () => ui.fileUploader.click());
                 ui.fileUploader.addEventListener("change",()=>{ if(ui.fileUploader.files.length>0){ const file = ui.fileUploader.files[0]; ui.fileNameInput.value=file.name; ui.selectedFileName.textContent = file.name; } else { ui.selectedFileName.textContent = "未选择任何文件"; }});
@@ -2933,7 +1892,7 @@
             if (!audioUrl) {
                 console.error(`Failed to get URL for track: ${track.displayName}`);
                 alert(`无法播放歌曲 "${track.displayName}"，请检查文件是否存在或网络连接。`);
-                nextTrack(true); // Attempt to play the next song
+                nextTrack(true);
                 return;
             }
             ui.player.audio.src = audioUrl;
@@ -3043,16 +2002,19 @@
         function parseLRC(lrc) {
             const lines = lrc.split('\n');
             const result = [];
-            const timeRegex = /$$(\d{2}):(\d{2})[.:](\d{2,3})$$/g;
+            const timeRegex = /\[(\d{2}):(\d{2})[.:](\d{2,3})\]/g;
             for (const line of lines) {
-                let lastMatch;
-                while((lastMatch = timeRegex.exec(line)) !== null) {
-                    const minutes = parseInt(lastMatch[1], 10);
-                    const seconds = parseInt(lastMatch[2], 10);
-                    const milliseconds = parseInt(lastMatch[3].padEnd(3, '0'), 10);
-                    const time = minutes * 60 + seconds + milliseconds / 1000;
-                    const text = line.substring(line.lastIndexOf(']') + 1).trim();
-                    if (text) result.push({ time, text });
+                const matches = [...line.matchAll(timeRegex)];
+                const text = line.substring(line.lastIndexOf(']') + 1).trim();
+                
+                if (text && matches.length > 0) {
+                    for (const match of matches) {
+                        const minutes = parseInt(match[1], 10);
+                        const seconds = parseInt(match[2], 10);
+                        const milliseconds = parseInt(match[3].padEnd(3, '0'), 10);
+                        const time = minutes * 60 + seconds + milliseconds / 1000;
+                        result.push({ time, text });
+                    }
                 }
             }
             return result.sort((a, b) => a.time - b.time);
@@ -3094,7 +2056,7 @@
         async function loadCloudPlaylist() {
             const { data } = await fetchFromGithub(MUSIC_DATA_PATH);
             if (data && data.content) {
-                state.playlist = JSON.parse(b6_to_utf8(data.content));
+                state.playlist = JSON.parse(b64_to_utf8(data.content));
                 musicDataSha = data.sha;
             } else {
                 state.playlist = [];
@@ -3103,7 +2065,15 @@
             renderPlaylists();
         }
 
-               async function uploadPendingFiles() {
+       async function saveCloudPlaylist() {
+            const content = utf8_to_b64(JSON.stringify(state.playlist, null, 2));
+            const result = await saveToGithub(MUSIC_DATA_PATH, content, 'Update music playlist', musicDataSha);
+            if (result.sha) {
+                musicDataSha = result.sha;
+            }
+        }
+
+        async function uploadPendingFiles() {
             const sm = ui.settingsModal;
             if (!state.pendingMusicFile) { alert("请先选择一个音乐文件。"); return; }
             const displayName = sm.renameInput.value.trim();
@@ -3112,7 +2082,7 @@
             const finalMusicFilename = displayName + '.mp3';
             const finalLrcFilename = displayName + '.lrc';
             sm.confirmUploadBtn.textContent = "取消上传 (0%)";
-            sm.confirmUploadBtn.disabled = true;
+            sm.confirmUploadBtn.disabled = false;
             try {
                 const musicPath = MUSIC_FILES_PATH + finalMusicFilename;
                 const musicResult = await uploadFileViaGitData({ file: state.pendingMusicFile, path: musicPath, commitMessage: `Upload music: ${finalMusicFilename}`, onProgress: (percent) => { if (percent < 100) sm.confirmUploadBtn.textContent = `取消上传 (${Math.round(percent)}%)`; else sm.confirmUploadBtn.textContent = '正在处理...'; } });
@@ -3146,7 +2116,7 @@
             }, start, close,
             updateTheme: () => {
                 const isDark = document.body.classList.contains('dark-mode');
-                ui.overlay.style.background = isDark ? 'var(--bg-day-element)' : 'var(--bg-day-element)';
+                ui.overlay.style.background = isDark ? 'var(--bg-night-element)' : 'var(--bg-day-element)';
                 ui.overlay.style.color = isDark ? 'var(--text-night)' : 'var(--text-day)';
             },
             togglePlayerCollapse: () => {
@@ -3157,7 +2127,6 @@
     })();
     // ===== [END] WANDER VIEW LOGIC =====
     
-    // ROBUST FILE FETCHER (V2.1 - Liveness Check)
     async function getSecureFileUrl(path) {
         if (!path) return '';
         if (secureFileCache.has(path)) {
@@ -3167,59 +2136,35 @@
                 if (response.ok) {
                     return cachedUrl;
                 }
-            } catch (e) {}
+            } catch (e) { /* Ignore */ }
             URL.revokeObjectURL(cachedUrl);
             secureFileCache.delete(path);
         }
 
-        let blob;
-        const { data: contentsData, error } = await fetchFromGithub(path, 'contents');
-        if (error) { console.error(`Failed to get metadata for ${path}:`, error); return ''; }
-        if (!contentsData) { console.error(`No metadata found for ${path}`); return ''; }
+        try {
+            const { data: metaData, error: metaError } = await fetchFromGithub(path, 'contents');
+            if (metaError || !metaData || !metaData.sha) {
+                throw new Error(`Could not get metadata for ${path}. ${metaError || 'No SHA found.'}`);
+            }
 
-        if (contentsData.download_url) {
-            try {
-                const response = await fetch(contentsData.download_url, {
-                    headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }
-                });
-                if (!response.ok) throw new Error(`Download URL fetch failed: ${response.statusText}`);
-                blob = await response.blob();
-            } catch (e) {
-                console.warn(`Download URL for ${path} failed, falling back...`, e);
-                blob = null;
-            }
-        }
-        
-        if (!blob && contentsData.content) {
-            try {
-                blob = b64toBlob(contentsData.content, 'application/octet-stream');
-            } catch(e) {
-                 console.warn(`Base64 decoding for ${path} failed, falling back...`, e);
-                 blob = null;
-            }
-        }
+            // [CRITICAL FIX] Corrected the call to fetchFromGithub to avoid duplicate 'git/' path segment.
+            const { data: blobData, error: blobError } = await fetchFromGithub(`blobs/${metaData.sha}`, 'git');
 
-        if (!blob && contentsData.sha) {
-            console.log(`Using Git Data API fallback for ${path}`);
-            try {
-                const { data: blobData } = await fetchFromGithub(`git/blobs/${contentsData.sha}`, 'git');
-                if (!blobData || !blobData.content) throw new Error("Git Blob API returned no content.");
-                blob = b64toBlob(blobData.content, 'application/octet-stream');
-            } catch (e) {
-                console.error(`Git Data API fallback for ${path} also failed.`, e);
-                return '';
+            if (blobError || !blobData || !blobData.content) {
+                throw new Error(`Could not get blob content for ${path}. ${blobError || 'No content returned.'}`);
             }
-        }
-        
-        if (blob) {
+            
+            const blob = b64toBlob(blobData.content, metaData.type);
             const blobUrl = URL.createObjectURL(blob);
             secureFileCache.set(path, blobUrl);
             return blobUrl;
-        }
 
-        console.error(`All methods failed to retrieve file: ${path}`);
-        return '';
+        } catch (error) {
+            console.error(`All methods failed to retrieve file: ${path}`, error);
+            return '';
+        }
     }
+
 
     function checkAppUpdate() {
         const lastSeenVersion = localStorage.getItem('lastSeenVersion');
@@ -3243,5 +2188,3 @@
         setupColorSync(colorModal.pickerN2, colorModal.hexN2, 'nightColor2');
     });
     </script>
-</body>
-</html>
