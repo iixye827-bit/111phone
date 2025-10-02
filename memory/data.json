@@ -25,6 +25,41 @@
         "path": "memory/photos/1759404763233-1759404781674.jpeg",
         "sha": "f4c3c36bd339af983d58422424292356190a5d49",
         "timestamp": 1759404787577
+      },
+      {
+        "type": "photoset",
+        "id": 1759404838417.225,
+        "albumId": 1759404763233,
+        "title": "水母",
+        "description": "喵喵",
+        "timestamp": 1759404838417,
+        "photos": [
+          {
+            "path": "memory/photos/1759404763233-1759404811984-1.jpeg",
+            "sha": "34a5240d698f4ebddd95d8fba3ef4f8afe90689e",
+            "timestamp": 1759404821457
+          },
+          {
+            "path": "memory/photos/1759404763233-1759404821458-2.jpeg",
+            "sha": "7056ac843ea035886d8672cc510c146d5031c260",
+            "timestamp": 1759404825972
+          },
+          {
+            "path": "memory/photos/1759404763233-1759404825972-3.jpeg",
+            "sha": "b4ef3c8814a9b98c51ba18c87a4d6b2b53989394",
+            "timestamp": 1759404830098
+          },
+          {
+            "path": "memory/photos/1759404763233-1759404830098-4.jpeg",
+            "sha": "ddafe5910519b35e9fe85b4b7fb9af6a416f4f7a",
+            "timestamp": 1759404834000
+          },
+          {
+            "path": "memory/photos/1759404763233-1759404834001-5.jpeg",
+            "sha": "90faf9c6d336d010d109cc4fbfd8abe6168ab3c9",
+            "timestamp": 1759404838417
+          }
+        ]
       }
     ]
   }
