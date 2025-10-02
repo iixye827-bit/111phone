@@ -110,7 +110,18 @@
             "sha": "66c5abd900cdbedc89117a69cf331e00a851ae80",
             "timestamp": 1759414217409
           }
-        ]
+        ],
+        "internalIndex": 0
+      },
+      {
+        "type": "photo",
+        "id": 1759414287868.768,
+        "albumId": 1759414098705,
+        "title": "2",
+        "description": "",
+        "path": "memory/photos/1759414098705-1759414283279.jpeg",
+        "sha": "34a5240d698f4ebddd95d8fba3ef4f8afe90689e",
+        "timestamp": 1759414287868
       }
     ]
   }
