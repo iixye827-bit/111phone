@@ -26,6 +26,16 @@
           "openExternally": false
         }
       ]
+    },
+    {
+      "name": "333",
+      "buttons": [
+        {
+          "text": "555",
+          "href": "444",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
