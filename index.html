@@ -636,10 +636,10 @@
             opacity: 1;
             pointer-events: auto;
         }
-        .jelly-menu-btn:nth-child(1) { transition-delay: 0.05s; }
-        .jelly-menu-btn:nth-child(2) { transition-delay: 0.1s; }
-        .jelly-menu-btn:nth-child(3) { transition-delay: 0.15s; }
-        .jelly-menu-btn:nth-child(4) { transition-delay: 0.2s; }
+        .jelly-menu-btn.hovered {
+            transform: var(--transform-end) scale(1.15) !important;
+            filter: brightness(1.1);
+        }
         /* ===== [END] FLOATING JELLYFISH BALL STYLES ===== */
 
     </style>
@@ -830,12 +830,31 @@
     <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据同步</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button><button id="manualSyncBtn" class="modal-button" style="color:#5a6778; margin-top: 10px;">手动同步与修复</button><div class="nuke-section"><button id="nukeDataBtn" class="modal-button">清空所有云端及本地数据</button></div></div></div></div>
     <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body">
         
-        <div class="toggle-section" style="border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 20px; border-radius: 12px 12px 0 0; box-shadow: none;">
-            <span>网页内悬浮球</span><label class="toggle-switch"><input type="checkbox" id="jellyBallToggle"><span class="slider"></span></label>
+        <div class="toggle-section" style="border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 15px; border-radius: 12px 12px 0 0; box-shadow: none; flex-wrap: wrap; gap: 10px;">
+            <span style="flex-basis: 100%;">网页内悬浮球</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span>启用悬浮球</span>
+                <label class="toggle-switch"><input type="checkbox" id="jellyBallToggle"><span class="slider"></span></label>
+            </div>
+            <div id="jelly-ball-options-container" style="display: none; width: 100%; flex-direction: column; gap: 10px; margin-top: 10px;">
+                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <span>启用左侧滑动返回</span>
+                    <label class="toggle-switch"><input type="checkbox" id="jellySwipeBackToggle"><span class="slider"></span></label>
+                </div>
+            </div>
         </div>
+
+        <div id="jelly-ball-functions-section" style="display: none; flex-direction: column; gap: 10px; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 20px;">
+            <label style="font-size: 14px; color: #5a6778;">自定义悬浮球功能</label>
+            <div id="jelly-function-checkboxes" style="display: flex; flex-direction: column; gap: 8px;"></div>
+        </div>
+        
         <div id="jelly-ball-custom-css-section" style="display: none; flex-direction: column; gap: 10px; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 20px;">
             <label for="jellyBallCssTextarea" style="font-size: 14px; color: #5a6778;">自定义悬浮球CSS</label>
-            <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="4" placeholder="#floating-jellyfish-ball {&#10;  background: #ff0000 !important;&#10;}"></textarea>
+            <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="4" placeholder="#floating-jellyfish-ball {&#10;  background: #ff0000 !important;&#10;}" style="flex-grow: 1;"></textarea>
+                <iframe id="jellyCssPreview" style="width: 52px; height: 52px; border: 1px solid #ccc; border-radius: 8px; transform: scale(0.9); transform-origin: top right; flex-shrink: 0;"></iframe>
+            </div>
             <button id="applyJellyBallCssBtn" class="modal-button">应用样式</button>
         </div>
 
@@ -1174,10 +1193,20 @@
     const FloatingBallManager = (() => {
         let ball = null;
         let isDragging = false;
+        let isLongPressActive = false;
+        let startPos = { x: 0, y: 0 };
         let offset = { x: 0, y: 0 };
         let idleTimer = null;
         let longPressTimer = null;
+        let activeMenuBtn = null;
         const LONG_PRESS_DURATION = 2000;
+        const DRAG_THRESHOLD = 10; // Pixels
+        const ALL_FUNCTIONS = [
+            { id: 'album', icon: '📷', title: '相册' },
+            { id: 'memo', icon: '📝', title: '备忘录' },
+            { id: 'folder', icon: '📁', title: '文件夹' },
+            { id: 'return', icon: '↩️', title: '返回主页' }
+        ];
 
         function _create() {
             if (localStorage.getItem('jellyBallEnabled') !== 'true') return;
@@ -1187,6 +1216,8 @@
             ball.id = 'floating-jellyfish-ball';
             ball.innerHTML = `<span>🎐</span><div class="jelly-menu"></div>`;
             document.body.appendChild(ball);
+
+            _renderMenuButtons();
              
             let startPos = localStorage.getItem('jellyBallPosition');
             if (startPos) {
@@ -1197,41 +1228,41 @@
                 ball.style.top = '80%';
                 ball.style.left = '90%';
             }
-
-            const menu = ball.querySelector('.jelly-menu');
-            const buttons = [
-                { icon: '📷', "data-action": 'album', title: '相册' },
-                { icon: '📝', "data-action": 'memo', title: '备忘录' },
-                { icon: '📁', "data-action": 'folder', title: '文件夹' },
-                { icon: '↩️', "data-action": 'return', title: '返回主页' }
-            ];
-
-            buttons.forEach(btn => {
-                const btnEl = document.createElement('button');
-                btnEl.className = 'jelly-menu-btn';
-                btnEl.innerHTML = btn.icon;
-                btnEl.title = btn.title;
-                btnEl.dataset.action = btn.action;
-                menu.appendChild(btnEl);
-            });
             
             _addEventListeners();
             _resetIdleTimer();
+        }
+
+        function _renderMenuButtons() {
+            if (!ball) return;
+            const menu = ball.querySelector('.jelly-menu');
+            menu.innerHTML = ''; // Clear existing buttons
+            const enabledFunctions = _getEnabledFunctions();
+
+            enabledFunctions.forEach(func => {
+                const btnEl = document.createElement('button');
+                btnEl.className = 'jelly-menu-btn';
+                btnEl.innerHTML = func.icon;
+                btnEl.title = func.title;
+                btnEl.dataset.actionId = func.id;
+                menu.appendChild(btnEl);
+            });
         }
 
         function _destroy() {
             if (ball) { ball.remove(); ball = null; }
             clearTimeout(idleTimer);
             clearTimeout(longPressTimer);
+            document.removeEventListener('mousemove', _onDragMove);
+            document.removeEventListener('touchmove', _onDragMove);
+            document.removeEventListener('mouseup', _onDragEnd);
+            document.removeEventListener('touchend', _onDragEnd);
         }
 
         function _addEventListeners() {
             ball.addEventListener('mousedown', _onDragStart);
             ball.addEventListener('touchstart', _onDragStart, { passive: false });
-            
-            document.addEventListener('click', (e) => { if(ball && !ball.contains(e.target)) _closeMenu(); }, true);
-            
-            ball.querySelector('.jelly-menu').addEventListener('click', _onMenuClick, true);
+            document.addEventListener('click', (e) => { if (ball && !ball.contains(e.target)) _closeMenu(); }, true);
         }
 
         function _onDragStart(e) {
@@ -1242,15 +1273,20 @@
             ball.classList.remove('idle', 'snap-left', 'snap-right');
             
             isDragging = false;
+            isLongPressActive = false;
+            activeMenuBtn = null;
+
             const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
             const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
 
+            startPos = { x: clientX, y: clientY };
             const rect = ball.getBoundingClientRect();
             offset.x = clientX - rect.left;
             offset.y = clientY - rect.top;
 
             longPressTimer = setTimeout(() => {
-                if (!isDragging) { _toggleMenu(); }
+                isLongPressActive = true;
+                _toggleMenu();
                 longPressTimer = null;
             }, LONG_PRESS_DURATION);
 
@@ -1261,39 +1297,77 @@
         }
 
         function _onDragMove(e) {
-            if (!ball.classList.contains('dragging')) ball.classList.add('dragging');
-            if (!isDragging) {
-                 isDragging = true;
-                 if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-                 _closeMenu();
-            }
-
             e.preventDefault();
             const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
             const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
 
-            let newX = clientX - offset.x;
-            let newY = clientY - offset.y;
+            if (isLongPressActive) {
+                _handleMenuInteraction(clientX, clientY);
+                return;
+            }
 
-            const ballSize = ball.offsetWidth;
-            const maxX = window.innerWidth - ballSize;
-            const maxY = window.innerHeight - ballSize;
+            const dx = clientX - startPos.x;
+            const dy = clientY - startPos.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-            newX = Math.max(0, Math.min(newX, maxX));
-            newY = Math.max(0, Math.min(newY, maxY));
+            if (!isDragging && distance > DRAG_THRESHOLD) {
+                isDragging = true;
+                if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+                ball.classList.add('dragging');
+                _closeMenu();
+            }
 
-            ball.style.left = `${newX}px`;
-            ball.style.top = `${newY}px`;
+            if (isDragging) {
+                let newX = clientX - offset.x;
+                let newY = clientY - offset.y;
+
+                const ballSize = ball.offsetWidth;
+                const maxX = window.innerWidth - ballSize;
+                const maxY = window.innerHeight - ballSize;
+
+                newX = Math.max(0, Math.min(newX, maxX));
+                newY = Math.max(0, Math.min(newY, maxY));
+
+                ball.style.left = `${newX}px`;
+                ball.style.top = `${newY}px`;
+            }
+        }
+        
+        function _handleMenuInteraction(clientX, clientY) {
+            const elementUnderPointer = document.elementFromPoint(clientX, clientY);
+            const menuBtn = elementUnderPointer ? elementUnderPointer.closest('.jelly-menu-btn') : null;
+            
+            if (activeMenuBtn && activeMenuBtn !== menuBtn) {
+                activeMenuBtn.classList.remove('hovered');
+            }
+            
+            if (menuBtn) {
+                menuBtn.classList.add('hovered');
+                activeMenuBtn = menuBtn;
+            } else {
+                activeMenuBtn = null;
+            }
         }
 
         function _onDragEnd(e) {
-            if (!isDragging) _closeMenu();
-            if (isDragging) _snapToEdge();
+            clearTimeout(longPressTimer);
+
+            if (isLongPressActive) {
+                if (activeMenuBtn) {
+                    _onMenuClick(activeMenuBtn);
+                }
+                _closeMenu();
+            } else if (isDragging) {
+                _snapToEdge();
+            }
             
             ball.classList.remove('dragging');
+            if (activeMenuBtn) activeMenuBtn.classList.remove('hovered');
+
             isDragging = false;
+            isLongPressActive = false;
+            activeMenuBtn = null;
             
-            clearTimeout(longPressTimer);
             _resetIdleTimer();
 
             document.removeEventListener('mousemove', _onDragMove);
@@ -1304,12 +1378,13 @@
         
         function _snapToEdge() {
             const rect = ball.getBoundingClientRect();
-             if ((rect.left + rect.width / 2) > window.innerWidth / 2) {
-                 ball.style.left = `${window.innerWidth - rect.width}px`;
-             } else {
-                 ball.style.left = '0px';
-             }
-             localStorage.setItem('jellyBallPosition', JSON.stringify({ x: ball.offsetLeft, y: ball.offsetTop }));
+             const snapPosition = (rect.left + rect.width / 2) > window.innerWidth / 2 ? window.innerWidth - rect.width : 0;
+             ball.style.transition = 'left 0.2s ease-out';
+             ball.style.left = `${snapPosition}px`;
+             setTimeout(() => {
+                 ball.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                 localStorage.setItem('jellyBallPosition', JSON.stringify({ x: ball.offsetLeft, y: ball.offsetTop }));
+             }, 200);
         }
 
         function _resetIdleTimer() {
@@ -1334,17 +1409,17 @@
             if (isOpen) {
                 const rect = ball.getBoundingClientRect();
                 const numButtons = menuBtns.length;
-                const radius = 55;
-                const btnSize = 38;
+                const radius = 65;
                 const margin = 10;
                 
-                let startAngle = -Math.PI / 2;
-                let endAngle = startAngle + Math.PI;
+                let startAngle, endAngle;
+                const center = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
 
-                if (rect.left < radius + margin) { startAngle = -Math.PI / 2; endAngle = Math.PI / 2; }
-                if (rect.right > window.innerWidth - radius - margin) { startAngle = Math.PI / 2; endAngle = 3 * Math.PI / 2; }
-                if (rect.top < radius + margin) { startAngle = 0; endAngle = Math.PI; }
-                if (rect.bottom > window.innerHeight - radius - margin) { startAngle = Math.PI; endAngle = 2 * Math.PI; }
+                if (center.x < radius + margin) { startAngle = -Math.PI / 2; endAngle = Math.PI / 2; }
+                else if (center.x > window.innerWidth - radius - margin) { startAngle = Math.PI / 2; endAngle = 3 * Math.PI / 2; }
+                else if (center.y < radius + margin) { startAngle = 0; endAngle = Math.PI; }
+                else if (center.y > window.innerHeight - radius - margin) { startAngle = Math.PI; endAngle = 2 * Math.PI; }
+                else { startAngle = -Math.PI / 2; endAngle = 3 * Math.PI / 2; }
                 
                 const angleStep = numButtons > 1 ? (endAngle - startAngle) / (numButtons - 1) : 0;
                 
@@ -1361,12 +1436,10 @@
             if(ball && ball.classList.contains('menu-open')) ball.classList.remove('menu-open');
         }
         
-        function _onMenuClick(e){
-            const button = e.target.closest('.jelly-menu-btn');
+        function _onMenuClick(button){
             if(!button) return;
-            e.stopPropagation();
 
-            const action = button.dataset.action;
+            const actionId = button.dataset.actionId;
             const memoryModal = document.getElementById('memoryModal');
             const originalZIndex = memoryModal.style.zIndex || getComputedStyle(memoryModal).zIndex;
             
@@ -1380,7 +1453,7 @@
                 if(hubAction) hubAction.click();
             }
 
-            switch(action) {
+            switch(actionId) {
                 case 'album': openMemoryAndSwitch('album'); break;
                 case 'memo': openMemoryAndSwitch('memo'); break;
                 case 'folder': openMemoryAndSwitch('cloud'); break;
@@ -1389,31 +1462,102 @@
             _closeMenu();
         }
 
+        function _getEnabledFunctions() {
+            const settings = JSON.parse(localStorage.getItem('jellyFunctionSettings')) || {};
+            return ALL_FUNCTIONS.filter(func => settings[func.id] !== false);
+        }
+
+        function initSettings() {
+            const toggle = document.getElementById('jellyBallToggle');
+            const swipeBackToggle = document.getElementById('jellySwipeBackToggle');
+            const optionsContainer = document.getElementById('jelly-ball-options-container');
+            const functionsSection = document.getElementById('jelly-ball-functions-section');
+            const cssSection = document.getElementById('jelly-ball-custom-css-section');
+            const cssTextarea = document.getElementById('jellyBallCssTextarea');
+            const applyCssBtn = document.getElementById('applyJellyBallCssBtn');
+            const customStyleTag = document.getElementById('custom-jelly-ball-styles');
+            const cssPreviewFrame = document.getElementById('jellyCssPreview');
+            const checkboxContainer = document.getElementById('jelly-function-checkboxes');
+            
+            const isEnabled = localStorage.getItem('jellyBallEnabled') === 'true';
+            const isSwipeBackEnabled = localStorage.getItem('jellySwipeBackEnabled') !== 'false';
+
+            function updateUIVisibility() {
+                const checked = toggle.checked;
+                optionsContainer.style.display = checked ? 'flex' : 'none';
+                functionsSection.style.display = checked ? 'flex' : 'none';
+                cssSection.style.display = checked ? 'flex' : 'none';
+            }
+
+            toggle.checked = isEnabled;
+            swipeBackToggle.checked = isSwipeBackEnabled;
+            
+            const functionSettings = JSON.parse(localStorage.getItem('jellyFunctionSettings')) || {};
+            checkboxContainer.innerHTML = '';
+            ALL_FUNCTIONS.forEach(func => {
+                const isChecked = functionSettings[func.id] !== false; // enabled by default
+                const checkboxHtml = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                       <span>${func.icon} ${func.title}</span> 
+                       <label class="toggle-switch"><input type="checkbox" data-function-id="${func.id}" ${isChecked ? 'checked' : ''}><span class="slider"></span></label>
+                    </div>`;
+                checkboxContainer.innerHTML += checkboxHtml;
+            });
+            
+            checkboxContainer.addEventListener('change', (e) => {
+                const checkbox = e.target;
+                if (checkbox.dataset.functionId) {
+                    const currentSettings = JSON.parse(localStorage.getItem('jellyFunctionSettings')) || {};
+                    currentSettings[checkbox.dataset.functionId] = checkbox.checked;
+                    localStorage.setItem('jellyFunctionSettings', JSON.stringify(currentSettings));
+                    _renderMenuButtons(); 
+                }
+            });
+
+            toggle.addEventListener('change', () => {
+                const checked = toggle.checked;
+                localStorage.setItem('jellyBallEnabled', checked);
+                updateUIVisibility();
+                if (checked) _create(); else _destroy();
+            });
+            swipeBackToggle.addEventListener('change', () => {
+                localStorage.setItem('jellySwipeBackEnabled', swipeBackToggle.checked);
+            });
+
+            const savedCss = localStorage.getItem('jellyBallCustomCss') || '';
+            cssTextarea.value = savedCss;
+            customStyleTag.innerHTML = savedCss;
+
+            const updatePreview = () => {
+                const previewDoc = cssPreviewFrame.contentDocument || cssPreviewFrame.contentWindow.document;
+                previewDoc.open();
+                previewDoc.write(`
+                    <style>
+                        body { margin: 0; display: flex; align-items: center; justify-content: center; height: 100%; }
+                        #preview-ball { width: 42px; height: 42px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size: 22px; }
+                        ${cssTextarea.value.replace(/#floating-jellyfish-ball/g, '#preview-ball')}
+                    </style>
+                    <div id="preview-ball">🎐</div>
+                `);
+                previewDoc.close();
+            };
+
+            cssTextarea.addEventListener('input', updatePreview);
+            applyCssBtn.addEventListener('click', () => {
+               const cssCode = cssTextarea.value;
+               customStyleTag.innerHTML = cssCode;
+               localStorage.setItem('jellyBallCustomCss', cssCode);
+               alert('自定义样式已应用！');
+            });
+            
+            updateUIVisibility();
+            setTimeout(updatePreview, 100);
+        }
+
         return {
-            init: () => {
-                const toggle = document.getElementById('jellyBallToggle');
-                const cssSection = document.getElementById('jelly-ball-custom-css-section');
-                const cssTextarea = document.getElementById('jellyBallCssTextarea');
-                const applyCssBtn = document.getElementById('applyJellyBallCssBtn');
-                const customStyleTag = document.getElementById('custom-jelly-ball-styles');
-                const isEnabled = localStorage.getItem('jellyBallEnabled') === 'true';
-                toggle.checked = isEnabled;
-                cssSection.style.display = isEnabled ? 'flex' : 'none';
-                const savedCss = localStorage.getItem('jellyBallCustomCss') || '';
-                cssTextarea.value = savedCss;
-                customStyleTag.innerHTML = savedCss;
-                toggle.addEventListener('change', () => {
-                    const checked = toggle.checked;
-                    localStorage.setItem('jellyBallEnabled', checked);
-                    cssSection.style.display = checked ? 'flex' : 'none';
-                });
-                applyCssBtn.addEventListener('click', () => {
-                   const cssCode = cssTextarea.value;
-                   customStyleTag.innerHTML = cssCode;
-                   localStorage.setItem('jellyBallCustomCss', cssCode);
-                   alert('自定义样式已应用！');
-                });
-            }, create: _create, destroy: _destroy
+            init: initSettings, 
+            create: _create, 
+            destroy: _destroy
         };
     })();
     // ===== [END] FLOATING JELLYFISH BALL LOGIC =====
@@ -2371,6 +2515,7 @@
     const gestureCaptureZone = document.getElementById('gestureCaptureZone');
     let startX = 0, startY = 0, currentX = 0, isIframeDragging = false, isSwipeIntent = false;
     gestureCaptureZone.addEventListener('touchstart', (e) => {
+        if(localStorage.getItem('jellySwipeBackEnabled') === 'false') return;
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
         currentX = startX;
