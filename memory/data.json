@@ -132,6 +132,16 @@
         "path": "memory/photos/1759414098705-1759414289361.jpeg",
         "sha": "7056ac843ea035886d8672cc510c146d5031c260",
         "timestamp": 1759414293281
+      },
+      {
+        "type": "photo",
+        "id": 1759414298698.0547,
+        "albumId": 1759414098705,
+        "title": "",
+        "description": "",
+        "path": "memory/photos/1759414098705-1759414294045.jpeg",
+        "sha": "b4ef3c8814a9b98c51ba18c87a4d6b2b53989394",
+        "timestamp": 1759414298698
       }
     ]
   }
