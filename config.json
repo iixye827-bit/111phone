@@ -5,6 +5,16 @@
     {
       "name": "全部",
       "buttons": []
+    },
+    {
+      "name": "11",
+      "buttons": [
+        {
+          "text": "22",
+          "href": "https://raw.githack.com/iixye827-bit/111phone/main/projects/22/index.html",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
