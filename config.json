@@ -45,6 +45,16 @@
           "openExternally": false
         }
       ]
+    },
+    {
+      "name": "12345",
+      "buttons": [
+        {
+          "text": "6",
+          "href": "7",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
