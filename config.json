@@ -15,6 +15,16 @@
           "openExternally": false
         }
       ]
+    },
+    {
+      "name": "小手机",
+      "buttons": [
+        {
+          "text": "11",
+          "href": "11",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
