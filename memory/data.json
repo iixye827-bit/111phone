@@ -71,6 +71,17 @@
         "name": "7"
       }
     ],
-    "items": []
+    "items": [
+      {
+        "type": "photo",
+        "id": 1759418450242.452,
+        "albumId": 1759414098705,
+        "title": "",
+        "description": "",
+        "path": "memory/photos/1759414098705-1759418442033.jpg",
+        "sha": "34a5240d698f4ebddd95d8fba3ef4f8afe90689e",
+        "timestamp": 1759418450242
+      }
+    ]
   }
 }
