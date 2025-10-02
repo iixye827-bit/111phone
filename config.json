@@ -16,6 +16,16 @@
           "openExternally": false
         }
       ]
+    },
+    {
+      "name": "22",
+      "buttons": [
+        {
+          "text": "111",
+          "href": "8544",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
