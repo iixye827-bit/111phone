@@ -67,6 +67,7 @@
         .nav-btn { position: relative; padding: 22px 16px; border: none; border-radius: 14px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background: var(--bg-day-element); backdrop-filter: blur(8px); font-size: 17px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent; }
         .nav-btn.hold { border: 2px solid var(--hold-border); transform: scale(1.02); z-index: 5; box-shadow: 8px 8px 16px rgba(174, 190, 212, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(91, 153, 226, 0.3); }
         body.dark-mode .nav-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
+        body.dark-mode .nav-btn:active { box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.25), inset -6px -6px 12px var(--shadow-light-night); }
         body.dark-mode .nav-btn.hold { box-shadow: 8px 8px 16px rgba(0, 0, 0, 0.4), -8px -8px 16px rgba(40, 52, 79, 0.8), 0 0 0 2px rgba(99, 179, 237, 0.3); }
         .nav-btn:hover { transform: translateY(-3px); filter: brightness(1.05); }
         .nav-btn:active { box-shadow: inset 6px 6px 12px var(--shadow-dark-day), inset -6px -6px 12px var(--shadow-light-day); transform: translateY(0); }
@@ -475,7 +476,7 @@
         body.theme-glass.dark-mode #memoryModal .editor-btn,
         body.theme-glass.dark-mode .management-controls,
         body.theme-glass.dark-mode #returnConfirmationToast {
-            background: rgba(40, 52, 79, 0.25);
+            background: rgba(30, 30, 30, 0.35);
             border-color: rgba(255, 255, 255, 0.18);
         }
 
@@ -500,7 +501,7 @@
         body.theme-glass.dark-mode .toggle-section,
         body.theme-glass.dark-mode #file-list-container,
         body.theme-glass.dark-mode .color-input-wrapper {
-            background: rgba(40, 52, 79, 0.15);
+            background: rgba(20, 20, 20, 0.25);
             border-color: rgba(255, 255, 255, 0.1);
         }
 
@@ -509,7 +510,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
         body.theme-glass.dark-mode .modal-button {
-            background: rgba(40, 52, 79, 0.4);
+             background: rgba(40, 40, 40, 0.5);
         }
 
         body.theme-glass .nav-btn:active,
@@ -526,8 +527,8 @@
             border: 1px solid rgba(255, 255, 255, 0.7);
         }
         body.theme-glass.dark-mode .segmented-control .slider-indicator {
-            background: rgba(99, 179, 237, 0.3);
-            border-color: rgba(99, 179, 237, 0.5);
+             background: rgba(200, 200, 200, 0.3);
+             border-color: rgba(255, 255, 255, 0.2);
         }
 
         body.theme-glass:not(.dark-mode) .category-pill.active {
@@ -606,13 +607,13 @@
                             <summary>☁️ 数据同步</summary>
                             <div class="details-content">
                                 <p><strong>配置同步</strong>: 此功能用于设置您的私有GitHub仓库信息，是整个应用数据同步的核心。配置完成后，所有更改都将自动保存至云端。</p>
-                                <p><strong>手动同步与修复</strong>: 在“数据同步”弹窗内，提供了一个手动同步按钮。此功能会强制从云端获取最新的配置文件，并与应用内置的最新模板进行对比。如果您的配置文件因版本更新而缺少了某些新功能的设置项，此功能会自动为您补全，确保应用正常运行。</p>
                                 <div class="important-note"><p><strong>新增智能迁移</strong>：该功能现在可以自动识别并修复旧版本（无分类功能）的配置文件，将其无缝升级为最新格式。</p></div>
                                 <p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p>
                                 <ul><li><strong>🟢 绿点</strong>: <code>已同步</code> - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: <code>同步中</code> - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: <code>同步失败</code> - 发生错误，请点击图标查看失败原因。</li></ul>
+                                <p><strong>手动同步与修复</strong>: 在“数据同步”弹窗内，提供了一个手动同步按钮。此功能会强制从云端获取最新的配置文件，并与应用内置的最新模板进行对比。如果您的配置文件因版本更新而缺少了某些新功能的设置项，此功能会自动为您补全，确保应用正常运行。</p>
                             </div>
                         </details>
-                        <details open>
+                        <details>
                             <summary>📱 项目与分类管理</summary>
                             <div class="details-content">
                                 <p><strong>分类导航</strong>: 您可以左右滑动顶部的分类导航栏来切换不同的项目分类。此导航栏可在“管理项目”中通过“分页展示”开关控制其显示或隐藏。</p>
@@ -705,7 +706,7 @@
     </div>
     <div class="modal-overlay" id="syncErrorModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>⚠️ 同步失败</span></div><button class="close-btn" data-modal-id="syncErrorModal">&times;</button></div><div class="modal-body"><p>无法连接到云端。请检查您的网络连接或GitHub配置。</p><p><strong>失败原因:</strong></p><div id="sync-error-message"></div></div></div></div>
     <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span id="addNavModalTitle">管理项目</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入按钮管理模式</button><div class="toggle-section" style="margin-top: 10px;"><span>分页展示</span><label class="toggle-switch"><input type="checkbox" id="paginationToggle"><span class="slider"></span></label></div><div class="segmented-control two-segments"><input type="radio" id="type-link" name="nav-type" value="link" checked hidden><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload" hidden><label for="type-upload">上传项目</label><div class="slider-indicator"></div></div><div class="form-section"><label for="newButtonCategoryInput">分类名称</label><input type="text" id="newButtonCategoryInput" class="modal-input" placeholder="选择或创建分类" list="category-datalist"><datalist id="category-datalist"></datalist></div><div id="category-management-section" style="display: none;"><button id="deleteCategoryBtn" class="modal-button" style="color:#e53e3e;">删除当前分类</button></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section"><div class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div class="toggle-section" style="margin-top: 10px;"><span>在新标签页中打开</span><label class="toggle-switch"><input type="checkbox" id="openExternallyToggle"><span class="slider"></span></label></div></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div><div class="important-note" style="font-size: 13px; padding: 8px 12px; margin-top: 5px;"><p>上传的项目无法编辑链接，如需更新请删除后重新上传。</p></div></div><button id="createNavBtn" class="modal-button">加入新项目</button><div class="status-text" id="upload-status"></div></div></div></div>
-    <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据同步</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="manualSyncBtn" class="modal-button" style="color:#5a6778;">手动同步与修复</button><button id="saveSettingsBtn" class="modal-button">保存配置</button><div class="nuke-section"><button id="nukeDataBtn" class="modal-button">清空所有云端及本地数据</button></div></div></div></div>
+    <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据同步</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button><div class="form-section" style="margin-top:15px; border-top: 1px solid rgba(128,128,128,0.3); padding-top: 15px;"><button id="manualSyncBtn" class="modal-button" style="color:#5a6778;">手动同步与修复</button><span id="manual-sync-status" class="status-text" style="min-height: 20px; padding-top: 5px;"></span></div><div class="nuke-section"><button id="nukeDataBtn" class="modal-button">清空所有云端及本地数据</button></div></div></div></div>
     <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body">
         <div class="theme-style-selector">
             <label>主题风格</label>
@@ -864,8 +865,8 @@
                                 <div id="uploadProgressBar" class="progress-bar"></div>
                             </div>
                         </div>
-                        <div id="file-list-container" style="margin-top:0;">
-                            <ul id="fileList"></ul>
+                        <div id="file-list-container" style="margin-top:0; min-height: 100px; display: block; width: 100%; flex-grow:0;">
+                            <ul id="fileList" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 5px;"></ul>
                             <div id="fileListStatus" class="file-list-status">请选择一个分类</div>
                         </div>
                     </div>
@@ -915,7 +916,7 @@
         </div>
         <div class="viewer-content">
             <button data-action="prev-photo" id="prev-photo-btn" class="viewer-btn nav-arrow">&#10094;</button>
-            <div id="viewer-img-container"><img id="viewer-img" src="" alt="Photo view"></div>
+            <div id="viewer-img-container"><img id="viewer-img" src="" alt="渲染中..."></div>
             <button data-action="next-photo" id="next-photo-btn" class="viewer-btn nav-arrow">&#10095;</button>
         </div>
         <div class="viewer-footer">
@@ -932,7 +933,7 @@
         </div>
         <div class="wander-main-content">
             <div class="wander-photo-container" id="wander-photo-container">
-                <img id="wander-img" src="" alt="Wander view">
+                <img id="wander-img" src="" alt="渲染中...">
                 <div class="wander-info-container">
                     <h3 id="wander-title"></h3>
                     <p id="wander-description"></p>
@@ -1448,10 +1449,16 @@
         const neumorphismSettings = document.getElementById('neumorphism-settings');
         if (styleName === 'glass') {
             document.body.classList.add('theme-glass');
+            document.body.classList.contains('dark-mode')
+                ? document.documentElement.style.setProperty('--shadow-dark-night', 'rgba(0, 0, 0, 0.1)')
+                : document.documentElement.style.setProperty('--shadow-dark-day', 'rgba(0, 0, 0, 0.1)');
+
             neumorphismSettings.classList.add('hidden');
             document.getElementById('theme-style-glass').checked = true;
         } else {
             document.body.classList.remove('theme-glass');
+            document.documentElement.style.setProperty('--shadow-dark-night', 'rgba(0, 0, 0, 0.3)');
+            document.documentElement.style.setProperty('--shadow-dark-day', 'rgba(174, 190, 212, 0.4)');
             neumorphismSettings.classList.remove('hidden');
             document.getElementById('theme-style-neumorphism').checked = true;
         }
@@ -1510,7 +1517,7 @@
         document.getElementById('nightTitleCardBgStatus').textContent = localStorage.getItem('nightTitleCardBgImageName') || '未设置';
     }
     
-    const settingsModalElements = { githubRepoInput: document.getElementById("githubRepoInput"), githubTokenInput: document.getElementById("githubTokenInput"), saveSettingsBtn: document.getElementById("saveSettingsBtn"), manualSyncBtn: document.getElementById('manualSyncBtn') };
+    const settingsModalElements = { githubRepoInput: document.getElementById("githubRepoInput"), githubTokenInput: document.getElementById("githubTokenInput"), saveSettingsBtn: document.getElementById("saveSettingsBtn"), manualSyncBtn: document.getElementById('manualSyncBtn'), manualSyncStatus: document.getElementById('manual-sync-status') };
     function setupModals(){document.querySelectorAll(".close-btn").forEach(e=>e.addEventListener("click",()=>{document.getElementById(e.dataset.modalId).classList.remove("show")})),document.querySelectorAll(".modal-overlay").forEach(e=>e.addEventListener("click",t=>e===t.target&&e.classList.remove("show"))),document.getElementById("helpBtn").addEventListener("click",()=>{document.getElementById("helpModal").classList.add("show"),toggleFabMenu(!1);localStorage.setItem('lastSeenVersion', CURRENT_APP_VERSION);document.getElementById('helpBtn').classList.remove('has-update');}),document.getElementById("dataSyncBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(settingsModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),settingsModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("addNavBtn").addEventListener("click",()=>{openAddModal(); toggleFabMenu(false);}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); })}
     function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){const e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e=!0){return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据同步)"),!1):!0}
     
@@ -1579,6 +1586,62 @@
     }
 
 
+    settingsModalElements.manualSyncBtn.addEventListener("click", async () => {
+        if (!checkConfig(true)) return;
+        const btn = settingsModalElements.manualSyncBtn;
+        const statusEl = settingsModalElements.manualSyncStatus;
+
+        btn.disabled = true;
+        btn.textContent = "同步中...";
+        statusEl.textContent = '正在从云端拉取配置文件...';
+
+        try {
+            let fetchedConfig = await fetchConfigFromGithub();
+            statusEl.textContent = '云端配置已获取，正在解析与合并...';
+
+            const defaultConfig = getDefaultConfig();
+            let needsSave = false;
+            let wasMigrated = false;
+            
+            if (fetchedConfig) {
+                 const migrationResult = migrateLegacyConfig(fetchedConfig);
+                 fetchedConfig = migrationResult.migratedConfig;
+                 wasMigrated = migrationResult.wasMigrated;
+                 if (wasMigrated) statusEl.textContent = '检测到旧版配置，正在执行迁移...';
+
+                 const mergedConfig = mergeDeep({}, defaultConfig, fetchedConfig);
+                 if (JSON.stringify(mergedConfig) !== JSON.stringify(fetchedConfig) || wasMigrated) {
+                     currentConfig = mergedConfig;
+                     needsSave = true;
+                     statusEl.textContent = '配置文件已更新/迁移，准备写回云端...';
+                 } else {
+                     statusEl.textContent = '配置文件已是最新，无需操作。';
+                 }
+            } else {
+                 statusEl.textContent = '云端无配置文件，将创建新的默认配置。';
+                 currentConfig = defaultConfig;
+                 configSha = null;
+                 needsSave = true;
+            }
+            
+            if (needsSave) {
+                 await saveGlobalConfig(wasMigrated ? 'Manual sync: Migrated legacy config' : 'Manual sync and repair');
+                 statusEl.textContent = '同步与修复完成！页面将刷新。';
+                 alert("同步与修复完成！页面将刷新以应用最新配置。");
+                 location.reload();
+            } else {
+                 alert("配置已是最新，无需修复。");
+            }
+        } catch (e) {
+            statusEl.textContent = `操作失败: ${e.message}`;
+            alert(`手动同步失败: ${e.message}`);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "手动同步与修复";
+            setTimeout(() => { statusEl.textContent = ''; }, 5000);
+        }
+    });
+
     async function loadInitialData() { 
         navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>'; 
         let fetchedConfig = await fetchConfigFromGithub(); 
@@ -1629,26 +1692,33 @@
     }
     
     function renderCategories() {
-        const navContainer = document.getElementById('categoryNavContainer');
-        if (!currentConfig.settings || currentConfig.settings.paginationEnabled === undefined) {
-            currentConfig.settings = { ...currentConfig.settings, paginationEnabled: true };
+        const navContainerEl = document.getElementById('categoryNavContainer');
+        if (!currentConfig.settings) {
+            currentConfig.settings = { paginationEnabled: true };
         }
-        navContainer.style.display = currentConfig.settings.paginationEnabled ? 'block' : 'none';
+        const paginationEnabled = currentConfig.settings.paginationEnabled !== false; // Default to true
+        navContainerEl.style.display = paginationEnabled ? 'block' : 'none';
         
         const categoryNav = document.getElementById('categoryNav');
         categoryNav.innerHTML = '';
-        currentConfig.categories.forEach(cat => {
-            const pill = document.createElement('button');
-            pill.className = 'category-pill';
-            pill.textContent = cat.name;
-            pill.dataset.category = cat.name;
-            if (cat.name === currentCategory) {
-                pill.classList.add('active');
-            }
-            categoryNav.appendChild(pill);
-        });
-        renderButtonsForCategory(currentCategory);
+
+        if(paginationEnabled) {
+            currentConfig.categories.forEach(cat => {
+                const pill = document.createElement('button');
+                pill.className = 'category-pill';
+                pill.textContent = cat.name;
+                pill.dataset.category = cat.name;
+                if (cat.name === currentCategory) {
+                    pill.classList.add('active');
+                }
+                categoryNav.appendChild(pill);
+            });
+        }
+        
+        const categoryToRender = paginationEnabled ? currentCategory : '全部';
+        renderButtonsForCategory(categoryToRender);
     }
+
     document.getElementById('categoryNav').addEventListener('click', (e) => {
         if (e.target.classList.contains('category-pill')) {
             const categoryName = e.target.dataset.category;
@@ -1663,6 +1733,11 @@
     function renderButtonsForCategory(categoryName) {
         navContainer.innerHTML = '';
         let buttons = [];
+
+        if (currentConfig.settings.paginationEnabled === false) {
+             categoryName = '全部';
+        }
+        
         if (categoryName === '全部') {
             const allButtons = new Map();
             currentConfig.categories.forEach(cat => {
@@ -1688,56 +1763,12 @@
     async function deleteGithubFolder(folderPath) { if (!checkConfig(true)) return false; const contentsUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${folderPath}`; try { const contentsResponse = await fetch(contentsUrl, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, cache: 'no-cache' }); if (contentsResponse.status === 404) { console.log(`Folder "${folderPath}" not found, nothing to delete.`); return true; } if (!contentsResponse.ok) throw new Error(`Could not list folder: ${contentsResponse.statusText}`); const files = await contentsResponse.json(); for (const file of files) { await deleteFromGithub(file.path, `Recursive delete: ${file.path}`, file.sha); } return true; } catch (error) { console.error(`Failed to delete folder "${folderPath}":`, error); return false; } }
     
     settingsModalElements.saveSettingsBtn.addEventListener("click",async()=>{const[e,t]=settingsModalElements.githubRepoInput.value.trim().split("/").map(e=>e.trim()),n=settingsModalElements.githubTokenInput.value.trim();if(e&&t&&n){saveGithubConfig({owner:e,repo:t,token:n,branch:"main"}),alert("配置已保存！正在刷新..."),document.getElementById("settingsModal").classList.remove("show"), location.reload() }else{alert("请填写完整信息。")}});
-    settingsModalElements.manualSyncBtn.addEventListener("click", async () => {
-        if (!checkConfig(true)) return;
-        const btn = settingsModalElements.manualSyncBtn;
-        btn.disabled = true;
-        btn.textContent = "同步中...";
-        try {
-            let fetchedConfig = await fetchConfigFromGithub();
-            const defaultConfig = getDefaultConfig();
-            let needsSave = false;
-            let wasMigrated = false;
-            
-            if (fetchedConfig) {
-                 const migrationResult = migrateLegacyConfig(fetchedConfig);
-                 fetchedConfig = migrationResult.migratedConfig;
-                 wasMigrated = migrationResult.wasMigrated;
-
-                 const mergedConfig = mergeDeep({}, defaultConfig, fetchedConfig);
-                 if (JSON.stringify(mergedConfig) !== JSON.stringify(fetchedConfig) || wasMigrated) {
-                     currentConfig = mergedConfig;
-                     needsSave = true;
-                     console.log("Config updated with new fields or migrated.");
-                 } else {
-                     console.log("Config is up to date.");
-                 }
-            } else {
-                 console.log("No remote config found, creating one.");
-                 currentConfig = defaultConfig;
-                 configSha = null;
-                 needsSave = true;
-            }
-            
-            if (needsSave) {
-                 await saveGlobalConfig(wasMigrated ? 'Manual sync: Migrated legacy config' : 'Manual sync and repair');
-                 alert("同步与修复完成！页面将刷新以应用最新配置。");
-                 location.reload();
-            } else {
-                 alert("配置已是最新，无需修复。");
-            }
-        } catch (e) {
-            alert(`手动同步失败: ${e.message}`);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = "手动同步与修复";
-        }
-    });
 
     const addNavModalElements={modal: document.getElementById('addNavModal'), title: document.getElementById('addNavModalTitle'), typeLinkRadio:document.getElementById("type-link"),typeUploadRadio:document.getElementById("type-upload"),linkSection:document.getElementById("link-section"),uploadSection:document.getElementById("upload-section"),categoryInput:document.getElementById("newButtonCategoryInput"),nameInput:document.getElementById("newButtonNameInput"),urlInput:document.getElementById("newButtonUrlInput"),openExternallyToggle:document.getElementById("openExternallyToggle"),filePickerBtn:document.getElementById("filePickerBtn"),projectHtmlPicker:document.getElementById("projectHtmlPicker"),fileStatus:document.getElementById("file-picker-status"),createBtn:document.getElementById("createNavBtn"),uploadStatus:document.getElementById("upload-status"),stayOpenToggle:document.getElementById("stayOpenToggle"), paginationToggle: document.getElementById('paginationToggle'), categoryMgmtSection: document.getElementById('category-management-section'), deleteCategoryBtn: document.getElementById('deleteCategoryBtn')};
     
     function updateAddNavModalUI() {
-        addNavModalElements.paginationToggle.checked = currentConfig.settings.paginationEnabled;
+        const paginationEnabled = currentConfig.settings.paginationEnabled !== false;
+        addNavModalElements.paginationToggle.checked = paginationEnabled;
         const selectedCategory = addNavModalElements.categoryInput.value.trim();
         const showDeleteBtn = selectedCategory && selectedCategory !== '全部' && currentConfig.categories.some(c => c.name === selectedCategory);
         addNavModalElements.categoryMgmtSection.style.display = showDeleteBtn ? 'block' : 'none';
@@ -2575,20 +2606,149 @@
 
         let viewerTouchStartX = 0;
         let viewerTouchEndX = 0;
-        ui.photoViewer.querySelector('#viewer-img-container').addEventListener('touchstart', e => {
+        const viewerImgContainer = ui.photoViewer.querySelector('#viewer-img-container');
+        viewerImgContainer.addEventListener('touchstart', e => {
             viewerTouchStartX = e.changedTouches[0].screenX;
         }, { passive: true });
-        ui.photoViewer.querySelector('#viewer-img-container').addEventListener('touchend', e => {
+        viewerImgContainer.addEventListener('touchend', e => {
             viewerTouchEndX = e.changedTouches[0].screenX;
             const swipeDiff = viewerTouchEndX - viewerTouchStartX;
             if (Math.abs(swipeDiff) > 50) {
-                changePhoto(swipeDiff < 0 ? 1 : -1);
+                 if (swipeDiff < 0) {
+                    if(document.getElementById('next-photo-btn').style.display !== 'none') changePhoto(1);
+                 } else {
+                    if(document.getElementById('prev-photo-btn').style.display !== 'none') changePhoto(-1);
+                 }
             }
         });
         
-        function populateDriveSelector(){const e=ui.buttonSelector.value;ui.buttonSelector.innerHTML="";currentConfig.categories.forEach(t=>{const n=t.name,o=document.createElement("option");o.value=o.textContent=n,ui.buttonSelector.appendChild(o)}),Array.from(ui.buttonSelector.options).some(t=>t.value===e)&&(ui.buttonSelector.value=e)}
-        async function fetchFilesForSelectedCategory(){const e=ui.buttonSelector.value;if(ui.fileList.innerHTML="",ui.fileListStatus.style.display="flex",!e)return void(ui.fileListStatus.textContent="请选择一个分类");if(!checkConfig(!1))return void(ui.fileListStatus.innerHTML="尚未配置GitHub信息<br>请点击 ☁️ 进行配置");ui.fileListStatus.textContent="正在加载...";const t=`data_sync/${e}`; const { data: o, error: n } = await fetchFromGithub(t); if (n) { ui.fileListStatus.textContent = await handleApiError("获取文件列表", new Error(n)); return; } if (!o || 0 === o.length) { ui.fileListStatus.textContent = "该分类下暂无文件"; return; } const l = await Promise.all(o.map(async e=>({...e,commitDate:await getLatestCommitDate(e.path)}))); l.sort((e,t)=>new Date(t.commitDate)-new Date(e.commitDate)),ui.fileList.innerHTML="",ui.fileListStatus.style.display="none",l.forEach(e=>{const t=document.createElement("li"),n=document.createElement("div");n.className="file-info",n.dataset.filePath=e.path,n.dataset.fileName=e.name;const o=document.createElement("span");o.className="file-name",o.textContent=e.name;const l=document.createElement("span");l.className="file-timestamp",l.textContent=(new Date(e.commitDate)).toLocaleString("zh-CN",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}),n.append(o,l);const a=document.createElement("button");a.className="delete-btn",a.innerHTML="&times;",a.title="删除文件",t.append(n,a),ui.fileList.appendChild(t),n.addEventListener("click",t=>forceDownload(t.currentTarget.dataset.filePath,t.currentTarget.dataset.fileName,n)),a.addEventListener("click",()=>deleteFile(e.path,e.sha,t))})}
-        async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";try{ const success = await deleteFromGithub(e, `Delete file: ${e}`, t); if (success) { n.remove(); if(ui.fileList.children.length === 0) { ui.fileListStatus.textContent = '该分类下暂无文件'; ui.fileListStatus.style.display = 'block'; } } else { n.style.opacity = "1"; } } catch(err) { n.style.opacity = "1"; }}
+        function populateDriveSelector() {
+            const buttonSelector = ui.buttonSelector;
+            const savedValue = buttonSelector.value;
+            buttonSelector.innerHTML = '';
+
+            const btnMap = new Map();
+            currentConfig.categories.forEach(cat => {
+                if (cat.name === '全部') return;
+                cat.buttons.forEach(btn => {
+                    if (!btnMap.has(btn.href)) {
+                        btnMap.set(btn.href, { ...btn, category: cat.name });
+                    }
+                });
+            });
+
+            const categorizedButtons = new Map();
+            btnMap.forEach((btn, href) => {
+                if (!categorizedButtons.has(btn.category)) {
+                    categorizedButtons.set(btn.category, []);
+                }
+                categorizedButtons.get(btn.category).push(btn);
+            });
+            
+            const defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.textContent = "选择按钮...";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            buttonSelector.appendChild(defaultOption);
+
+            categorizedButtons.forEach((buttons, category) => {
+                const optgroup = document.createElement("optgroup");
+                optgroup.label = category;
+                buttons.forEach(btn => {
+                    const option = document.createElement("option");
+                    option.value = btn.href;
+                    option.textContent = btn.text;
+                    optgroup.appendChild(option);
+                });
+                buttonSelector.appendChild(optgroup);
+            });
+            buttonSelector.value = savedValue || "";
+        }
+
+        async function fetchFilesForSelectedCategory(){
+            const selectedButtonHref = ui.buttonSelector.value;
+
+            ui.fileList.innerHTML = "";
+            ui.fileListStatus.style.display = "flex";
+
+            if (!selectedButtonHref) {
+                ui.fileListStatus.textContent = "请选择一个按钮";
+                return;
+            }
+            if (!checkConfig(false)) {
+                ui.fileListStatus.innerHTML = "尚未配置GitHub信息<br>请点击 ☁️ 进行配置";
+                return;
+            }
+
+            const buttonConfig = findButtonConfigByHref(selectedButtonHref);
+            if (!buttonConfig || !buttonConfig.href.includes('raw.githack.com')) {
+                ui.fileListStatus.textContent = "此按钮不支持文件夹功能";
+                return;
+            }
+
+            ui.fileListStatus.textContent = "正在加载...";
+            
+            const urlParts = buttonConfig.href.split('/');
+            const projectFolder = urlParts.slice(5, -1).join('/');
+            const path = projectFolder;
+
+            const { data: files, error } = await fetchFromGithub(path);
+
+            if (error) {
+                ui.fileListStatus.textContent = await handleApiError("获取文件列表", new Error(error));
+                return;
+            }
+            if (!files || files.length === 0 || (files.length === 1 && files[0].name === 'index.html')) {
+                ui.fileListStatus.textContent = "该按钮内暂无文件";
+                return;
+            }
+            
+            const displayFiles = files.filter(f => f.name !== 'index.html');
+            const fileDetails = await Promise.all(displayFiles.map(async file => ({
+                ...file,
+                commitDate: await getLatestCommitDate(file.path)
+            })));
+            
+            fileDetails.sort((a,b) => new Date(b.commitDate) - new Date(a.commitDate));
+
+            ui.fileList.innerHTML = "";
+            ui.fileListStatus.style.display = "none";
+            fileDetails.forEach(file => {
+                const li = document.createElement('li');
+                li.style.cssText = `flex-direction: column; align-items: start; background: var(--bg-day-element); box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day); padding: 10px; width: 120px; text-align: center;`;
+                if(document.body.classList.contains('dark-mode')){
+                    li.style.boxShadow = `4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night)`;
+                }
+
+                const fileInfo = document.createElement('div');
+                fileInfo.className = "file-info";
+                fileInfo.dataset.filePath = file.path;
+                fileInfo.dataset.fileName = file.name;
+
+                const fileName = document.createElement("span");
+                fileName.className = "file-name";
+                fileName.textContent = file.name;
+                fileName.style.textAlign = 'center';
+                fileName.style.width = '100%';
+
+                fileInfo.append(fileName);
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "delete-btn";
+                deleteBtn.innerHTML = "&times;";
+                deleteBtn.title = "删除文件";
+                deleteBtn.style.position = 'absolute';
+                deleteBtn.style.top = '-5px';
+                deleteBtn.style.right = '-5px';
+
+                li.append(fileInfo, deleteBtn);
+                ui.fileList.appendChild(li);
+
+                fileInfo.addEventListener("click", ev => forceDownload(ev.currentTarget.dataset.filePath, ev.currentTarget.dataset.fileName, fileInfo));
+                deleteBtn.addEventListener("click", () => deleteFile(file.path, file.sha, li));
+            });
+        }
+        async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";try{ const success = await deleteFromGithub(e, `Delete file: ${e}`, t); if (success) { n.remove(); if(ui.fileList.children.length === 0) { ui.fileListStatus.textContent = '该文件夹下暂无文件'; ui.fileListStatus.style.display = 'block'; } } else { n.style.opacity = "1"; } } catch(err) { n.style.opacity = "1"; }}
         async function forceDownload(path, filename, el) {
             const fileNameSpan = el.querySelector(".file-name");
             const originalText = fileNameSpan.textContent;
@@ -2605,7 +2765,7 @@
                 xhr.onprogress = (event) => {
                     if (event.lengthComputable) {
                         const percentComplete = Math.round((event.loaded / event.total) * 100);
-                        fileNameSpan.textContent = `正在下载... ${percentComplete}%`;
+                        fileNameSpan.textContent = `下载中... ${percentComplete}%`;
                     } else {
                         if (fileNameSpan.textContent.indexOf('正在下载') === -1) {
                             fileNameSpan.textContent = '正在下载...';
@@ -2654,7 +2814,43 @@
                 el.style.pointerEvents = "auto";
             }
         }
-        async function uploadFile() { if (activeUploadXHR) { activeUploadXHR.abort(); return; } if (!checkConfig()) return; const category = ui.buttonSelector.value; const file = ui.fileUploader.files[0]; let fileName = ui.fileNameInput.value.trim() || (file && file.name); if (!category || !file || !fileName) { return alert("请选择分类、文件，并确保文件名不为空。"); } ui.uploadBtn.disabled = true; ui.uploadBtn.textContent = "上传中 (0%)..."; ui.progressContainer.style.display = 'block'; ui.progressBar.style.width = '0%'; try { const path = `data_sync/${category}/${fileName}`; await uploadFileViaGitData({ file, path, commitMessage: `Upload ${fileName}`, onProgress: (percent) => { ui.progressBar.style.width = `${percent}%`; if (percent < 100) { ui.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; } else { ui.uploadBtn.textContent = '正在处理...'; } } }); alert("上传成功！"); ui.fileUploader.value = ""; ui.fileNameInput.value = ""; ui.selectedFileName.textContent = '未选择任何文件'; fetchFilesForSelectedCategory(); } catch (error) { if (error.message !== "上传已取消。") alert(await handleApiError(`上传文件 ${fileName}`, error)); } finally { ui.uploadBtn.disabled = false; ui.uploadBtn.textContent = "上传文件"; ui.progressContainer.style.display = 'none'; } }
+        async function uploadFile() { 
+            if (activeUploadXHR) { activeUploadXHR.abort(); return; } 
+            if (!checkConfig()) return; 
+            const selectedButtonHref = ui.buttonSelector.value;
+            const file = ui.fileUploader.files[0]; 
+            let fileName = ui.fileNameInput.value.trim() || (file && file.name); 
+            if (!selectedButtonHref || !file || !fileName) { return alert("请选择要上传到的按钮、文件，并确保文件名不为空。"); } 
+            
+            const buttonConfig = findButtonConfigByHref(selectedButtonHref);
+            if (!buttonConfig || !buttonConfig.href.includes('raw.githack.com')) {
+                return alert("此按钮不支持文件夹功能。");
+            }
+            
+            const urlParts = buttonConfig.href.split('/');
+            const projectFolder = urlParts.slice(5, -1).join('/');
+
+            ui.uploadBtn.disabled = true; 
+            ui.uploadBtn.textContent = "上传中 (0%)..."; 
+            ui.progressContainer.style.display = 'block'; 
+            ui.progressBar.style.width = '0%'; 
+            
+            try { 
+                const path = `${projectFolder}/${fileName}`;
+                await uploadFileViaGitData({ file, path, commitMessage: `Upload ${fileName} to ${buttonConfig.text}`, onProgress: (percent) => { ui.progressBar.style.width = `${percent}%`; if (percent < 100) { ui.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; } else { ui.uploadBtn.textContent = '正在处理...'; } } }); 
+                alert("上传成功！"); 
+                ui.fileUploader.value = ""; 
+                ui.fileNameInput.value = ""; 
+                ui.selectedFileName.textContent = '未选择任何文件'; 
+                fetchFilesForSelectedCategory(); 
+            } catch (error) { 
+                if (error.message !== "上传已取消。") alert(await handleApiError(`上传文件 ${fileName}`, error)); 
+            } finally { 
+                ui.uploadBtn.disabled = false; 
+                ui.uploadBtn.textContent = "上传文件"; 
+                ui.progressContainer.style.display = 'none'; 
+            } 
+        }
 
         return {
             open: () => {
@@ -2819,8 +3015,13 @@
                 description = item.description;
             }
             
+            // Show "Rendering..." text while loading
+            ui.img.src = ""; // Clear previous image
+            ui.img.alt = "渲染中...";
+
             const photoUrl = await getSecureFileUrl(photo.path);
             ui.img.src = photoUrl;
+            ui.img.alt = title || description || "Wander view image"; // Set proper alt text
             ui.photoContainer.style.setProperty('--blur-bg', `url(${photoUrl})`);
             ui.title.textContent = title || '';
             ui.description.textContent = description || '';
@@ -2855,13 +3056,19 @@
         
         function initGestures() {
             let startX = 0;
-            ui.overlay.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
-            ui.overlay.addEventListener('touchend', e => {
-                let endX = e.changedTouches[0].clientX;
-                if (Math.abs(startX - endX) < 50) return;
-                if (e.target.closest('.wander-music-player')) return;
-                if (ui.photoContainer.classList.contains('fullscreen') && state.items[state.currentIndex].type !== 'photoset') return;
-                changePhoto(startX > endX ? 1 : -1);
+            ui.photoContainer.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+            ui.photoContainer.addEventListener('touchend', e => {
+                const endX = e.changedTouches[0].clientX;
+                const swipeDiff = endX - startX;
+                if (Math.abs(swipeDiff) < 50) return;
+                
+                if (ui.photoContainer.classList.contains('fullscreen') && state.items[state.currentIndex].type !== 'photoset') {
+                    // Normal fullscreen swipe
+                    changePhoto(swipeDiff > 0 ? -1 : 1);
+                } else {
+                    // Photoset or non-fullscreen swipe
+                    changePhoto(swipeDiff > 0 ? -1 : 1);
+                }
             }, { passive: true });
         }
 
