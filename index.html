@@ -1450,18 +1450,29 @@
                 const initialTop = winEl.offsetTop;
 
                 const onDragMove = (moveEvent) => {
+                    // 获取当前指针位置
                     const moveClientX = isTouchEvent ? moveEvent.touches[0].clientX : moveEvent.clientX;
                     const moveClientY = isTouchEvent ? moveEvent.touches[0].clientY : moveEvent.clientY;
                     
+                    // 计算窗口的理论新位置
                     let newX = initialLeft + (moveClientX - startClientX);
                     let newY = initialTop + (moveClientY - startClientY);
                     
-                    newX = Math.max(0, Math.min(newX, window.innerWidth - winEl.offsetWidth));
-                    newY = Math.max(0, Math.min(newY, window.innerHeight - winEl.offsetHeight));
+                    // 获取当前可靠的视窗边界
+                    const boundaryX = document.documentElement.clientWidth - winEl.offsetWidth;
+                    const boundaryY = document.documentElement.clientHeight - winEl.offsetHeight;
+
+                    // 确保窗口不会超出边界
+                    // newX 不能小于0，也不能大于 (屏幕宽度 - 窗口宽度)
+                    newX = Math.max(0, Math.min(newX, boundaryX));
+                    // newY 不能小于0，也不能大于 (屏幕高度 - 窗口高度)
+                    newY = Math.max(0, Math.min(newY, boundaryY));
                     
+                    // 应用最终计算出的安全位置
                     winEl.style.left = `${newX}px`;
                     winEl.style.top = `${newY}px`;
                 };
+
 
                 const onDragEnd = () => {
                     if (isTouchEvent) {
