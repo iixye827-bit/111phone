@@ -541,7 +541,7 @@
              background: rgba(30, 30, 30, 0.4);
         }
 
-        body.theme-glass .nav-btn:active,
+                body.theme-glass .nav-btn:active,
         body.theme-glass .modal-button:active,
         body.theme-glass .fab-main:active,
         body.theme-glass .fab-drawer-item:active {
@@ -560,7 +560,7 @@
         }
         /* ===== [END] FROSTED GLASS THEME ===== */
 
-        /* ===== [START] FLOATING JELLYFISH BALL STYLES (REVISED) ===== */
+        /* ===== [START] FLOATING JELLYFISH BALL STYLES (MODIFIED) ===== */
         @keyframes jelly-glow {
             0% { filter: drop-shadow(0 0 2px rgba(91, 153, 226, 0.7)); }
             50% { filter: drop-shadow(0 0 8px rgba(91, 153, 226, 1)); }
@@ -583,7 +583,7 @@
             user-select: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: opacity 0.3s ease, transform 0.3s ease, left 0.2s ease-out, top 0.2s ease-out;
             animation: jelly-glow 2.5s infinite ease-in-out;
         }
         body.dark-mode #floating-jellyfish-ball {
@@ -632,7 +632,7 @@
             pointer-events: none;
         }
         #floating-jellyfish-ball.menu-open .jelly-menu-btn {
-            transform: var(--transform-end); /* This will be set by JS */
+            transform: var(--transform-end);
             opacity: 1;
             pointer-events: auto;
         }
@@ -641,6 +641,109 @@
             filter: brightness(1.1);
         }
         /* ===== [END] FLOATING JELLYFISH BALL STYLES ===== */
+
+        /* ===== [START] FLOATING PROJECT WINDOW STYLES ===== */
+        .floating-project-window {
+            position: fixed;
+            z-index: 2010;
+            width: 350px;
+            height: 500px;
+            background: var(--bg-day-element);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            resize: both;
+            min-width: 250px;
+            min-height: 300px;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: scale(0.9);
+            opacity: 0;
+        }
+        .floating-project-window.visible {
+            transform: scale(1);
+            opacity: 1;
+        }
+        body.dark-mode .floating-project-window {
+            background: var(--bg-night-element);
+        }
+        body.theme-glass .floating-project-window {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+        body.theme-glass.dark-mode .floating-project-window {
+            background: rgba(20, 20, 20, 0.25);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .fpw-header {
+            flex-shrink: 0;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: grab;
+            user-select: none;
+        }
+        body.dark-mode .fpw-header { background: rgba(255,255,255,0.05); }
+        .fpw-header:active { cursor: grabbing; }
+        .fpw-title {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .fpw-controls button {
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-size: 18px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            line-height: 28px;
+        }
+        .fpw-controls button:hover { background: rgba(0,0,0,0.1); }
+        .fpw-content {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+        .fpw-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .fpw-hide-handle {
+            position: fixed;
+            z-index: 2009;
+            padding: 10px 8px;
+            background: var(--bg-day-element);
+            color: var(--text-day);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+            font-size: 12px;
+            font-weight: 600;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .fpw-hide-handle.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        body.dark-mode .fpw-hide-handle { background: var(--bg-night-element); color: var(--text-night); }
+        /* ===== [END] FLOATING PROJECT WINDOW STYLES ===== */
 
     </style>
     <style id="custom-jelly-ball-styles"></style>
@@ -828,80 +931,88 @@
     <div class="modal-overlay" id="syncErrorModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>⚠️ 同步失败</span></div><button class="close-btn" data-modal-id="syncErrorModal">&times;</button></div><div class="modal-body"><p>无法连接到云端。请检查您的网络连接或GitHub配置。</p><p><strong>失败原因:</strong></p><div id="sync-error-message"></div></div></div></div>
     <div class="modal-overlay" id="addNavModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span id="addNavModalTitle">管理项目</span></div><div class="header-toggle-group"><span>连续添加</span><label class="toggle-switch"><input type="checkbox" id="stayOpenToggle"><span class="slider"></span></label></div><button class="close-btn" data-modal-id="addNavModal">&times;</button></div><div class="modal-body"><button id="enterManageModeBtn" class="modal-button" style="color:#5a6778;">进入按钮管理模式</button><div class="toggle-section" style="margin-top: 10px;"><span>分页展示</span><label class="toggle-switch"><input type="checkbox" id="paginationToggle"><span class="slider"></span></label></div><div class="segmented-control two-segments"><input type="radio" id="type-link" name="nav-type" value="link" checked hidden><label for="type-link">外部链接</label><input type="radio" id="type-upload" name="nav-type" value="upload" hidden><label for="type-upload">上传项目</label><div class="slider-indicator"></div></div><div class="form-section"><label for="newButtonCategoryInput">分类名称</label><input type="text" id="newButtonCategoryInput" class="modal-input" placeholder="选择或创建分类" list="category-datalist"><datalist id="category-datalist"></datalist></div><div id="category-management-section" style="display: none;"><button id="deleteCategoryBtn" class="modal-button" style="color:#e53e3e;">删除当前分类</button></div><div class="form-section"><label for="newButtonNameInput">按钮名称</label><input type="text" id="newButtonNameInput" class="modal-input" placeholder="例如: 我的博客"></div><div id="link-section"><div class="form-section"><label for="newButtonUrlInput">网址链接</label><input type="text" id="newButtonUrlInput" class="modal-input" placeholder="https://example.com"></div><div class="toggle-section" style="margin-top: 10px;"><span>在新标签页中打开</span><label class="toggle-switch"><input type="checkbox" id="openExternallyToggle"><span class="slider"></span></label></div></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div><div class="important-note" style="font-size: 13px; padding: 8px 12px; margin-top: 5px;"><p>上传的项目无法编辑链接，如需更新请删除后重新上传。</p></div></div><button id="createNavBtn" class="modal-button">加入新项目</button><div class="status-text" id="upload-status"></div></div></div></div>
     <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据同步</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button><button id="manualSyncBtn" class="modal-button" style="color:#5a6778; margin-top: 10px;">手动同步与修复</button><div class="nuke-section"><button id="nukeDataBtn" class="modal-button">清空所有云端及本地数据</button></div></div></div></div>
-    <div class="modal-overlay" id="colorPaletteModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>主题设置</span></div><button class="close-btn" data-modal-id="colorPaletteModal">&times;</button></div><div class="modal-body">
-        
-        <div class="toggle-section" style="border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 15px; border-radius: 12px 12px 0 0; box-shadow: none; flex-wrap: wrap; gap: 10px;">
-            <span style="flex-basis: 100%;">网页内悬浮球</span>
-            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <span>启用悬浮球</span>
-                <label class="toggle-switch"><input type="checkbox" id="jellyBallToggle"><span class="slider"></span></label>
+    <div class="modal-overlay" id="colorPaletteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-group"><span>主题设置</span></div>
+                <button class="close-btn" data-modal-id="colorPaletteModal">&times;</button>
             </div>
-            <div id="jelly-ball-options-container" style="display: none; width: 100%; flex-direction: column; gap: 10px; margin-top: 10px;">
-                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                    <span>启用左侧滑动返回</span>
-                    <label class="toggle-switch"><input type="checkbox" id="jellySwipeBackToggle"><span class="slider"></span></label>
+            <div class="modal-body">
+                
+                <div class="toggle-section" style="flex-wrap: wrap; gap: 10px;">
+                    <span style="flex-basis: 100%; font-weight: 600;">网页内悬浮球</span>
+                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                        <span>启用悬浮球</span>
+                        <label class="toggle-switch"><input type="checkbox" id="jellyBallToggle"><span class="slider"></span></label>
+                    </div>
+                </div>
+
+                <div id="jelly-ball-options-container" style="display: none; width: 100%; flex-direction: column; gap: 15px;">
+                    <div class="toggle-section">
+                        <span>启用左滑返回 (应用内网页)</span>
+                        <label class="toggle-switch"><input type="checkbox" id="jellySwipeBackToggle"><span class="slider"></span></label>
+                    </div>
+
+                    <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px;">
+                        <label style="font-size: 14px; color: #5a6778; font-weight: 600;">body.dark-mode & label { color: #c0c6cc; }自定义功能</label>
+                        <div id="jelly-function-checkboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 15px; width: 100%;"></div>
+                    </div>
+                    
+                    <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                        <label for="jellyBallCssTextarea" style="font-size: 14px; color: #5a6778; font-weight: 600;">body.dark-mode & label { color: #c0c6cc; }自定义CSS (云同步)</label>
+                        <div style="display: flex; gap: 10px; width:100%; align-items: flex-start;">
+                            <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="4" placeholder="#floating-jellyfish-ball {&#10;  background: #ff0000 !important;&#10;}" style="flex-grow: 1;"></textarea>
+                            <div id="jellyCssPreview" style="width: 52px; height: 52px; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background:var(--bg-day-element); box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day);"><div id="jellyCssPreviewBall" style="width: 42px; height: 42px; border-radius: 50%; font-size: 22px; display:flex; align-items:center; justify-content:center;">🎐</div></div>
+                        </div>
+                        <button id="applyJellyBallCssBtn" class="modal-button" style="width: 100%;">应用样式</button>
+                    </div>
+                </div>
+
+                <div class="theme-style-selector">
+                    <label style="font-weight: 600;">主题风格</label>
+                    <div class="segmented-control two-segments">
+                        <input type="radio" id="theme-style-neumorphism" name="theme-style" value="neumorphism" checked hidden>
+                        <label for="theme-style-neumorphism">全拟态</label>
+                        <input type="radio" id="theme-style-glass" name="theme-style" value="glass" hidden>
+                        <label for="theme-style-glass">磨砂玻璃</label>
+                        <div class="slider-indicator"></div>
+                    </div>
+                </div>
+                <div id="pneumorphism-settings">
+                    <div class="color-picker-grid"><div class="color-picker-group"><label>日间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="dayColor1Picker"><span class="hex-display" id="dayColor1Hex"></span></div></div><div class="color-picker-group"><label>日间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="dayColor2Picker"><span class="hex-display" id="dayColor2Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="nightColor1Picker"><span class="hex-display" id="nightColor1Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="nightColor2Picker"><span class="hex-display" id="nightColor2Hex"></span></div></div></div>
+                    <div class="preview-container"><div class="preview-box" id="dayPreview" data-label="Day"></div><div class="preview-box" id="nightPreview" data-label="Night"></div></div>
+                    <div class="preset-manager"><div class="preset-row"><input type="text" id="presetNameInput" class="modal-input" placeholder="为当前配色命名"><button id="savePresetBtn" class="modal-button save">保存</button><button id="updatePresetBtn" class="modal-button">更新</button></div><div class="preset-row"><select id="presetSelector" class="modal-select"></select><button id="deletePresetBtn" class="modal-button delete">删除</button></div></div>
+                    <div class="toggle-section"><span>每次启动时随机应用预设</span><label class="toggle-switch"><input type="checkbox" id="randomPaletteToggle"><span class="slider"></span></label></div>
+                </div>
+                <div class="background-image-manager">
+                    <div class="background-image-row">
+                        <input type="file" id="dayBgImagePicker" accept="image/*" hidden>
+                        <button id="uploadDayBgBtn" class="modal-button">导入日间背景</button>
+                        <span id="dayBgStatus" class="status"></span>
+                        <button id="clearDayBgBtn" class="modal-button delete">清除</button>
+                    </div>
+                    <div class="background-image-row">
+                        <input type="file" id="nightBgImagePicker" accept="image/*" hidden>
+                        <button id="uploadNightBgBtn" class="modal-button">导入夜间背景</button>
+                        <span id="nightBgStatus" class="status"></span>
+                        <button id="clearNightBgBtn" class="modal-button delete">清除</button>
+                    </div>
+                    <div class="background-image-row">
+                        <input type="file" id="dayTitleCardBgImagePicker" accept="image/*" hidden>
+                        <button id="uploadDayTitleCardBgBtn" class="modal-button">导入日间卡片</button>
+                        <span id="dayTitleCardBgStatus" class="status"></span>
+                        <button id="clearDayTitleCardBgBtn" class="modal-button delete">清除</button>
+                    </div>
+                    <div class="background-image-row">
+                        <input type="file" id="nightTitleCardBgImagePicker" accept="image/*" hidden>
+                        <button id="uploadNightTitleCardBgBtn" class="modal-button">导入夜间卡片</button>
+                        <span id="nightTitleCardBgStatus" class="status"></span>
+                        <button id="clearNightTitleCardBgBtn" class="modal-button delete">清除</button>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div id="jelly-ball-functions-section" style="display: none; flex-direction: column; gap: 10px; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 20px;">
-            <label style="font-size: 14px; color: #5a6778;">自定义悬浮球功能</label>
-            <div id="jelly-function-checkboxes" style="display: flex; flex-direction: column; gap: 8px;"></div>
-        </div>
-        
-        <div id="jelly-ball-custom-css-section" style="display: none; flex-direction: column; gap: 10px; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 20px;">
-            <label for="jellyBallCssTextarea" style="font-size: 14px; color: #5a6778;">自定义悬浮球CSS</label>
-            <div style="display: flex; gap: 10px; align-items: flex-start;">
-                <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="4" placeholder="#floating-jellyfish-ball {&#10;  background: #ff0000 !important;&#10;}" style="flex-grow: 1;"></textarea>
-                <iframe id="jellyCssPreview" style="width: 52px; height: 52px; border: 1px solid #ccc; border-radius: 8px; transform: scale(0.9); transform-origin: top right; flex-shrink: 0;"></iframe>
-            </div>
-            <button id="applyJellyBallCssBtn" class="modal-button">应用样式</button>
-        </div>
-
-        <div class="theme-style-selector">
-            <label>主题风格</label>
-            <div class="segmented-control two-segments">
-                <input type="radio" id="theme-style-neumorphism" name="theme-style" value="neumorphism" checked hidden>
-                <label for="theme-style-neumorphism">全拟态</label>
-                <input type="radio" id="theme-style-glass" name="theme-style" value="glass" hidden>
-                <label for="theme-style-glass">磨砂玻璃</label>
-                <div class="slider-indicator"></div>
-            </div>
-        </div>
-        <div id="pneumorphism-settings">
-            <div class="color-picker-grid"><div class="color-picker-group"><label>日间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="dayColor1Picker"><span class="hex-display" id="dayColor1Hex"></span></div></div><div class="color-picker-group"><label>日间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="dayColor2Picker"><span class="hex-display" id="dayColor2Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="nightColor1Picker"><span class="hex-display" id="nightColor1Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="nightColor2Picker"><span class="hex-display" id="nightColor2Hex"></span></div></div></div>
-            <div class="preview-container"><div class="preview-box" id="dayPreview" data-label="Day"></div><div class="preview-box" id="nightPreview" data-label="Night"></div></div>
-            <div class="preset-manager"><div class="preset-row"><input type="text" id="presetNameInput" class="modal-input" placeholder="为当前配色命名"><button id="savePresetBtn" class="modal-button save">保存</button><button id="updatePresetBtn" class="modal-button">更新</button></div><div class="preset-row"><select id="presetSelector" class="modal-select"></select><button id="deletePresetBtn" class="modal-button delete">删除</button></div></div>
-            <div class="toggle-section"><span>每次启动时随机应用预设</span><label class="toggle-switch"><input type="checkbox" id="randomPaletteToggle"><span class="slider"></span></label></div>
-        </div>
-        <!-- Background Image Manager -->
-        <div class="background-image-manager">
-            <div class="background-image-row">
-                <input type="file" id="dayBgImagePicker" accept="image/*" hidden>
-                <button id="uploadDayBgBtn" class="modal-button">导入日间背景</button>
-                <span id="dayBgStatus" class="status"></span>
-                <button id="clearDayBgBtn" class="modal-button delete">清除</button>
-            </div>
-            <div class="background-image-row">
-                <input type="file" id="nightBgImagePicker" accept="image/*" hidden>
-                <button id="uploadNightBgBtn" class="modal-button">导入夜间背景</button>
-                <span id="nightBgStatus" class="status"></span>
-                <button id="clearNightBgBtn" class="modal-button delete">清除</button>
-            </div>
-            <div class="background-image-row">
-                <input type="file" id="dayTitleCardBgImagePicker" accept="image/*" hidden>
-                <button id="uploadDayTitleCardBgBtn" class="modal-button">导入日间卡片</button>
-                <span id="dayTitleCardBgStatus" class="status"></span>
-                <button id="clearDayTitleCardBgBtn" class="modal-button delete">清除</button>
-            </div>
-            <div class="background-image-row">
-                <input type="file" id="nightTitleCardBgImagePicker" accept="image/*" hidden>
-                <button id="uploadNightTitleCardBgBtn" class="modal-button">导入夜间卡片</button>
-                <span id="nightTitleCardBgStatus" class="status"></span>
-                <button id="clearNightTitleCardBgBtn" class="modal-button delete">清除</button>
-            </div>
-        </div>
-    </div></div></div>
+    </div>
     
     <!-- ===== [START] MEMORY MODAL ===== -->
     <div class="modal-overlay" id="memoryModal">
@@ -1172,7 +1283,10 @@
         <div id="gestureCaptureZone"></div>
         <div class="swipe-hint" id="swipeHint"><div class="arrow"></div><span>从左侧向右滑动关闭</span></div>
     </div>
-
+    
+    <!-- Floating Project Windows Container -->
+    <div id="floating-projects-container"></div>
+    
        <script>
     // [JS - V12.5.0 "Cascade Select"]
     const CURRENT_APP_VERSION = '3.7.0';
@@ -1186,10 +1300,120 @@
     let currentCategory = '全部';
     let photoObserver;
 
-    const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按🌞打开工具栏 | By淡季水母', categories: [{ name: '全部', buttons: [] }], settings: { paginationEnabled: true }, themePresets: [] });
+    const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按🌞打开工具栏 | By淡季水母', categories: [{ name: '全部', buttons: [] }], settings: { paginationEnabled: true, jellyBall: { enabled: false, swipeBack: true, functions: {}, customCSS: '' } }, themePresets: [] });
     let currentConfig = getDefaultConfig();
     
-    // ===== [START] FLOATING JELLYFISH BALL LOGIC (REVISED) =====
+    // ===== [START] FLOATING PROJECT WINDOW MANAGER =====
+    const FloatingProjectWindowManager = (() => {
+        const container = document.getElementById('floating-projects-container');
+        let windows = {};
+
+        function create(id, title, url) {
+            if (windows[id]) {
+                const win = windows[id].element;
+                win.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+                win.style.transform = 'scale(1.05)';
+                setTimeout(() => win.style.transform = 'scale(1)', 200);
+                return;
+            }
+
+            const winEl = document.createElement('div');
+            winEl.className = 'floating-project-window';
+            winEl.id = `fpw-${id}`;
+            winEl.innerHTML = `
+                <div class="fpw-header">
+                    <span class="fpw-title">${title}</span>
+                    <div class="fpw-controls">
+                        <button class="fpw-hide" title="隐藏">－</button>
+                        <button class="fpw-close" title="关闭">×</button>
+                    </div>
+                </div>
+                <div class="fpw-content">
+                    <iframe src="${url}" frameborder="0" sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"></iframe>
+                </div>
+            `;
+            container.appendChild(winEl);
+
+            const handleEl = document.createElement('div');
+            handleEl.className = 'fpw-hide-handle';
+            handleEl.id = `fpw-handle-${id}`;
+            handleEl.textContent = title;
+            container.appendChild(handleEl);
+
+            windows[id] = {id, title, url, element: winEl, handle: handleEl };
+            
+            setTimeout(() => winEl.classList.add('visible'), 50);
+
+            _attachEventListeners(winEl, handleEl, id);
+        }
+
+        function _attachEventListeners(winEl, handleEl, id) {
+            const header = winEl.querySelector('.fpw-header');
+            
+            // Dragging
+            header.addEventListener('mousedown', e => {
+                let offsetX = e.clientX - winEl.offsetLeft;
+                let offsetY = e.clientY - winEl.offsetTop;
+                function onMouseMove(event) {
+                    let newX = event.clientX - offsetX;
+                    let newY = event.clientY - offsetY;
+                    newX = Math.max(0, Math.min(newX, window.innerWidth - winEl.offsetWidth));
+                    newY = Math.max(0, Math.min(newY, window.innerHeight - winEl.offsetHeight));
+                    winEl.style.left = `${newX}px`;
+                    winEl.style.top = `${newY}px`;
+                }
+                function onMouseUp() {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+
+            // Controls
+            winEl.querySelector('.fpw-close').addEventListener('click', () => close(id));
+            winEl.querySelector('.fpw-hide').addEventListener('click', () => hide(id));
+            handleEl.addEventListener('click', () => show(id));
+        }
+
+        function hide(id) {
+            const win = windows[id];
+            if (!win) return;
+            win.element.classList.remove('visible');
+            
+            setTimeout(() => {
+                win.element.style.display = 'none';
+                win.handle.style.top = `${win.element.offsetTop + 20}px`;
+                win.handle.style.left = '0px';
+                win.handle.style.borderRadius = '0 8px 8px 0';
+                win.handle.classList.add('visible');
+            }, 300);
+        }
+
+        function show(id) {
+            const win = windows[id];
+            if (!win) return;
+            win.handle.classList.remove('visible');
+            win.element.style.display = 'flex';
+            setTimeout(() => win.element.classList.add('visible'), 50);
+        }
+
+        function close(id) {
+            const win = windows[id];
+            if (!win) return;
+            win.element.classList.remove('visible');
+            setTimeout(() => {
+                win.element.remove();
+                win.handle.remove();
+                delete windows[id];
+            }, 300);
+        }
+
+        return { create };
+    })();
+    // ===== [END] FLOATING PROJECT WINDOW MANAGER =====
+
+    // ===== [START] FLOATING JELLYFISH BALL LOGIC (MODIFIED) =====
     const FloatingBallManager = (() => {
         let ball = null;
         let isDragging = false;
@@ -1199,17 +1423,18 @@
         let idleTimer = null;
         let longPressTimer = null;
         let activeMenuBtn = null;
-        const LONG_PRESS_DURATION = 2000;
-        const DRAG_THRESHOLD = 10; // Pixels
+        const LONG_PRESS_DURATION = 1500;
+        const DRAG_THRESHOLD = 10;
         const ALL_FUNCTIONS = [
-            { id: 'album', icon: '📷', title: '相册' },
-            { id: 'memo', icon: '📝', title: '备忘录' },
+            { id: 'album', icon: '🖼️', title: '相册' },
             { id: 'folder', icon: '📁', title: '文件夹' },
-            { id: 'return', icon: '↩️', title: '返回主页' }
+            { id: 'return', icon: '🔙', title: '返回' },
+            { id: 'memo', icon: '📝', title: '备忘录' },
+            { id: 'quick_switch', icon: '🔄', title: '快速切换' }
         ];
 
         function _create() {
-            if (localStorage.getItem('jellyBallEnabled') !== 'true') return;
+            if (currentConfig.settings.jellyBall?.enabled !== true) return;
             if (document.getElementById('floating-jellyfish-ball')) return;
 
             ball = document.createElement('div');
@@ -1236,7 +1461,7 @@
         function _renderMenuButtons() {
             if (!ball) return;
             const menu = ball.querySelector('.jelly-menu');
-            menu.innerHTML = ''; // Clear existing buttons
+            menu.innerHTML = '';
             const enabledFunctions = _getEnabledFunctions();
 
             enabledFunctions.forEach(func => {
@@ -1248,48 +1473,29 @@
                 menu.appendChild(btnEl);
             });
         }
-
-        function _destroy() {
-            if (ball) { ball.remove(); ball = null; }
-            clearTimeout(idleTimer);
-            clearTimeout(longPressTimer);
-            document.removeEventListener('mousemove', _onDragMove);
-            document.removeEventListener('touchmove', _onDragMove);
-            document.removeEventListener('mouseup', _onDragEnd);
-            document.removeEventListener('touchend', _onDragEnd);
-        }
-
-        function _addEventListeners() {
-            ball.addEventListener('mousedown', _onDragStart);
-            ball.addEventListener('touchstart', _onDragStart, { passive: false });
-            document.addEventListener('click', (e) => { if (ball && !ball.contains(e.target)) _closeMenu(); }, true);
-        }
+        
+        function _destroy() { if (ball) { ball.remove(); ball = null; } clearTimeout(idleTimer); clearTimeout(longPressTimer); document.removeEventListener('mousemove', _onDragMove); document.removeEventListener('touchmove', _onDragMove); document.removeEventListener('mouseup', _onDragEnd); document.removeEventListener('touchend', _onDragEnd); }
+        function _addEventListeners() { ball.addEventListener('mousedown', _onDragStart); ball.addEventListener('touchstart', _onDragStart, { passive: false }); document.addEventListener('click', (e) => { if (ball && !ball.contains(e.target)) _closeMenu(); }, true); }
 
         function _onDragStart(e) {
-            if (ball.classList.contains('menu-open') && e.target.classList.contains('jelly-menu-btn')) return;
+            if (ball.classList.contains('menu-open') && e.target.closest('.jelly-menu-btn')) return;
             e.preventDefault();
             
             clearTimeout(idleTimer);
             ball.classList.remove('idle', 'snap-left', 'snap-right');
-            
             isDragging = false;
             isLongPressActive = false;
             activeMenuBtn = null;
-
+            
             const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
             const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-
             startPos = { x: clientX, y: clientY };
             const rect = ball.getBoundingClientRect();
             offset.x = clientX - rect.left;
             offset.y = clientY - rect.top;
 
-            longPressTimer = setTimeout(() => {
-                isLongPressActive = true;
-                _toggleMenu();
-                longPressTimer = null;
-            }, LONG_PRESS_DURATION);
-
+            longPressTimer = setTimeout(() => { isLongPressActive = true; _toggleMenu(); longPressTimer = null; }, LONG_PRESS_DURATION);
+            
             document.addEventListener('mousemove', _onDragMove);
             document.addEventListener('touchmove', _onDragMove, { passive: false });
             document.addEventListener('mouseup', _onDragEnd);
@@ -1297,20 +1503,16 @@
         }
 
         function _onDragMove(e) {
-            e.preventDefault();
             const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
             const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
 
-            if (isLongPressActive) {
-                _handleMenuInteraction(clientX, clientY);
-                return;
-            }
-
+            if (isLongPressActive) { _handleMenuInteraction(clientX, clientY); return; }
             const dx = clientX - startPos.x;
             const dy = clientY - startPos.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-
+            
             if (!isDragging && distance > DRAG_THRESHOLD) {
+                e.preventDefault();
                 isDragging = true;
                 if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
                 ball.classList.add('dragging');
@@ -1318,56 +1520,29 @@
             }
 
             if (isDragging) {
+                e.preventDefault();
                 let newX = clientX - offset.x;
                 let newY = clientY - offset.y;
-
                 const ballSize = ball.offsetWidth;
-                const maxX = window.innerWidth - ballSize;
-                const maxY = window.innerHeight - ballSize;
-
-                newX = Math.max(0, Math.min(newX, maxX));
-                newY = Math.max(0, Math.min(newY, maxY));
-
+                newX = Math.max(0, Math.min(newX, window.innerWidth - ballSize));
+                newY = Math.max(0, Math.min(newY, window.innerHeight - ballSize));
                 ball.style.left = `${newX}px`;
                 ball.style.top = `${newY}px`;
             }
         }
         
-        function _handleMenuInteraction(clientX, clientY) {
-            const elementUnderPointer = document.elementFromPoint(clientX, clientY);
-            const menuBtn = elementUnderPointer ? elementUnderPointer.closest('.jelly-menu-btn') : null;
-            
-            if (activeMenuBtn && activeMenuBtn !== menuBtn) {
-                activeMenuBtn.classList.remove('hovered');
-            }
-            
-            if (menuBtn) {
-                menuBtn.classList.add('hovered');
-                activeMenuBtn = menuBtn;
-            } else {
-                activeMenuBtn = null;
-            }
-        }
-
+        function _handleMenuInteraction(clientX, clientY) { const menuBtn=document.elementFromPoint(clientX,clientY)?.closest('.jelly-menu-btn'); if(activeMenuBtn&&activeMenuBtn!==menuBtn){activeMenuBtn.classList.remove('hovered');} if(menuBtn){menuBtn.classList.add('hovered'); activeMenuBtn=menuBtn;}else{activeMenuBtn=null;} }
+        
         function _onDragEnd(e) {
             clearTimeout(longPressTimer);
-
-            if (isLongPressActive) {
-                if (activeMenuBtn) {
-                    _onMenuClick(activeMenuBtn);
-                }
-                _closeMenu();
-            } else if (isDragging) {
-                _snapToEdge();
-            }
+            if (isLongPressActive) { if (activeMenuBtn) { _onMenuClick(activeMenuBtn); } _closeMenu(); } 
+            else if (!isDragging) { /* Short click, do nothing for now */ } 
+            else { _snapToEdge(); }
             
             ball.classList.remove('dragging');
             if (activeMenuBtn) activeMenuBtn.classList.remove('hovered');
 
-            isDragging = false;
-            isLongPressActive = false;
-            activeMenuBtn = null;
-            
+            isDragging = isLongPressActive = false; activeMenuBtn = null;
             _resetIdleTimer();
 
             document.removeEventListener('mousemove', _onDragMove);
@@ -1376,189 +1551,136 @@
             document.removeEventListener('touchend', _onDragEnd);
         }
         
-        function _snapToEdge() {
-            const rect = ball.getBoundingClientRect();
-             const snapPosition = (rect.left + rect.width / 2) > window.innerWidth / 2 ? window.innerWidth - rect.width : 0;
-             ball.style.transition = 'left 0.2s ease-out';
-             ball.style.left = `${snapPosition}px`;
-             setTimeout(() => {
-                 ball.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-                 localStorage.setItem('jellyBallPosition', JSON.stringify({ x: ball.offsetLeft, y: ball.offsetTop }));
-             }, 200);
-        }
-
-        function _resetIdleTimer() {
-            clearTimeout(idleTimer);
-            ball.classList.remove('idle', 'snap-left', 'snap-right');
-            idleTimer = setTimeout(() => {
-                const rect = ball.getBoundingClientRect();
-                 if ((rect.left + rect.width / 2) > window.innerWidth / 2) {
-                     ball.classList.add('snap-right');
-                 } else {
-                     ball.classList.add('snap-left');
-                 }
-                ball.classList.add('idle');
-                _closeMenu();
-            }, 3000);
-        }
-
-        function _toggleMenu() {
-            const isOpen = ball.classList.toggle('menu-open');
-            const menuBtns = ball.querySelectorAll('.jelly-menu-btn');
-            
-            if (isOpen) {
-                const rect = ball.getBoundingClientRect();
-                const numButtons = menuBtns.length;
-                const radius = 65;
-                const margin = 10;
-                
-                let startAngle, endAngle;
-                const center = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-
-                if (center.x < radius + margin) { startAngle = -Math.PI / 2; endAngle = Math.PI / 2; }
-                else if (center.x > window.innerWidth - radius - margin) { startAngle = Math.PI / 2; endAngle = 3 * Math.PI / 2; }
-                else if (center.y < radius + margin) { startAngle = 0; endAngle = Math.PI; }
-                else if (center.y > window.innerHeight - radius - margin) { startAngle = Math.PI; endAngle = 2 * Math.PI; }
-                else { startAngle = -Math.PI / 2; endAngle = 3 * Math.PI / 2; }
-                
-                const angleStep = numButtons > 1 ? (endAngle - startAngle) / (numButtons - 1) : 0;
-                
-                menuBtns.forEach((btn, i) => {
-                    const angle = startAngle + (i * angleStep);
-                    const x = Math.cos(angle) * radius;
-                    const y = Math.sin(angle) * radius;
-                    btn.style.setProperty('--transform-end', `translate(${x}px, ${y}px)`);
-                });
-            }
-        }
-        
-        function _closeMenu(){
-            if(ball && ball.classList.contains('menu-open')) ball.classList.remove('menu-open');
-        }
+        function _snapToEdge() { const rect=ball.getBoundingClientRect(); const isRight=rect.left+rect.width/2>window.innerWidth/2; ball.style.left=`${isRight?window.innerWidth-rect.width:0}px`; localStorage.setItem('jellyBallPosition',JSON.stringify({x:ball.offsetLeft,y:ball.offsetTop})); }
+        function _resetIdleTimer() { clearTimeout(idleTimer); ball.classList.remove('idle','snap-left','snap-right'); idleTimer=setTimeout(()=>{const rect=ball.getBoundingClientRect(); ball.classList.add((rect.left+rect.width/2)>window.innerWidth/2?'snap-right':'snap-left','idle'); _closeMenu(); },3000); }
+        function _toggleMenu() { const isOpen=ball.classList.toggle('menu-open'); const menuBtns=ball.querySelectorAll('.jelly-menu-btn'); if(isOpen){const rect=ball.getBoundingClientRect();const n=menuBtns.length,r=65,m=10;let s,e;const c={x:rect.left+rect.width/2,y:rect.top+rect.height/2};if(c.x<r+m){s=-Math.PI/2;e=Math.PI/2;}else if(c.x>window.innerWidth-r-m){s=Math.PI/2;e=3*Math.PI/2;}else if(c.y<r+m){s=0;e=Math.PI;}else if(c.y>window.innerHeight-r-m){s=Math.PI;e=2*Math.PI;}else{s=-Math.PI/2;e=3*Math.PI/2;} const a=n>1?(e-s)/(n-1):0; menuBtns.forEach((b,i)=>{const t=s+i*a;b.style.setProperty('--transform-end',`translate(${Math.cos(t)*r}px, ${Math.sin(t)*r}px)`);});}}
+        function _closeMenu(){ if(ball&&ball.classList.contains('menu-open')) ball.classList.remove('menu-open'); }
         
         function _onMenuClick(button){
             if(!button) return;
-
             const actionId = button.dataset.actionId;
             const memoryModal = document.getElementById('memoryModal');
-            const originalZIndex = memoryModal.style.zIndex || getComputedStyle(memoryModal).zIndex;
             
             function openMemoryAndSwitch(viewName) {
                 MemoryApp.open();
-                memoryModal.style.zIndex = '2010';
-                const closeBtn = memoryModal.querySelector('.close-btn');
-                const resetZIndex = () => { memoryModal.style.zIndex = originalZIndex; closeBtn.removeEventListener('click', resetZIndex); };
-                closeBtn.addEventListener('click', resetZIndex, { once: true });
-                const hubAction = memoryModal.querySelector(`[data-action="goto-${viewName}"]`);
-                if(hubAction) hubAction.click();
+                memoryModal.style.zIndex = '2015'; // Ensure it's above floating windows
+                const closeHandler=()=>{memoryModal.style.zIndex='';memoryModal.querySelector('.close-btn').removeEventListener('click',closeHandler);};
+                memoryModal.querySelector('.close-btn').addEventListener('click',closeHandler,{once:true});
+                memoryModal.querySelector(`[data-action="goto-${viewName}"]`)?.click();
             }
 
             switch(actionId) {
                 case 'album': openMemoryAndSwitch('album'); break;
                 case 'memo': openMemoryAndSwitch('memo'); break;
                 case 'folder': openMemoryAndSwitch('cloud'); break;
-                case 'return': closeIframeModal(); break;
+                case 'return': if (iframeModal.classList.contains('active')) { closeIframeModal(); } break;
+                case 'quick_switch': _showQuickSwitchMenu(); break;
             }
             _closeMenu();
         }
 
-        function _getEnabledFunctions() {
-            const settings = JSON.parse(localStorage.getItem('jellyFunctionSettings')) || {};
-            return ALL_FUNCTIONS.filter(func => settings[func.id] !== false);
+        function _showQuickSwitchMenu() {
+            let menuHtml='<option value="">选择一个项目...</option>';
+            currentConfig.categories.forEach(cat => { cat.buttons.forEach(btn => { menuHtml += `<option value="${btn.href}" data-text="${btn.text}">${cat.name} / ${btn.text}</option>`; }); });
+
+            const tempSelect=document.createElement('select');
+            tempSelect.innerHTML=menuHtml;
+            tempSelect.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;padding:10px;font-size:16px;border-radius:8px;";
+            document.body.appendChild(tempSelect);
+            
+            const closeMenu=()=>{if(document.body.contains(tempSelect))document.body.removeChild(tempSelect);document.removeEventListener('click',closeMenu,true);};
+            setTimeout(()=>document.addEventListener('click',closeMenu,true),0);
+
+            tempSelect.addEventListener('change', e => {
+                const selected = e.target.options[e.target.selectedIndex];
+                const url = selected.value;
+                const title = selected.dataset.text;
+                if(url) FloatingProjectWindowManager.create(Date.now(), title, url);
+                closeMenu();
+            });
+            tempSelect.addEventListener('click', e => e.stopPropagation());
         }
+
+        function _getEnabledFunctions() { const settings=currentConfig.settings.jellyBall?.functions||{}; return ALL_FUNCTIONS.filter(func=>settings[func.id]!==false); }
 
         function initSettings() {
             const toggle = document.getElementById('jellyBallToggle');
             const swipeBackToggle = document.getElementById('jellySwipeBackToggle');
             const optionsContainer = document.getElementById('jelly-ball-options-container');
-            const functionsSection = document.getElementById('jelly-ball-functions-section');
-            const cssSection = document.getElementById('jelly-ball-custom-css-section');
             const cssTextarea = document.getElementById('jellyBallCssTextarea');
             const applyCssBtn = document.getElementById('applyJellyBallCssBtn');
             const customStyleTag = document.getElementById('custom-jelly-ball-styles');
-            const cssPreviewFrame = document.getElementById('jellyCssPreview');
+            const cssPreview = document.getElementById('jellyCssPreview');
+            const previewBall = document.getElementById('jellyCssPreviewBall');
             const checkboxContainer = document.getElementById('jelly-function-checkboxes');
             
-            const isEnabled = localStorage.getItem('jellyBallEnabled') === 'true';
-            const isSwipeBackEnabled = localStorage.getItem('jellySwipeBackEnabled') !== 'false';
-
-            function updateUIVisibility() {
-                const checked = toggle.checked;
-                optionsContainer.style.display = checked ? 'flex' : 'none';
-                functionsSection.style.display = checked ? 'flex' : 'none';
-                cssSection.style.display = checked ? 'flex' : 'none';
+            // Ensure jellyBall settings object exists
+            if (!currentConfig.settings.jellyBall) {
+                currentConfig.settings.jellyBall = { enabled: false, swipeBack: true, functions: {}, customCSS: ''};
             }
 
-            toggle.checked = isEnabled;
-            swipeBackToggle.checked = isSwipeBackEnabled;
+            const settings = currentConfig.settings.jellyBall;
+            toggle.checked = settings.enabled || false;
+            swipeBackToggle.checked = settings.swipeBack !== false;
             
-            const functionSettings = JSON.parse(localStorage.getItem('jellyFunctionSettings')) || {};
             checkboxContainer.innerHTML = '';
             ALL_FUNCTIONS.forEach(func => {
-                const isChecked = functionSettings[func.id] !== false; // enabled by default
+                const isChecked = settings.functions?.[func.id] !== false;
                 const checkboxHtml = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                       <span>${func.icon} ${func.title}</span> 
-                       <label class="toggle-switch"><input type="checkbox" data-function-id="${func.id}" ${isChecked ? 'checked' : ''}><span class="slider"></span></label>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                       <label for="jelly_func_${func.id}" style="cursor:pointer; display:flex; align-items:center; gap: 5px;">${func.icon} ${func.title}</label>
+                       <label class="toggle-switch"><input type="checkbox" id="jelly_func_${func.id}" data-function-id="${func.id}" ${isChecked ? 'checked' : ''}><span class="slider"></span></label>
                     </div>`;
                 checkboxContainer.innerHTML += checkboxHtml;
             });
             
+            function updateUIVisibility() { optionsContainer.style.display = toggle.checked ? 'flex' : 'none'; }
+            
+            toggle.addEventListener('change', () => { settings.enabled = toggle.checked; updateUIVisibility(); if (settings.enabled) _create(); else _destroy(); saveGlobalConfig('Update Jellyfish Ball settings'); });
+            swipeBackToggle.addEventListener('change', () => { settings.swipeBack = swipeBackToggle.checked; saveGlobalConfig('Update Jellyfish Ball settings'); });
+            
             checkboxContainer.addEventListener('change', (e) => {
                 const checkbox = e.target;
                 if (checkbox.dataset.functionId) {
-                    const currentSettings = JSON.parse(localStorage.getItem('jellyFunctionSettings')) || {};
-                    currentSettings[checkbox.dataset.functionId] = checkbox.checked;
-                    localStorage.setItem('jellyFunctionSettings', JSON.stringify(currentSettings));
+                    if (!settings.functions) settings.functions = {};
+                    settings.functions[checkbox.dataset.functionId] = checkbox.checked;
                     _renderMenuButtons(); 
+                    saveGlobalConfig('Update Jellyfish Ball settings');
                 }
             });
 
-            toggle.addEventListener('change', () => {
-                const checked = toggle.checked;
-                localStorage.setItem('jellyBallEnabled', checked);
-                updateUIVisibility();
-                if (checked) _create(); else _destroy();
-            });
-            swipeBackToggle.addEventListener('change', () => {
-                localStorage.setItem('jellySwipeBackEnabled', swipeBackToggle.checked);
-            });
-
-            const savedCss = localStorage.getItem('jellyBallCustomCss') || '';
-            cssTextarea.value = savedCss;
-            customStyleTag.innerHTML = savedCss;
-
+            cssTextarea.value = settings.customCSS || '';
+            customStyleTag.innerHTML = settings.customCSS || '';
+            
             const updatePreview = () => {
-                const previewDoc = cssPreviewFrame.contentDocument || cssPreviewFrame.contentWindow.document;
-                previewDoc.open();
-                previewDoc.write(`
-                    <style>
-                        body { margin: 0; display: flex; align-items: center; justify-content: center; height: 100%; }
-                        #preview-ball { width: 42px; height: 42px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size: 22px; }
-                        ${cssTextarea.value.replace(/#floating-jellyfish-ball/g, '#preview-ball')}
-                    </style>
-                    <div id="preview-ball">🎐</div>
-                `);
-                previewDoc.close();
+                const css = cssTextarea.value.replace(/#floating-jellyfish-ball/g, `#${previewBall.id}`);
+                previewBall.style.cssText = ''; // Reset inline styles
+                const tempStyle = document.createElement('style');
+                document.head.appendChild(tempStyle);
+                tempStyle.innerHTML = css;
+                // Since we can't easily undo pseudoclasses etc., this is a simplified visual feedback
+                const appliedRules = tempStyle.sheet.cssRules[0]?.style;
+                if(appliedRules) {
+                    if (appliedRules.background) previewBall.style.background = appliedRules.background;
+                    if (appliedRules.color) previewBall.style.color = appliedRules.color;
+                    if (appliedRules.border) previewBall.style.border = appliedRules.border;
+                }
+                document.head.removeChild(tempStyle);
             };
 
             cssTextarea.addEventListener('input', updatePreview);
             applyCssBtn.addEventListener('click', () => {
-               const cssCode = cssTextarea.value;
-               customStyleTag.innerHTML = cssCode;
-               localStorage.setItem('jellyBallCustomCss', cssCode);
-               alert('自定义样式已应用！');
+               settings.customCSS = cssTextarea.value;
+               customStyleTag.innerHTML = settings.customCSS;
+               saveGlobalConfig('Update Jellyfish Ball settings');
+               alert('自定义样式已应用并同步至云端！');
             });
             
             updateUIVisibility();
             setTimeout(updatePreview, 100);
         }
 
-        return {
-            init: initSettings, 
-            create: _create, 
-            destroy: _destroy
-        };
+        return { init: initSettings, create: _create, destroy: _destroy };
     })();
     // ===== [END] FLOATING JELLYFISH BALL LOGIC =====
 
@@ -2102,10 +2224,6 @@
             console.log("Migration: Cleaned up legacy root 'buttons' array.");
         }
 
-        if (wasModified) {
-            console.log("Migration process completed. Configuration has been standardized.");
-        }
-
         return { migratedConfig: config, wasMigrated: wasModified };
     }
 
@@ -2515,7 +2633,7 @@
     const gestureCaptureZone = document.getElementById('gestureCaptureZone');
     let startX = 0, startY = 0, currentX = 0, isIframeDragging = false, isSwipeIntent = false;
     gestureCaptureZone.addEventListener('touchstart', (e) => {
-        if(localStorage.getItem('jellySwipeBackEnabled') === 'false') return;
+        if(currentConfig.settings?.jellyBall?.swipeBack === false) return;
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
         currentX = startX;
@@ -2753,7 +2871,7 @@
                 el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">🖼️</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${itemCount} 个项目</div>`;
                 ui.albumList.appendChild(el);
             });
-            if (memoryCache.album.folders.length === 0) ui.albumList.innerHTML = `<p class="empty-list-placeholder">没有相册</p>`;
+                        if (memoryCache.album.folders.length === 0) ui.albumList.innerHTML = `<p class="empty-list-placeholder">没有相册</p>`;
         }
         function renderPhotos() {
             if (photoObserver) photoObserver.disconnect();
