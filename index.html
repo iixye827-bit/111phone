@@ -2911,12 +2911,12 @@
         FloatingBallManager.create();
     }
     function closeIframeModal() { 
-    hideReturnConfirmation(); 
-    iframeModal.classList.remove('active'); 
-    // 增加下面这行代码，以确保在关闭时触发页面卸载，从而强制保存其 localStorage 数据
-    setTimeout(() => { iframeEl.src = 'about:blank'; }, 400); 
-}
-
+        FloatingProjectWindowManager.closeAll();
+        FloatingBallManager.destroy();
+        hideReturnConfirmation(); 
+        iframeModal.classList.remove('active'); 
+        
+    }
     function showReturnConfirmation() { returnConfirmationToast.classList.add('show'); }
     function hideReturnConfirmation() { returnConfirmationToast.classList.remove('show'); }
     document.getElementById('confirmReturnBtn').addEventListener('click', closeIframeModal);
