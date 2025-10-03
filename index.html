@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+    <!-- <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0"> -->
+<!-- <meta http-equiv="Pragma" content="no-cache"> -->
+<!-- <meta http-equiv="Expires" content="0"> -->
 
     <!-- PWA & Mobile App Settings -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -863,7 +863,7 @@
         </div>
     </details>
     <details>
-        <summary>📱 项目与分类管理</summary>
+        <summary>📱 项目管理</summary>
         <div class="details-content">
             <p><strong>分类导航</strong>: 您可以左右滑动顶部的分类导航栏来切换不同的项目分类。此导航栏可在“管理项目”中通过“分页展示”开关控制其显示或隐藏。</p>
             <p><strong>添加/编辑项目</strong>: 在"管理项目"弹窗中进行操作。进入“按钮管理模式”（在“管理项目”弹窗内点击）后，点击已存在的按钮即可进入编辑模式。</p>
@@ -922,10 +922,6 @@
                             <h4>v3.9.0 <span class="update-date">- 2025.10.03</span></h4>
                             <ul>
                                 <li><span class="tag new">新功能</span> 新增网页内悬浮球与多项目悬浮窗功能，提升多任务操作体验。（详见“功能介绍”）</li>
-                                <li><span class="tag fix">修复</span> 悬浮窗在移动端（尤其是iOS）现已完全适配，解决了拖动跳位、无法移动以及按钮无法点击的问题。</li>
-                                <li><span class="tag opt">优化</span> 返回主页面时，所有打开的悬浮窗将自动关闭。</li>
-                                <li><span class="tag opt">优化</span> 悬浮球的初始位置将自适应屏幕居中。</li>
-                                <li><span class="tag fix">修复</span> 修正了主题设置界面内与悬浮球相关的UI文字错误和布局偏移问题。</li>
                             </ul>
                         </div>
                         <div class="update-log-entry">
@@ -983,7 +979,7 @@
                         </div>
                         
                         <footer class="update-footer">
-                            当前版本: v3.7.0
+                            当前版本: v3.9.0
                         </footer>
                     </div>
                     <div id="help-page-3" class="help-page-content">
@@ -2919,7 +2915,7 @@
         FloatingBallManager.destroy();
         hideReturnConfirmation(); 
         iframeModal.classList.remove('active'); 
-        setTimeout(() => { iframeEl.src = 'about:blank'; }, 400); 
+        
     }
     function showReturnConfirmation() { returnConfirmationToast.classList.add('show'); }
     function hideReturnConfirmation() { returnConfirmationToast.classList.remove('show'); }
