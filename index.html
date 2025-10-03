@@ -837,69 +837,96 @@
                         <h4>步骤 2：创建私人数据仓库</h4><p>此步骤将创建一个独立的、完全私密的仓库，专门用来存放您的所有配置和文件。</p><ol><li><strong>访问创建页面</strong>：<a href="https://github.com/new" target="_blank" rel="noopener noreferrer">点击此链接直接进入 GitHub 仓库创建页面</a>。</li><li><strong>填写仓库信息</strong>：<ul><li><strong>Repository name (仓库名称)</strong>：起一个清晰的名字，例如 <code>My-Jellyfish-Data</code>。</li><li><strong>关键：选择 <code>Private</code> (私有)</strong>。这是您的私人数据，必须设为私有。</li><li><strong>勾选 <code>Add a README file</code></strong>：确保仓库被成功初始化。</li></ul></li><li><strong>点击 <code>Create repository</code></strong> 按钮完成创建。</li></ol>
                         <h4>步骤 3：在 JellyfishCenter 内完成最终配置</h4><p>现在，我们将“钥匙”和“数据仓库”信息告诉本应用。</p><ol><li><strong>打开配置面板</strong>：长按右下角的 🌞/🌜 按钮展开菜单 → 点击 <strong>☁️ (数据同步)</strong>。</li><li><strong>填入信息</strong>：<ul><li><strong>仓库</strong>：填写您在 <strong>步骤2</strong> 创建的**私人数据仓库**地址，格式为 <code>你的GitHub用户名/My-Jellyfish-Data</code>。</li><li><strong>Personal Access Token</strong>：粘贴您在 <strong>步骤1</strong> 创建并复制好的完整 Token。</li></ul></li><li><strong>保存并同步</strong>：点击 <strong><code>保存配置</code></strong> 按钮。</li></ol><p><strong>恭喜！</strong> 您的 JellyfishCenter 现已与云端完全同步，可以开始使用了！</p>
                     </div>
-                    <div id="help-page-1" class="help-page-content">
-                        <details>
-                            <summary>核心操作</summary>
-                                <div class="details-content">
-                                <p><strong>编辑标题/副标题</strong>: 直接点击页面上的主标题或副标题即可修改。</p>
-                                <p><strong>切换主题</strong>: <strong>单击 (短按)</strong> 右下角的 🌞/🌜 按钮。</p>
-                                <p><strong>打开功能菜单</strong>: <strong>长按</strong> 右下角的 🌞/🌜 按钮。</p>
-                                <p><strong>访问链接与返回</strong>: 对于外部链接，默认在应用内全屏打开。您可以从屏幕**左侧中间区域向右滑动**来关闭当前页面并返回中心。您也可以在添加链接时选择“在新标签页中打开”，这样链接会直接通过系统浏览器打开。</p>
-                                <div class="important-note">
-                                    <p><strong>关于“在新标签页中打开”选项的说明：</strong><br>此选项主要用于解决部分与应用内浏览器不兼容的网站。启用此选项后，链接将通过系统默认浏览器打开。请注意，部分设备在该模式下可能无法隐藏底部工具栏，这是一个已知的系统限制，请您根据需求自行选择。</p>
-                                </div>
-                            </div>
-                        </details>
-                        <details>
-                            <summary>☁️ 数据同步</summary>
-                            <div class="details-content">
-                                <p><strong>配置同步</strong>: 此功能用于设置您的私有GitHub仓库信息，是整个应用数据同步的核心。配置完成后，所有更改都将自动保存至云端。</p>
-                                <div class="important-note"><p><strong>新增智能迁移</strong>：该功能现在可以自动识别并修复旧版本（无分类功能）的配置文件，将其无缝升级为最新格式。</p></div>
-                                <p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p>
-                                <ul><li><strong>🟢 绿点</strong>: <code>已同步</code> - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: <code>同步中</code> - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: <code>同步失败</code> - 发生错误，请点击图标查看失败原因。</li></ul>
-                                <p><strong>手动同步与修复</strong>: 在“数据同步”弹窗内，提供了一个手动同步按钮。此功能会强制从云端获取最新的配置文件，并与应用内置的最新模板进行对比。如果您的配置文件因版本更新而缺少了某些新功能的设置项，此功能会自动为您补全，确保应用正常运行。</p>
-                            </div>
-                        </details>
-                        <details>
-                            <summary>📱 项目与分类管理</summary>
-                            <div class="details-content">
-                                <p><strong>分类导航</strong>: 您可以左右滑动顶部的分类导航栏来切换不同的项目分类。此导航栏可在“管理项目”中通过“分页展示”开关控制其显示或隐藏。</p>
-                                <p><strong>添加/编辑项目</strong>: 在"管理项目"弹窗中进行操作。进入“按钮管理模式”（在“管理项目”弹窗内点击）后，点击已存在的按钮即可进入编辑模式。</p>
-                                <p><strong>删除分类</strong>: 在“管理项目”弹窗中，选择一个分类后，即可看到“删除当前分类”按钮。您可以选择：</p>
-                                <ul>
-                                    <li><strong>仅删除分类</strong>: 项目将被保留并移至“全部”分类下。</li>
-                                    <li><strong>删除分类和所有项目</strong>: 永久删除该分类及其包含的所有项目（需二次确认）。</li>
-                                </ul>
-                            </div>
-                        </details>
-                        <details>
-                            <summary>🎨 主题与个性化</summary>
-                            <div class="details-content">
-                                <p><strong>主题风格</strong>：您现在可以在“全拟态”和“磨砂玻璃”两种视觉风格之间切换。选择“磨砂玻璃”后，界面元素将变为半透明质感，此时配色功能将关闭，但您仍可上传自定义背景图以搭配新风格。</p>
-                                <p><strong>实时调色</strong>：在“全拟态”风格下，可实时调整日间/夜间模式的背景渐变色，以及标题卡片的背景图片。</p>
-                                <p><strong>色彩预设</strong>：在“全拟态”风格下，您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能，在每次启动时随机应用一个已保存的预设。</p>
-                            </div>
-                        </details>
-                        <details>
-                            <summary>📷 记忆功能</summary>
-                            <div class="details-content">
-                                <p>一个集成了备忘录、相册和文件云盘的私人空间，所有数据都安全地存储在您的GitHub私有仓库中。您可以从主入口进入相应模块进行管理。</p>
-                                <h4>💫 漫游模式</h4>
-                                <ul>
-                                    <li><strong>音乐播放</strong>: 您可以上传自己的音乐和歌词文件，在漫游模式中播放。</li>
-                                    <li><strong>便捷播放</strong>: 在音乐设置的播放列表中，直接点击歌曲名即可自动进入漫游模式并开始播放。</li>
-                                </ul>
-                            </div>
-                        </details>
+              
+<div id="help-page-1" class="help-page-content">
+    <details>
+        <summary>核心操作</summary>
+        <div class="details-content">
+            <p><strong>编辑标题/副标题</strong>: 直接点击页面上的主标题或副标题即可修改。</p>
+            <p><strong>切换主题</strong>: <strong>单击 (短按)</strong> 右下角的 🌞/🌜 按钮。</p>
+            <p><strong>打开功能菜单</strong>: <strong>长按</strong> 右下角的 🌞/🌜 按钮。</p>
+            <p><strong>访问链接与返回</strong>: 对于外部链接，默认在应用内全屏打开。您可以从屏幕**左侧中间区域向右滑动**来关闭当前页面并返回中心。您也可以在添加链接时选择“在新标签页中打开”，这样链接会直接通过系统浏览器打开。</p>
+            <div class="important-note">
+                <p><strong>关于“在新标签页中打开”选项的说明：</strong><br>此选项主要用于解决部分与应用内浏览器不兼容的网站。启用此选项后，链接将通过系统默认浏览器打开。请注意，部分设备在该模式下可能无法隐藏底部工具栏，这是一个已知的系统限制，请您根据需求自行选择。</p>
+            </div>
+        </div>
+    </details>
+    <details>
+        <summary>☁️ 数据同步</summary>
+        <div class="details-content">
+            <p><strong>配置同步</strong>: 此功能用于设置您的私有GitHub仓库信息，是整个应用数据同步的核心。配置完成后，所有更改都将自动保存至云端。</p>
+            <div class="important-note"><p><strong>新增智能迁移</strong>：该功能现在可以自动识别并修复旧版本（无分类功能）的配置文件，将其无缝升级为最新格式。</p></div>
+            <p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p>
+            <ul><li><strong>🟢 绿点</strong>: <code>已同步</code> - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: <code>同步中</code> - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: <code>同步失败</code> - 发生错误，请点击图标查看失败原因。</li></ul>
+            <p><strong>手动同步与修复</strong>: 在“数据同步”弹窗内，提供了一个手动同步按钮。此功能会强制从云端获取最新的配置文件，并与应用内置的最新模板进行对比。如果您的配置文件因版本更新而缺少了某些新功能的设置项，此功能会自动为您补全，确保应用正常运行。</p>
+        </div>
+    </details>
+    <details>
+        <summary>📱 项目与分类管理</summary>
+        <div class="details-content">
+            <p><strong>分类导航</strong>: 您可以左右滑动顶部的分类导航栏来切换不同的项目分类。此导航栏可在“管理项目”中通过“分页展示”开关控制其显示或隐藏。</p>
+            <p><strong>添加/编辑项目</strong>: 在"管理项目"弹窗中进行操作。进入“按钮管理模式”（在“管理项目”弹窗内点击）后，点击已存在的按钮即可进入编辑模式。</p>
+            <p><strong>删除分类</strong>: 在“管理项目”弹窗中，选择一个分类后，即可看到“删除当前分类”按钮。您可以选择：</p>
+            <ul>
+                <li><strong>仅删除分类</strong>: 项目将被保留并移至“全部”分类下。</li>
+                <li><strong>删除分类和所有项目</strong>: 永久删除该分类及其包含的所有项目（需二次确认）。</li>
+            </ul>
+        </div>
+    </details>
+    <details>
+        <summary>🎨 主题与个性化</summary>
+        <div class="details-content">
+            <p><strong>主题风格</strong>：您现在可以在“全拟态”和“磨砂玻璃”两种视觉风格之间切换。选择“磨砂玻璃”后，界面元素将变为半透明质感，此时配色功能将关闭，但您仍可上传自定义背景图以搭配新风格。</p>
+            <p><strong>实时调色</strong>：在“全拟态”风格下，可实时调整日间/夜间模式的背景渐变色，以及标题卡片的背景图片。</p>
+            <p><strong>色彩预设</strong>：在“全拟态”风格下，您可以保存、应用、更新或删除自己喜欢的配色方案，还可以开启“随机主题”功能，在每次启动时随机应用一个已保存的预设。</p>
+            <div class="important-note" style="margin-top: 15px;">
+                <h4>🎐 悬浮窗与悬浮球</h4>
+                <p>通过 <code>主题设置 → 网页内悬浮球</code>，您可以在应用内网页中开启一个便捷的悬浮助手。</p>
+                <p><strong>悬浮球操作</strong>:</p>
+                <ul>
+                    <li><strong>拖动</strong>: 按住并拖动可移动位置，松手后自动贴边。</li>
+                    <li><strong>闲置隐藏</strong>: 静置3秒后会自动半透明隐藏，减少干扰。</li>
+                    <li><strong>功能菜单</strong>: <strong>长按</strong>悬浮球会弹出环形功能菜单，滑动到目标功能上松手即可触发。</li>
+                </ul>
+                <p><strong>“快速切换”悬浮窗</strong>:</p>
+                <p>这是悬浮球菜单中的一个强大功能（🔗），它允许您将任何项目在独立的悬浮窗口中打开。</p>
+                <ul>
+                    <li><strong>移动</strong>: 按住窗口顶部的标题栏进行拖动。</li>
+                    <li><strong>隐藏/关闭</strong>: 点击标题栏上的 <strong>－</strong> 可将其最小化至侧边栏，点击 <strong>×</strong> 可彻底关闭。</li>
+                    <li><strong>调整大小</strong>: 拖动窗口右下角可以等比例缩放窗口大小。</li>
+                </ul>
+            </div>
+        </div>
+    </details>
+    <details>
+        <summary>📷 记忆功能</summary>
+        <div class="details-content">
+            <p>一个集成了备忘录、相册和文件云盘的私人空间，所有数据都安全地存储在您的GitHub私有仓库中。您可以从主入口进入相应模块进行管理。</p>
+            <h4>💫 漫游模式</h4>
+            <ul>
+                <li><strong>音乐播放</strong>: 您可以上传自己的音乐和歌词文件，在漫游模式中播放。</li>
+                <li><strong>便捷播放</strong>: 在音乐设置的播放列表中，直接点击歌曲名即可自动进入漫游模式并开始播放。</li>
+            </ul>
+        </div>
+    </details>
 
-                        <div class="warning"><p><strong>危险操作</strong>：在 <code>数据同步</code> (☁️) 弹窗的最下方有“清空所有数据”按钮。此操作会 <strong>永久删除</strong> 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
+    <div class="warning"><p><strong>危险操作</strong>：在 <code>数据同步</code> (☁️) 弹窗的最下方有“清空所有数据”按钮。此操作会 <strong>永久删除</strong> 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
                     </div>
                     <div id="help-page-2" class="help-page-content">
                         <div class="update-header-info">
                             <p><strong>小红书ID:</strong> 淡季水母</p>
                             <p><strong>QQ交流群:</strong> 563191005</p>
                         </div>
-                        
+                        <div class="update-log-entry">
+                            <h4>v3.9.0 <span class="update-date">- 2025.10.03</span></h4>
+                            <ul>
+                                <li><span class="tag new">新功能</span> 新增网页内悬浮球与多项目悬浮窗功能，提升多任务操作体验。（详见“功能介绍”）</li>
+                                <li><span class="tag fix">修复</span> 悬浮窗在移动端（尤其是iOS）现已完全适配，解决了拖动跳位、无法移动以及按钮无法点击的问题。</li>
+                                <li><span class="tag opt">优化</span> 返回主页面时，所有打开的悬浮窗将自动关闭。</li>
+                                <li><span class="tag opt">优化</span> 悬浮球的初始位置将自适应屏幕居中。</li>
+                                <li><span class="tag fix">修复</span> 修正了主题设置界面内与悬浮球相关的UI文字错误和布局偏移问题。</li>
+                            </ul>
+                        </div>
                         <div class="update-log-entry">
                             <h4>v3.7.0 <span class="update-date">- 2025.10.02</span></h4>
                             <ul>
@@ -1402,50 +1429,73 @@
             }
         }
 
+// <-- 开始替换为 -->
+
         function _attachEventListeners(winEl, handleEl, id) {
             const header = winEl.querySelector('.fpw-header');
-            
-            const startDrag = (clientX, clientY) => {
-                focus(id);
-                let offsetX = clientX - winEl.offsetLeft;
-                let offsetY = clientY - winEl.offsetTop;
+            const resizer = winEl.querySelector('.fpw-resizer');
+
+            // --- Drag Logic ---
+            const startDrag = (e) => {
+                // Prevent drag if a button was clicked
+                if (e.target.closest('button')) return;
                 
-                const onDragMove = (moveClientX, moveClientY) => {
-                    let newX = moveClientX - offsetX;
-                    let newY = moveClientY - offsetY;
+                e.preventDefault();
+                focus(id);
+                
+                const isTouchEvent = e.type === 'touchstart';
+                const startClientX = isTouchEvent ? e.touches[0].clientX : e.clientX;
+                const startClientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
+                const initialLeft = winEl.offsetLeft;
+                const initialTop = winEl.offsetTop;
+
+                const onDragMove = (moveEvent) => {
+                    const moveClientX = isTouchEvent ? moveEvent.touches[0].clientX : moveEvent.clientX;
+                    const moveClientY = isTouchEvent ? moveEvent.touches[0].clientY : moveEvent.clientY;
+                    
+                    let newX = initialLeft + (moveClientX - startClientX);
+                    let newY = initialTop + (moveClientY - startClientY);
+                    
                     newX = Math.max(0, Math.min(newX, window.innerWidth - winEl.offsetWidth));
                     newY = Math.max(0, Math.min(newY, window.innerHeight - winEl.offsetHeight));
+                    
                     winEl.style.left = `${newX}px`;
                     winEl.style.top = `${newY}px`;
                 };
 
-                const onMouseMove = (event) => onDragMove(event.clientX, event.clientY);
-                const onTouchMove = (event) => { event.preventDefault(); onDragMove(event.touches[0].clientX, event.touches[0].clientY); };
-
                 const onDragEnd = () => {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onDragEnd);
-                    document.removeEventListener('touchmove', onTouchMove);
-                    document.removeEventListener('touchend', onDragEnd);
+                    if (isTouchEvent) {
+                        document.removeEventListener('touchmove', onDragMove);
+                        document.removeEventListener('touchend', onDragEnd);
+                    } else {
+                        document.removeEventListener('mousemove', onDragMove);
+                        document.removeEventListener('mouseup', onDragEnd);
+                    }
                 };
-
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onDragEnd);
-                document.addEventListener('touchmove', onTouchMove, { passive: false });
-                document.addEventListener('touchend', onDragEnd);
+                
+                if (isTouchEvent) {
+                    document.addEventListener('touchmove', onDragMove, { passive: false });
+                    document.addEventListener('touchend', onDragEnd);
+                } else {
+                    document.addEventListener('mousemove', onDragMove);
+                    document.addEventListener('mouseup', onDragEnd);
+                }
             };
 
-            header.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
-            header.addEventListener('touchstart', e => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+            header.addEventListener('mousedown', startDrag);
+            header.addEventListener('touchstart', startDrag, { passive: false });
 
-            const resizer = winEl.querySelector('.fpw-resizer');
-            const startResize = (clientX, clientY) => {
-                let startX = clientX;
+            // --- Resize Logic ---
+            const startResize = (e) => {
+                e.preventDefault();
+                const isTouchEvent = e.type === 'touchstart';
+                let startX = isTouchEvent ? e.touches[0].clientX : e.clientX;
                 let startWidth = winEl.offsetWidth;
                 let startHeight = winEl.offsetHeight;
                 const aspectRatio = startWidth / startHeight;
 
-                const onResizeMove = (moveClientX) => {
+                const onResizeMove = (moveEvent) => {
+                    const moveClientX = isTouchEvent ? moveEvent.touches[0].clientX : moveEvent.clientX;
                     const dx = moveClientX - startX;
                     const newWidth = startWidth + dx;
                     if (newWidth >= parseFloat(winEl.style.minWidth || 250)) {
@@ -1453,32 +1503,39 @@
                         winEl.style.height = (newWidth / aspectRatio) + 'px';
                     }
                 };
-                
-                const onMouseMove = (event) => onResizeMove(event.clientX);
-                const onTouchMove = (event) => { event.preventDefault(); onResizeMove(event.touches[0].clientX); };
 
                 const onResizeEnd = () => {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onResizeEnd);
-                    document.removeEventListener('touchmove', onTouchMove);
-                    document.removeEventListener('touchend', onResizeEnd);
+                     if (isTouchEvent) {
+                        document.removeEventListener('touchmove', onResizeMove);
+                        document.removeEventListener('touchend', onResizeEnd);
+                    } else {
+                        document.removeEventListener('mousemove', onResizeMove);
+                        document.removeEventListener('mouseup', onResizeEnd);
+                    }
                 };
-                
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onResizeEnd);
-                document.addEventListener('touchmove', onTouchMove, { passive: false });
-                document.addEventListener('touchend', onResizeEnd);
+
+                if (isTouchEvent) {
+                    document.addEventListener('touchmove', onResizeMove, { passive: false });
+                    document.addEventListener('touchend', onResizeEnd);
+                } else {
+                    document.addEventListener('mousemove', onResizeMove);
+                    document.addEventListener('mouseup', onResizeEnd);
+                }
             };
             
-            resizer.addEventListener('mousedown', e => { e.preventDefault(); startResize(e.clientX, e.clientY); });
-            resizer.addEventListener('touchstart', e => { e.preventDefault(); startResize(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+            resizer.addEventListener('mousedown', startResize);
+            resizer.addEventListener('touchstart', startResize, { passive: false });
 
+            // --- Controls & Focus ---
             winEl.querySelector('.fpw-close').addEventListener('click', () => close(id));
             winEl.querySelector('.fpw-hide').addEventListener('click', () => hide(id));
             handleEl.addEventListener('click', () => show(id));
             winEl.addEventListener('mousedown', () => focus(id));
             winEl.addEventListener('touchstart', () => focus(id), { passive: true });
         }
+
+// <-- 结束替换为 -->
+
 
         function hide(id) {
             const win = windows[id];
