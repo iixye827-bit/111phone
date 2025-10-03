@@ -76,7 +76,7 @@
   "settings": {
     "paginationEnabled": true,
     "jellyBall": {
-      "enabled": true,
+      "enabled": false,
       "swipeBack": true,
       "functions": {},
       "customCSS": ""
