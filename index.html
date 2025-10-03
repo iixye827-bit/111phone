@@ -1436,8 +1436,7 @@
             const resizer = winEl.querySelector('.fpw-resizer');
 
             // --- Drag Logic ---
-
-const startDrag = (e) => {
+ const startDrag = (e) => {
                 // Prevent drag if a button was clicked
                 if (e.target.closest('button')) return;
                 e.preventDefault();
@@ -1445,18 +1444,19 @@ const startDrag = (e) => {
                 const isTouchEvent = e.type === 'touchstart';
                 const startClientX = isTouchEvent ? e.touches[0].clientX : e.clientX;
                 const startClientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
-                
-                // --- 关键修复：使用 getBoundingClientRect() 获取精确的初始位置 ---
-                const rect = winEl.getBoundingClientRect();
-                const initialLeft = rect.left;
-                const initialTop = rect.top;
+                // --- 最终修复方案：计算鼠标/手指与元素左上角的固定偏移量 ---
+                const offsetX = startClientX - winEl.getBoundingClientRect().left;
+                const offsetY = startClientY - winEl.getBoundingClientRect().top;
                 const onDragMove = (moveEvent) => {
                     const moveClientX = isTouchEvent ? moveEvent.touches[0].clientX : moveEvent.clientX;
                     const moveClientY = isTouchEvent ? moveEvent.touches[0].clientY : moveEvent.clientY;
-                    let newX = initialLeft + (moveClientX - startClientX);
-                    let newY = initialTop + (moveClientY - startClientY);
-                    newX = Math.max(0, Math.min(newX, window.innerWidth - winEl.offsetWidth));
-                    newY = Math.max(0, Math.min(newY, window.innerHeight - winEl.offsetHeight));
+                    // 新位置 = 当前手指位置 - 初始固定偏移量
+                    let newX = moveClientX - offsetX;
+                    let newY = moveClientY - offsetY;
+                    
+                    // --- 移除边界限制 ---
+                    // 不再检查窗口边界，允许自由拖动
+                    
                     winEl.style.left = `${newX}px`;
                     winEl.style.top = `${newY}px`;
                 };
