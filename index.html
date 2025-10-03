@@ -756,7 +756,7 @@
             z-index: 10;
         }
         
-        .fpw-hide-handle {
+                .fpw-hide-handle {
             position: fixed;
             z-index: 2009;
             padding: 10px 8px;
@@ -766,7 +766,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
             cursor: pointer;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, top 0.3s ease; /* 修改点：增加了 top 属性的过渡效果 */
             font-size: 12px;
             font-weight: 600;
             writing-mode: vertical-rl;
@@ -775,6 +775,7 @@
             opacity: 0;
             pointer-events: none;
         }
+
         .fpw-hide-handle.visible {
             opacity: 1;
             pointer-events: auto;
@@ -1535,6 +1536,19 @@
 // <-- 结束替换为 -->
 
 
+                const BASE_TOP_OFFSET = 20; // 第一个标签距离屏幕顶部的距离
+        const HANDLE_SPACING = 25;  // 每个标签之间的垂直间距
+
+        /**
+         * 重新计算并排列所有可见的隐藏标签位置
+         */
+        function _restackHandles() {
+            const visibleHandles = Array.from(container.querySelectorAll('.fpw-hide-handle.visible'));
+            visibleHandles.forEach((handle, index) => {
+                handle.style.top = `${BASE_TOP_OFFSET + (index * HANDLE_SPACING)}px`;
+            });
+        }
+
         function hide(id) {
             const win = windows[id];
             if (!win) return;
@@ -1542,17 +1556,24 @@
             
             setTimeout(() => {
                 win.element.style.display = 'none';
-                win.handle.style.top = `${win.element.offsetTop + 20}px`;
+                // 设置固定的基础样式
                 win.handle.style.left = '0px';
                 win.handle.style.borderRadius = '0 8px 8px 0';
                 win.handle.classList.add('visible');
+                
+                // 调用新的排列函数来确定最终位置
+                _restackHandles();
             }, 300);
         }
 
         function show(id) {
             const win = windows[id];
             if (!win) return;
+
+            // 先隐藏标签，然后重新排列剩下的标签
             win.handle.classList.remove('visible');
+            _restackHandles();
+
             win.element.style.display = 'flex';
             setTimeout(() => {
                 win.element.classList.add('visible');
@@ -1563,11 +1584,24 @@
         function close(id) {
             const win = windows[id];
             if (!win) return;
+            
+            // 标记标签为不可见，以便在关闭动画期间，其他标签可以先移动到位
+            const wasVisible = win.handle.classList.contains('visible');
+            if(wasVisible) {
+                win.handle.classList.remove('visible');
+            }
+
             win.element.classList.remove('visible');
+            
             setTimeout(() => {
                 win.element.remove();
                 win.handle.remove();
                 delete windows[id];
+                
+                // 只有当被关闭的窗口之前是隐藏状态时，才需要重新排列
+                if (wasVisible) {
+                    _restackHandles();
+                }
             }, 300);
         }
 
@@ -1576,6 +1610,7 @@
                 close(id);
             }
         }
+
         
         return { create, closeAll };
     })();
