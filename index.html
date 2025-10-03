@@ -1450,30 +1450,35 @@
         const initialLeft = rect.left;
         const initialTop = rect.top;
 
-                const onDragMove = (moveEvent) => {
-                    // 获取当前指针位置
+              const onDragMove = (moveEvent) => {
+                    // 1. 获取当前缩放比例 (这是本次修复的关键)
+                    // getBoundingClientRect().width 是视觉上的宽度 (受缩放影响)
+                    // offsetWidth 是布局上的宽度 (不受缩放影响)
+                    // 它们的比值就是当前的缩放比例
+                    const currentRect = winEl.getBoundingClientRect();
+                    // 防止除以0的错误
+                    const scale = currentRect.width / winEl.offsetWidth || 1; 
+                    // 2. 获取指针的移动距离 (屏幕像素)
                     const moveClientX = isTouchEvent ? moveEvent.touches[0].clientX : moveEvent.clientX;
                     const moveClientY = isTouchEvent ? moveEvent.touches[0].clientY : moveEvent.clientY;
+                    const deltaX = moveClientX - startClientX;
+                    const deltaY = moveClientY - startClientY;
+                    // 3. 将屏幕移动距离根据缩放比例进行换算，得到布局上的移动距离
+                    // 并加上窗口的初始位置
+                    let newX = initialLeft + (deltaX / scale);
+                    let newY = initialTop + (deltaY / scale);
                     
-                    // 计算窗口的理论新位置
-                    let newX = initialLeft + (moveClientX - startClientX);
-                    let newY = initialTop + (moveClientY - startClientY);
-                    
-                    // 获取当前可靠的视窗边界
-                    const boundaryX = document.documentElement.clientWidth - winEl.offsetWidth;
-                    const boundaryY = document.documentElement.clientHeight - winEl.offsetHeight;
-
-                    // 确保窗口不会超出边界
-                    // newX 不能小于0，也不能大于 (屏幕宽度 - 窗口宽度)
+                    // 4. 计算边界时，也需要使用布局尺寸
+                    const boundaryX = document.documentElement.clientWidth / scale - winEl.offsetWidth;
+                    const boundaryY = document.documentElement.clientHeight / scale - winEl.offsetHeight;
+                    // 5. 确保窗口在换算后的坐标系内也不会超出边界
                     newX = Math.max(0, Math.min(newX, boundaryX));
-                    // newY 不能小于0，也不能大于 (屏幕高度 - 窗口高度)
                     newY = Math.max(0, Math.min(newY, boundaryY));
                     
-                    // 应用最终计算出的安全位置
+                    // 6. 应用最终位置
                     winEl.style.left = `${newX}px`;
                     winEl.style.top = `${newY}px`;
                 };
-
 
                 const onDragEnd = () => {
                     if (isTouchEvent) {
