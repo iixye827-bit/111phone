@@ -68,7 +68,8 @@
     }
   ],
   "settings": {
-    "paginationEnabled": true
+    "paginationEnabled": true,
+    "jellyBallCss": ""
   },
   "themePresets": []
 }
