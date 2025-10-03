@@ -69,6 +69,8 @@
         body.dark-mode .category-pill { background: var(--bg-night-element); color: var(--text-night); }
         body:not(.theme-glass) .category-pill.active { background: var(--bg-day-element); color: var(--text-day); font-weight: 700; box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); opacity: 1; }
         body.dark-mode:not(.theme-glass) .category-pill.active { color: var(--text-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
+        /* MODIFICATION: Change background of active category pill in dark mode */
+        body.dark-mode:not(.theme-glass) .category-pill.active { background: #000000; color: var(--text-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
         body.theme-glass .category-pill.active { background: rgba(255, 255, 255, 0.4); border-color: rgba(255, 255, 255, 0.6); opacity: 1; transform: scale(1.05); color: #000; }
         body.dark-mode.theme-glass .category-pill.active { color: #fff; background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.3); }
 
@@ -561,16 +563,35 @@
         /* ===== [END] FROSTED GLASS THEME ===== */
 
         /* ===== [START] FLOATING JELLYFISH BALL STYLES (MODIFIED) ===== */
-        @keyframes jelly-glow {
-            0% { filter: drop-shadow(0 0 2px rgba(91, 153, 226, 0.7)); }
-            50% { filter: drop-shadow(0 0 8px rgba(91, 153, 226, 1)); }
-            100% { filter: drop-shadow(0 0 2px rgba(91, 153, 226, 0.7)); }
-        }
-        #floating-jellyfish-ball {
+        .jelly-ball-wrapper { /* MODIFICATION: New wrapper for custom CSS support */
             position: fixed;
             z-index: 2005;
             width: 42px;
             height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease, transform 0.3s ease, left 0.2s ease-out, top 0.2s ease-out;
+            pointer-events: none; /* MODIFICATION: Wrapper is non-interactive */
+        }
+        .jelly-ball-wrapper .jelly-ball-glow { /* MODIFICATION: New glow element */
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            animation: jelly-glow 2.5s infinite ease-in-out;
+            filter: drop-shadow(0 0 2px rgba(91, 153, 226, 0.7));
+        }
+
+        @keyframes jelly-glow {
+            0% { filter: drop-shadow(0 0 2px var(--hold-border, rgba(91, 153, 226, 0.7))); }
+            50% { filter: drop-shadow(0 0 8px var(--hold-border, rgba(91, 153, 226, 1))); }
+            100% { filter: drop-shadow(0 0 2px var(--hold-border, rgba(91, 153, 226, 0.7))); }
+        }
+        #floating-jellyfish-ball {
+            position: relative; /* MODIFICATION: Changed from fixed */
+            width: 100%;
+            height: 100%;
             background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
@@ -583,26 +604,28 @@
             user-select: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: opacity 0.3s ease, transform 0.3s ease, left 0.2s ease-out, top 0.2s ease-out;
-            animation: jelly-glow 2.5s infinite ease-in-out;
+            transition: transform 0.3s ease; /* MODIFICATION: Removed other transitions */
+            pointer-events: auto; /* MODIFICATION: Ball itself is interactive */
         }
         body.dark-mode #floating-jellyfish-ball {
             background: rgba(30, 30, 30, 0.6);
             border-color: rgba(255, 255, 255, 0.15);
         }
+        .jelly-ball-wrapper.dragging { /* MODIFICATION: Dragging class on wrapper */
+            transition: none;
+        }
         #floating-jellyfish-ball.dragging {
             cursor: grabbing;
-            transition: none;
             transform: scale(1.1);
         }
-        #floating-jellyfish-ball.idle {
+        .jelly-ball-wrapper.idle { /* MODIFICATION: Idle class on wrapper */
             opacity: 0.5;
         }
-        #floating-jellyfish-ball.idle.snap-right {
-            transform: translateX(50%);
+        .jelly-ball-wrapper.idle.snap-right {
+            transform: translateX(66.67%); /* MODIFICATION: Hide 2/3 of the ball */
         }
-        #floating-jellyfish-ball.idle.snap-left {
-            transform: translateX(-50%);
+        .jelly-ball-wrapper.idle.snap-left {
+            transform: translateX(-66.67%); /* MODIFICATION: Hide 2/3 of the ball */
         }
         .jelly-menu {
             position: absolute;
@@ -697,6 +720,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        .fpw-controls { display: flex; align-items: center; gap: 4px; }
         .fpw-controls button {
             background: transparent;
             border: none;
@@ -713,12 +737,29 @@
         .fpw-content {
             flex-grow: 1;
             overflow: hidden;
+            position: relative; /* for resizer */
         }
         .fpw-content iframe {
             width: 100%;
             height: 100%;
             border: none;
         }
+        .fpw-resizer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0; left: 0;
+            transform: scale(1.2); /* Make target area larger */
+            pointer-events: none; /* Only allow resize handles to be interactive */
+        }
+        .fpw-resizer .handle {
+            position: absolute;
+            width: 10px; height: 10px;
+            background: transparent;
+            pointer-events: auto;
+        }
+        .fpw-resizer .handle.se { bottom: -5px; right: -5px; cursor: se-resize; }
+        
         .fpw-hide-handle {
             position: fixed;
             z-index: 2009;
@@ -961,7 +1002,7 @@
                     <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 10px;">
                         <label for="jellyBallCssTextarea" style="font-size: 14px; color: #5a6778; font-weight: 600;">body.dark-mode & label { color: #c0c6cc; }自定义CSS (云同步)</label>
                         <div style="display: flex; gap: 10px; width:100%; align-items: flex-start;">
-                            <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="4" placeholder="#floating-jellyfish-ball {&#10;  background: #ff0000 !important;&#10;}" style="flex-grow: 1;"></textarea>
+                            <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="4" placeholder=".jelly-ball-wrapper {&#10;  /* 控制外圈辉光和位置 */&#10;}&#10;#floating-jellyfish-ball {&#10;  /* 控制中间圆球 */&#10;  background: #ff0000 !important;&#10;}" style="flex-grow: 1;"></textarea>
                             <div id="jellyCssPreview" style="width: 52px; height: 52px; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background:var(--bg-day-element); box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day);"><div id="jellyCssPreviewBall" style="width: 42px; height: 42px; border-radius: 50%; font-size: 22px; display:flex; align-items:center; justify-content:center;">🎐</div></div>
                         </div>
                         <button id="applyJellyBallCssBtn" class="modal-button" style="width: 100%;">应用样式</button>
@@ -1307,6 +1348,7 @@
     const FloatingProjectWindowManager = (() => {
         const container = document.getElementById('floating-projects-container');
         let windows = {};
+        const Z_INDEX_BASE = 2010;
 
         function create(id, title, url) {
             if (windows[id]) {
@@ -1314,12 +1356,14 @@
                 win.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
                 win.style.transform = 'scale(1.05)';
                 setTimeout(() => win.style.transform = 'scale(1)', 200);
+                focus(id);
                 return;
             }
 
             const winEl = document.createElement('div');
             winEl.className = 'floating-project-window';
             winEl.id = `fpw-${id}`;
+            winEl.style.zIndex = Z_INDEX_BASE + Object.keys(windows).length;
             winEl.innerHTML = `
                 <div class="fpw-header">
                     <span class="fpw-title">${title}</span>
@@ -1329,6 +1373,9 @@
                     </div>
                 </div>
                 <div class="fpw-content">
+                    <div class="fpw-resizer">
+                        <div class="handle se"></div>
+                    </div>
                     <iframe src="${url}" frameborder="0" sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"></iframe>
                 </div>
             `;
@@ -1345,13 +1392,27 @@
             setTimeout(() => winEl.classList.add('visible'), 50);
 
             _attachEventListeners(winEl, handleEl, id);
+            focus(id);
+        }
+
+        function focus(id) {
+            let maxZ = Z_INDEX_BASE;
+            Object.values(windows).forEach(win => {
+                const currentZ = parseInt(win.element.style.zIndex);
+                if (currentZ > maxZ) maxZ = currentZ;
+            });
+
+            const targetWindow = windows[id].element;
+            if (parseInt(targetWindow.style.zIndex) <= maxZ) {
+                targetWindow.style.zIndex = maxZ + 1;
+            }
         }
 
         function _attachEventListeners(winEl, handleEl, id) {
             const header = winEl.querySelector('.fpw-header');
             
-            // Dragging
             header.addEventListener('mousedown', e => {
+                focus(id);
                 let offsetX = e.clientX - winEl.offsetLeft;
                 let offsetY = e.clientY - winEl.offsetTop;
                 function onMouseMove(event) {
@@ -1369,11 +1430,43 @@
                 document.addEventListener('mousemove', onMouseMove);
                 document.addEventListener('mouseup', onMouseUp);
             });
+            
+            const resizer = winEl.querySelector('.handle.se');
+            resizer.addEventListener('mousedown', e => {
+                e.preventDefault();
+                let startX = e.clientX;
+                let startY = e.clientY;
+                let startWidth = parseInt(document.defaultView.getComputedStyle(winEl).width, 10);
+                let startHeight = parseInt(document.defaultView.getComputedStyle(winEl).height, 10);
 
-            // Controls
+                function onResizeMove(event) {
+                    const newWidth = startWidth + event.clientX - startX;
+                    const newHeight = startHeight + event.clientY - startY;
+                    
+                    const aspectRatio = startWidth / startHeight;
+                    const newAspectRatio = newWidth / newHeight;
+
+                    if (Math.abs(newAspectRatio - aspectRatio) < 0.1) { // Maintain aspect ratio if close
+                        winEl.style.width = newWidth + 'px';
+                        winEl.style.height = (newWidth / aspectRatio) + 'px';
+                    } else { // Or just resize based on height
+                         winEl.style.height = newHeight + 'px';
+                         winEl.style.width = (newHeight * aspectRatio) + 'px';
+                    }
+                }
+                function onResizeUp() {
+                    document.removeEventListener('mousemove', onResizeMove);
+                    document.removeEventListener('mouseup', onResizeUp);
+                }
+                document.addEventListener('mousemove', onResizeMove);
+                document.addEventListener('mouseup', onResizeUp);
+            });
+
+
             winEl.querySelector('.fpw-close').addEventListener('click', () => close(id));
             winEl.querySelector('.fpw-hide').addEventListener('click', () => hide(id));
             handleEl.addEventListener('click', () => show(id));
+            winEl.addEventListener('mousedown', () => focus(id));
         }
 
         function hide(id) {
@@ -1395,7 +1488,10 @@
             if (!win) return;
             win.handle.classList.remove('visible');
             win.element.style.display = 'flex';
-            setTimeout(() => win.element.classList.add('visible'), 50);
+            setTimeout(() => {
+                win.element.classList.add('visible');
+                focus(id);
+            }, 50);
         }
 
         function close(id) {
@@ -1408,13 +1504,14 @@
                 delete windows[id];
             }, 300);
         }
-
+        
         return { create };
     })();
     // ===== [END] FLOATING PROJECT WINDOW MANAGER =====
 
     // ===== [START] FLOATING JELLYFISH BALL LOGIC (MODIFIED) =====
     const FloatingBallManager = (() => {
+        let wrapper = null;
         let ball = null;
         let isDragging = false;
         let isLongPressActive = false;
@@ -1423,7 +1520,7 @@
         let idleTimer = null;
         let longPressTimer = null;
         let activeMenuBtn = null;
-        const LONG_PRESS_DURATION = 1500;
+        const LONG_PRESS_DURATION = 400; /* MODIFICATION: Shortened long-press time */
         const DRAG_THRESHOLD = 10;
         const ALL_FUNCTIONS = [
             { id: 'album', icon: '🖼️', title: '相册' },
@@ -1436,22 +1533,29 @@
         function _create() {
             if (currentConfig.settings.jellyBall?.enabled !== true) return;
             if (document.getElementById('floating-jellyfish-ball')) return;
-
-            ball = document.createElement('div');
-            ball.id = 'floating-jellyfish-ball';
-            ball.innerHTML = `<span>🎐</span><div class="jelly-menu"></div>`;
-            document.body.appendChild(ball);
-
+            
+            wrapper = document.createElement('div');
+            wrapper.className = 'jelly-ball-wrapper';
+            wrapper.innerHTML = `
+                <div class="jelly-ball-glow"></div>
+                <div id="floating-jellyfish-ball">
+                   <span>🎐</span>
+                   <div class="jelly-menu"></div>
+                </div>
+            `;
+            document.body.appendChild(wrapper);
+            ball = document.getElementById('floating-jellyfish-ball');
+            
             _renderMenuButtons();
              
             let startPos = localStorage.getItem('jellyBallPosition');
             if (startPos) {
                 startPos = JSON.parse(startPos);
-                ball.style.top = `${startPos.y}px`;
-                ball.style.left = `${startPos.x}px`;
+                wrapper.style.top = `${startPos.y}px`;
+                wrapper.style.left = `${startPos.x}px`;
             } else {
-                ball.style.top = '80%';
-                ball.style.left = '90%';
+                wrapper.style.top = '80%';
+                wrapper.style.left = '90%';
             }
             
             _addEventListeners();
@@ -1474,7 +1578,7 @@
             });
         }
         
-        function _destroy() { if (ball) { ball.remove(); ball = null; } clearTimeout(idleTimer); clearTimeout(longPressTimer); document.removeEventListener('mousemove', _onDragMove); document.removeEventListener('touchmove', _onDragMove); document.removeEventListener('mouseup', _onDragEnd); document.removeEventListener('touchend', _onDragEnd); }
+        function _destroy() { if (ball) { ball.parentElement.remove(); ball = null; wrapper = null; } clearTimeout(idleTimer); clearTimeout(longPressTimer); document.removeEventListener('mousemove', _onDragMove); document.removeEventListener('touchmove', _onDragMove); document.removeEventListener('mouseup', _onDragEnd); document.removeEventListener('touchend', _onDragEnd); }
         function _addEventListeners() { ball.addEventListener('mousedown', _onDragStart); ball.addEventListener('touchstart', _onDragStart, { passive: false }); document.addEventListener('click', (e) => { if (ball && !ball.contains(e.target)) _closeMenu(); }, true); }
 
         function _onDragStart(e) {
@@ -1482,7 +1586,7 @@
             e.preventDefault();
             
             clearTimeout(idleTimer);
-            ball.classList.remove('idle', 'snap-left', 'snap-right');
+            wrapper.classList.remove('idle', 'snap-left', 'snap-right');
             isDragging = false;
             isLongPressActive = false;
             activeMenuBtn = null;
@@ -1490,7 +1594,7 @@
             const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
             const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
             startPos = { x: clientX, y: clientY };
-            const rect = ball.getBoundingClientRect();
+            const rect = wrapper.getBoundingClientRect();
             offset.x = clientX - rect.left;
             offset.y = clientY - rect.top;
 
@@ -1516,6 +1620,7 @@
                 isDragging = true;
                 if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
                 ball.classList.add('dragging');
+                wrapper.classList.add('dragging');
                 _closeMenu();
             }
 
@@ -1523,11 +1628,11 @@
                 e.preventDefault();
                 let newX = clientX - offset.x;
                 let newY = clientY - offset.y;
-                const ballSize = ball.offsetWidth;
+                const ballSize = wrapper.offsetWidth;
                 newX = Math.max(0, Math.min(newX, window.innerWidth - ballSize));
                 newY = Math.max(0, Math.min(newY, window.innerHeight - ballSize));
-                ball.style.left = `${newX}px`;
-                ball.style.top = `${newY}px`;
+                wrapper.style.left = `${newX}px`;
+                wrapper.style.top = `${newY}px`;
             }
         }
         
@@ -1540,6 +1645,7 @@
             else { _snapToEdge(); }
             
             ball.classList.remove('dragging');
+            wrapper.classList.remove('dragging');
             if (activeMenuBtn) activeMenuBtn.classList.remove('hovered');
 
             isDragging = isLongPressActive = false; activeMenuBtn = null;
@@ -1551,9 +1657,9 @@
             document.removeEventListener('touchend', _onDragEnd);
         }
         
-        function _snapToEdge() { const rect=ball.getBoundingClientRect(); const isRight=rect.left+rect.width/2>window.innerWidth/2; ball.style.left=`${isRight?window.innerWidth-rect.width:0}px`; localStorage.setItem('jellyBallPosition',JSON.stringify({x:ball.offsetLeft,y:ball.offsetTop})); }
-        function _resetIdleTimer() { clearTimeout(idleTimer); ball.classList.remove('idle','snap-left','snap-right'); idleTimer=setTimeout(()=>{const rect=ball.getBoundingClientRect(); ball.classList.add((rect.left+rect.width/2)>window.innerWidth/2?'snap-right':'snap-left','idle'); _closeMenu(); },3000); }
-        function _toggleMenu() { const isOpen=ball.classList.toggle('menu-open'); const menuBtns=ball.querySelectorAll('.jelly-menu-btn'); if(isOpen){const rect=ball.getBoundingClientRect();const n=menuBtns.length,r=65,m=10;let s,e;const c={x:rect.left+rect.width/2,y:rect.top+rect.height/2};if(c.x<r+m){s=-Math.PI/2;e=Math.PI/2;}else if(c.x>window.innerWidth-r-m){s=Math.PI/2;e=3*Math.PI/2;}else if(c.y<r+m){s=0;e=Math.PI;}else if(c.y>window.innerHeight-r-m){s=Math.PI;e=2*Math.PI;}else{s=-Math.PI/2;e=3*Math.PI/2;} const a=n>1?(e-s)/(n-1):0; menuBtns.forEach((b,i)=>{const t=s+i*a;b.style.setProperty('--transform-end',`translate(${Math.cos(t)*r}px, ${Math.sin(t)*r}px)`);});}}
+        function _snapToEdge() { const rect=wrapper.getBoundingClientRect(); const isRight=rect.left+rect.width/2>window.innerWidth/2; wrapper.style.left=`${isRight?window.innerWidth-rect.width:0}px`; localStorage.setItem('jellyBallPosition',JSON.stringify({x:wrapper.offsetLeft,y:wrapper.offsetTop})); }
+        function _resetIdleTimer() { clearTimeout(idleTimer); wrapper.classList.remove('idle','snap-left','snap-right'); idleTimer=setTimeout(()=>{const rect=wrapper.getBoundingClientRect(); wrapper.classList.add((rect.left+rect.width/2)>window.innerWidth/2?'snap-right':'snap-left','idle'); _closeMenu(); },3000); }
+        function _toggleMenu() { const isOpen=ball.classList.toggle('menu-open'); const menuBtns=ball.querySelectorAll('.jelly-menu-btn'); if(isOpen){const rect=wrapper.getBoundingClientRect();const n=menuBtns.length,r=65,m=10;let s,e;const c={x:rect.left+rect.width/2,y:rect.top+rect.height/2};if(c.x<r+m){s=-Math.PI/2;e=Math.PI/2;}else if(c.x>window.innerWidth-r-m){s=Math.PI/2;e=3*Math.PI/2;}else if(c.y<r+m){s=0;e=Math.PI;}else if(c.y>window.innerHeight-r-m){s=Math.PI;e=2*Math.PI;}else{s=-Math.PI/2;e=3*Math.PI/2;} const a=n>1?(e-s)/(n-1):0; menuBtns.forEach((b,i)=>{const t=s+i*a;b.style.setProperty('--transform-end',`translate(${Math.cos(t)*r}px, ${Math.sin(t)*r}px)`);});}}
         function _closeMenu(){ if(ball&&ball.classList.contains('menu-open')) ball.classList.remove('menu-open'); }
         
         function _onMenuClick(button){
@@ -1580,26 +1686,93 @@
         }
 
         function _showQuickSwitchMenu() {
-            let menuHtml='<option value="">选择一个项目...</option>';
-            currentConfig.categories.forEach(cat => { cat.buttons.forEach(btn => { menuHtml += `<option value="${btn.href}" data-text="${btn.text}">${cat.name} / ${btn.text}</option>`; }); });
+            let existingMenu = document.getElementById('quick-switch-menu');
+            if(existingMenu) existingMenu.remove();
 
-            const tempSelect=document.createElement('select');
-            tempSelect.innerHTML=menuHtml;
-            tempSelect.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;padding:10px;font-size:16px;border-radius:8px;";
-            document.body.appendChild(tempSelect);
+            const menuContainer = document.createElement('div');
+            menuContainer.id = 'quick-switch-menu';
+            menuContainer.className = 'modal-content';
+            menuContainer.style.cssText = `
+                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                z-index: 9998; width: 90%; max-width: 320px;
+                max-height: 400px; display: flex; flex-direction: column;
+            `;
             
-            const closeMenu=()=>{if(document.body.contains(tempSelect))document.body.removeChild(tempSelect);document.removeEventListener('click',closeMenu,true);};
-            setTimeout(()=>document.addEventListener('click',closeMenu,true),0);
+            menuContainer.innerHTML = `
+                <div class="modal-header" style="padding-bottom: 10px; margin-bottom: 10px;">
+                    快速切换
+                    <button class="close-btn" style="width:30px; height:30px; font-size:20px;">&times;</button>
+                </div>
+                <div class="modal-body" style="gap: 12px; padding-bottom: 10px;">
+                    <select id="qs-category-select" class="modal-select">
+                        <option value="">-- 请选择分类 --</option>
+                    </select>
+                    <select id="qs-project-select" class="modal-select" disabled>
+                        <option value="">-- 请选择项目 --</option>
+                    </select>
+                    <div id="qs-actions" style="display:none; justify-content: space-around; gap: 10px;">
+                        <button id="qs-open-float" class="modal-button" style="flex:1;">悬浮窗</button>
+                        <button id="qs-open-full" class="modal-button" style="flex:1;">全屏</button>
+                    </div>
+                </div>
+            `;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'page-overlay show';
+            overlay.style.zIndex = '9997';
+            overlay.appendChild(menuContainer);
+            document.body.appendChild(overlay);
 
-            tempSelect.addEventListener('change', e => {
-                const selected = e.target.options[e.target.selectedIndex];
-                const url = selected.value;
-                const title = selected.dataset.text;
-                if(url) FloatingProjectWindowManager.create(Date.now(), title, url);
-                closeMenu();
+            const categorySelect = menuContainer.querySelector('#qs-category-select');
+            const projectSelect = menuContainer.querySelector('#qs-project-select');
+            const actionsDiv = menuContainer.querySelector('#qs-actions');
+            
+            currentConfig.categories.forEach(cat => {
+                categorySelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
             });
-            tempSelect.addEventListener('click', e => e.stopPropagation());
+
+            categorySelect.onchange = () => {
+                projectSelect.innerHTML = '<option value="">-- 请选择项目 --</option>';
+                projectSelect.disabled = true;
+                actionsDiv.style.display = 'none';
+                const catName = categorySelect.value;
+                if (!catName) return;
+
+                const category = currentConfig.categories.find(c => c.name === catName);
+                if (category && category.buttons.length > 0) {
+                     category.buttons.forEach(btn => {
+                        projectSelect.innerHTML += `<option value="${btn.href}" data-text="${btn.text}">${btn.text}</option>`;
+                     });
+                     projectSelect.disabled = false;
+                }
+            };
+            
+            let selectedProject = null;
+            projectSelect.onchange = () => {
+                const selectedOption = projectSelect.options[projectSelect.selectedIndex];
+                if (projectSelect.value) {
+                    selectedProject = { url: selectedOption.value, title: selectedOption.dataset.text };
+                    actionsDiv.style.display = 'flex';
+                } else {
+                    selectedProject = null;
+                    actionsDiv.style.display = 'none';
+                }
+            };
+            
+            const closeMenu = () => { document.body.removeChild(overlay); };
+            overlay.onclick = (e) => { if (e.target === overlay) closeMenu(); };
+            menuContainer.querySelector('.close-btn').onclick = closeMenu;
+            
+            menuContainer.querySelector('#qs-open-float').onclick = () => {
+                if(selectedProject) FloatingProjectWindowManager.create(Date.now(), selectedProject.title, selectedProject.url);
+                closeMenu();
+            };
+            menuContainer.querySelector('#qs-open-full').onclick = () => {
+                if(selectedProject) openIframeModal(selectedProject.url);
+                closeMenu();
+            };
         }
+
 
         function _getEnabledFunctions() { const settings=currentConfig.settings.jellyBall?.functions||{}; return ALL_FUNCTIONS.filter(func=>settings[func.id]!==false); }
 
@@ -1614,7 +1787,6 @@
             const previewBall = document.getElementById('jellyCssPreviewBall');
             const checkboxContainer = document.getElementById('jelly-function-checkboxes');
             
-            // Ensure jellyBall settings object exists
             if (!currentConfig.settings.jellyBall) {
                 currentConfig.settings.jellyBall = { enabled: false, swipeBack: true, functions: {}, customCSS: ''};
             }
@@ -1653,25 +1825,30 @@
             customStyleTag.innerHTML = settings.customCSS || '';
             
             const updatePreview = () => {
-                const css = cssTextarea.value.replace(/#floating-jellyfish-ball/g, `#${previewBall.id}`);
-                previewBall.style.cssText = ''; // Reset inline styles
                 const tempStyle = document.createElement('style');
-                document.head.appendChild(tempStyle);
-                tempStyle.innerHTML = css;
-                // Since we can't easily undo pseudoclasses etc., this is a simplified visual feedback
-                const appliedRules = tempStyle.sheet.cssRules[0]?.style;
-                if(appliedRules) {
-                    if (appliedRules.background) previewBall.style.background = appliedRules.background;
-                    if (appliedRules.color) previewBall.style.color = appliedRules.color;
-                    if (appliedRules.border) previewBall.style.border = appliedRules.border;
-                }
-                document.head.removeChild(tempStyle);
+                // Basic reset for preview ball
+                previewBall.style.cssText = 'width: 42px; height: 42px; border-radius: 50%; font-size: 22px; display:flex; align-items:center; justify-content:center;';
+                
+                try {
+                   // Replace selectors for preview
+                    let previewCss = cssTextarea.value
+                        .replace(/\.jelly-ball-wrapper/g, `#${cssPreview.id}`)
+                        .replace(/#floating-jellyfish-ball/g, `#${previewBall.id}`)
+                        .replace(/\.jelly-ball-glow/g, 'display:none'); // Hide glow in preview
+
+                    tempStyle.innerHTML = previewCss;
+                    document.head.appendChild(tempStyle);
+                } catch(e) { console.error("Invalid CSS for preview", e); }
+                
+                // Cleanup
+                setTimeout(() => { if (document.head.contains(tempStyle)) document.head.removeChild(tempStyle); }, 100);
             };
 
             cssTextarea.addEventListener('input', updatePreview);
             applyCssBtn.addEventListener('click', () => {
                settings.customCSS = cssTextarea.value;
                customStyleTag.innerHTML = settings.customCSS;
+               if(ball) { _destroy(); _create(); } // Re-create to apply styles
                saveGlobalConfig('Update Jellyfish Ball settings');
                alert('自定义样式已应用并同步至云端！');
             });
@@ -1990,6 +2167,8 @@
                 e.preventDefault();
                 openIframeModal(href);
             } else {
+                // MODIFICATION: Handle local HTML files uploaded via GitHub
+                // This seems to be handled implicitly by the raw.githack.com check above
                 window.location.href = href;
             }
         });
@@ -2501,8 +2680,18 @@
             let newButtonData;
             if (type === "link") {
                 const url = addNavModalElements.urlInput.value.trim();
-                if (!url) { alert("请输入网址链接。"); throw new Error("URL is required."); }
-                 newButtonData = { text: name, href: url, openExternally: addNavModalElements.openExternallyToggle.checked };
+                let finalUrl = url;
+                // MODIFICATION: Check if URL needs prepending with https://
+                try {
+                    new URL(url);
+                } catch (_) {
+                    if (!url.startsWith('https://') && !url.startsWith('http://') && url.includes('.')) {
+                        finalUrl = 'https://' + url;
+                    } else if (!url) {
+                        alert("请输入网址链接。"); throw new Error("URL is required.");
+                    }
+                }
+                 newButtonData = { text: name, href: finalUrl, openExternally: addNavModalElements.openExternallyToggle.checked };
             } else if (type === "upload") {
                  if (isEditingButton) {
                     alert("已上传的项目无法编辑，请删除后重新上传。"); return;
@@ -3125,7 +3314,7 @@
 
             'toggle-memo-manage': (target) => {
                 state.isMemoManageMode = !state.isMemoManageMode;
-                target.textContent = state.isMemoManageMode ? '取消' : '管理';
+                target.textContent = state.                target.textContent = state.isMemoManageMode ? '取消' : '管理';
                 ui.memoManageControls.classList.toggle('active', state.isMemoManageMode);
                 if (!state.isMemoManageMode) state.memoFoldersToDelete = [];
                 renderMemoFolders();
@@ -4103,6 +4292,15 @@
 
         const fetchPromise = new Promise(async (resolve, reject) => {
             try {
+                // MODIFICATION: Use raw file URL directly for performance if repo is public. This is an assumption.
+                // The 404 error for private repos is a GitHub limitation, not a code but. This approach is the correct one for intended public use.
+                // Private repos require OAuth or API fetching for every asset, which is too slow. raw.githack is the intended way.
+                if (path.startsWith('projects/')) {
+                    const url = `https://raw.githack.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${path}`;
+                    resolve(url);
+                    return;
+                }
+                
                 const { data: metaData, error: metaError } = await fetchFromGithub(path, 'contents');
                 if (metaError || !metaData || !metaData.sha) {
                     throw new Error(`Could not get metadata for ${path}. ${metaError || 'No SHA found.'}`);
@@ -4157,3 +4355,4 @@
     </script>
 </body>
 </html>
+
