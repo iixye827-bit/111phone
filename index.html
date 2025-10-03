@@ -625,7 +625,7 @@
                         <details>
                             <summary>☁️ 数据云盘</summary>
                             <div class="details-content">
-                                <p><strong>文件存取</strong>: 您可以为每个项目分类上传和下载文件。所有文件都安全地存储在您的私有GitHub仓库中。</p>
+                                <p><strong>文件存取</strong>: 您可以为每个项目分类上传和下载文件。所有文件都安全地存储在您的私有GitHub仓库中。文件下载功能已经过优化，可稳定处理各种大小的文件。</p>
                                 <p><strong>云同步状态指示灯</strong>：☁️ 图标上的小圆点会实时显示同步状态：</p>
                                 <ul><li><strong>🟢 绿点</strong>: <code>已同步</code> - 所有本地更改都已成功保存到云端。</li><li><strong>🟡 黄点 (闪烁)</strong>: <code>同步中</code> - 正在与云端进行数据交换。</li><li><strong>🔴 红点</strong>: <code>同步失败</code> - 发生错误，请点击图标查看失败原因。</li></ul>
                             </div>
@@ -1682,7 +1682,21 @@
         }
     });
     
-    function openIframeModal(url) { if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } iframeEl.src = url; iframeModal.classList.add('active'); }
+    function openIframeModal(url) { 
+    if (!localStorage.getItem('swipeHintShown')) {
+        swipeHint.classList.add('show');
+        setTimeout(() => {
+            swipeHint.classList.remove('show');
+            localStorage.setItem('swipeHintShown', 'true');
+        }, 4000);
+    }
+    // 只有当目标 URL 与当前 iframe 的 URL 不一致时，才重新加载
+    if (iframeEl.src !== url) {
+        iframeEl.src = url;
+    }
+    iframeModal.classList.add('active');
+}
+
     function closeIframeModal() { hideReturnConfirmation(); iframeModal.classList.remove('active'); setTimeout(() => { iframeEl.src = 'about:blank'; }, 400); }
     function showReturnConfirmation() { returnConfirmationToast.classList.add('show'); }
     function hideReturnConfirmation() { returnConfirmationToast.classList.remove('show'); }
