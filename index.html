@@ -1436,50 +1436,30 @@
             const resizer = winEl.querySelector('.fpw-resizer');
 
             // --- Drag Logic ---
-            const startDrag = (e) => {
+
+const startDrag = (e) => {
                 // Prevent drag if a button was clicked
                 if (e.target.closest('button')) return;
-                
                 e.preventDefault();
                 focus(id);
-                
                 const isTouchEvent = e.type === 'touchstart';
                 const startClientX = isTouchEvent ? e.touches[0].clientX : e.clientX;
                 const startClientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
+                
+                // --- 关键修复：使用 getBoundingClientRect() 获取精确的初始位置 ---
                 const rect = winEl.getBoundingClientRect();
-        const initialLeft = rect.left;
-        const initialTop = rect.top;
-
-              const onDragMove = (moveEvent) => {
-                    // 1. 获取当前缩放比例 (这是本次修复的关键)
-                    // getBoundingClientRect().width 是视觉上的宽度 (受缩放影响)
-                    // offsetWidth 是布局上的宽度 (不受缩放影响)
-                    // 它们的比值就是当前的缩放比例
-                    const currentRect = winEl.getBoundingClientRect();
-                    // 防止除以0的错误
-                    const scale = currentRect.width / winEl.offsetWidth || 1; 
-                    // 2. 获取指针的移动距离 (屏幕像素)
+                const initialLeft = rect.left;
+                const initialTop = rect.top;
+                const onDragMove = (moveEvent) => {
                     const moveClientX = isTouchEvent ? moveEvent.touches[0].clientX : moveEvent.clientX;
                     const moveClientY = isTouchEvent ? moveEvent.touches[0].clientY : moveEvent.clientY;
-                    const deltaX = moveClientX - startClientX;
-                    const deltaY = moveClientY - startClientY;
-                    // 3. 将屏幕移动距离根据缩放比例进行换算，得到布局上的移动距离
-                    // 并加上窗口的初始位置
-                    let newX = initialLeft + (deltaX / scale);
-                    let newY = initialTop + (deltaY / scale);
-                    
-                    // 4. 计算边界时，也需要使用布局尺寸
-                    const boundaryX = document.documentElement.clientWidth / scale - winEl.offsetWidth;
-                    const boundaryY = document.documentElement.clientHeight / scale - winEl.offsetHeight;
-                    // 5. 确保窗口在换算后的坐标系内也不会超出边界
-                    newX = Math.max(0, Math.min(newX, boundaryX));
-                    newY = Math.max(0, Math.min(newY, boundaryY));
-                    
-                    // 6. 应用最终位置
+                    let newX = initialLeft + (moveClientX - startClientX);
+                    let newY = initialTop + (moveClientY - startClientY);
+                    newX = Math.max(0, Math.min(newX, window.innerWidth - winEl.offsetWidth));
+                    newY = Math.max(0, Math.min(newY, window.innerHeight - winEl.offsetHeight));
                     winEl.style.left = `${newX}px`;
                     winEl.style.top = `${newY}px`;
                 };
-
                 const onDragEnd = () => {
                     if (isTouchEvent) {
                         document.removeEventListener('touchmove', onDragMove);
@@ -1489,7 +1469,6 @@
                         document.removeEventListener('mouseup', onDragEnd);
                     }
                 };
-                
                 if (isTouchEvent) {
                     document.addEventListener('touchmove', onDragMove, { passive: false });
                     document.addEventListener('touchend', onDragEnd);
@@ -1498,7 +1477,6 @@
                     document.addEventListener('mouseup', onDragEnd);
                 }
             };
-
             header.addEventListener('mousedown', startDrag);
             header.addEventListener('touchstart', startDrag, { passive: false });
 
