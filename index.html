@@ -2904,19 +2904,35 @@
         updateAddNavModalUI();
     }
     
-    function openIframeModal(url) { 
+        function openIframeModal(url) { 
+        // --- 新增代码：记录 iframe 状态 ---
+        localStorage.setItem('lastIframeState', JSON.stringify({ url: url, isOpen: true }));
+        // --- 新增代码结束 ---
+        
         if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } 
         iframeEl.src = url; 
         iframeModal.classList.add('active'); 
         FloatingBallManager.create();
     }
-    function closeIframeModal() { 
+
+        function closeIframeModal() { 
+        // --- 新增代码：更新 iframe 状态为“已关闭” ---
+        try {
+            const lastState = JSON.parse(localStorage.getItem('lastIframeState') || '{}');
+            lastState.isOpen = false;
+            localStorage.setItem('lastIframeState', JSON.stringify(lastState));
+        } catch (e) {
+            // 如果解析失败，则清除
+            localStorage.removeItem('lastIframeState');
+        }
+        // --- 新增代码结束 ---
+
         FloatingProjectWindowManager.closeAll();
         FloatingBallManager.destroy();
         hideReturnConfirmation(); 
         iframeModal.classList.remove('active'); 
-        
     }
+
     function showReturnConfirmation() { returnConfirmationToast.classList.add('show'); }
     function hideReturnConfirmation() { returnConfirmationToast.classList.remove('show'); }
     document.getElementById('confirmReturnBtn').addEventListener('click', closeIframeModal);
@@ -4437,6 +4453,26 @@
         }
     }
 
+        // --- 新增一个函数用于恢复会话 ---
+    function restoreLastSession() {
+        try {
+            const lastStateJSON = localStorage.getItem('lastIframeState');
+            if (lastStateJSON) {
+                const lastState = JSON.parse(lastStateJSON);
+                // 如果PWA关闭时，iframe是打开的，并且有URL
+                if (lastState.isOpen && lastState.url) {
+                    console.log('Restoring last iframe session:', lastState.url);
+                    // 直接调用 openIframeModal 来恢复视图
+                    openIframeModal(lastState.url);
+                }
+            }
+        } catch (e) {
+            console.error('Failed to restore session:', e);
+            localStorage.removeItem('lastIframeState'); // 清理损坏的数据
+        }
+    }
+    // --- 新增函数结束 ---
+
     window.addEventListener('load', async () => {
         initTheme(); 
         loadGithubConfig();
@@ -4451,7 +4487,11 @@
         setupColorSync(colorModal.pickerD2, colorModal.hexD2, 'dayColor2');
         setupColorSync(colorModal.pickerN1, colorModal.hexN1, 'nightColor1'); 
         setupColorSync(colorModal.pickerN2, colorModal.hexN2, 'nightColor2');
+        
+        // --- 新增调用：在所有初始化完成后，尝试恢复会话 ---
+        restoreLastSession();
     });
+
     </script>
 </body>
 </html>
