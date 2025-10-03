@@ -1446,8 +1446,9 @@
                 const isTouchEvent = e.type === 'touchstart';
                 const startClientX = isTouchEvent ? e.touches[0].clientX : e.clientX;
                 const startClientY = isTouchEvent ? e.touches[0].clientY : e.clientY;
-                const initialLeft = winEl.offsetLeft;
-                const initialTop = winEl.offsetTop;
+                const rect = winEl.getBoundingClientRect();
+        const initialLeft = rect.left;
+        const initialTop = rect.top;
 
                 const onDragMove = (moveEvent) => {
                     // 获取当前指针位置
