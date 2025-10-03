@@ -69,6 +69,12 @@
   ],
   "settings": {
     "paginationEnabled": true,
+    "jellyBall": {
+      "enabled": false,
+      "swipeBack": true,
+      "functions": {},
+      "customCSS": ""
+    },
     "jellyBallCss": ""
   },
   "themePresets": []
