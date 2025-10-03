@@ -68,8 +68,6 @@
         .category-pill { flex-shrink: 0; padding: 8px 18px; border: none; border-radius: 20px; background: var(--bg-day-element); box-shadow: none; color: var(--text-day); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; opacity: 0.6; }
         body.dark-mode .category-pill { background: var(--bg-night-element); color: var(--text-night); }
         body:not(.theme-glass) .category-pill.active { background: var(--bg-day-element); color: var(--text-day); font-weight: 700; box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); opacity: 1; }
-        body.dark-mode:not(.theme-glass) .category-pill.active { color: var(--text-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
-        /* MODIFICATION: Change background of active category pill in dark mode */
         body.dark-mode:not(.theme-glass) .category-pill.active { background: #000000; color: var(--text-night); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
         body.theme-glass .category-pill.active { background: rgba(255, 255, 255, 0.4); border-color: rgba(255, 255, 255, 0.6); opacity: 1; transform: scale(1.05); color: #000; }
         body.dark-mode.theme-glass .category-pill.active { color: #fff; background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.3); }
@@ -101,7 +99,7 @@
         #sync-status-indicator.synced { background-color: #28a745; } #sync-status-indicator.syncing { background-color: #ffc107; animation: pulse 1.5s infinite; } #sync-status-indicator.error { background-color: #dc3545; animation: none; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
         .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:1000;opacity:0;transition:opacity .3s ease}.modal-overlay.show{display:flex;opacity:1}.modal-content{width:90%;background:var(--bg-day-element);color:var(--text-day);border-radius:16px;box-shadow:12px 12px 24px var(--shadow-dark-day),-12px -12px 24px var(--shadow-light-day);padding:12px;transition:transform .3s ease,background .5s ease,box-shadow .5s ease;transform:scale(.95);display:flex;flex-direction:column;max-height:90vh}.modal-overlay.show .modal-content{transform:scale(1)}body.dark-mode .modal-content{background:var(--bg-night-element);color:var(--text-night);box-shadow:12px 12px 24px var(--shadow-dark-night),-12px -12px 24px var(--shadow-light-night)}.modal-header{display:flex;justify-content:space-between;align-items:center;font-size:20px;font-weight:600;margin-bottom:20px;flex-shrink:0; padding: 0 3px;}.modal-title-group{display:flex;align-items:center;gap:8px}.modal-header .close-btn,.modal-header .settings-btn{cursor:pointer;border:none;background:transparent;color:inherit;padding:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s ease}.modal-header .close-btn{font-size:24px;font-weight:bold;width:36px;height:36px}.modal-header .settings-btn{font-size:20px;width:32px;height:32px}.modal-header .close-btn:hover,.modal-header .settings-btn:hover{background:rgba(0,0,0,0.05)}body.dark-mode .modal-header .close-btn:hover,body.dark-mode .modal-header .settings-btn:hover{background:rgba(255,255,255,0.08)}
-        .modal-body { overflow-y: auto; flex-grow: 1; display:flex; flex-direction:column; gap: 15px; margin-right: -5px; padding-right: 5px; scrollbar-width: none; -ms-overflow-style: none; }
+        .modal-body { overflow-y: auto; overflow-x: hidden; flex-grow: 1; display:flex; flex-direction:column; gap: 15px; margin-right: -5px; padding-right: 5px; scrollbar-width: none; -ms-overflow-style: none; }
         .modal-body > * { margin-left: 3px; margin-right: 3px; width: calc(100% - 6px); }
         .modal-body::-webkit-scrollbar { width: 0; background: transparent; }
         .modal-input,.modal-select,.modal-textarea{padding:12px 15px;border:none;border-radius:10px;font-size:16px;background:var(--bg-day-element);color:var(--text-day);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day);transition:all .3s ease;caret-color:var(--hold-border)}body.dark-mode .modal-input,body.dark-mode .modal-select,body.dark-mode .modal-textarea{background:var(--bg-night-element);color:var(--text-night);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}.modal-input:focus,.modal-select:focus,.modal-textarea:focus{outline:none;box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day),0 0 0 2px var(--hold-border)}body.dark-mode .modal-input:focus,body.dark-mode .modal-select:focus,body.dark-mode .modal-textarea:focus{box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night),0 0 0 2px var(--hold-border)} .modal-textarea{resize:vertical;min-height:80px;}
@@ -677,15 +675,17 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            resize: both;
+            /* resize: both;  */ /* Using custom resizer */
             min-width: 250px;
             min-height: 300px;
             transition: opacity 0.3s ease, transform 0.3s ease;
-            transform: scale(0.9);
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
             opacity: 0;
         }
         .floating-project-window.visible {
-            transform: scale(1);
+            transform: translate(-50%, -50%) scale(1);
             opacity: 1;
         }
         body.dark-mode .floating-project-window {
@@ -710,6 +710,8 @@
             justify-content: space-between;
             cursor: grab;
             user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
         }
         body.dark-mode .fpw-header { background: rgba(255,255,255,0.05); }
         .fpw-header:active { cursor: grabbing; }
@@ -737,7 +739,7 @@
         .fpw-content {
             flex-grow: 1;
             overflow: hidden;
-            position: relative; /* for resizer */
+            position: relative;
         }
         .fpw-content iframe {
             width: 100%;
@@ -746,19 +748,13 @@
         }
         .fpw-resizer {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0; left: 0;
-            transform: scale(1.2); /* Make target area larger */
-            pointer-events: none; /* Only allow resize handles to be interactive */
+            width: 20px;
+            height: 20px;
+            right: 0;
+            bottom: 0;
+            cursor: se-resize;
+            z-index: 10;
         }
-        .fpw-resizer .handle {
-            position: absolute;
-            width: 10px; height: 10px;
-            background: transparent;
-            pointer-events: auto;
-        }
-        .fpw-resizer .handle.se { bottom: -5px; right: -5px; cursor: se-resize; }
         
         .fpw-hide-handle {
             position: fixed;
@@ -995,12 +991,12 @@
                     </div>
 
                     <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px;">
-                        <label style="font-size: 14px; color: #5a6778; font-weight: 600;">body.dark-mode & label { color: #c0c6cc; }自定义功能</label>
+                        <label style="font-size: 14px; color: #5a6778; font-weight: 600;">自定义功能</label>
                         <div id="jelly-function-checkboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 15px; width: 100%;"></div>
                     </div>
                     
                     <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 10px;">
-                        <label for="jellyBallCssTextarea" style="font-size: 14px; color: #5a6778; font-weight: 600;">body.dark-mode & label { color: #c0c6cc; }自定义CSS (云同步)</label>
+                        <label for="jellyBallCssTextarea" style="font-size: 14px; color: #5a6778; font-weight: 600;">自定义CSS (云同步)</label>
                         <div style="display: flex; gap: 10px; width:100%; align-items: flex-start;">
                             <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="4" placeholder=".jelly-ball-wrapper {&#10;  /* 控制外圈辉光和位置 */&#10;}&#10;#floating-jellyfish-ball {&#10;  /* 控制中间圆球 */&#10;  background: #ff0000 !important;&#10;}" style="flex-grow: 1;"></textarea>
                             <div id="jellyCssPreview" style="width: 52px; height: 52px; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background:var(--bg-day-element); box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day);"><div id="jellyCssPreviewBall" style="width: 42px; height: 42px; border-radius: 50%; font-size: 22px; display:flex; align-items:center; justify-content:center;">🎐</div></div>
@@ -1354,8 +1350,8 @@
             if (windows[id]) {
                 const win = windows[id].element;
                 win.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-                win.style.transform = 'scale(1.05)';
-                setTimeout(() => win.style.transform = 'scale(1)', 200);
+                win.style.transform = `${win.style.transform.replace(/scale$[^)]+$/, '')} scale(1.05)`;
+                setTimeout(() => win.style.transform = win.style.transform.replace(/scale\([^)]+\)/, 'scale(1)'), 200);
                 focus(id);
                 return;
             }
@@ -1373,9 +1369,7 @@
                     </div>
                 </div>
                 <div class="fpw-content">
-                    <div class="fpw-resizer">
-                        <div class="handle se"></div>
-                    </div>
+                    <div class="fpw-resizer"></div>
                     <iframe src="${url}" frameborder="0" sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"></iframe>
                 </div>
             `;
@@ -1411,62 +1405,79 @@
         function _attachEventListeners(winEl, handleEl, id) {
             const header = winEl.querySelector('.fpw-header');
             
-            header.addEventListener('mousedown', e => {
+            const startDrag = (clientX, clientY) => {
                 focus(id);
-                let offsetX = e.clientX - winEl.offsetLeft;
-                let offsetY = e.clientY - winEl.offsetTop;
-                function onMouseMove(event) {
-                    let newX = event.clientX - offsetX;
-                    let newY = event.clientY - offsetY;
+                let offsetX = clientX - winEl.offsetLeft;
+                let offsetY = clientY - winEl.offsetTop;
+                
+                const onDragMove = (moveClientX, moveClientY) => {
+                    let newX = moveClientX - offsetX;
+                    let newY = moveClientY - offsetY;
                     newX = Math.max(0, Math.min(newX, window.innerWidth - winEl.offsetWidth));
                     newY = Math.max(0, Math.min(newY, window.innerHeight - winEl.offsetHeight));
                     winEl.style.left = `${newX}px`;
                     winEl.style.top = `${newY}px`;
-                }
-                function onMouseUp() {
+                };
+
+                const onMouseMove = (event) => onDragMove(event.clientX, event.clientY);
+                const onTouchMove = (event) => { event.preventDefault(); onDragMove(event.touches[0].clientX, event.touches[0].clientY); };
+
+                const onDragEnd = () => {
                     document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
-                }
+                    document.removeEventListener('mouseup', onDragEnd);
+                    document.removeEventListener('touchmove', onTouchMove);
+                    document.removeEventListener('touchend', onDragEnd);
+                };
+
                 document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onMouseUp);
-            });
-            
-            const resizer = winEl.querySelector('.handle.se');
-            resizer.addEventListener('mousedown', e => {
-                e.preventDefault();
-                let startX = e.clientX;
-                let startY = e.clientY;
-                let startWidth = parseInt(document.defaultView.getComputedStyle(winEl).width, 10);
-                let startHeight = parseInt(document.defaultView.getComputedStyle(winEl).height, 10);
+                document.addEventListener('mouseup', onDragEnd);
+                document.addEventListener('touchmove', onTouchMove, { passive: false });
+                document.addEventListener('touchend', onDragEnd);
+            };
 
-                function onResizeMove(event) {
-                    const newWidth = startWidth + event.clientX - startX;
-                    const newHeight = startHeight + event.clientY - startY;
-                    
-                    const aspectRatio = startWidth / startHeight;
-                    const newAspectRatio = newWidth / newHeight;
+            header.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
+            header.addEventListener('touchstart', e => { e.preventDefault(); startDrag(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
 
-                    if (Math.abs(newAspectRatio - aspectRatio) < 0.1) { // Maintain aspect ratio if close
+            const resizer = winEl.querySelector('.fpw-resizer');
+            const startResize = (clientX, clientY) => {
+                let startX = clientX;
+                let startWidth = winEl.offsetWidth;
+                let startHeight = winEl.offsetHeight;
+                const aspectRatio = startWidth / startHeight;
+
+                const onResizeMove = (moveClientX) => {
+                    const dx = moveClientX - startX;
+                    const newWidth = startWidth + dx;
+                    if (newWidth >= parseFloat(winEl.style.minWidth || 250)) {
                         winEl.style.width = newWidth + 'px';
                         winEl.style.height = (newWidth / aspectRatio) + 'px';
-                    } else { // Or just resize based on height
-                         winEl.style.height = newHeight + 'px';
-                         winEl.style.width = (newHeight * aspectRatio) + 'px';
                     }
-                }
-                function onResizeUp() {
-                    document.removeEventListener('mousemove', onResizeMove);
-                    document.removeEventListener('mouseup', onResizeUp);
-                }
-                document.addEventListener('mousemove', onResizeMove);
-                document.addEventListener('mouseup', onResizeUp);
-            });
+                };
+                
+                const onMouseMove = (event) => onResizeMove(event.clientX);
+                const onTouchMove = (event) => { event.preventDefault(); onResizeMove(event.touches[0].clientX); };
 
+                const onResizeEnd = () => {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onResizeEnd);
+                    document.removeEventListener('touchmove', onTouchMove);
+                    document.removeEventListener('touchend', onResizeEnd);
+                };
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onResizeEnd);
+                document.addEventListener('touchmove', onTouchMove, { passive: false });
+                document.addEventListener('touchend', onResizeEnd);
+            };
+            
+            resizer.addEventListener('mousedown', e => { e.preventDefault(); startResize(e.clientX, e.clientY); });
+            resizer.addEventListener('touchstart', e => { e.preventDefault(); startResize(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
 
             winEl.querySelector('.fpw-close').addEventListener('click', () => close(id));
             winEl.querySelector('.fpw-hide').addEventListener('click', () => hide(id));
             handleEl.addEventListener('click', () => show(id));
             winEl.addEventListener('mousedown', () => focus(id));
+            winEl.addEventListener('touchstart', () => focus(id), { passive: true });
         }
 
         function hide(id) {
@@ -1504,8 +1515,14 @@
                 delete windows[id];
             }, 300);
         }
+
+        function closeAll() {
+            for (const id in windows) {
+                close(id);
+            }
+        }
         
-        return { create };
+        return { create, closeAll };
     })();
     // ===== [END] FLOATING PROJECT WINDOW MANAGER =====
 
@@ -1527,7 +1544,7 @@
             { id: 'folder', icon: '📁', title: '文件夹' },
             { id: 'return', icon: '🔙', title: '返回' },
             { id: 'memo', icon: '📝', title: '备忘录' },
-            { id: 'quick_switch', icon: '🔄', title: '快速切换' }
+            { id: 'quick_switch', icon: '🔗', title: '快速切换' }
         ];
 
         function _create() {
@@ -1686,21 +1703,26 @@
         }
 
         function _showQuickSwitchMenu() {
-            let existingMenu = document.getElementById('quick-switch-menu');
+            let existingMenu = document.getElementById('quick-switch-menu-overlay');
             if(existingMenu) existingMenu.remove();
 
+            const overlay = document.createElement('div');
+            overlay.id = 'quick-switch-menu-overlay';
+            overlay.className = 'page-overlay show';
+            overlay.style.zIndex = '9997';
+            overlay.style.display = 'flex';
+            overlay.style.alignItems = 'center';
+            overlay.style.justifyContent = 'center';
+            
             const menuContainer = document.createElement('div');
             menuContainer.id = 'quick-switch-menu';
             menuContainer.className = 'modal-content';
-            menuContainer.style.cssText = `
-                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-                z-index: 9998; width: 90%; max-width: 320px;
-                max-height: 400px; display: flex; flex-direction: column;
-            `;
-            
+            menuContainer.style.maxWidth = '320px';
+            menuContainer.style.maxHeight = '400px';
+
             menuContainer.innerHTML = `
                 <div class="modal-header" style="padding-bottom: 10px; margin-bottom: 10px;">
-                    快速切换
+                    <div class="modal-title-group">快速切换</div>
                     <button class="close-btn" style="width:30px; height:30px; font-size:20px;">&times;</button>
                 </div>
                 <div class="modal-body" style="gap: 12px; padding-bottom: 10px;">
@@ -1710,16 +1732,13 @@
                     <select id="qs-project-select" class="modal-select" disabled>
                         <option value="">-- 请选择项目 --</option>
                     </select>
-                    <div id="qs-actions" style="display:none; justify-content: space-around; gap: 10px;">
+                    <div id="qs-actions" style="display:none; justify-content: space-around; gap: 10px; margin-top: 10px;">
                         <button id="qs-open-float" class="modal-button" style="flex:1;">悬浮窗</button>
                         <button id="qs-open-full" class="modal-button" style="flex:1;">全屏</button>
                     </div>
                 </div>
             `;
             
-            const overlay = document.createElement('div');
-            overlay.className = 'page-overlay show';
-            overlay.style.zIndex = '9997';
             overlay.appendChild(menuContainer);
             document.body.appendChild(overlay);
 
@@ -2167,8 +2186,6 @@
                 e.preventDefault();
                 openIframeModal(href);
             } else {
-                // MODIFICATION: Handle local HTML files uploaded via GitHub
-                // This seems to be handled implicitly by the raw.githack.com check above
                 window.location.href = href;
             }
         });
@@ -2681,8 +2698,7 @@
             if (type === "link") {
                 const url = addNavModalElements.urlInput.value.trim();
                 let finalUrl = url;
-                // MODIFICATION: Check if URL needs prepending with https://
-                try {
+                 try {
                     new URL(url);
                 } catch (_) {
                     if (!url.startsWith('https://') && !url.startsWith('http://') && url.includes('.')) {
@@ -2809,6 +2825,7 @@
         FloatingBallManager.create();
     }
     function closeIframeModal() { 
+        FloatingProjectWindowManager.closeAll();
         FloatingBallManager.destroy();
         hideReturnConfirmation(); 
         iframeModal.classList.remove('active'); 
@@ -2983,7 +3000,7 @@
         function updateStatus(text, isError = false, reason = '') { ui.status.textContent = isError && reason ? `${text}: ${reason}` : text; ui.status.style.color = isError ? '#e53e3e' : 'inherit'; }
 
         async function syncWithGithub() {
-            if (!checkConfig(false)) return;
+                        if (!checkConfig(false)) return;
             updateStatus('同步中...');
             const { data, error } = await fetchFromGithub(MEMORY_DATA_PATH);
             if (error) { updateStatus('同步失败', true, error); return; }
@@ -3314,7 +3331,7 @@
 
             'toggle-memo-manage': (target) => {
                 state.isMemoManageMode = !state.isMemoManageMode;
-                target.textContent = state.                target.textContent = state.isMemoManageMode ? '取消' : '管理';
+                target.textContent = state.isMemoManageMode ? '取消' : '管理';
                 ui.memoManageControls.classList.toggle('active', state.isMemoManageMode);
                 if (!state.isMemoManageMode) state.memoFoldersToDelete = [];
                 renderMemoFolders();
@@ -4292,9 +4309,6 @@
 
         const fetchPromise = new Promise(async (resolve, reject) => {
             try {
-                // MODIFICATION: Use raw file URL directly for performance if repo is public. This is an assumption.
-                // The 404 error for private repos is a GitHub limitation, not a code but. This approach is the correct one for intended public use.
-                // Private repos require OAuth or API fetching for every asset, which is too slow. raw.githack is the intended way.
                 if (path.startsWith('projects/')) {
                     const url = `https://raw.githack.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${path}`;
                     resolve(url);
@@ -4355,4 +4369,3 @@
     </script>
 </body>
 </html>
-
