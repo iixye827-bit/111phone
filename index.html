@@ -923,147 +923,12 @@ body.dragging-active {
 /* =============================================================== */
 
 /* =============================================================== */
-/* ============= [重构] 手机模式专属样式 V2.0 ============= */
+/* ================= [新增] 手机模式专属样式 V1.0 ================== */
 /* =============================================================== */
 
-/* 手机模式的根容器，默认隐藏，覆盖在所有内容之上 */
-#mobile-mode-wrapper {
-    display: none; /* 默认完全隐藏 */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 100; /* 确保在主内容之上，但在弹窗之下 */
-    transition: opacity 0.4s ease;
-    opacity: 0;
-}
-body.mobile-mode-active #mobile-mode-wrapper {
-    display: block; /* 激活时显示 */
-    opacity: 1;
-}
-
-/* 锁屏界面样式 */
-#lock-screen {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    position: absolute; /* 绝对定位，方便做滑入滑出效果 */
-    top: 0;
-    left: 0;
-    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateX(0); /* 默认显示 */
-}
-
-/* 当显示主屏幕时，锁屏向左滑出 */
-body.mobile-mode-active:not(.show-lock-screen) #lock-screen {
-    transform: translateX(-100%);
-}
-
-/* 主内容在手机模式下的滑动效果 */
-body.mobile-mode-active .title-card,
-body.mobile-mode-active .category-nav-container,
-body.mobile-mode-active .nav-container {
-    transition: transform 0.5s cubic-bezier(0.4, 0.2, 0, 1);
-    transform: translateX(100vw); /* 默认隐藏在右侧 */
-}
-body.mobile-mode-active:not(.show-lock-screen) .title-card,
-body.mobile-mode-active:not(.show-lock-screen) .category-nav-container,
-body.mobile-mode-active:not(.show-lock-screen) .nav-container {
-    transform: translateX(0); /* 滑入屏幕 */
-}
-
-/* 锁屏底部滑动提示区 */
-#lock-screen-swipe-area {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 300px;
-    text-align: center;
-    padding: 15px;
-    border-radius: 20px;
-    color: var(--text-day);
-    font-size: 16px;
-    font-weight: 600;
-    user-select: none;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    animation: pulse-text 2s infinite ease-in-out;
-}
-body.dark-mode #lock-screen-swipe-area {
-    color: var(--text-night);
-    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4);
-}
-@keyframes pulse-text { /* ... 动画保持不变 ... */
-    0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.02); }
-}
-
-/* 锁屏网格布局 */
-#lock-screen-grid {
-    flex-grow: 1;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 15px;
-    padding: 20px;
-    width: 100%;
-    max-width: 900px; /* 在大屏上限制最大宽度 */
-    margin: auto;
-}
-
-/* 组件通用样式 */
-.widget {
-    background: rgba(255,255,255,0.15);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    overflow: hidden;
-    position: relative;
-    color: var(--text-night); /* 默认深色背景配浅色字 */
-    padding: 15px;
-    box-sizing: border-box;
-}
-body.dark-mode .widget {
-    background: rgba(0,0,0,0.2);
-    border-color: rgba(255,255,255,0.1);
-    color: var(--text-night);
-}
-
-/* 不同类型的组件样式 */
-.widget.image-widget {
-    padding: 0;
-}
-.widget.image-widget img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.widget.note-widget h5 {
-    margin: 0 0 8px;
-    font-size: 1em;
-    opacity: 0.8;
-}
-.widget.note-widget p {
-    font-size: 0.9em;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 4; /* 根据组件大小调整 */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-.widget.html-widget iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    background: transparent;
-}
-/* =============================================================== */
-/* ========================= [新增结束] ========================== */
-/* =============================================================== */
-
+/* 页面滑动容器，作为轨道 */
+#page-container {
+    width: 200%; /* 包含两个100%宽度的页面 */
     height: 100vh;
     display: flex;
     position: fixed; /* 固定定位以实现整页滑动 */
@@ -1162,6 +1027,200 @@ body.dark-mode #lock-screen-swipe-area {
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
+/* =============================================================== */
+/* ============= [新增] 锁屏组件及编辑器样式 V1.0 ============== */
+/* =============================================================== */
+
+/* 锁屏界面布局调整，为网格腾出空间 */
+#lock-screen {
+    justify-content: space-between; /* 上下分布 */
+    align-items: center;
+    padding-top: 5vh;
+    padding-bottom: 5vh;
+}
+
+/* 锁屏组件网格容器 */
+#lock-screen-grid {
+    width: 100%;
+    max-width: 450px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 15px;
+    height: 50vh; /* 给予一个相对高度 */
+    max-height: 400px;
+}
+
+/* 组件通用样式 */
+.lock-screen-widget {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    color: var(--text-day);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+body.dark-mode .lock-screen-widget {
+    background: rgba(20, 20, 20, 0.25);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-night);
+}
+
+/* 占两格的组件 */
+.lock-screen-widget.span-2 {
+    grid-column: span 2;
+}
+
+/* 图片组件样式 */
+.widget-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 备忘录组件样式 */
+.widget-note {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px;
+    gap: 5px;
+}
+.widget-note-title {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+.widget-note-content {
+    opacity: 0.8;
+    -webkit-line-clamp: 3;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 自定义HTML组件样式 */
+.widget-html {
+    padding: 0; /* 内边距由用户HTML决定 */
+}
+.widget-html > * {
+    width: 100%;
+    height: 100%;
+}
+
+
+/* --- 锁屏编辑器 (悬浮窗内) 样式 --- */
+#lock-screen-editor-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 10px;
+}
+.editor-cell {
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    background:var(--bg-day-element); 
+    box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+body.dark-mode .editor-cell {
+    background:var(--bg-night-element); 
+    box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night);
+}
+.editor-cell:hover {
+    transform: scale(1.05);
+    box-shadow: 4px 4px 8px var(--shadow-dark-day),-4px -4px 8px var(--shadow-light-day);
+}
+.editor-cell.span-2 {
+    grid-column: span 2;
+}
+.editor-cell .add-icon {
+    font-size: 24px;
+    opacity: 0.5;
+}
+.editor-cell .widget-preview {
+    font-size: 12px;
+    padding: 5px;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background-size: cover;
+    background-position: center;
+}
+.widget-preview-icon {
+    font-size: 2em;
+}
+.widget-preview-text {
+    font-weight: bold;
+    word-break: break-all;
+}
+
+/* --- 组件选择器 (模态框) 样式 --- */
+#widget-selector-modal .modal-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+#widget-selector-modal .selector-button {
+    padding: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+#widget-selector-modal .selector-button span:first-child {
+    font-size: 2em;
+}
+#widget-selector-modal #remove-widget-btn {
+    grid-column: 1 / -1; /* 占满整行 */
+    background: #e53e3e !important; 
+    color: white !important;
+}
+
+/* --- 记忆内容选择器 (模态框) 样式 --- */
+#memory-item-selector-list {
+    max-height: 50vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.memory-item-option {
+    padding: 12px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    background:var(--bg-day-element); 
+    box-shadow: 4px 4px 8px var(--shadow-dark-day),-4px -4px 8px var(--shadow-light-day);
+    transition: all 0.2s ease;
+}
+.memory-item-option:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+body.dark-mode .memory-item-option {
+    background:var(--bg-night-element); 
+    box-shadow: 4px 4px 8px var(--shadow-dark-night),-4px -4px 8px var(--shadow-light-night);
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
 
 
     </style>
@@ -1170,30 +1229,20 @@ body.dark-mode #lock-screen-swipe-area {
 <body>
     <div class="page-overlay" id="pageOverlay"></div>
 
-    <!-- ===== [重构] 主内容区，保持原始结构 ===== -->
-    <div class="title-card" id="titleCard">
-        <h1 class="editable-title" id="title">JellyfishCenter</h1>
-        <div class="editable-subtitle" id="subtitle">长按🌞打开工具栏 | By淡季水母</div>
-    </div>
-    <div class="category-nav-container" id="categoryNavContainer">
-        <div class="category-nav" id="categoryNav"></div>
-    </div>
-    <div class="nav-container" id="navContainer">
-        <p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>
-    </div>
-    <!-- ===== [重构结束] ===== -->
-
-    <!-- ===== [新增] 手机模式专属容器 (默认隐藏) ===== -->
-    <div id="mobile-mode-wrapper">
+        <!-- [新增] 锁屏界面 -->
         <div id="lock-screen">
-            <!-- [新增] 锁屏网格布局容器 -->
+            <!-- [修改] 新增组件网格容器 -->
             <div id="lock-screen-grid"></div> 
+            
             <div id="lock-screen-swipe-area">
                 <span>&gt; &gt; &gt; 滑动以进入主屏幕</span>
             </div>
         </div>
-    </div>
-    <!-- ===== [新增结束] ===== -->
+
+        <!-- [新增] 主内容包裹容器 -->
+        <div id="main-content">
+            <!-- 原有的内容被移动到这里 -->
+            <div class="title-card" id="titleCard">
                 <h1 class="editable-title" id="title">JellyfishCenter</h1>
                 <div class="editable-subtitle" id="subtitle">长按🌞打开工具栏 | By淡季水母</div>
             </div>
@@ -1417,16 +1466,21 @@ body.dark-mode #lock-screen-swipe-area {
             </div>
                         <div class="modal-body">
 
-                                <!-- ===== [修改] 手机模式功能区 ===== -->
-                <div class="toggle-section" style="flex-direction: column; align-items: stretch; gap: 10px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                        <span>手机模式</span>
+                <!-- ===== [修改] 手机模式功能区 ===== -->
+                <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px;">
+                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600;">手机模式</span>
                         <label class="toggle-switch">
                             <input type="checkbox" id="mobileModeToggle">
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <button id="customizeLockScreenBtn" class="modal-button" style="display: none; margin-top: 5px;">设置锁屏</button>
+                    <!-- [新增] 锁屏设置入口，默认隐藏 -->
+                    <div id="lock-screen-settings-entry" style="display: none; width: 100%; margin-top: 10px;">
+                        <button id="openLockScreenEditorBtn" class="modal-button" style="width: 100%;">
+                            锁屏与组件
+                        </button>
+                    </div>
                 </div>
                 <!-- ===== [修改结束] ===== -->
                 
@@ -2009,7 +2063,65 @@ body.dark-mode #lock-screen-swipe-area {
             }
         }
 
-// <-- 开始替换为 -->
+        function createWithUrl (id, title, url) {
+            if (_createWindow(id, title)) {
+                windows[id].element.querySelector('.fpw-content').innerHTML = `
+                    <div class="fpw-resizer"></div>
+                    <iframe src="${url}" frameborder="0" sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"></iframe>
+                `;
+                 _attachEventListeners(windows[id].element, windows[id].handle, id);
+            }
+        }
+        
+        function createWithContent(id, title, contentHTML, onReady) {
+            if (_createWindow(id, title)) {
+                const contentArea = windows[id].element.querySelector('.fpw-content');
+                contentArea.innerHTML = `<div class="fpw-resizer"></div>${contentHTML}`;
+                 _attachEventListeners(windows[id].element, windows[id].handle, id);
+                 if (onReady) {
+                    onReady(contentArea);
+                 }
+            }
+        }
+
+        function _createWindow(id, title) {
+            if (windows[id]) {
+                const win = windows[id].element;
+                win.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+                win.style.transform = `${win.style.transform.replace(/scale$[^)]+$/, '') || 'translate(-50%, -50%)'} scale(1.05)`;
+                setTimeout(() => win.style.transform = win.style.transform.replace(/scale\([^)]+\)/, 'scale(1)'), 200);
+                focus(id);
+                return false; // Window already exists
+            }
+
+            const winEl = document.createElement('div');
+            winEl.className = 'floating-project-window';
+            winEl.id = `fpw-${id}`;
+            winEl.style.zIndex = Z_INDEX_BASE + Object.keys(windows).length;
+            winEl.innerHTML = `
+                <div class="fpw-header">
+                    <span class="fpw-title">${title}</span>
+                    <div class="fpw-controls">
+                        <button class="fpw-hide" title="隐藏">－</button>
+                        <button class="fpw-close" title="关闭">×</button>
+                    </div>
+                </div>
+                <div class="fpw-content"></div>
+            `;
+            container.appendChild(winEl);
+            
+            const handleEl = document.createElement('div');
+            handleEl.className = 'fpw-hide-handle';
+            handleEl.id = `fpw-handle-${id}`;
+            handleEl.textContent = title;
+            container.appendChild(handleEl);
+            
+            windows[id] = {id, title, element: winEl, handle: handleEl };
+            setTimeout(() => winEl.classList.add('visible'), 50);
+            focus(id);
+            return true; // Window was created
+        }
+
 
         function _attachEventListeners(winEl, handleEl, id) {
             const header = winEl.querySelector('.fpw-header');
@@ -2191,8 +2303,10 @@ body.dark-mode #lock-screen-swipe-area {
         }
 
         
-        return { create, closeAll };
+        
+        return { create: createWithUrl, createWithContent, closeAll, close };
     })();
+
     // ===== [END] FLOATING PROJECT WINDOW MANAGER =====
 
     // ===== [START] FLOATING JELLYFISH BALL LOGIC (MODIFIED) =====
@@ -4557,10 +4671,6 @@ body.dark-mode #lock-screen-swipe-area {
                 ui.uploadBtn.addEventListener("click", uploadFile);
             },
             getAlbumItems: () => memoryCache ? memoryCache.album.items : [],
- getNoteById: (noteId) => {
-                if (!memoryCache || !memoryCache.memo || !memoryCache.memo.notes) return null;
-                return memoryCache.memo.notes.find(n => n.id === noteId);
-            }
         };
     })();
     // ===== [END] MEMORY APP LOGIC =====
@@ -5169,8 +5279,11 @@ const blob = b64toBlob(blobData.content, contentType);
         initTheme(); 
         loadGithubConfig();
         checkAppUpdate();
-        initMobileMode(); // [新增] 初始化手机模式
-        await loadInitialData();
+        await loadInitialData(); // 先加载数据，再初始化依赖数据的模式
+        initMobileMode(); // 初始化手机模式
+
+        document.getElementById('openLockScreenEditorBtn').addEventListener('click', openLockScreenEditor);
+
 
         setupModals();
         MemoryApp.init();
@@ -5412,153 +5525,8 @@ const blob = b64toBlob(blobData.content, contentType);
         /* =============================================================== */
         /* ================ [新增] 手机模式核心逻辑 V1.0 =================== */
         /* =============================================================== */
-        /* =============================================================== */
-        /* ================ [重构] 手机模式核心逻辑 V2.0 =================== */
-        /* =============================================================== */
         function initMobileMode() {
             const toggle = document.getElementById('mobileModeToggle');
-            const customizeBtn = document.getElementById('customizeLockScreenBtn');
-            const savedState = localStorage.getItem('mobileModeActive') === 'true';
-
-            toggle.checked = savedState;
-            setMobileMode(savedState, false);
-
-            toggle.addEventListener('change', () => setMobileMode(toggle.checked, true));
-            customizeBtn.addEventListener('click', openLockscreenEditor);
-            
-            setupMobileModeSwiping();
-        }
-
-        function setMobileMode(isActive, withTransition) {
-            isMobileModeActive = isActive;
-            localStorage.setItem('mobileModeActive', isActive);
-            
-            document.getElementById('customizeLockScreenBtn').style.display = isActive ? 'block' : 'none';
-
-            if (isActive) {
-                document.body.classList.add('mobile-mode-active');
-                isLockScreenVisible = true;
-                document.body.classList.add('show-lock-screen');
-                renderLockScreenWidgets(); // [新增]
-            } else {
-                document.body.classList.remove('mobile-mode-active', 'show-lock-screen');
-            }
-        }
-
-        function setupMobileModeSwiping() {
-            const mainBody = document.body;
-            let touchStartX = 0;
-            let isDragging = false;
-            let canSwipe = true;
-
-            mainBody.addEventListener('touchstart', (e) => {
-                if (!isMobileModeActive || e.target.closest('.modal-overlay, .floating-project-window')) return;
-                touchStartX = e.touches[0].clientX;
-                isDragging = true;
-            }, { passive: true });
-
-            mainBody.addEventListener('touchend', (e) => {
-                if (!isDragging || !isMobileModeActive) return;
-                isDragging = false;
-                const touchEndX = e.changedTouches[0].clientX;
-                const deltaX = touchEndX - touchStartX;
-                const threshold = window.innerWidth / 4;
-
-                if (isLockScreenVisible && deltaX < -threshold) {
-                    isLockScreenVisible = false;
-                    document.body.classList.remove('show-lock-screen');
-                } else if (!isLockScreenVisible && deltaX > threshold) {
-                    isLockScreenVisible = true;
-                    document.body.classList.add('show-lock-screen');
-                }
-            }, { passive: true });
-        }
-
-        // [新增] 渲染锁屏组件
-        async function renderLockScreenWidgets() {
-            const gridContainer = document.getElementById('lock-screen-grid');
-            gridContainer.innerHTML = ''; // 清空
-
-            // 确保配置存在
-            if (!currentConfig.lockscreen) {
-                currentConfig.lockscreen = { customCSS: '', widgets: [] };
-            }
-            const { widgets } = currentConfig.lockscreen;
-            if (!widgets || widgets.length === 0) {
-                 gridContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: inherit; opacity: 0.5;">锁屏为空，请在主题设置中添加组件。</p>';
-                 return;
-            }
-
-            for (const widgetData of widgets) {
-                const widgetEl = document.createElement('div');
-                widgetEl.className = 'widget';
-                widgetEl.style.gridArea = widgetData.gridArea;
-
-                switch (widgetData.type) {
-                    case 'image':
-                        widgetEl.classList.add('image-widget');
-                        const imgUrl = await getSecureFileUrl(widgetData.content.path);
-                        if(imgUrl) widgetEl.innerHTML = `<img src="${imgUrl}" alt="Lockscreen Widget Image">`;
-                        break;
-                    case 'note':
-                        widgetEl.classList.add('note-widget');
-                        const note = MemoryApp.getNoteById(widgetData.content.noteId); // 需要在MemoryApp中暴露一个新方法
-                        if (note) {
-                           widgetEl.innerHTML = `<h5>${note.title || '无标题'}</h5><p>${note.content}</p>`;
-                        }
-                        break;
-                    case 'html':
-                        widgetEl.classList.add('html-widget');
-                         // 安全地使用 sandboxed iframe
-                        const iframe = document.createElement('iframe');
-                        iframe.sandbox = 'allow-scripts'; // 仅允许脚本，禁止其他危险操作
-                        iframe.srcdoc = widgetData.content.html;
-                        widgetEl.appendChild(iframe);
-                        break;
-                }
-                gridContainer.appendChild(widgetEl);
-            }
-        }
-
-        // [新增] 打开锁屏编辑器
-        function openLockscreenEditor() {
-            const editorTemplate = document.getElementById('lockscreen-editor-template');
-            const editorContent = editorTemplate.content.cloneNode(true);
-            
-            // 使用现有功能创建悬浮窗
-            FloatingProjectWindowManager.create('lockscreen-editor', '锁屏编辑器', 'about:blank');
-            
-            // 稍等片刻，确保悬浮窗DOM已创建
-            setTimeout(() => {
-                const editorWindow = document.getElementById('fpw-lockscreen-editor');
-                if (!editorWindow) return;
-                const contentArea = editorWindow.querySelector('.fpw-content');
-                contentArea.innerHTML = ''; // 清空iframe
-                contentArea.appendChild(editorContent);
-                
-                // 初始化编辑器状态
-                initializeEditorLogic();
-            }, 200);
-        }
-        
-        // [新增] 编辑器内部逻辑
-        function initializeEditorLogic() {
-            // 此处将添加完整的编辑器交互逻辑
-            console.log("Lockscreen editor opened and initialized.");
-            // 示例：加载现有CSS
-            const cssEditor = document.getElementById('lockscreen-css-editor');
-            if(cssEditor && currentConfig.lockscreen) {
-                cssEditor.value = currentConfig.lockscreen.customCSS || '';
-            }
-
-            // TODO: 实现添加组件、网格预览、保存等功能
-            // document.getElementById('editor-add-widget-btn').onclick = ...
-            // document.getElementById('editor-save-lockscreen-btn').onclick = ...
-        }
-        /* =============================================================== */
-        /* ========================= [新增结束] ========================== */
-        /* =============================================================== */
-
             const savedState = localStorage.getItem('mobileModeActive') === 'true';
 
             toggle.checked = savedState;
@@ -5571,28 +5539,240 @@ const blob = b64toBlob(blobData.content, contentType);
             setupMobileModeSwiping();
         }
 
-        function setMobileMode(isActive, withTransition) {
+                function setMobileMode(isActive, withTransition) {
             isMobileModeActive = isActive;
             localStorage.setItem('mobileModeActive', isActive);
 
-            document.body.style.transition = withTransition ? 'background 0.5s ease' : 'none';
-
+            const settingsEntry = document.getElementById('lock-screen-settings-entry');
+            settingsEntry.style.display = isActive ? 'block' : 'none';
+            
+            // 修复布局问题的核心
             if (isActive) {
                 document.body.classList.add('mobile-mode-active');
-                // 默认显示锁屏
                 isLockScreenVisible = true;
                 document.body.classList.add('show-lock-screen');
-                // 隐藏原 fab 按钮
                 document.getElementById('fabContainer').style.display = 'none';
+                renderLockScreen(); // 激活时渲染锁屏
             } else {
+                FloatingProjectWindowManager.close('lockScreenEditor'); // 关闭可能打开的编辑器
                 document.body.classList.remove('mobile-mode-active', 'show-lock-screen');
-                // 恢复原 fab 按钮
-                 document.getElementById('fabContainer').style.display = 'block';
+                document.getElementById('fabContainer').style.display = 'block';
             }
-            // 确保动画结束后再恢复
-            if (withTransition) {
-                setTimeout(() => document.body.style.transition = '', 500);
+        }
+
+        async function renderLockScreen() {
+            const grid = document.getElementById('lock-screen-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            const widgets = currentConfig.settings.lockScreenWidgets || [];
+            
+            for (const widget of widgets) {
+                if (widget.type === 'empty') continue;
+
+                const el = document.createElement('div');
+                el.className = `lock-screen-widget widget-${widget.type}`;
+                if (widget.span && widget.span > 1) {
+                    el.classList.add(`span-${widget.span}`);
+                }
+
+                switch(widget.type) {
+                    case 'image':
+                        const img = document.createElement('img');
+                        img.src = await getSecureFileUrl(widget.content);
+                        el.appendChild(img);
+                        break;
+                    case 'note':
+                        const note = (memoryCache.memo.notes || []).find(n => n.id == widget.content);
+                        if(note) {
+                           el.innerHTML = `<span class="widget-note-title">${note.title || '无标题'}</span><span class="widget-note-content">${note.content}</span>`;
+                        } else {
+                           el.innerHTML = `备忘录未找到`;
+                        }
+                        break;
+                    case 'html':
+                        el.innerHTML = widget.content;
+                        break;
+                }
+                grid.appendChild(el);
             }
+        }
+
+        // --- 锁屏编辑器相关函数 ---
+
+        function openLockScreenEditor() {
+            // 初始化配置
+            if (!currentConfig.settings.lockScreenWidgets) {
+                currentConfig.settings.lockScreenWidgets = Array(8).fill({ type: 'empty' });
+            }
+
+            const editorHTML = `
+                <div id="lock-screen-editor-grid">
+                    ${currentConfig.settings.lockScreenWidgets.map((widget, index) => {
+                        if (widget.skip) return ''; // 用于处理占两格的情况
+                        let content = '<span class="add-icon">+</span>';
+                        if(widget.type !== 'empty') {
+                            let icon = '❓';
+                            let text = '组件';
+                            if (widget.type === 'image') { icon = '🖼️'; text = '图片'; }
+                            if (widget.type === 'note') { icon = '📝'; text = '备忘'; }
+                            if (widget.type === 'html') { icon = '🌐'; text = 'HTML'; }
+                            content = `<div class="widget-preview"><span class="widget-preview-icon">${icon}</span><span class="widget-preview-text">${text}</span></div>`;
+                        }
+                        return `<div class="editor-cell ${widget.span > 1 ? `span-${widget.span}` : ''}" data-index="${index}">${content}</div>`;
+                    }).join('')}
+                </div>
+            `;
+
+            FloatingProjectWindowManager.createWithContent('lockScreenEditor', '锁屏组件编辑器', editorHTML, (contentArea) => {
+                // 窗口创建后，为格子绑定事件
+                contentArea.querySelector('#lock-screen-editor-grid').addEventListener('click', (e) => {
+                    const cell = e.target.closest('.editor-cell');
+                    if (cell) {
+                        showWidgetSelector(parseInt(cell.dataset.index, 10));
+                    }
+                });
+            });
+        }
+        
+        function showWidgetSelector(index) {
+            // 关闭可能已打开的编辑器悬浮窗，防止重叠
+            FloatingProjectWindowManager.close('lockScreenEditor');
+            
+            // 创建并显示选择器模态框
+            const modalHTML = `
+                <div class="modal-overlay show" id="widget-selector-modal">
+                    <div class="modal-content" style="max-width: 350px;">
+                        <div class="modal-header"><div class="modal-title-group">选择组件 (格子 ${index + 1})</div><button class="close-btn">&times;</button></div>
+                        <div class="modal-body">
+                            <button class="modal-button selector-button" data-type="image"><span>🖼️</span><span>相册图片</span></button>
+                            <button class="modal-button selector-button" data-type="note"><span>📝</span><span>指定备忘</span></button>
+                            <button class="modal-button selector-button" data-type="html"><span>🌐</span><span>自定义HTML</span></button>
+                            <button class="modal-button selector-button" data-type="span"><span>↔️</span><span>设为2格宽</span></button>
+                            <button id="remove-widget-btn" class="modal-button selector-button" data-type="remove"><span>❌</span><span>移除组件</span></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            const modal = document.getElementById('widget-selector-modal');
+            const closeModal = () => modal.remove();
+
+            modal.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal-overlay') || e.target.classList.contains('close-btn')) {
+                    closeModal();
+                    openLockScreenEditor(); // 返回编辑器
+                }
+                const btn = e.target.closest('.selector-button');
+                if (btn) {
+                    const type = btn.dataset.type;
+                    closeModal(); // 先关闭当前选择器
+                    
+                    switch (type) {
+                        case 'image': selectMemoryItem('image', index); break;
+                        case 'note': selectMemoryItem('note', index); break;
+                        case 'html': enterCustomHTML(index); break;
+                        case 'span': toggleWidgetSpan(index); break;
+                        case 'remove': removeWidget(index); break;
+                    }
+                }
+            });
+        }
+        
+        function selectMemoryItem(itemType, cellIndex) {
+            const items = (itemType === 'image') 
+                ? (memoryCache.album.items || []).filter(i => i.type === 'photo')
+                : (memoryCache.memo.notes || []);
+
+            const itemTypeName = (itemType === 'image') ? '图片' : '备忘录';
+
+            const modalHTML = `
+                <div class="modal-overlay show" id="memory-item-selector-modal">
+                    <div class="modal-content" style="max-width: 400px;">
+                        <div class="modal-header"><div class="modal-title-group">选择${itemTypeName}</div><button class="close-btn">&times;</button></div>
+                        <div class="modal-body">
+                            <div id="memory-item-selector-list">
+                                ${items.length > 0 ? items.map(item => `
+                                    <div class="memory-item-option" data-id="${item.id}" data-path="${item.path || ''}">
+                                        ${item.title || (item.name || '无标题')}
+                                    </div>
+                                `).join('') : `<p>没有可用的${itemTypeName}。</p>`}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+            const modal = document.getElementById('memory-item-selector-modal');
+            const closeModal = () => modal.remove();
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal-overlay') || e.target.classList.contains('close-btn')) {
+                    closeModal(); 
+                    openLockScreenEditor();
+                    return;
+                }
+                const option = e.target.closest('.memory-item-option');
+                if (option) {
+                    const content = (itemType === 'image') ? option.dataset.path : option.dataset.id;
+                    updateWidget(cellIndex, { type: itemType, content });
+                    closeModal();
+                }
+            });
+        }
+
+        function enterCustomHTML(cellIndex) {
+            const currentHTML = (currentConfig.settings.lockScreenWidgets[cellIndex] || {}).content || '';
+            const html = prompt('请输入你的HTML代码:', currentHTML);
+            if (html !== null) { // 允许用户输入空字符串来清空
+                updateWidget(cellIndex, { type: 'html', content: html });
+            } else {
+                 openLockScreenEditor();
+            }
+        }
+        
+        function updateWidget(index, data) {
+            currentConfig.settings.lockScreenWidgets[index] = {
+                ...currentConfig.settings.lockScreenWidgets[index],
+                ...data
+            };
+            saveGlobalConfig('Update lock screen widget');
+            renderLockScreen();
+            openLockScreenEditor(); // 重新打开编辑器以显示最新状态
+        }
+
+        function toggleWidgetSpan(index) {
+            const widgets = currentConfig.settings.lockScreenWidgets;
+            // 只有在左边的三列才能设为2格宽
+            if (index % 4 < 3) {
+                const currentSpan = widgets[index].span;
+                if (currentSpan > 1) { // 从2格变回1格
+                    widgets[index].span = 1;
+                    delete widgets[index + 1].skip;
+                } else { // 从1格变为2格
+                    widgets[index].span = 2;
+                    // 标记右侧格子为被占用
+                    widgets[index + 1] = { type: 'empty', skip: true };
+                }
+                saveGlobalConfig('Toggle widget span');
+                renderLockScreen();
+            } else {
+                alert('此位置的组件无法扩展为2格宽。');
+            }
+            openLockScreenEditor();
+        }
+
+        function removeWidget(index) {
+            const widgets = currentConfig.settings.lockScreenWidgets;
+            if(widgets[index].span > 1) {
+                 delete widgets[index+1].skip;
+            }
+            widgets[index] = { type: 'empty' };
+            saveGlobalConfig('Remove lock screen widget');
+            renderLockScreen();
+            openLockScreenEditor();
         }
 
         function setupMobileModeSwiping() {
@@ -5663,32 +5843,5 @@ const blob = b64toBlob(blobData.content, contentType);
     });
 
     </script>
-    <!-- ... 你的其他 HTML ... -->
-
-    <!-- ===== [新增] 锁屏编辑器UI模板 ===== -->
-    <template id="lockscreen-editor-template">
-        <div id="lockscreen-editor-content" style="width: 100%; height: 100%; display: flex; flex-direction: column; padding: 15px; box-sizing: border-box; gap: 15px; overflow: hidden;">
-            
-            <div class="form-section">
-                <label style="font-size: 14px; color: #5a6778; font-weight: 600;">自定义锁屏 CSS</label>
-                <textarea id="lockscreen-css-editor" class="modal-textarea" rows="4" placeholder="例如:&#10;#lock-screen-grid {&#10;  background: linear-gradient(...);&#10;}&#10;.widget { color: white; }"></textarea>
-            </div>
-
-            <div class="form-section" style="flex-grow: 1; min-height: 0;">
-                <label style="font-size: 14px; color: #5a6778; font-weight: 600;">组件布局</label>
-                <div id="lockscreen-editor-grid-preview" style="display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 8px; aspect-ratio: 16 / 9; background: rgba(0,0,0,0.1); border-radius: 8px; padding: 8px; overflow: hidden;">
-                    <!-- JS会在这里填充预览组件 -->
-                </div>
-            </div>
-
-            <div class="modal-footer" style="display: flex; justify-content: space-between; gap: 10px; flex-shrink: 0;">
-                 <button id="editor-add-widget-btn" class="modal-button">添加组件</button>
-                 <button id="editor-save-lockscreen-btn" class="modal-button" style="color:var(--hold-border)">保存并应用</button>
-            </div>
-        </div>
-    </template>
-    <!-- ===== [新增结束] ===== -->
-</body>
-
 </body>
 </html>
