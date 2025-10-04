@@ -3817,7 +3817,8 @@
             files.forEach(async (file) => {
                 const li = document.createElement("li");
                 const sizeText = file.size ? `${(file.size / 1024).toFixed(1)} KB` : '...';
-                li.innerHTML = `<div class="file-info"><span class="file-name">${file.name}</span><span class="file-meta" data-path="${file.path}">${sizeText}</span></div><button class="delete-btn">&times;</button>`;
+                li.innerHTML = `<div class="file-info"><span class="file-name">${file.name}</span><span class="file-meta" data-path="${file.path}">${sizeText}</span></div><button class="delete-btn" data-sha="${file.sha}">&times;</button>`;
+
                 ui.fileList.appendChild(li);
                 
                 if (!file.size) { getLatestCommitDate(file.path).then(date => { const metaSpan = li.querySelector('.file-meta'); if (metaSpan) metaSpan.textContent = date.split('T')[0]; }); }
@@ -3827,7 +3828,45 @@
             });
         }
 
-        async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString().split('T')[0];const o=await n.json();return o[0]?.commit.committer.date.split('T')[0]||(new Date(0)).toISOString().split('T')[0]}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString().split('T')[0]}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";try{ const success = await deleteFromGithub(e, `Delete file: ${e}`, t); if (success) { n.remove(); if(ui.fileList.children.length === 0) { ui.fileListStatus.textContent = '该文件夹下暂无文件'; ui.fileListStatus.style.display = 'block'; } } else { n.style.opacity = "1"; } } catch(err) { n.style.opacity = "1"; }}
+        async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString().split('T')[0];const o=await n.json();return o[0]?.commit.committer.date.split('T')[0]||(new Date(0)).toISOString().split('T')[0]}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString().split('T')[0]}}async function deleteFile(e,t,n){
+    const originalFileName = n.querySelector(".file-name").textContent;
+    if(!confirm(`确定要永久删除文件 "${originalFileName}" 吗？`))return;
+    
+    // --- [新增功能] ---
+    const fileNameSpan = n.querySelector(".file-name");
+    const deleteButton = n.querySelector(".delete-btn");
+    fileNameSpan.textContent = "正在删除...";
+    deleteButton.style.display = "none"; // 隐藏删除按钮
+    n.style.pointerEvents = "none"; // 禁止重复点击
+    n.style.opacity="0.7";
+    // --- [新增结束] ---
+    
+    try{ 
+        const success = await deleteFromGithub(e, `Delete file: ${e}`, t); 
+        if (success) { 
+            n.remove(); 
+            if(ui.fileList.children.length === 0) { 
+                ui.fileListStatus.textContent = '该文件夹下暂无文件'; 
+                ui.fileListStatus.style.display = 'block'; 
+            } 
+        } else { 
+            // --- [优化] 恢复状态 ---
+            fileNameSpan.textContent = originalFileName;
+            deleteButton.style.display = "flex";
+            n.style.pointerEvents = "auto";
+            n.style.opacity = "1";
+            // --- [优化结束] ---
+        } 
+    } catch(err) { 
+         // --- [优化] 恢复状态 ---
+         fileNameSpan.textContent = originalFileName;
+         deleteButton.style.display = "flex";
+         n.style.pointerEvents = "auto";
+         n.style.opacity = "1";
+         // --- [优化结束] ---
+    }
+}
+
         async function forceDownload(path, filename, el) {
             const fileNameSpan = el.querySelector(".file-name");
             const originalText = fileNameSpan.textContent;
@@ -3896,51 +3935,82 @@
             }
         }
                 async function uploadFile() {
-            if (activeUploadXHR) { activeUploadXHR.abort(); return; }
-            if (!checkConfig()) return;
+    if (activeUploadXHR) { activeUploadXHR.abort(); return; }
+    if (!checkConfig()) return;
 
-            const selectedProjectHref = ui.projectSelector.value;
-            const file = ui.fileUploader.files[0];
-            let fileName = ui.fileNameInput.value.trim() || (file && file.name);
+    const selectedProjectHref = ui.projectSelector.value;
+    const file = ui.fileUploader.files[0];
+    let fileName = ui.fileNameInput.value.trim() || (file && file.name);
 
-            if (!selectedProjectHref || !file || !fileName) {
-                return alert("请选择要上传到的项目、文件，并确保文件名不为空。");
-            }
+    if (!selectedProjectHref || !file || !fileName) {
+        return alert("请选择要上传到的项目、文件，并确保文件名不为空。");
+    }
 
-            const projectConfig = findButtonConfigByHref(selectedProjectHref);
-            if (!projectConfig) {
-                return alert("此项目配置无效。");
-            }
+    const projectConfig = findButtonConfigByHref(selectedProjectHref);
+    if (!projectConfig) {
+        return alert("此项目配置无效。");
+    }
+    
+    const projectName = projectConfig.text;
+    const folderName = projectName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-") || `project-${Date.now()}`;
+    const basePath = `jellyfish_drive/${folderName}`;
+    const path = `${basePath}/${fileName}`;
 
-            // 新逻辑：为项目创建一个安全、唯一的文件夹名
-            const projectName = projectConfig.text;
-            const folderName = projectName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-") || `project-${Date.now()}`;
-            
-            // 新逻辑：所有文件都存放在 'jellyfish_drive' 目录下
-            const basePath = `jellyfish_drive/${folderName}`;
-            const path = `${basePath}/${fileName}`;
+    ui.uploadBtn.disabled = true;
+    ui.uploadBtn.textContent = "上传中 (0%)...";
+    ui.progressContainer.style.display = 'block';
+    ui.progressBar.style.width = '0%';
 
-            ui.uploadBtn.disabled = true;
-            ui.uploadBtn.textContent = "上传中 (0%)...";
-            ui.progressContainer.style.display = 'block';
-            ui.progressBar.style.width = '0%';
+    try {
+        const result = await uploadFileViaGitData({ 
+            file, 
+            path, 
+            commitMessage: `Upload ${fileName} to Drive/${projectName}`, 
+            onProgress: (percent) => { 
+                ui.progressBar.style.width = `${percent}%`; 
+                if (percent < 100) { 
+                    ui.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; 
+                } else { 
+                    ui.uploadBtn.textContent = '正在处理...'; 
+                } 
+            } 
+        });
 
-            try {
-                // 使用新的 commitMessage 描述操作
-                await uploadFileViaGitData({ file, path, commitMessage: `Upload ${fileName} to Drive/${projectName}`, onProgress: (percent) => { ui.progressBar.style.width = `${percent}%`; if (percent < 100) { ui.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; } else { ui.uploadBtn.textContent = '正在处理...'; } } });
-                alert("上传成功！");
-                ui.fileUploader.value = "";
-                ui.fileNameInput.value = "";
-                ui.selectedFileName.textContent = '未选择任何文件';
-                fetchFilesForSelectedProject();
-            } catch (error) {
-                if (error.message !== "上传已取消。") alert(await handleApiError(`上传文件 ${fileName}`, error));
-            } finally {
-                ui.uploadBtn.disabled = false;
-                ui.uploadBtn.textContent = "上传文件";
-                ui.progressContainer.style.display = 'none';
-            }
+        // --- [核心修复] ---
+        // 直接在本地构建新文件对象，并添加到UI，而不是重新从服务器获取整个列表
+        ui.fileListStatus.style.display = "none";
+        const newFile = {
+            name: fileName,
+            path: path,
+            sha: result.sha, // 使用上传后返回的精确sha
+            size: file.size
+        };
+
+        const li = document.createElement("li");
+        const sizeText = `${(newFile.size / 1024).toFixed(1)} KB`;
+        li.innerHTML = `<div class="file-info"><span class="file-name">${newFile.name}</span><span class="file-meta" data-path="${newFile.path}">${sizeText}</span></div><button class="delete-btn">&times;</button>`;
+        ui.fileList.appendChild(li);
+
+        li.querySelector(".file-info").addEventListener("click", () => forceDownload(newFile.path, newFile.name, li));
+        li.querySelector(".delete-btn").addEventListener("click", () => deleteFile(newFile.path, newFile.sha, li));
+        // --- [修复结束] ---
+
+        alert("上传成功！");
+        ui.fileUploader.value = "";
+        ui.fileNameInput.value = "";
+        ui.selectedFileName.textContent = '未选择任何文件';
+
+    } catch (error) {
+        if (error.message !== "上传已取消。") {
+            alert(await handleApiError(`上传文件 ${fileName}`, error));
         }
+    } finally {
+        ui.uploadBtn.disabled = false;
+        ui.uploadBtn.textContent = "上传文件";
+        ui.progressContainer.style.display = 'none';
+    }
+}
+
 
 
         return {
