@@ -2461,7 +2461,7 @@ body.dragging-active {
 
     async function deleteFromGithub(path, commitMessage, sha, ignoreNotFound = false) {
         if (!checkConfig(true)) return false;
-        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents}/${path}`;
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
         try {
             const response = await fetch(url, {
                 method: 'DELETE',
