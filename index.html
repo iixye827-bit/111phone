@@ -3716,25 +3716,17 @@ fetchFilesForSelectedProject(); fetchFilesForSelectedProject(); },
         }
        
               function populateDriveCategorySelector() {
-            ui.categorySelector.innerHTML = '<option value="">-- 请选择分类 --</option>';
-            if (currentConfig.categories && currentConfig.categories.length > 0) {
-                const categoriesWithUploads = new Set();
-                currentConfig.categories.forEach(cat => {
-                    // 修复：将检查条件从旧的 'raw.githack.com' URL 更改为新的 'projects/' 路径
-                    if (cat.buttons.some(b => b.href && b.href.startsWith('projects/'))) {
-                        categoriesWithUploads.add(cat.name);
-                    }
-                });
-
-                categoriesWithUploads.forEach(catName => {
-                    const option = document.createElement('option');
-                    option.value = catName;
-                    option.textContent = catName;
-                    ui.categorySelector.appendChild(option);
-                });
-            }
-        }
-
+    ui.categorySelector.innerHTML = '<option value="">-- 请选择分类 --</option>';
+    if (currentConfig.categories && currentConfig.categories.length > 0) {
+        // 直接遍历所有分类并添加到下拉菜单
+        currentConfig.categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.name;
+            option.textContent = cat.name;
+            ui.categorySelector.appendChild(option);
+        });
+    }
+}
 
         function populateDriveProjectSelector() {
             const selectedCategory = ui.categorySelector.value;
