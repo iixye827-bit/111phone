@@ -26,11 +26,6 @@
           "openExternally": false
         },
         {
-          "text": "1",
-          "href": "1",
-          "openExternally": false
-        },
-        {
           "text": "33",
           "href": "https://raw.githack.com/iixye827-bit/111phone/main/projects/33/index.html",
           "openExternally": false
@@ -43,6 +38,11 @@
         {
           "text": "333333333",
           "href": "https://raw.githack.com/iixye827-bit/111phone/main/projects/333333333/index.html",
+          "openExternally": false
+        },
+        {
+          "text": "1",
+          "href": "1",
           "openExternally": false
         }
       ]
