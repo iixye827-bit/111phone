@@ -876,6 +876,35 @@ body.dragging-active {
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
+/* =============================================================== */
+/* ============= [新增] 非阻塞式顶部提示框样式 ============ */
+/* =============================================================== */
+.top-toast {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -150%); /* 初始位置在屏幕外 */
+    padding: 12px 20px;
+    background-color: var(--bg-night-element, #1f2a40);
+    color: var(--text-night, #e0e6f0);
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+    pointer-events: none; /* 不会阻挡鼠标点击 */
+    text-align: center;
+    max-width: 90%;
+}
+.top-toast.show {
+    transform: translate(-50%, 0); /* 移动到屏幕内 */
+    opacity: 1;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
 
 
     </style>
@@ -1558,6 +1587,33 @@ body.dragging-active {
     <div id="floating-projects-container"></div>
     
        <script>
+    // [新增] 非阻塞式顶部提示框函数
+    function showTopToast(message, duration = 3000) {
+        // 防止重复创建
+        let existingToast = document.querySelector('.top-toast');
+        if (existingToast) {
+            existingToast.remove();
+        }
+
+        const toast = document.createElement('div');
+        toast.className = 'top-toast';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        // 触发显示动画
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 50);
+
+        // 在指定时间后触发隐藏动画
+        setTimeout(() => {
+            toast.classList.remove('show');
+            // 在动画结束后从 DOM 中移除元素
+            toast.addEventListener('transitionend', () => toast.remove());
+        }, duration);
+    }
+
+
     // [JS - V12.5.0 "Cascade Select"]
     const CURRENT_APP_VERSION = '3.7.0';
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false, isEditingButton = false, editingButtonData = null;
@@ -2487,16 +2543,16 @@ body.dragging-active {
                 } else {
                      alert('无法加载项目文件，请检查您的网络和GitHub配置。');
                 }
-            } else if (href.startsWith('http')) {
+                        } else if (href.startsWith('http')) {
                 e.preventDefault();
                 const isGithubLink = ['github.com', 'raw.githack.com', 'github.io'].some(domain => href.includes(domain));
                 if (isGithubLink) {
-                    if (!confirm("检测到 GitHub 相关链接，建议开启 VPN 以确保访问成功。\n\n点击“确定”继续访问。")) {
-                        return;
-                    }
+                    // 调用新的非阻塞提示框函数
+                    showTopToast('GitHub链接加载中，如遇缓慢请开启VPN');
                 }
                 openIframeModal(href);
             } else {
+
                 window.location.href = href;
             }
         });
