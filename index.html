@@ -111,7 +111,7 @@
         #colorPaletteModal .modal-content, #helpModal .modal-content { max-width: 500px; } 
         .theme-style-selector { border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 20px; margin-bottom: 20px; } body.dark-mode .theme-style-selector { border-color: rgba(255,255,255,0.1); }
         .theme-style-selector label { font-size: 14px; color: #5a6778; display: block; margin-bottom: 8px; } body.dark-mode .theme-style-selector label { color: #c0c6cc; }
-        #neumorphism-settings.hidden { display: none; }
+        #pneumorphism-settings.hidden { display: none; }
         #colorPaletteModal .modal-body { gap: 20px; padding-bottom: 15px; }
         .color-picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .color-picker-group { display: flex; flex-direction: column; gap: 8px; }
         .color-picker-group label { font-size: 14px; color: #5a6778; } body.dark-mode .color-picker-group label { color: #c0c6cc; }
@@ -289,7 +289,7 @@
         #fileListStatus { flex-grow: 1; text-align: center; color: #a0aec0; display: flex; align-items: center; justify-content: center; min-height: 50px; } body.dark-mode #fileListStatus { color:#889; }
         .file-info { flex-grow: 1; cursor: pointer; min-width: 0; }
         .file-name { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 16px; }
-        .file-size { font-size: 12px; font-weight: 300; color: #9A86A4; }
+        .file-meta { font-size: 12px; font-weight: 300; color: #9A86A4; }
         .delete-btn { background:transparent; border:none; cursor:pointer; padding:0; flex-shrink:0; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:background .2s,color .2s; color:#bbb; font-size:22px; font-weight:bold; line-height:1; }
         .delete-btn:hover { background:#f0f0f0; color:#e53e3e; } body.dark-mode .delete-btn { color:#889; } body.dark-mode .delete-btn:hover { background:rgba(255,255,255,0.1); color:#fc8181; }
 
@@ -783,6 +783,19 @@
         body.dark-mode .fpw-hide-handle { background: var(--bg-night-element); color: var(--text-night); }
         /* ===== [END] FLOATING PROJECT WINDOW STYLES ===== */
 
+        /* ===== [START] CSS HELP MODAL STYLES ===== */
+        #jelly-css-help-modal .modal-content { max-width: 600px; }
+        #jelly-css-help-modal .modal-body { gap: 10px; }
+        .css-help-section { padding: 12px 15px; border-radius: 10px; background: rgba(0,0,0,0.03); }
+        body.dark-mode .css-help-section { background: rgba(255,255,255,0.03); }
+        .css-help-section h3 { font-size: 1.25em; margin-bottom: 10px; color: var(--hold-border); text-align: center; border-bottom: 1px solid rgba(128,128,128,0.2); padding-bottom: 8px;}
+        .css-help-section h4 { font-size: 1.1em; margin-top: 15px; margin-bottom: 5px; }
+        .css-help-section p, .css-help-section li { line-height: 1.6; font-size: 0.95em; }
+        .css-help-text-block { background-color: rgba(128,128,128,0.1); padding: 12px; border-radius: 8px; margin-top: 5px; font-family: monospace; white-space: pre-wrap; word-break: break-all; font-size: 13px; position:relative;}
+        .css-help-text-block .copy-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: inherit; padding: 4px 8px; border-radius: 5px; font-size: 12px; cursor: pointer; transition: background 0.2s; }
+        .css-help-text-block .copy-btn:hover { background: rgba(255,255,255,0.4); }
+        /* ===== [END] CSS HELP MODAL STYLES ===== */
+
     </style>
     <style id="custom-jelly-ball-styles"></style>
 </head>
@@ -1019,14 +1032,18 @@
                         <div id="jelly-function-checkboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 15px; width: 100%;"></div>
                     </div>
                     
-                    <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 10px;">
-                        <label for="jellyBallCssTextarea" style="font-size: 14px; color: #5a6778; font-weight: 600;">自定义CSS (云同步)</label>
+                                        <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                        <label for="jellyBallCssTextarea" style="font-size: 14px; color: #5a6778; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            <span>自定义CSS (云同步)</span>
+                            <button id="show-jelly-css-help" style="background:none; border:none; font-size: 20px; cursor:pointer; padding:0; line-height: 1;" title="CSS提示词向导">💡</button>
+                        </label>
                         <div style="display: flex; gap: 10px; width:100%; align-items: flex-start;">
                             <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="4" placeholder=".jelly-ball-wrapper {&#10;  /* 控制外圈辉光和位置 */&#10;}&#10;#floating-jellyfish-ball {&#10;  /* 控制中间圆球 */&#10;  background: #ff0000 !important;&#10;}" style="flex-grow: 1;"></textarea>
                             <div id="jellyCssPreview" style="width: 52px; height: 52px; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background:var(--bg-day-element); box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day);"><div id="jellyCssPreviewBall" style="width: 42px; height: 42px; border-radius: 50%; font-size: 22px; display:flex; align-items:center; justify-content:center;">🪼</div></div>
                         </div>
                         <button id="applyJellyBallCssBtn" class="modal-button" style="width: 100%;">应用样式</button>
                     </div>
+
                 </div>
 
                 <div class="theme-style-selector">
@@ -1075,6 +1092,101 @@
         </div>
     </div>
     
+    <!-- ===== [START] CSS HELP MODAL ===== -->
+    <div class="modal-overlay" id="jelly-css-help-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-group"><span>💡 CSS 主题生成向导</span></div>
+                <button class="close-btn" data-modal-id="jelly-css-help-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="css-help-section">
+                    <h3>欢迎使用！</h3>
+                    <p>本向导能帮助你轻松创建漂亮的自定义CSS主题，即使你完全不懂代码也没关系。</p>
+                    <p>只需按照以下步骤操作，就能让AI成为你的专属设计师。</p>
+                </div>
+                <div class="css-help-section">
+                    <h4>使用步骤</h4>
+                    <ol>
+                        <li><strong>复制</strong>下方的“AI提示词模板”内的所有内容。</li>
+                        <li>在方括号 <code>[ ]</code> 内填写你的想法和描述，描述越清晰，AI生成的效果越好。</li>
+                        <li>将填写好的完整内容发送给AI（例如ChatGPT, Kimi, Claude, 文心一言等）。</li>
+                        <li>将AI返回的CSS代码粘贴到上方的输入框中，即可实时预览效果！</li>
+                    </ol>
+                </div>
+                                <div class="css-help-section">
+                    <h4>AI提示词模板 (请复制这里)</h4>
+                    <div class="css-help-text-block" id="css-prompt-template">
+                        <button class="copy-btn">复制</button>
+请为我创建一个悬浮窗的CSS主题。要求如下：
+1. 主题名称 (Class Name): .[请在这里为你的主题起一个独特的英文名，例如: cool-blue-theme]
+2. 整体风格描述: [描述一下你想要的整体感觉，例如：赛博朋克、macOS毛玻璃风格、可爱卡通风、简约商务风、复古游戏像素风]
+3. 颜色方案:
+主要背景色: [例如：深灰色、半透明的白色、淡蓝色]
+强调色 (用于标题栏或按钮): [例如：亮蓝色、霓虹粉、金色]
+文字颜色: [例如：白色、深灰色]
+4. 窗口细节:
+圆角大小: [例如：直角、小圆角、大圆角]
+边框样式: [例如：不需要边框、1像素宽的实线白色边框、发光的蓝色边框]
+阴影效果: [例如：需要一个柔和的阴影来营造立体感、不需要阴影]
+5. 各部分具体要求:
+标题栏 (.fp-window-title): [例如：使用强调色作为背景、文字居中]
+内容区 (.fp-window-body): [例如：背景比主背景色稍亮一些]
+按钮 (.fp-window-body button): [例如：圆角按钮，背景是强调色，鼠标悬停时变亮]
+请确保所有样式都包含在 .[这里填写你上面起的主题名称] 这个父选择器下，以避免影响页面其他元素。
+                    </div>
+                </div>
+                 <div class="css-help-section">
+                    <h4>填写的例子</h4>
+                    <p>这里有几个填写好的例子，你可以直接复制它们去请求AI，感受一下效果！</p>
+                    <h4>示例1：赛博朋克风格</h4>
+                    <div class="css-help-text-block" id="css-prompt-example1">
+                        <button class="copy-btn">复制</button>
+请为我创建一个悬浮窗的CSS主题。要求如下：
+1. 主题名称 (Class Name): .cyberpunk-neon
+2. 整体风格描述: 赛博朋克风格，有霓虹灯的感觉，整体偏暗色调。
+3. 颜色方案:
+主要背景色: #1a1a2e (深蓝紫色)
+强调色 (用于标题栏或按钮): #f0a500 (亮黄色) 和 #e4007f (霓虹粉)
+文字颜色: #ffffff (白色)
+4. 窗口细节:
+圆角大小: 小圆角 (大约 4px)
+边框样式: 1像素宽的霓虹粉色实线边框
+阴影效果: 需要一个霓虹粉色的发光阴影 (box-shadow)
+5. 各部分具体要求:
+标题栏 (.fp-window-title): 背景色为 #1a1a2e，但底部有一条1像素的亮黄色边框。
+内容区 (.fp-window-body): 背景色透明。
+按钮 (.fp-window-body button): 方形按钮，黑色背景，亮黄色边框，鼠标悬停时背景变为亮黄色，文字变黑。
+请确保所有样式都包含在 .cyberpunk-neon 这个父选择器下，以避免影响页面其他元素。
+                    </div>
+                    <h4>示例2：简约白 & 毛玻璃风格</h4>
+                     <div class="css-help-text-block" id="css-prompt-example2">
+                         <button class="copy-btn">复制</button>
+请为我创建一个悬浮窗的CSS主题。要求如下：
+1. 主题名称 (Class Name): .glassmorphism-light
+2. 整体风格描述: 模仿苹果macOS的毛玻璃效果，非常简约、干净、现代。
+3. 颜色方案:
+主要背景色: 半透明的白色 (rgba(255, 255, 255, 0.7))
+强调色 (用于标题栏或按钮): 无特定强调色，保持简约
+文字颜色: 黑色
+4. 窗口细节:
+圆角大小: 大圆角 (大约 12px)
+边框样式: 1像素宽的半透明灰色边框 (rgba(200, 200, 200, 0.5))
+阴影效果: 需要一个非常柔和、自然的阴影
+5. 各部分具体要求:
+标题栏 (.fp-window-title): 字体加粗，稍微大一点。
+内容区 (.fp-window-body): 无特殊要求。
+按钮 (.fp-window-body button): 灰色背景，白色文字，无边框，圆角。鼠标悬停时背景变深一点。
+特别注意：请在 .glassmorphism-light 选择器中加入 backdrop-filter: blur(15px); 和 -webkit-backdrop-filter: blur(15px); 来实现背景模糊效果。
+请确保所有样式都包含在 .glassmorphism-light 这个父选择器下，以避免影响页面其他元素。
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- ===== [END] CSS HELP MODAL ===== -->
+
     <!-- ===== [START] MEMORY MODAL ===== -->
     <div class="modal-overlay" id="memoryModal">
         <div class="modal-content">
@@ -1890,11 +2002,18 @@
             const customStyleTag = document.getElementById('custom-jelly-ball-styles');
             const cssPreview = document.getElementById('jellyCssPreview');
             const previewBall = document.getElementById('jellyCssPreviewBall');
-            const checkboxContainer = document.getElementById('jelly-function-checkboxes');
+                        const checkboxContainer = document.getElementById('jelly-function-checkboxes');
+            let previewStyleTag = document.getElementById('jelly-preview-style');
+            if (!previewStyleTag) {
+                previewStyleTag = document.createElement('style');
+                previewStyleTag.id = 'jelly-preview-style';
+                document.head.appendChild(previewStyleTag);
+            }
             
             if (!currentConfig.settings.jellyBall) {
                 currentConfig.settings.jellyBall = { enabled: false, swipeBack: true, functions: {}, customCSS: ''};
             }
+
 
             const settings = currentConfig.settings.jellyBall;
             toggle.checked = settings.enabled || false;
@@ -1929,25 +2048,21 @@
             cssTextarea.value = settings.customCSS || '';
             customStyleTag.innerHTML = settings.customCSS || '';
             
-            const updatePreview = () => {
-                const tempStyle = document.createElement('style');
-                // Basic reset for preview ball
-                previewBall.style.cssText = 'width: 42px; height: 42px; border-radius: 50%; font-size: 22px; display:flex; align-items:center; justify-content:center;';
+                                    const updatePreview = () => {
+                const previewCss = cssTextarea.value
+                    .replace(/\.jelly-ball-wrapper/g, `#${cssPreview.id}`)
+                    .replace(/#floating-jellyfish-ball/g, `#${previewBall.id}`)
+                    .replace(/\.jelly-ball-glow/g, 'display:none');
                 
-                try {
-                   // Replace selectors for preview
-                    let previewCss = cssTextarea.value
-                        .replace(/\.jelly-ball-wrapper/g, `#${cssPreview.id}`)
-                        .replace(/#floating-jellyfish-ball/g, `#${previewBall.id}`)
-                        .replace(/\.jelly-ball-glow/g, 'display:none'); // Hide glow in preview
-
-                    tempStyle.innerHTML = previewCss;
-                    document.head.appendChild(tempStyle);
-                } catch(e) { console.error("Invalid CSS for preview", e); }
-                
-                // Cleanup
-                setTimeout(() => { if (document.head.contains(tempStyle)) document.head.removeChild(tempStyle); }, 100);
+                const styleTag = document.getElementById('jelly-preview-style');
+                if (styleTag) {
+                    styleTag.textContent = previewCss; // 使用 textContent 效率更高
+                    // 强制浏览器重新计算样式，解决部分浏览器下的渲染延迟问题
+                    void previewBall.offsetWidth; 
+                }
             };
+
+
 
             cssTextarea.addEventListener('input', updatePreview);
             applyCssBtn.addEventListener('click', () => {
@@ -1960,6 +2075,11 @@
             
             updateUIVisibility();
             setTimeout(updatePreview, 100);
+
+            // New: CSS help modal logic
+            document.getElementById('show-jelly-css-help').addEventListener('click', () => {
+                document.getElementById('jelly-css-help-modal').classList.add('show');
+            });
         }
 
         return { init: initSettings, create: _create, destroy: _destroy };
@@ -2151,7 +2271,7 @@
 
     async function deleteFromGithub(path, commitMessage, sha, ignoreNotFound = false) {
         if (!checkConfig(true)) return false;
-        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents}/${path}`;
         try {
             const response = await fetch(url, {
                 method: 'DELETE',
@@ -2240,7 +2360,7 @@
     fabMainBtn.addEventListener('touchend', e => { e.preventDefault(); fabMainBtn.dispatchEvent(new MouseEvent('mouseup')); }, { passive: false });
     
     function attachButtonListeners(btn) {
-        btn.addEventListener('click', function(e) {
+        btn.addEventListener('click', async function(e) {
             if (isManagementMode) {
                 const href = this.dataset.href;
                 if (!e.target.classList.contains('delete-icon')) {
@@ -2255,21 +2375,29 @@
             const href = this.dataset.href;
             if (!href) return;
 
-            const githubDomains = ['github.com', 'raw.githack.com', 'github.io'];
-            try {
-                const url = new URL(href);
-                if (githubDomains.some(domain => url.hostname.includes(domain))) {
+            const buttonConfig = findButtonConfigByHref(href);
+
+            if (buttonConfig && buttonConfig.openExternally) {
+                window.open(href, '_blank', 'noopener,noreferrer');
+                return;
+            }
+
+            if (href.startsWith('projects/')) {
+                e.preventDefault();
+                const secureUrl = await getSecureFileUrl(href);
+                if(secureUrl) {
+                    openIframeModal(secureUrl);
+                } else {
+                     alert('无法加载项目文件，请检查您的网络和GitHub配置。');
+                }
+            } else if (href.startsWith('http')) {
+                e.preventDefault();
+                const isGithubLink = ['github.com', 'raw.githack.com', 'github.io'].some(domain => href.includes(domain));
+                if (isGithubLink) {
                     if (!confirm("检测到 GitHub 相关链接，建议开启 VPN 以确保访问成功。\n\n点击“确定”继续访问。")) {
                         return;
                     }
                 }
-            } catch (error) { /* Not a valid URL, ignore */ }
-
-            const buttonConfig = findButtonConfigByHref(href);
-            if (buttonConfig && buttonConfig.openExternally) {
-                window.open(href, '_blank', 'noopener,noreferrer');
-            } else if (href.startsWith('http')) {
-                e.preventDefault();
                 openIframeModal(href);
             } else {
                 window.location.href = href;
@@ -2305,18 +2433,10 @@
 
             currentConfig.categories = currentConfig.categories.filter(cat => cat.name === '全部' || cat.buttons.length > 0);
 
-            const isUploadedProject = href.includes('raw.githack.com');
-            if (isUploadedProject) { 
-                const urlParts = href.split('/');
-                const owner = urlParts[2].split('.')[0];
-                const repo = urlParts[3];
-                const pathParts = urlParts.slice(5);
-                const folderPath = pathParts.slice(0, pathParts.length - 1).join('/');
-
-                if (folderPath.startsWith('projects/')) {
-                    const success = await deleteGithubFolder(folderPath); 
-                    if (!success) { alert('删除云端文件夹失败!'); location.reload(); return; }
-                }
+            if (href.startsWith('projects/')) {
+                const folderPath = href.substring(0, href.lastIndexOf('/'));
+                const success = await deleteGithubFolder(folderPath);
+                if (!success) { alert('删除云端文件夹失败!'); location.reload(); return; }
             }
             if (categoryModified) {
                 await saveGlobalConfig(`Delete button: ${buttonName}`);
@@ -2446,7 +2566,7 @@
     }
     
     const settingsModalElements = { githubRepoInput: document.getElementById("githubRepoInput"), githubTokenInput: document.getElementById("githubTokenInput"), saveSettingsBtn: document.getElementById("saveSettingsBtn"), manualSyncBtn: document.getElementById('manualSyncBtn') };
-    function setupModals(){document.querySelectorAll(".close-btn").forEach(e=>e.addEventListener("click",()=>{document.getElementById(e.dataset.modalId).classList.remove("show")})),document.querySelectorAll(".modal-overlay").forEach(e=>e.addEventListener("click",t=>e===t.target&&e.classList.remove("show"))),document.getElementById("helpBtn").addEventListener("click",()=>{document.getElementById("helpModal").classList.add("show"),toggleFabMenu(!1);localStorage.setItem('lastSeenVersion', CURRENT_APP_VERSION);document.getElementById('helpBtn').classList.remove('has-update');}),document.getElementById("dataSyncBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(settingsModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),settingsModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("addNavBtn").addEventListener("click",()=>{openAddModal(); toggleFabMenu(false);}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); })}
+    function setupModals(){document.querySelectorAll(".close-btn").forEach(e=>e.addEventListener("click",()=>{document.getElementById(e.dataset.modalId).classList.remove("show")})),document.querySelectorAll(".modal-overlay").forEach(e=>e.addEventListener("click",t=>e===t.target&&e.classList.remove("show"))),document.getElementById("helpBtn").addEventListener("click",()=>{document.getElementById("helpModal").classList.add("show"),toggleFabMenu(!1);localStorage.setItem('lastSeenVersion', CURRENT_APP_VERSION);document.getElementById('helpBtn').classList.remove('has-update');}),document.getElementById("dataSyncBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(settingsModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),settingsModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("addNavBtn").addEventListener("click",()=>{openAddModal(); toggleFabMenu(false);}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); }), document.getElementById('jelly-css-help-modal').querySelectorAll('.copy-btn').forEach(btn => { btn.addEventListener('click', async (e) => { const textBlock = e.target.parentElement; const textToCopy = textBlock.innerText.replace(e.target.innerText, '').trim(); try { await navigator.clipboard.writeText(textToCopy); const originalText = e.target.textContent; e.target.textContent = '已复制!'; setTimeout(() => { e.target.textContent = originalText; }, 1500); } catch (err) { alert('复制失败，请手动复制。'); } }); });}
     function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){const e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e=!0){return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据同步)"),!1):!0}
     
     function isObject(item) { return (item && typeof item === 'object' && !Array.isArray(item)); }
@@ -2805,8 +2925,7 @@
                  const path=`projects/${name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-")||`project-${Date.now()}`}/index.html`;
                  await uploadFileViaGitData({ file: projectFile, path, commitMessage: `Create project: ${name}`, onProgress: (p) => { addNavModalElements.uploadStatus.textContent = `上传中: ${Math.round(p)}%`; } });
                  addNavModalElements.uploadStatus.textContent="正在处理...";
-                 const webUrl = `https://raw.githack.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${path}`; 
-                 newButtonData= { text:name, href:webUrl, openExternally: false };
+                 newButtonData= { text:name, href: path, openExternally: false }; // **FIX**: Store the path, not the githack URL
                  alert("项目上传发布成功！");
             }
             
@@ -2879,60 +2998,43 @@
         
         els.categoryInput.value = buttonData.categoryName;
         els.nameInput.value = buttonData.text;
-        els.urlInput.value = buttonData.href;
-        els.openExternallyToggle.checked = buttonData.openExternally || false;
-
-        if (buttonData.href.includes('raw.githack.com')) {
+        
+        const isUploadedProject = buttonData.href.startsWith('projects/');
+        
+        if (isUploadedProject) {
+            els.urlInput.value = "已上传的项目，路径不可编辑。";
             els.typeUploadRadio.checked = true;
             els.linkSection.style.display = 'none';
             els.uploadSection.style.display = 'flex';
             els.uploadSection.style.pointerEvents = 'none';
             els.uploadSection.style.opacity = '0.5';
             document.querySelector('label[for="type-upload"]').style.display = 'none';
-            els.typeLinkRadio.checked = true;
-            els.linkSection.style.display = 'block';
-            els.urlInput.readOnly = true;
-
         } else {
+            els.urlInput.value = buttonData.href;
             els.typeLinkRadio.checked = true;
             els.linkSection.style.display = 'block';
             els.uploadSection.style.display = 'none';
-            els.urlInput.readOnly = false;
         }
-
+        
+        els.openExternallyToggle.checked = buttonData.openExternally || false;
+        
         populateCategoryDatalist();
         updateAddNavModalUI();
     }
     
-        function openIframeModal(url) { 
-        // --- 新增代码：记录 iframe 状态 ---
-        localStorage.setItem('lastIframeState', JSON.stringify({ url: url, isOpen: true }));
-        // --- 新增代码结束 ---
-        
+ function openIframeModal(url) { 
         if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } 
         iframeEl.src = url; 
         iframeModal.classList.add('active'); 
         FloatingBallManager.create();
     }
-
-        function closeIframeModal() { 
-        // --- 新增代码：更新 iframe 状态为“已关闭” ---
-        try {
-            const lastState = JSON.parse(localStorage.getItem('lastIframeState') || '{}');
-            lastState.isOpen = false;
-            localStorage.setItem('lastIframeState', JSON.stringify(lastState));
-        } catch (e) {
-            // 如果解析失败，则清除
-            localStorage.removeItem('lastIframeState');
-        }
-        // --- 新增代码结束 ---
-
+    function closeIframeModal() { 
         FloatingProjectWindowManager.closeAll();
         FloatingBallManager.destroy();
         hideReturnConfirmation(); 
         iframeModal.classList.remove('active'); 
+        // setTimeout(() => { iframeEl.src = 'about:blank'; }, 400); // <-- 已注释掉
     }
-
     function showReturnConfirmation() { returnConfirmationToast.classList.add('show'); }
     function hideReturnConfirmation() { returnConfirmationToast.classList.remove('show'); }
     document.getElementById('confirmReturnBtn').addEventListener('click', closeIframeModal);
@@ -3322,7 +3424,8 @@
         const actions = {
             'goto-memo': () => { showPage('memo-section'); state.currentSection = 'memo'; document.getElementById('memory-modal-title').textContent = '备忘录'; renderMemoFolders(); },
             'goto-album': () => { showPage('album-section'); state.currentSection = 'album'; document.getElementById('memory-modal-title').textContent = '相册'; renderAlbumFolders(); },
-            'goto-cloud': () => { showPage('cloud-drive-section'); state.currentSection = 'cloud'; document.getElementById('memory-modal-title').textContent = '文件夹'; populateDriveProjectSelector(); fetchFilesForSelectedProject(); },
+            'goto-cloud': () => { showPage('cloud-drive-section'); state.currentSection = 'cloud'; document.getElementById('memory-modal-title').textContent = '文件夹'; populateDriveCategorySelector(); fetchFilesForSelectedProject(); 
+fetchFilesForSelectedProject(); fetchFilesForSelectedProject(); },
             'back-to-hub': () => { showPage('hub-view'); state.currentSection = null; document.getElementById('memory-modal-title').textContent = '记忆'; },
             'add-memo-folder': () => { state.folderModalContext = { type: 'memo', id: null }; document.getElementById('folder-modal-title').textContent = '新文件夹'; ui.folderModal.querySelector('#folder-name-input').value = ''; ui.folderModal.classList.add('show'); },
             'add-album-folder': () => {
@@ -3611,25 +3714,46 @@
                 return null;
             }
         }
-        
+       
+              function populateDriveCategorySelector() {
+            ui.categorySelector.innerHTML = '<option value="">-- 请选择分类 --</option>';
+            if (currentConfig.categories && currentConfig.categories.length > 0) {
+                const categoriesWithUploads = new Set();
+                currentConfig.categories.forEach(cat => {
+                    // 修复：将检查条件从旧的 'raw.githack.com' URL 更改为新的 'projects/' 路径
+                    if (cat.buttons.some(b => b.href && b.href.startsWith('projects/'))) {
+                        categoriesWithUploads.add(cat.name);
+                    }
+                });
+
+                categoriesWithUploads.forEach(catName => {
+                    const option = document.createElement('option');
+                    option.value = catName;
+                    option.textContent = catName;
+                    ui.categorySelector.appendChild(option);
+                });
+            }
+        }
+
+
         function populateDriveProjectSelector() {
             const selectedCategory = ui.categorySelector.value;
             ui.projectSelector.innerHTML = '';
             ui.projectSelector.classList.add('hidden');
-            if (currentConfig.categories && currentConfig.categories.length > 0) {
-                 const category = currentConfig.categories.find(c => c.name === selectedCategory);
-                 if (category && category.buttons.length > 0) {
-                     const uploadButtons = category.buttons.filter(b => b.href && b.href.includes('raw.githack.com'));
-                     if (uploadButtons.length > 0) {
-                        uploadButtons.forEach(btn => {
-                             const option = document.createElement('option');
-                             option.value = btn.href;
-                             option.textContent = btn.text;
-                             ui.projectSelector.appendChild(option);
-                         });
-                         ui.projectSelector.classList.remove('hidden');
-                     }
-                 }
+            if (!selectedCategory) return;
+            
+            const category = currentConfig.categories.find(c => c.name === selectedCategory);
+            if (category && category.buttons) {
+                const uploadButtons = category.buttons.filter(b => b.href && b.href.startsWith('projects/'));
+                if (uploadButtons.length > 0) {
+                   uploadButtons.forEach(btn => {
+                       const option = document.createElement('option');
+                       option.value = btn.href;
+                       option.textContent = btn.text;
+                       ui.projectSelector.appendChild(option);
+                   });
+                   ui.projectSelector.classList.remove('hidden');
+                }
             }
         }
         function fetchFilesForSelectedProject() {
@@ -3638,72 +3762,44 @@
             ui.fileList.innerHTML = '';
             ui.fileListStatus.style.display = 'block';
 
-            if (categoryName === 'memory-album-category') {
-                if (!memoryCache) { ui.fileListStatus.textContent = "记忆模块未加载，请先访问相册。"; return; }
-                ui.fileListStatus.textContent = '加载中...';
-                
-                const allPhotos = [];
-                memoryCache.album.items.forEach(item => {
-                    if (item.type === 'photoset') {
-                        item.photos.forEach(photo => allPhotos.push({ ...photo, albumName: memoryCache.album.folders.find(f => f.id === item.albumId)?.name || '未知相册' }));
-                    } else {
-                        allPhotos.push({ ...item, albumName: memoryCache.album.folders.find(f => f.id === item.albumId)?.name || '未知相册' });
-                    }
-                });
-                
-                if (allPhotos.length === 0) {
-                     ui.fileListStatus.textContent = '相册中没有照片。';
-                     return;
-                }
-
-                ui.fileListStatus.style.display = 'none';
-                allPhotos.forEach(async photo => {
-                    const li = document.createElement("li");
-                    const sizeBytes = photo.size || 0;
-                    const sizeText = sizeBytes ? (sizeBytes / 1024).toFixed(1) + " KB" : (await getLatestCommitDate(photo.path)).split('T')[0];
-                    const filename = photo.path.split("/").pop();
-                    
-                    li.innerHTML = `<div class="file-info"><span class="file-name">${photo.title || filename}</span><span class="file-size">${photo.albumName} - ${sizeText}</span></div><button class="delete-btn">&times;</button>`;
-                    ui.fileList.appendChild(li);
-                    
-                    const fileInfo = li.querySelector(".file-info");
-                    fileInfo.addEventListener("click", () => forceDownload(photo.path, filename, li));
-                    const deleteBtn = li.querySelector(".delete-btn");
-                    deleteBtn.addEventListener("click", () => alert("请在相册中删除此照片。"));
-                });
-            } else {
-                 if (!projectHref) {
-                    ui.fileListStatus.textContent = (categoryName && categoryName !== 'select...-category') ? "该分类下无上传项目" : '请选择一个分类';
-                    return;
-                }
-                fetchFilesFromGithubProject(projectHref);
+            if (!projectHref) {
+                ui.fileListStatus.textContent = (categoryName && categoryName !== '') ? "该分类下无上传项目" : '请选择一个分类';
+                return;
             }
+            fetchFilesFromGithubProject(projectHref);
         }
 
         async function fetchFilesFromGithubProject(projectHref) {
-            const urlParts = projectHref.split('/');
-            const owner = urlParts[2].split('.')[0];
-            const repo = urlParts[3];
-            const projectPath = `projects/${urlParts.slice(5, -1).join('/')}`;
+            const projectPath = projectHref.substring(0, projectHref.lastIndexOf('/'));
             ui.fileListStatus.textContent = "加载中...";
 
             const { data: files, error } = await fetchFromGithub(projectPath);
             if (error) { ui.fileListStatus.textContent = `加载失败: ${error}`; return; }
-            if (!files || files.length === 0) { ui.fileListStatus.textContent = "该文件夹下暂无文件"; return; }
+
+            const filesToShow = files ? files.filter(file => file.name !== 'index.html') : [];
+
+            if (filesToShow.length === 0) { ui.fileListStatus.textContent = "该文件夹下暂无文件"; return; }
             
             ui.fileListStatus.style.display = "none";
-            files.forEach(async (file) => {
-                if (file.name === 'index.html') return;
+            filesToShow.forEach(async (file) => {
                 const li = document.createElement("li");
-                const sizeText = file.size ? (file.size / 1024).toFixed(1) + " KB" : (await getLatestCommitDate(file.path)).split('T')[0];
-                li.innerHTML = `<div class="file-info"><span class="file-name">${file.name}</span><span class="file-size">${sizeText}</span></div><button class="delete-btn">&times;</button>`;
+                const sizeText = file.size ? `${(file.size / 1024).toFixed(1)} KB` : '...';
+                
+                li.innerHTML = `<div class="file-info"><span class="file-name">${file.name}</span><span class="file-meta" data-path="${file.path}">${sizeText}</span></div><button class="delete-btn">&times;</button>`;
                 ui.fileList.appendChild(li);
-                const fileInfo = li.querySelector(".file-info");
-                fileInfo.addEventListener("click", () => forceDownload(file.path, file.name, li));
-                const deleteBtn = li.querySelector(".delete-btn");                deleteBtn.addEventListener("click", () => deleteFile(file.path, file.sha, li));
+                
+                if (!file.size) {
+                    getLatestCommitDate(file.path).then(date => {
+                        const metaSpan = li.querySelector('.file-meta');
+                        if (metaSpan) metaSpan.textContent = date.split('T')[0];
+                    });
+                }
+                
+                li.querySelector(".file-info").addEventListener("click", () => forceDownload(file.path, file.name, li));
+                li.querySelector(".delete-btn").addEventListener("click", () => deleteFile(file.path, file.sha, li));
             });
         }
-        async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString();const o=await n.json();return o[0]?.commit.committer.date||(new Date(0)).toISOString()}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString()}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";try{ const success = await deleteFromGithub(e, `Delete file: ${e}`, t); if (success) { n.remove(); if(ui.fileList.children.length === 0) { ui.fileListStatus.textContent = '该文件夹下暂无文件'; ui.fileListStatus.style.display = 'block'; } } else { n.style.opacity = "1"; } } catch(err) { n.style.opacity = "1"; }}
+        async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString().split('T')[0];const o=await n.json();return o[0]?.commit.committer.date.split('T')[0]||(new Date(0)).toISOString().split('T')[0]}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString().split('T')[0]}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";try{ const success = await deleteFromGithub(e, `Delete file: ${e}`, t); if (success) { n.remove(); if(ui.fileList.children.length === 0) { ui.fileListStatus.textContent = '该文件夹下暂无文件'; ui.fileListStatus.style.display = 'block'; } } else { n.style.opacity = "1"; } } catch(err) { n.style.opacity = "1"; }}
         async function forceDownload(path, filename, el) {
             const fileNameSpan = el.querySelector(".file-name");
             const originalText = fileNameSpan.textContent;
@@ -3717,14 +3813,16 @@
                 xhr.setRequestHeader('Accept', 'application/vnd.github.v3.raw');
                 xhr.responseType = 'blob';
 
+                let lastProgressText = '';
                 xhr.onprogress = (event) => {
+                    let newProgressText = '正在下载...';
                     if (event.lengthComputable) {
                         const percentComplete = Math.round((event.loaded / event.total) * 100);
-                        fileNameSpan.textContent = `下载中... ${percentComplete}%`;
-                    } else {
-                        if (fileNameSpan.textContent.indexOf('正在下载') === -1) {
-                            fileNameSpan.textContent = '正在下载...';
-                        }
+                        newProgressText = `下载中... ${percentComplete}%`;
+                    }
+                    if (newProgressText !== lastProgressText) {
+                        fileNameSpan.textContent = newProgressText;
+                        lastProgressText = newProgressText;
                     }
                 };
 
@@ -3782,8 +3880,7 @@
                 return alert("此项目配置无效。");
             }
             
-            const urlParts = projectConfig.href.split('/');
-            const projectFolder = urlParts.slice(5, -1).join('/');
+            const projectFolder = projectConfig.href.substring(0, projectConfig.href.lastIndexOf('/'));
 
             ui.uploadBtn.disabled = true; 
             ui.uploadBtn.textContent = "上传中 (0%)..."; 
@@ -3791,7 +3888,7 @@
             ui.progressBar.style.width = '0%'; 
             
             try { 
-                const path = `projects/${projectFolder}/${fileName}`;
+                const path = `${projectFolder}/${fileName}`;
                 await uploadFileViaGitData({ file, path, commitMessage: `Upload ${fileName} to ${projectConfig.text}`, onProgress: (percent) => { ui.progressBar.style.width = `${percent}%`; if (percent < 100) { ui.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; } else { ui.uploadBtn.textContent = '正在处理...'; } } }); 
                 alert("上传成功！"); 
                 ui.fileUploader.value = ""; 
@@ -4411,9 +4508,8 @@
 
         const fetchPromise = new Promise(async (resolve, reject) => {
             try {
-                if (path.startsWith('projects/')) {
-                    const url = `https://raw.githack.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${path}`;
-                    resolve(url);
+                if (!path.startsWith('projects/') && !path.startsWith('memory/')) {
+                    resolve(path);
                     return;
                 }
                 
@@ -4428,7 +4524,9 @@
                     throw new Error(`Could not get blob content for ${path}. ${blobError || 'No content returned.'}`);
                 }
                 
-                const blob = b64toBlob(blobData.content, metaData.type);
+                const contentType = path.toLowerCase().endsWith('.html') || path.toLowerCase().endsWith('.htm') ? 'text/html' : metaData.type;
+const blob = b64toBlob(blobData.content, contentType);
+
                 const blobUrl = URL.createObjectURL(blob);
                 
                 secureFileCache.set(path, blobUrl);
@@ -4453,26 +4551,6 @@
         }
     }
 
-        // --- 新增一个函数用于恢复会话 ---
-    function restoreLastSession() {
-        try {
-            const lastStateJSON = localStorage.getItem('lastIframeState');
-            if (lastStateJSON) {
-                const lastState = JSON.parse(lastStateJSON);
-                // 如果PWA关闭时，iframe是打开的，并且有URL
-                if (lastState.isOpen && lastState.url) {
-                    console.log('Restoring last iframe session:', lastState.url);
-                    // 直接调用 openIframeModal 来恢复视图
-                    openIframeModal(lastState.url);
-                }
-            }
-        } catch (e) {
-            console.error('Failed to restore session:', e);
-            localStorage.removeItem('lastIframeState'); // 清理损坏的数据
-        }
-    }
-    // --- 新增函数结束 ---
-
     window.addEventListener('load', async () => {
         initTheme(); 
         loadGithubConfig();
@@ -4487,11 +4565,7 @@
         setupColorSync(colorModal.pickerD2, colorModal.hexD2, 'dayColor2');
         setupColorSync(colorModal.pickerN1, colorModal.hexN1, 'nightColor1'); 
         setupColorSync(colorModal.pickerN2, colorModal.hexN2, 'nightColor2');
-        
-        // --- 新增调用：在所有初始化完成后，尝试恢复会话 ---
-        restoreLastSession();
     });
-
     </script>
 </body>
 </html>
