@@ -21,11 +21,6 @@
       "name": "1",
       "buttons": [
         {
-          "text": "33聊天室",
-          "href": "https://raw.githack.com/iixye827-bit/111phone/main/projects/33聊天室/index.html",
-          "openExternally": false
-        },
-        {
           "text": "EVE",
           "href": "https://qstghg-wi18orwied-melom-karona-ffcb84.netlify.app/",
           "openExternally": false
@@ -38,6 +33,11 @@
         {
           "text": "333333333",
           "href": "https://raw.githack.com/iixye827-bit/111phone/main/projects/333333333/index.html",
+          "openExternally": false
+        },
+        {
+          "text": "33聊天室",
+          "href": "https://raw.githack.com/iixye827-bit/111phone/main/projects/33聊天室/index.html",
           "openExternally": false
         },
         {
