@@ -99,7 +99,9 @@
         #sync-status-indicator.synced { background-color: #28a745; } #sync-status-indicator.syncing { background-color: #ffc107; animation: pulse 1.5s infinite; } #sync-status-indicator.error { background-color: #dc3545; animation: none; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.3); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
         .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;z-index:1000;opacity:0;transition:opacity .3s ease}.modal-overlay.show{display:flex;opacity:1}.modal-content{width:90%;background:var(--bg-day-element);color:var(--text-day);border-radius:16px;box-shadow:12px 12px 24px var(--shadow-dark-day),-12px -12px 24px var(--shadow-light-day);padding:12px;transition:transform .3s ease,background .5s ease,box-shadow .5s ease;transform:scale(.95);display:flex;flex-direction:column;max-height:90vh}.modal-overlay.show .modal-content{transform:scale(1)}body.dark-mode .modal-content{background:var(--bg-night-element);color:var(--text-night);box-shadow:12px 12px 24px var(--shadow-dark-night),-12px -12px 24px var(--shadow-light-night)}.modal-header{display:flex;justify-content:space-between;align-items:center;font-size:20px;font-weight:600;margin-bottom:20px;flex-shrink:0; padding: 0 3px;}.modal-title-group{display:flex;align-items:center;gap:8px}.modal-header .close-btn,.modal-header .settings-btn{cursor:pointer;border:none;background:transparent;color:inherit;padding:5px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s ease}.modal-header .close-btn{font-size:24px;font-weight:bold;width:36px;height:36px}.modal-header .settings-btn{font-size:20px;width:32px;height:32px}.modal-header .close-btn:hover,.modal-header .settings-btn:hover{background:rgba(0,0,0,0.05)}body.dark-mode .modal-header .close-btn:hover,body.dark-mode .modal-header .settings-btn:hover{background:rgba(255,255,255,0.08)}
-        .modal-body { overflow-y: auto; overflow-x: hidden; flex-grow: 1; display:flex; flex-direction:column; gap: 15px; margin-right: -5px; padding-right: 5px; scrollbar-width: none; -ms-overflow-style: none; }
+                .modal-body { overflow-y: auto; overflow-x: hidden; flex-grow: 1; display:flex; flex-direction:column; gap: 15px; margin-right: -5px; padding-right: 5px; scrollbar-width: none; -ms-overflow-style: none; -webkit-mask-image: linear-gradient(to bottom, black 95%, transparent 100%); mask-image: linear-gradient(to bottom, black 95%, transparent 100%); }
+
+
         .modal-body > * { margin-left: 3px; margin-right: 3px; width: calc(100% - 6px); }
         .modal-body::-webkit-scrollbar { width: 0; background: transparent; }
         .modal-input,.modal-select,.modal-textarea{padding:12px 15px;border:none;border-radius:10px;font-size:16px;background:var(--bg-day-element);color:var(--text-day);box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day);transition:all .3s ease;caret-color:var(--hold-border)}body.dark-mode .modal-input,body.dark-mode .modal-select,body.dark-mode .modal-textarea{background:var(--bg-night-element);color:var(--text-night);box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night)}.modal-input:focus,.modal-select:focus,.modal-textarea:focus{outline:none;box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day),0 0 0 2px var(--hold-border)}body.dark-mode .modal-input:focus,body.dark-mode .modal-select:focus,body.dark-mode .modal-textarea:focus{box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night),0 0 0 2px var(--hold-border)} .modal-textarea{resize:vertical;min-height:80px;}
@@ -156,7 +158,9 @@
         .progress-container { display: none; height: 12px; background:var(--bg-day-element); border-radius: 6px; box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day); padding: 2px; } body.dark-mode .progress-container { box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night); }
         .progress-bar { width: 0%; height: 100%; border-radius: 4px; background-color: #707899; transition: width 0.2s linear; }
         #helpModal .modal-body { gap: 0; padding-top: 15px; } #helpModal .modal-body > input[name="help-tab"] { display: none; } 
-        .help-page-content { display: none; padding: 15px 5px 0 5px; overflow-x: hidden; }
+      .help-page-content { display: none; padding: 15px 5px 40px 5px; overflow-x: hidden; } /* 修改点：底部内边距调整为 40px */
+
+
         .help-page-content h3 { font-size: 1.3em; margin: 20px 0 10px 0; padding-bottom: 5px; border-bottom: 1px solid rgba(128,128,128,0.3); } .help-page-content h4 { font-size: 1.1em; margin: 18px 0 8px 0; }
         .help-page-content p, .help-page-content li, .help-page-content a { line-height: 1.7; color: #4a5568; margin-bottom: 8px; word-wrap: break-word; }
         body.dark-mode .help-page-content p, body.dark-mode .help-page-content li, body.dark-mode .help-page-content a { color: #a0aec0; }
@@ -428,18 +432,30 @@
         .tag.fix { background-color: #93b5b3; } /* Morandi Green */
         .tag.opt { background-color: #d1a787; } /* Morandi Orange/Brown */
         .tag.release { background-color: #b091a2; }
-        .update-footer {
-            position: sticky;
-            bottom: -1px;
+         .update-footer {
+            position: absolute;
+            bottom: 0;
             left: 0;
             right: 0;
             text-align: center;
             font-size: 12px;
-            color: #a0aec0;
-            padding: 10px 0 5px 0;
-            background: var(--bg-day-element);
-            margin: 15px -15px -15px -15px;
+            color: #888; /* 修改点：加深日间模式的文字颜色 */
+            padding: 8px 0 15px 0;
+            background: transparent;
+            border-top: none;
+            margin: 0;
+            pointer-events: none;
+            /* 核心修改：添加文字阴影以增强可读性 */
+            text-shadow: 0 0 5px rgba(255, 255, 255, 1), 0 0 10px rgba(255, 255, 255, 0.8);
         }
+        body.dark-mode .update-footer {
+             color: #a0aec0; /* 修改点：为夜间模式设置一个合适的亮色 */
+             /* 核心修改：为夜间模式添加更强的黑色阴影 */
+             text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 0, 0, 0.4);
+        }
+
+
+
         body.dark-mode .update-footer { background: var(--bg-night-element); }
 
         .fab-drawer-item#helpBtn { position: relative; }
@@ -1043,6 +1059,15 @@ body.dragging-active {
                             <p><strong>QQ交流群:</strong> 563191005</p>
                         </div>
                         <div class="update-log-entry">
+                            <h4>v4.1.0 <span class="update-date">- 2025.10.04</span></h4>
+                            <ul>
+                                <li><span class="tag fix">修复</span> 解决了上传的HTML项目在部分情况下无法正常打开的问题。</li>
+                                <li><span class="tag new">新功能</span> 新增悬浮球CSS自定义向导与模板，方便用户快速美化悬浮球。（详见“主题设置”）</li>
+                                <li><span class="tag new">新功能</span> 在“按钮管理模式”下，支持通过长按并拖拽的方式，对项目按钮进行直观排序。</li>
+                                <li><span class="tag fix">修复</span> 修复了记忆功能的“文件夹”模块中，项目选择器无法正确加载和选择项目的问题。</li>
+                            </ul>
+                        </div>
+                        <div class="update-log-entry">
                             <h4>v3.9.0 <span class="update-date">- 2025.10.03</span></h4>
                             <ul>
                                 <li><span class="tag new">新功能</span> 新增网页内悬浮球与多项目悬浮窗功能，提升多任务操作体验。（详见“功能介绍”）</li>
@@ -1103,7 +1128,7 @@ body.dragging-active {
                         </div>
                         
                         <footer class="update-footer">
-                            当前版本: v3.9.0
+                            当前版本: v4.1.0
                         </footer>
                     </div>
                     <div id="help-page-3" class="help-page-content">
@@ -1587,6 +1612,18 @@ body.dragging-active {
     <div id="floating-projects-container"></div>
     
        <script>
+    // [新增] 字符串哈希函数，用于检测内容变更
+    function simpleHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+            hash |= 0; // Convert to 32bit integer
+        }
+        return hash;
+    }
+
+
     // [新增] 非阻塞式顶部提示框函数
     function showTopToast(message, duration = 3000) {
         // 防止重复创建
@@ -2719,7 +2756,22 @@ body.dragging-active {
     }
     
     const settingsModalElements = { githubRepoInput: document.getElementById("githubRepoInput"), githubTokenInput: document.getElementById("githubTokenInput"), saveSettingsBtn: document.getElementById("saveSettingsBtn"), manualSyncBtn: document.getElementById('manualSyncBtn') };
-    function setupModals(){document.querySelectorAll(".close-btn").forEach(e=>e.addEventListener("click",()=>{document.getElementById(e.dataset.modalId).classList.remove("show")})),document.querySelectorAll(".modal-overlay").forEach(e=>e.addEventListener("click",t=>e===t.target&&e.classList.remove("show"))),document.getElementById("helpBtn").addEventListener("click",()=>{document.getElementById("helpModal").classList.add("show"),toggleFabMenu(!1);localStorage.setItem('lastSeenVersion', CURRENT_APP_VERSION);document.getElementById('helpBtn').classList.remove('has-update');}),document.getElementById("dataSyncBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(settingsModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),settingsModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("addNavBtn").addEventListener("click",()=>{openAddModal(); toggleFabMenu(false);}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); }), document.getElementById('jelly-css-help-modal').querySelectorAll('.copy-btn').forEach(btn => { btn.addEventListener('click', async (e) => { const textBlock = e.target.parentElement; const textToCopy = textBlock.innerText.replace(e.target.innerText, '').trim(); try { await navigator.clipboard.writeText(textToCopy); const originalText = e.target.textContent; e.target.textContent = '已复制!'; setTimeout(() => { e.target.textContent = originalText; }, 1500); } catch (err) { alert('复制失败，请手动复制。'); } }); });}
+    function setupModals(){document.querySelectorAll(".close-btn").forEach(e=>e.addEventListener("click",()=>{document.getElementById(e.dataset.modalId).classList.remove("show")})),document.querySelectorAll(".modal-overlay").forEach(e=>e.addEventListener("click",t=>e===t.target&&e.classList.remove("show"))),document.getElementById("helpBtn").addEventListener("click", () => {
+    // 切换弹窗和菜单的显示
+    document.getElementById("helpModal").classList.add("show");
+    toggleFabMenu(false);
+    
+    // [核心修改] 更新“已读”状态
+    const helpPage = document.getElementById('help-page-2');
+    if (helpPage) {
+        const currentUpdateHash = simpleHash(helpPage.innerHTML.trim());
+        localStorage.setItem('lastSeenUpdateHash', String(currentUpdateHash));
+    }
+    
+    // 立即移除红点，提供即时反馈
+    document.getElementById('helpBtn').classList.remove('has-update');
+})
+,document.getElementById("dataSyncBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(settingsModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),settingsModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("addNavBtn").addEventListener("click",()=>{openAddModal(); toggleFabMenu(false);}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); }), document.getElementById('jelly-css-help-modal').querySelectorAll('.copy-btn').forEach(btn => { btn.addEventListener('click', async (e) => { const textBlock = e.target.parentElement; const textToCopy = textBlock.innerText.replace(e.target.innerText, '').trim(); try { await navigator.clipboard.writeText(textToCopy); const originalText = e.target.textContent; e.target.textContent = '已复制!'; setTimeout(() => { e.target.textContent = originalText; }, 1500); } catch (err) { alert('复制失败，请手动复制。'); } }); });}
     function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){const e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e=!0){return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据同步)"),!1):!0}
     
     function isObject(item) { return (item && typeof item === 'object' && !Array.isArray(item)); }
@@ -4807,9 +4859,18 @@ const blob = b64toBlob(blobData.content, contentType);
     }
 
 
-    function checkAppUpdate() {
-        const lastSeenVersion = localStorage.getItem('lastSeenVersion');
-        if (lastSeenVersion !== CURRENT_APP_VERSION) {
+        function checkAppUpdate() {
+        const helpPage = document.getElementById('help-page-2');
+        if (!helpPage) return;
+
+        // 1. 计算当前更新公告内容的哈希值
+        const currentUpdateHash = simpleHash(helpPage.innerHTML.trim());
+
+        // 2. 获取用户上次看到的哈希值
+        const lastSeenUpdateHash = localStorage.getItem('lastSeenUpdateHash');
+
+        // 3. 比较哈希值，如果不一致则显示红点
+        if (String(currentUpdateHash) !== lastSeenUpdateHash) {
             document.getElementById('helpBtn').classList.add('has-update');
         }
     }
