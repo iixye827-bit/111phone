@@ -457,6 +457,34 @@
         }
         /* ===== [END] HELP MODAL UPDATE STYLES ===== */
 
+        /* ... 你现有的其他 CSS ... */
+        .fab-drawer-item.has-update::after {
+            /* ... */
+        }
+        /* ===== [END] HELP MODAL UPDATE STYLES ===== */
+
+
+        /* =============================================================== */
+        /* ============ [新增] iOS 提示模态框的微调样式 ============ */
+        /* =============================================================== */
+        #iosWarningModal .modal-body p {
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        #iosWarningModal .modal-body strong {
+            color: var(--hold-border);
+            font-weight: 600;
+        }
+        /* =============================================================== */
+        /* ========================= [新增结束] ========================== */
+        /* =============================================================== */
+
+
+        /* ===== [START] FROSTED GLASS THEME ===== */
+        body.theme-glass .modal-overlay,
+        /* ... */
+
+
         /* ===== [START] FROSTED GLASS THEME ===== */
         body.theme-glass .modal-overlay,
         body.theme-glass #memoryPhotoViewerOverlay {
@@ -794,6 +822,16 @@
         .css-help-text-block { background-color: rgba(128,128,128,0.1); padding: 12px; border-radius: 8px; margin-top: 5px; font-family: monospace; white-space: pre-wrap; word-break: break-all; font-size: 13px; position:relative;}
         .css-help-text-block .copy-btn { position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: inherit; padding: 4px 8px; border-radius: 5px; font-size: 12px; cursor: pointer; transition: background 0.2s; }
         .css-help-text-block .copy-btn:hover { background: rgba(255,255,255,0.4); }
+
+/* 你可以把这段 CSS 放在 <style> 标签的末尾 */
+#iosPwaWarningModal .modal-header {
+    justify-content: center; /* 让标题居中 */
+}
+#iosPwaWarningModal .important-note {
+    border-left-color: #e53e3e; /* 强化警告区域的边框颜色 */
+    background-color: rgba(229, 62, 62, 0.1);
+}
+
         /* ===== [END] CSS HELP MODAL STYLES ===== */
 
     </style>
@@ -1186,6 +1224,41 @@
         </div>
     </div>
     <!-- ===== [END] CSS HELP MODAL ===== -->
+
+    <!-- ... 你现有的其他 modal ... -->
+    <div class="modal-overlay" id="jelly-css-help-modal">
+        <!-- ... CSS 帮助模态框的内容 ... -->
+    </div>
+    <!-- ===== [END] CSS HELP MODAL ===== -->
+
+    <!-- =============================================================== -->
+    <!-- ================ [新增] iOS 用户首次访问提示模态框 ================ -->
+    <!-- =============================================================== -->
+    <div class="modal-overlay" id="iosWarningModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <div class="modal-title-group"><span>⚠️ iOS 用户重要提示</span></div>
+            </div>
+            <div class="modal-body">
+                <p>尊敬的 iOS 用户，由于系统对 Web 应用沙箱（Sandbox）环境的严格限制，当您将本应用“添加到主屏幕”后，每次从后台彻底关闭应用（上划清除）都可能导致 <strong>iframe 内的项目数据被清除</strong>。</p>
+                <p>为避免数据丢失，我们建议您：</p>
+                <ol style="margin-left: 20px; line-height: 1.7;">
+                    <li><strong>使用“标签页模式”打开项目</strong>：在“管理项目”页面上传或编辑项目时，开启“在新标签页中打开”开关。这会使用系统浏览器打开，数据更安全，但可能无法实现完全全屏。</li>
+                    <li><strong>直接在浏览器中使用</strong>：通过 Safari 等浏览器直接访问本站，而不是通过桌面图标，这是最稳妥的方式。</li>
+                </ol>
+                <p style="margin-top: 15px;">为保障您的数据安全，强烈建议您<strong>定期备份</strong>重要数据。</p>
+                <button id="iosWarningConfirmBtn" class="modal-button" style="margin-top: 15px;">我已知晓</button>
+            </div>
+        </div>
+    </div>
+    <!-- =============================================================== -->
+    <!-- ========================= [新增结束] ========================== -->
+    <!-- =============================================================== -->
+
+    <!-- ===== [START] MEMORY MODAL ===== -->
+    <div class="modal-overlay" id="memoryModal">
+        <!-- ... 记忆模态框的内容 ... -->
+    </div>
 
     <!-- ===== [START] MEMORY MODAL ===== -->
     <div class="modal-overlay" id="memoryModal">
@@ -4675,6 +4748,26 @@ const blob = b64toBlob(blobData.content, contentType);
         setupColorSync(colorModal.pickerD2, colorModal.hexD2, 'dayColor2');
         setupColorSync(colorModal.pickerN1, colorModal.hexN1, 'nightColor1'); 
         setupColorSync(colorModal.pickerN2, colorModal.hexN2, 'nightColor2');
+ function showIosWarning() {
+            // 检查是否为 iOS 设备 (iPhone, iPad, iPod)
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            // 检查 localStorage 中是否已有标记
+            const hasBeenShown = localStorage.getItem('iosWarningShown') === 'true';
+            if (isIOS && !hasBeenShown) {
+                const modal = document.getElementById('iosWarningModal');
+                const confirmBtn = document.getElementById('iosWarningConfirmBtn');
+                // 显示模态框
+                modal.classList.add('show');
+                // 为确认按钮绑定点击事件
+                confirmBtn.addEventListener('click', () => {
+                    // 隐藏模态框
+                    modal.classList.remove('show');
+                    // 在 localStorage 中设置标记，确保不再显示
+                    localStorage.setItem('iosWarningShown', 'true');
+                }, { once: true }); // 使用 once: true 确保事件只触发一次
+            }
+        }
+        showIosWarning();
     });
     </script>
 </body>
