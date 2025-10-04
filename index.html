@@ -3424,8 +3424,15 @@
         const actions = {
             'goto-memo': () => { showPage('memo-section'); state.currentSection = 'memo'; document.getElementById('memory-modal-title').textContent = '备忘录'; renderMemoFolders(); },
             'goto-album': () => { showPage('album-section'); state.currentSection = 'album'; document.getElementById('memory-modal-title').textContent = '相册'; renderAlbumFolders(); },
-            'goto-cloud': () => { showPage('cloud-drive-section'); state.currentSection = 'cloud'; document.getElementById('memory-modal-title').textContent = '文件夹'; populateDriveCategorySelector(); fetchFilesForSelectedProject(); 
-fetchFilesForSelectedProject(); fetchFilesForSelectedProject(); },
+            'goto-cloud': () => { 
+    showPage('cloud-drive-section'); 
+    state.currentSection = 'cloud'; 
+    document.getElementById('memory-modal-title').textContent = '文件夹'; 
+    populateDriveCategorySelector(); 
+    populateDriveProjectSelector(); // 新增此行
+    fetchFilesForSelectedProject(); 
+},
+
             'back-to-hub': () => { showPage('hub-view'); state.currentSection = null; document.getElementById('memory-modal-title').textContent = '记忆'; },
             'add-memo-folder': () => { state.folderModalContext = { type: 'memo', id: null }; document.getElementById('folder-modal-title').textContent = '新文件夹'; ui.folderModal.querySelector('#folder-name-input').value = ''; ui.folderModal.classList.add('show'); },
             'add-album-folder': () => {
@@ -3728,26 +3735,41 @@ fetchFilesForSelectedProject(); fetchFilesForSelectedProject(); },
     }
 }
 
-        function populateDriveProjectSelector() {
+         function populateDriveProjectSelector() {
             const selectedCategory = ui.categorySelector.value;
-            ui.projectSelector.innerHTML = '';
-            ui.projectSelector.classList.add('hidden');
-            if (!selectedCategory) return;
-            
+            ui.projectSelector.innerHTML = ''; // 首先清空旧的项目
+
+            if (!selectedCategory || selectedCategory === '') {
+                ui.projectSelector.classList.add('hidden');
+                return;
+            }
+
+            ui.projectSelector.classList.remove('hidden');
+
             const category = currentConfig.categories.find(c => c.name === selectedCategory);
-            if (category && category.buttons) {
-                const uploadButtons = category.buttons.filter(b => b.href && b.href.startsWith('projects/'));
-                if (uploadButtons.length > 0) {
-                   uploadButtons.forEach(btn => {
-                       const option = document.createElement('option');
-                       option.value = btn.href;
-                       option.textContent = btn.text;
-                       ui.projectSelector.appendChild(option);
-                   });
-                   ui.projectSelector.classList.remove('hidden');
-                }
+            // 修改核心：不再过滤，获取该分类下的【所有】按钮/项目
+            const allProjects = (category && category.buttons) ? category.buttons : [];
+
+            if (allProjects.length > 0) {
+                // 遍历所有项目并添加到选择框
+                allProjects.forEach(btn => {
+                    const option = document.createElement('option');
+                    // 使用项目的 href 作为唯一标识
+                    option.value = btn.href; 
+                    option.textContent = btn.text;
+                    ui.projectSelector.appendChild(option);
+                });
+            } else {
+                // 如果分类下确实没有任何项目
+                const option = document.createElement('option');
+                option.value = "";
+                option.textContent = "此分类下无任何项目";
+                option.disabled = true;
+                ui.projectSelector.appendChild(option);
             }
         }
+
+
         function fetchFilesForSelectedProject() {
             const categoryName = ui.categorySelector.value;
             const projectHref = ui.projectSelector.value;
@@ -3761,36 +3783,50 @@ fetchFilesForSelectedProject(); fetchFilesForSelectedProject(); },
             fetchFilesFromGithubProject(projectHref);
         }
 
-        async function fetchFilesFromGithubProject(projectHref) {
-            const projectPath = projectHref.substring(0, projectHref.lastIndexOf('/'));
-            ui.fileListStatus.textContent = "加载中...";
+                async function fetchFilesFromGithubProject(projectHref) {
+            const projectConfig = findButtonConfigByHref(projectHref);
 
-            const { data: files, error } = await fetchFromGithub(projectPath);
-            if (error) { ui.fileListStatus.textContent = `加载失败: ${error}`; return; }
+            // 如果没有有效的项目被选中（例如，下拉框是提示信息时），则直接显示提示
+            if (!projectConfig) {
+                ui.fileListStatus.textContent = "请选择一个项目以查看文件";
+                return;
+            }
 
-            const filesToShow = files ? files.filter(file => file.name !== 'index.html') : [];
-
-            if (filesToShow.length === 0) { ui.fileListStatus.textContent = "该文件夹下暂无文件"; return; }
+            // 新逻辑：根据项目名称生成对应的安全文件夹路径
+            const projectName = projectConfig.text;
+            const folderName = projectName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-") || `project-${Date.now()}`;
             
+            // 新逻辑：只从 'jellyfish_drive' 中读取数据
+            const projectPath = `jellyfish_drive/${folderName}`;
+            ui.fileListStatus.textContent = "加载中...";
+            
+            // fetchFromGithub 能优雅地处理 404 (文件夹不存在) 的情况
+            const { data: files, error } = await fetchFromGithub(projectPath);
+            if (error) { 
+                ui.fileListStatus.textContent = `加载失败: ${error}`; 
+                return; 
+            }
+
+            // 如果 files 为 null (文件夹不存在) 或为空数组，都视为没有文件
+            if (!files || files.length === 0) {
+                ui.fileListStatus.textContent = "该项目下暂无文件";
+                return;
+            }
+
             ui.fileListStatus.style.display = "none";
-            filesToShow.forEach(async (file) => {
+            files.forEach(async (file) => {
                 const li = document.createElement("li");
                 const sizeText = file.size ? `${(file.size / 1024).toFixed(1)} KB` : '...';
-                
                 li.innerHTML = `<div class="file-info"><span class="file-name">${file.name}</span><span class="file-meta" data-path="${file.path}">${sizeText}</span></div><button class="delete-btn">&times;</button>`;
                 ui.fileList.appendChild(li);
                 
-                if (!file.size) {
-                    getLatestCommitDate(file.path).then(date => {
-                        const metaSpan = li.querySelector('.file-meta');
-                        if (metaSpan) metaSpan.textContent = date.split('T')[0];
-                    });
-                }
+                if (!file.size) { getLatestCommitDate(file.path).then(date => { const metaSpan = li.querySelector('.file-meta'); if (metaSpan) metaSpan.textContent = date.split('T')[0]; }); }
                 
                 li.querySelector(".file-info").addEventListener("click", () => forceDownload(file.path, file.name, li));
                 li.querySelector(".delete-btn").addEventListener("click", () => deleteFile(file.path, file.sha, li));
             });
         }
+
         async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString().split('T')[0];const o=await n.json();return o[0]?.commit.committer.date.split('T')[0]||(new Date(0)).toISOString().split('T')[0]}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString().split('T')[0]}}async function deleteFile(e,t,n){if(!confirm(`确定要永久删除文件 "${e.split("/").pop()}" 吗？`))return;n.style.opacity="0.5";try{ const success = await deleteFromGithub(e, `Delete file: ${e}`, t); if (success) { n.remove(); if(ui.fileList.children.length === 0) { ui.fileListStatus.textContent = '该文件夹下暂无文件'; ui.fileListStatus.style.display = 'block'; } } else { n.style.opacity = "1"; } } catch(err) { n.style.opacity = "1"; }}
         async function forceDownload(path, filename, el) {
             const fileNameSpan = el.querySelector(".file-name");
@@ -3859,42 +3895,53 @@ fetchFilesForSelectedProject(); fetchFilesForSelectedProject(); },
                 el.style.pointerEvents = "auto";
             }
         }
-        async function uploadFile() { 
-            if (activeUploadXHR) { activeUploadXHR.abort(); return; } 
-            if (!checkConfig()) return; 
+                async function uploadFile() {
+            if (activeUploadXHR) { activeUploadXHR.abort(); return; }
+            if (!checkConfig()) return;
+
             const selectedProjectHref = ui.projectSelector.value;
-            const file = ui.fileUploader.files[0]; 
-            let fileName = ui.fileNameInput.value.trim() || (file && file.name); 
-            if (!selectedProjectHref || !file || !fileName) { return alert("请选择要上传到的项目、文件，并确保文件名不为空。"); } 
-            
+            const file = ui.fileUploader.files[0];
+            let fileName = ui.fileNameInput.value.trim() || (file && file.name);
+
+            if (!selectedProjectHref || !file || !fileName) {
+                return alert("请选择要上传到的项目、文件，并确保文件名不为空。");
+            }
+
             const projectConfig = findButtonConfigByHref(selectedProjectHref);
             if (!projectConfig) {
                 return alert("此项目配置无效。");
             }
-            
-            const projectFolder = projectConfig.href.substring(0, projectConfig.href.lastIndexOf('/'));
 
-            ui.uploadBtn.disabled = true; 
-            ui.uploadBtn.textContent = "上传中 (0%)..."; 
-            ui.progressContainer.style.display = 'block'; 
-            ui.progressBar.style.width = '0%'; 
+            // 新逻辑：为项目创建一个安全、唯一的文件夹名
+            const projectName = projectConfig.text;
+            const folderName = projectName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-") || `project-${Date.now()}`;
             
-            try { 
-                const path = `${projectFolder}/${fileName}`;
-                await uploadFileViaGitData({ file, path, commitMessage: `Upload ${fileName} to ${projectConfig.text}`, onProgress: (percent) => { ui.progressBar.style.width = `${percent}%`; if (percent < 100) { ui.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; } else { ui.uploadBtn.textContent = '正在处理...'; } } }); 
-                alert("上传成功！"); 
-                ui.fileUploader.value = ""; 
-                ui.fileNameInput.value = ""; 
-                ui.selectedFileName.textContent = '未选择任何文件'; 
-                fetchFilesForSelectedProject(); 
-            } catch (error) { 
-                if (error.message !== "上传已取消。") alert(await handleApiError(`上传文件 ${fileName}`, error)); 
-            } finally { 
-                ui.uploadBtn.disabled = false; 
-                ui.uploadBtn.textContent = "上传文件"; 
-                ui.progressContainer.style.display = 'none'; 
-            } 
+            // 新逻辑：所有文件都存放在 'jellyfish_drive' 目录下
+            const basePath = `jellyfish_drive/${folderName}`;
+            const path = `${basePath}/${fileName}`;
+
+            ui.uploadBtn.disabled = true;
+            ui.uploadBtn.textContent = "上传中 (0%)...";
+            ui.progressContainer.style.display = 'block';
+            ui.progressBar.style.width = '0%';
+
+            try {
+                // 使用新的 commitMessage 描述操作
+                await uploadFileViaGitData({ file, path, commitMessage: `Upload ${fileName} to Drive/${projectName}`, onProgress: (percent) => { ui.progressBar.style.width = `${percent}%`; if (percent < 100) { ui.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; } else { ui.uploadBtn.textContent = '正在处理...'; } } });
+                alert("上传成功！");
+                ui.fileUploader.value = "";
+                ui.fileNameInput.value = "";
+                ui.selectedFileName.textContent = '未选择任何文件';
+                fetchFilesForSelectedProject();
+            } catch (error) {
+                if (error.message !== "上传已取消。") alert(await handleApiError(`上传文件 ${fileName}`, error));
+            } finally {
+                ui.uploadBtn.disabled = false;
+                ui.uploadBtn.textContent = "上传文件";
+                ui.progressContainer.style.display = 'none';
+            }
         }
+
 
         return {
             open: () => {
@@ -3944,9 +3991,10 @@ fetchFilesForSelectedProject(); fetchFilesForSelectedProject(); },
                 document.querySelector('[data-action="close-wander-view"]').addEventListener('click', actions['close-wander-view']);
                 document.querySelector('[data-action="toggle-player-collapse"]').addEventListener('click', actions['toggle-player-collapse']);
                 ui.categorySelector.addEventListener("change", () => {
-                   populateDriveProjectSelector();
-                   fetchFilesForSelectedProject();
-                });
+   populateDriveProjectSelector();
+   fetchFilesForSelectedProject();
+});
+
                 ui.projectSelector.addEventListener("change", fetchFilesForSelectedProject);
                 ui.selectFileBtn.addEventListener('click', () => ui.fileUploader.click());
                 ui.fileUploader.addEventListener("change",()=>{ if(ui.fileUploader.files.length>0){ const file = ui.fileUploader.files[0]; ui.fileNameInput.value=file.name; ui.selectedFileName.textContent = file.name; } else { ui.selectedFileName.textContent = "未选择任何文件"; }});
