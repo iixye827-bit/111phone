@@ -834,6 +834,50 @@
 
         /* ===== [END] CSS HELP MODAL STYLES ===== */
 
+/* =============================================================== */
+/* ============= [新增] 拖拽排序功能专属样式 V1.0 ============= */
+/* =============================================================== */
+
+/* 当拖拽发生时，给 body 添加此类，以防止意外的文本选择 */
+body.dragging-active {
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grabbing !important;
+}
+
+/* 正在被拖拽的原始按钮的样式，让它“占位”但视觉上弱化 */
+.nav-btn.dragging,
+.category-pill.dragging {
+    opacity: 0.4;
+    animation: none !important; /* 拖拽时停止抖动动画 */
+    transform: none !important;
+}
+
+/* 跟随手指移动的半透明虚影的样式 */
+.drag-ghost {
+    position: fixed; /* 使用 fixed 定位，使其可以在全屏自由移动 */
+    pointer-events: none; /* 让鼠标事件可以穿透虚影，检测到下方的元素 */
+    z-index: 9999;
+    opacity: 0.8;
+    transform: scale(1.08); /* 拖拽时微微放大，有被“拿起”的感觉 */
+    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+/* 当一个按钮成为有效的放置目标时的样式 */
+.nav-btn.drag-over,
+.category-pill.drag-over {
+    transform: scale(1.05) !important; /* 目标位置微微放大 */
+    animation: none !important; /* 悬停时也停止抖动 */
+    box-shadow: 0 0 18px 4px var(--hold-border, #63b3ed) !important; /* 关键的蓝色光晕特效 */
+    transition: all 0.2s ease-in-out;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+
+
     </style>
     <style id="custom-jelly-ball-styles"></style>
 </head>
@@ -1134,90 +1178,78 @@
     <div class="modal-overlay" id="jelly-css-help-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title-group"><span>💡 CSS 主题生成向导</span></div>
+                <div class="modal-title-group"><span>💡 悬浮球 CSS 自定义向导</span></div>
                 <button class="close-btn" data-modal-id="jelly-css-help-modal">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="css-help-section">
                     <h3>欢迎使用！</h3>
-                    <p>本向导能帮助你轻松创建漂亮的自定义CSS主题，即使你完全不懂代码也没关系。</p>
+                    <p>本向导能帮助你轻松创建漂亮的自定义悬浮球CSS主题，即使你完全不懂代码也没关系。</p>
                     <p>只需按照以下步骤操作，就能让AI成为你的专属设计师。</p>
                 </div>
                 <div class="css-help-section">
-                    <h4>使用步骤</h4>
-                    <ol>
-                        <li><strong>复制</strong>下方的“AI提示词模板”内的所有内容。</li>
-                        <li>在方括号 <code>[ ]</code> 内填写你的想法和描述，描述越清晰，AI生成的效果越好。</li>
-                        <li>将填写好的完整内容发送给AI（例如ChatGPT, Kimi, Claude, 文心一言等）。</li>
-                        <li>将AI返回的CSS代码粘贴到上方的输入框中，即可实时预览效果！</li>
-                    </ol>
-                </div>
-                                <div class="css-help-section">
-                    <h4>AI提示词模板 (请复制这里)</h4>
-                    <div class="css-help-text-block" id="css-prompt-template">
-                        <button class="copy-btn">复制</button>
-请为我创建一个悬浮窗的CSS主题。要求如下：
-1. 主题名称 (Class Name): .[请在这里为你的主题起一个独特的英文名，例如: cool-blue-theme]
-2. 整体风格描述: [描述一下你想要的整体感觉，例如：赛博朋克、macOS毛玻璃风格、可爱卡通风、简约商务风、复古游戏像素风]
-3. 颜色方案:
-主要背景色: [例如：深灰色、半透明的白色、淡蓝色]
-强调色 (用于标题栏或按钮): [例如：亮蓝色、霓虹粉、金色]
-文字颜色: [例如：白色、深灰色]
-4. 窗口细节:
-圆角大小: [例如：直角、小圆角、大圆角]
-边框样式: [例如：不需要边框、1像素宽的实线白色边框、发光的蓝色边框]
-阴影效果: [例如：需要一个柔和的阴影来营造立体感、不需要阴影]
-5. 各部分具体要求:
-标题栏 (.fp-window-title): [例如：使用强调色作为背景、文字居中]
-内容区 (.fp-window-body): [例如：背景比主背景色稍亮一些]
-按钮 (.fp-window-body button): [例如：圆角按钮，背景是强调色，鼠标悬停时变亮]
-请确保所有样式都包含在 .[这里填写你上面起的主题名称] 这个父选择器下，以避免影响页面其他元素。
-                    </div>
-                </div>
-                 <div class="css-help-section">
-                    <h4>填写的例子</h4>
-                    <p>这里有几个填写好的例子，你可以直接复制它们去请求AI，感受一下效果！</p>
-                    <h4>示例1：赛博朋克风格</h4>
-                    <div class="css-help-text-block" id="css-prompt-example1">
-                        <button class="copy-btn">复制</button>
-请为我创建一个悬浮窗的CSS主题。要求如下：
-1. 主题名称 (Class Name): .cyberpunk-neon
-2. 整体风格描述: 赛博朋克风格，有霓虹灯的感觉，整体偏暗色调。
-3. 颜色方案:
-主要背景色: #1a1a2e (深蓝紫色)
-强调色 (用于标题栏或按钮): #f0a500 (亮黄色) 和 #e4007f (霓虹粉)
-文字颜色: #ffffff (白色)
-4. 窗口细节:
-圆角大小: 小圆角 (大约 4px)
-边框样式: 1像素宽的霓虹粉色实线边框
-阴影效果: 需要一个霓虹粉色的发光阴影 (box-shadow)
-5. 各部分具体要求:
-标题栏 (.fp-window-title): 背景色为 #1a1a2e，但底部有一条1像素的亮黄色边框。
-内容区 (.fp-window-body): 背景色透明。
-按钮 (.fp-window-body button): 方形按钮，黑色背景，亮黄色边框，鼠标悬停时背景变为亮黄色，文字变黑。
-请确保所有样式都包含在 .cyberpunk-neon 这个父选择器下，以避免影响页面其他元素。
-                    </div>
-                    <h4>示例2：简约白 & 毛玻璃风格</h4>
-                     <div class="css-help-text-block" id="css-prompt-example2">
-                         <button class="copy-btn">复制</button>
-请为我创建一个悬浮窗的CSS主题。要求如下：
-1. 主题名称 (Class Name): .glassmorphism-light
-2. 整体风格描述: 模仿苹果macOS的毛玻璃效果，非常简约、干净、现代。
-3. 颜色方案:
-主要背景色: 半透明的白色 (rgba(255, 255, 255, 0.7))
-强调色 (用于标题栏或按钮): 无特定强调色，保持简约
-文字颜色: 黑色
-4. 窗口细节:
-圆角大小: 大圆角 (大约 12px)
-边框样式: 1像素宽的半透明灰色边框 (rgba(200, 200, 200, 0.5))
-阴影效果: 需要一个非常柔和、自然的阴影
-5. 各部分具体要求:
-标题栏 (.fp-window-title): 字体加粗，稍微大一点。
-内容区 (.fp-window-body): 无特殊要求。
-按钮 (.fp-window-body button): 灰色背景，白色文字，无边框，圆角。鼠标悬停时背景变深一点。
-特别注意：请在 .glassmorphism-light 选择器中加入 backdrop-filter: blur(15px); 和 -webkit-backdrop-filter: blur(15px); 来实现背景模糊效果。
-请确保所有样式都包含在 .glassmorphism-light 这个父选择器下，以避免影响页面其他元素。
-                    </div>
+    <h4>方案 A：自定义双环辉光悬浮球</h4>
+    <p style="margin-bottom: 12px; font-size: 0.9em; color: #889;">此方案保留悬浮球默认的“内圈球体 + 外圈辉光”结构，适合进行颜色和风格的深度定制。</p>
+    
+    <h5 style="margin-top: 15px; margin-bottom: 5px;">AI 提示词模板 (方案 A)</h5>
+    <div class="css-help-text-block" id="css-prompt-template-A">
+        <button class="copy-btn">复制</button>
+请为我创建一个双环辉光悬浮球的CSS主题。要求如下：<br><br>
+1. <strong>整体风格描述</strong>: [例如：宇宙星云、魔法水晶、金属核心]<br>
+2. <strong>内圈球体样式 (<code>#floating-jellyfish-ball</code>)</strong>:<br>
+&nbsp;&nbsp;&nbsp;• 背景: [例如：深蓝色带有亮片，或紫色到蓝色的渐变]<br>
+&nbsp;&nbsp;&nbsp;• 内部图标(🪼)颜色: [例如：白色]<br>
+&nbsp;&nbsp;&nbsp;• 边框: [例如：1像素银色边框]<br>
+3. <strong>外圈辉光样式 (<code>.jelly-ball-wrapper</code>)</strong>:<br>
+&nbsp;&nbsp;&nbsp;• 辉光颜色: [例如：亮紫色]<br><br>
+请为以上要求生成CSS代码。外圈辉光颜色通过修改 <code>--hold-border</code> 变量实现。
+    </div>
+
+    <h5 style="margin-top: 15px; margin-bottom: 5px;">示例：宇宙星云</h5>
+    <div class="css-help-text-block" id="css-prompt-example-A">
+        <button class="copy-btn">复制</button>
+请为我创建一个双环辉光悬浮球的CSS主题。要求如下：<br><br>
+1. <strong>整体风格描述</strong>: 宇宙星云，深邃的太空感。<br>
+2. <strong>内圈球体样式 (<code>#floating-jellyfish-ball</code>)</strong>:<br>
+&nbsp;&nbsp;&nbsp;• 背景: 深邃的星空背景，可以使用深蓝到黑色的渐变。<br>
+&nbsp;&nbsp;&nbsp;• 内部图标(🪼)颜色: 明亮的白色，像一颗恒星。<br>
+&nbsp;&nbsp;&nbsp;• 边框: 不需要边框。<br>
+3. <strong>外圈辉光样式 (<code>.jelly-ball-wrapper</code>)</strong>:<br>
+&nbsp;&nbsp;&nbsp;• 辉光颜色: 梦幻的紫色 (<code>#8a2be2</code>)。<br><br>
+请为以上要求生成CSS代码。外圈辉光颜色通过修改 <code>--hold-border</code> 变量实现。
+    </div>
+</div>
+
+<div class="css-help-section" style="margin-top: 20px;">
+    <h4>方案 B：替换为自定义图标</h4>
+    <p style="margin-bottom: 12px; font-size: 0.9em; color: #889;">此方案会完全隐藏默认的球体和辉光，将其替换为您指定的任意图片，适合追求极致个性化的用户。</p>
+    
+    <h5 style="margin-top: 15px; margin-bottom: 5px;">AI 提示词模板 (方案 B)</h5>
+    <div class="css-help-text-block" id="css-prompt-template-B">
+        <button class="copy-btn">复制</button>
+请为我生成一段CSS代码，将悬浮球替换为自定义图片。要求如下：<br><br>
+1. <strong>图片地址</strong>: [请在此处粘贴一个公开的图片URL，建议使用透明背景的.png格式图片]<br>
+2. <strong>可选样式</strong>:<br>
+&nbsp;&nbsp;&nbsp;• 边框: [例如：不需要边框，或 2像素金色边框]<br>
+&nbsp;&nbsp;&nbsp;• 鼠标悬停效果: [例如：放大1.1倍]<br><br>
+代码需要做到:<br>
+&nbsp;&nbsp;&nbsp;- 隐藏原来的内外圈辉光和图标。<br>
+&nbsp;&nbsp;&nbsp;- 将背景设置为我提供的图片地址。
+    </div>
+
+    <h5 style="margin-top: 15px; margin-bottom: 5px;">示例：精灵球</h5>
+    <div class="css-help-text-block" id="css-prompt-example-B">
+        <button class="copy-btn">复制</button>
+请为我生成一段CSS代码，将悬浮球替换为自定义图片。要求如下：<br><br>
+1. <strong>图片地址</strong>: <code>https://www.freeiconspng.com/uploads/pok-mon-go-pokeball-png-10.png</code><br>
+2. <strong>可选样式</strong>:<br>
+&nbsp;&nbsp;&nbsp;• 边框: 不需要边框。<br>
+&nbsp;&nbsp;&nbsp;• 鼠标悬停效果: 旋转15度。<br><br>
+代码需要做到:<br>
+&nbsp;&nbsp;&nbsp;- 隐藏原来的内外圈辉光和图标。<br>
+&nbsp;&nbsp;&nbsp;- 将背景设置为我提供的图片地址。
+    </div>
+</div>
                 </div>
 
             </div>
@@ -4768,6 +4800,214 @@ const blob = b64toBlob(blobData.content, contentType);
             }
         }
         showIosWarning();
+        /* =============================================================== */
+        /* ============== [新增] 拖拽排序功能核心逻辑 V1.0 ============= */
+        /* =============================================================== */
+        const DragAndSort = (() => {
+            let draggedEl = null;      // 正在拖拽的原始元素
+            let ghostEl = null;        // 跟随鼠标的虚影元素
+            let dropTarget = null;     // 当前的放置目标元素
+            let longPressTimer = null; // 长按计时器
+            let isDragging = false;    // 是否正在拖拽的标志
+            let startPos = { x: 0, y: 0 };
+            let offset = { x: 0, y: 0 };
+
+            const LONG_PRESS_DELAY = 300; // 长按 300 毫秒触发
+            const DRAG_THRESHOLD = 5;     // 移动超过 5px 则取消长按
+
+            // 当长按计时器触发，开始拖拽
+            function startDrag(event) {
+                if (!draggedEl) return;
+                isDragging = true;
+                
+                const rect = draggedEl.getBoundingClientRect();
+
+                // 1. 创建虚影
+                ghostEl = draggedEl.cloneNode(true);
+                ghostEl.classList.add('drag-ghost');
+                document.body.appendChild(ghostEl);
+                
+                // 设置虚影的初始尺寸和位置
+                ghostEl.style.width = `${rect.width}px`;
+                ghostEl.style.height = `${rect.height}px`;
+                ghostEl.style.left = `${rect.left}px`;
+                ghostEl.style.top = `${rect.top}px`;
+
+                // 计算鼠标/手指在元素上的偏移
+                offset.x = startPos.x - rect.left;
+                offset.y = startPos.y - rect.top;
+
+                // 2. 更新原始元素和body的样式
+                draggedEl.classList.add('dragging');
+                document.body.classList.add('dragging-active');
+
+                // 3. 初始移动一次虚影，确保位置正确
+                moveGhost(startPos.x, startPos.y);
+            }
+
+            // 移动虚影
+            function moveGhost(clientX, clientY) {
+                if (!ghostEl) return;
+                ghostEl.style.left = `${clientX - offset.x}px`;
+                ghostEl.style.top = `${clientY - offset.y}px`;
+            }
+
+            // 拖拽过程中的处理
+            function onDragMove(event) {
+                const a = event.touches ? event.touches[0] : event;
+                const { clientX, clientY } = a;
+
+                // 如果还没开始拖拽（长按计时器未触发），检查移动距离
+                if (!isDragging) {
+                    if (Math.abs(clientX - startPos.x) > DRAG_THRESHOLD || Math.abs(clientY - startPos.y) > DRAG_THRESHOLD) {
+                        clearTimeout(longPressTimer); // 移动过大，取消长按
+                    }
+                    return;
+                }
+
+                event.preventDefault(); // 开始拖拽后，阻止默认行为（如滚动）
+                moveGhost(clientX, clientY);
+
+                // 隐藏虚影，以便检测其下方的元素
+                ghostEl.style.display = 'none';
+                const elementBelow = document.elementFromPoint(clientX, clientY);
+                ghostEl.style.display = '';
+
+                // 移除上一个目标的高亮
+                if (dropTarget) {
+                    dropTarget.classList.remove('drag-over');
+                    dropTarget = null;
+                }
+                
+                // 检查下方元素是否是有效的放置目标
+                const potentialTarget = elementBelow ? elementBelow.closest('.nav-btn, .category-pill') : null;
+                if (potentialTarget && potentialTarget !== draggedEl && draggedEl.classList.contains(potentialTarget.classList[0])) {
+                    dropTarget = potentialTarget;
+                    dropTarget.classList.add('drag-over');
+                }
+            }
+
+            // 拖拽结束
+            function onDragEnd(event) {
+                clearTimeout(longPressTimer);
+                if (!isDragging) return;
+
+                // 如果存在有效的放置目标
+                if (dropTarget) {
+                    dropTarget.classList.remove('drag-over');
+                    
+                    const parent = draggedEl.parentNode;
+                    const nextSiblingOfTarget = dropTarget.nextSibling;
+                    
+                    // DOM节点交换
+                    parent.insertBefore(draggedEl, nextSiblingOfTarget);
+                    parent.insertBefore(dropTarget, draggedEl);
+
+                    // 更新数据模型
+                    updateDataModel(draggedEl, dropTarget, parent);
+                }
+
+                // 清理工作
+                draggedEl.classList.remove('dragging');
+                document.body.classList.remove('dragging-active');
+                if (ghostEl) {
+                    ghostEl.remove();
+                }
+                
+                draggedEl = null;
+                ghostEl = null;
+                dropTarget = null;
+                isDragging = false;
+                
+                document.removeEventListener('mousemove', onDragMove);
+                document.removeEventListener('touchmove', onDragMove);
+                document.removeEventListener('mouseup', onDragEnd);
+                document.removeEventListener('touchend', onDragEnd);
+            }
+
+            // 按下事件（长按的起点）
+            function onDragStart(event) {
+                // 只在管理模式下生效
+                if (!document.body.classList.contains('management-active')) return;
+                
+                const target = event.target.closest('.nav-btn, .category-pill');
+                if (!target || isDragging) return;
+
+                // 排除删除按钮
+                if (event.target.classList.contains('delete-icon')) return;
+
+                draggedEl = target;
+                const a = event.touches ? event.touches[0] : event;
+                startPos.x = a.clientX;
+                startPos.y = a.clientY;
+
+                // 设置长按计时器
+                longPressTimer = setTimeout(() => startDrag(event), LONG_PRESS_DELAY);
+
+                // 绑定移动和结束事件
+                document.addEventListener('mousemove', onDragMove);
+                document.addEventListener('touchmove', onDragMove, { passive: false });
+                document.addEventListener('mouseup', onDragEnd, { once: true });
+                document.addEventListener('touchend', onDragEnd, { once: true });
+            }
+
+            // 更新底层数据结构
+            function updateDataModel(el1, el2, parent) {
+                // 情况一：对项目按钮排序
+                if (parent.id === 'navContainer') {
+                    const category = currentConfig.categories.find(c => c.name === currentCategory);
+                    if (!category) return;
+
+                    const allButtons = Array.from(parent.querySelectorAll('.nav-btn'));
+                    const newButtonOrder = allButtons.map(btn => {
+                        return category.buttons.find(b => b.href === btn.dataset.href);
+                    }).filter(Boolean); // 过滤掉可能找不到的按钮
+
+                    category.buttons = newButtonOrder;
+                }
+                // 情况二：对分类标签排序
+                else if (parent.id === 'categoryNav') {
+                    const allPills = Array.from(parent.querySelectorAll('.category-pill'));
+                    const newCategoryOrder = allPills.map(pill => {
+                        return currentConfig.categories.find(c => c.name === pill.dataset.category);
+                    }).filter(Boolean);
+
+                    // 确保“全部”分类始终在第一位
+                    const allCategory = newCategoryOrder.find(c => c.name === '全部');
+                    const otherCategories = newCategoryOrder.filter(c => c.name !== '全部');
+                    if (allCategory) {
+                        currentConfig.categories = [allCategory, ...otherCategories];
+                    } else {
+                        currentConfig.categories = newCategoryOrder;
+                    }
+                }
+                
+                saveGlobalConfig('Reorder items via drag and drop');
+            }
+
+            // 公开的初始化方法
+            return {
+                init() {
+                    console.log("Drag and Sort functionality initialized.");
+                    const mainContainer = document.getElementById('navContainer');
+                    const categoryContainer = document.getElementById('categoryNav');
+
+                    // 使用事件委托来处理动态添加的按钮
+                    mainContainer.addEventListener('mousedown', onDragStart);
+                    mainContainer.addEventListener('touchstart', onDragStart, { passive: true });
+                    
+                    categoryContainer.addEventListener('mousedown', onDragStart);
+                    categoryContainer.addEventListener('touchstart', onDragStart, { passive: true });
+                }
+            };
+        })();
+
+        // 初始化拖拽排序功能
+        DragAndSort.init();
+        /* =============================================================== */
+        /* ========================= [新增结束] ========================== */
+        /* =============================================================== */
+
     });
     </script>
 </body>
