@@ -6,7 +6,16 @@
         "name": "默认文件夹"
       }
     ],
-    "notes": []
+    "notes": [
+      {
+        "id": 1759600256491,
+        "folderId": 1759414098704,
+        "title": "1",
+        "content": "1",
+        "timestamp": 1759600256491,
+        "isPinned": false
+      }
+    ]
   },
   "album": {
     "folders": [
