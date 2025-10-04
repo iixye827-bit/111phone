@@ -104,7 +104,7 @@
     }
   ],
   "settings": {
-    "paginationEnabled": false,
+    "paginationEnabled": true,
     "jellyBall": {
       "enabled": true,
       "swipeBack": true,
