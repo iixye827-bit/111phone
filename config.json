@@ -90,6 +90,16 @@
           "openExternally": false
         }
       ]
+    },
+    {
+      "name": "123456",
+      "buttons": [
+        {
+          "text": "初始",
+          "href": "222",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
