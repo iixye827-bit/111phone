@@ -48,27 +48,6 @@
         "name": "7"
       }
     ],
-    "items": [
-      {
-        "id": 1759601428616,
-        "albumId": 1759414098705,
-        "type": "photo",
-        "title": "",
-        "description": "",
-        "timestamp": 1759601428616,
-        "path": "memory/photos/1759601422928_E9795A65D04A393F3A9EAAE52FE7F2AC.png",
-        "sha": "5beb4525d6b360ed8fdfdc4947529869d722d329"
-      },
-      {
-        "id": 1759667448012,
-        "albumId": 1759414098705,
-        "type": "photo",
-        "title": "",
-        "description": "",
-        "timestamp": 1759667448012,
-        "path": "memory/photos/1759667442803_1040g3k031k57boiok8005nngshm086igl2jg568!nd_dft_wlteh_jpg_3.JPEG",
-        "sha": "545cf986213c43bb56e237338f0120d8a702f791"
-      }
-    ]
+    "items": []
   }
 }
