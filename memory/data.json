@@ -24,6 +24,17 @@
         "name": "我的照片"
       }
     ],
-    "items": []
+    "items": [
+      {
+        "id": 1759762939867,
+        "albumId": 1759414098705,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1759762939867,
+        "path": "memory/photos/1759762928721_IMG_6060.jpeg",
+        "sha": "34a5240d698f4ebddd95d8fba3ef4f8afe90689e"
+      }
+    ]
   }
 }
