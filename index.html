@@ -923,25 +923,24 @@ body.dragging-active {
 /* =============================================================== */
 
 /* =============================================================== */
-/* ============= [最终修正版] 手机模式专属样式 V5 ============= */
+/* ============== [修正] 手机模式专属样式 V3 ================= */
 /* =============================================================== */
 
-/* 1. 默认状态下，滑动容器是隐藏的 */
+/* 1. 默认状态下，我们新增的滑动容器是完全隐藏的 */
 .main-wrapper {
     display: none;
 }
 
-/* 2. 当手机模式开启时 (body有.mobile-mode类) */
 
-/* (A) 隐藏原始的、直接在 body 下的元素 */
-body.mobile-mode > .title-card,
-body.mobile-mode > .category-nav-container,
-body.mobile-mode > .nav-container {
-    display: none;
+/* 2. 仅当手机模式开启时 (body有.mobile-mode类)，应用以下所有样式 */
+body.mobile-mode {
+    /* 强制 body 停止原有的 flex 布局，并禁止页面滚动 */
+    display: block !important;
+    overflow: hidden !important;
 }
 
-/* (B) 显示滑动容器并使其全屏 */
 body.mobile-mode .main-wrapper {
+    /* 显示滑动容器并使其铺满整个屏幕 */
     display: block;
     position: fixed;
     top: 0;
@@ -951,21 +950,34 @@ body.mobile-mode .main-wrapper {
     overflow: hidden;
 }
 
-/* (C) 确保 body 本身不产生滚动条 */
-body.mobile-mode {
-    overflow: hidden;
+/* 关键修复：在手机模式下，隐藏原始的主页元素 */
+body.mobile-mode > .title-card,
+body.mobile-mode > .category-nav-container,
+body.mobile-mode > .nav-container {
+    display: none !important;
 }
 
-/* --- 以下是手机模式内部的样式，不会影响外部 --- */
-.page-slider {
+
+/* --- 以下是手机模式内部的样式，都以 body.mobile-mode 开头 --- */
+
+body.mobile-mode .page-slider {
     display: flex;
     width: 200%;
     height: 100%;
-    transform: translateX(0); /* JS 会控制这里 */
+    /* transform 由 JS 控制，这里设个初始值即可 */
+    transform: translateX(0); 
+    /* transition 也由 JS 控制 */
 }
 
-.lock-screen-page,
-.home-screen-page {
+body.mobile-mode .page-slider.show-home-screen .home-screen-page > * {
+    /* 当切换到主屏幕时，内部元素淡入动画 */
+    transform: translateX(0);
+    opacity: 1;
+    transition: transform 0.4s 0.2s ease-out, opacity 0.3s 0.2s ease-out; /* 延迟出现 */
+}
+
+body.mobile-mode .lock-screen-page,
+body.mobile-mode .home-screen-page {
     width: 50%;
     height: 100%;
     flex-shrink: 0;
@@ -976,19 +988,10 @@ body.mobile-mode {
     align-items: center;
 }
 
-.home-screen-page > * {
-    transition: transform 0.4s 0.2s ease-out, opacity 0.3s 0.2s ease-out;
-    transform: translateX(100px);
-    opacity: 0;
+/* --- 锁屏页样式 --- */
+.lock-screen-page {
+    padding-top: 5vh;
 }
-
-.page-slider.show-home-screen .home-screen-page > * {
-    transform: translateX(0);
-    opacity: 1;
-}
-
-/* 锁屏页网格样式... */
-.lock-screen-page { padding-top: 5vh; }
 .lockscreen-grid {
     width: 100%;
     max-width: 500px;
@@ -998,13 +1001,53 @@ body.mobile-mode {
     grid-template-rows: repeat(4, 1fr);
     gap: 15px;
 }
-.grid-cell { background: rgba(128, 128, 128, 0.1); border: 2px dashed rgba(128, 128, 128, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background-color .2s, border-color .2s; }
-.grid-cell:hover { background: rgba(128, 128, 128, 0.2); border-color: rgba(128, 128, 128, 0.4); }
-.add-component-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px); font-size: 24px; color: var(--text-day); cursor: pointer; transition: transform .2s, background .2s; }
-body.dark-mode .add-component-btn { color: var(--text-night); background: rgba(0, 0, 0, 0.1); }
-.add-component-btn:hover { transform: scale(1.1); background: rgba(255, 255, 255, 0.2); }
-body.dark-mode .add-component-btn:hover { background: rgba(0, 0, 0, 0.2); }
+.grid-cell {
+    background: rgba(128, 128, 128, 0.1);
+    border: 2px dashed rgba(128, 128, 128, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.grid-cell:hover {
+    background: rgba(128, 128, 128, 0.2);
+    border-color: rgba(128, 128, 128, 0.4);
+}
+.add-component-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    font-size: 24px;
+    color: var(--text-day);
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+body.dark-mode .add-component-btn {
+    color: var(--text-night);
+    background: rgba(0, 0, 0, 0.1);
+}
+.add-component-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
+}
+body.dark-mode .add-component-btn:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
 
+/* --- 主屏幕页（包含原始元素的副本）样式 --- */
+.home-screen-page .title-card,
+.home-screen-page .category-nav-container,
+.home-screen-page .nav-container {
+    transform: translateX(100px);
+    opacity: 0;
+}
+/* =============================================================== */
+/* ========================= [修正结束] ========================== */
+/* =============================================================== */
 
 
 
