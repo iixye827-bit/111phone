@@ -120,6 +120,13 @@
           "data": {
             "path": "memory/photos/1759762928721_IMG_6060.jpeg"
           }
+        },
+        "1": {
+          "type": "photo",
+          "size": "large",
+          "data": {
+            "path": "memory/photos/1759762928721_IMG_6060.jpeg"
+          }
         }
       },
       "lockScreen": {
