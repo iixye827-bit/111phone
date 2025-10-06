@@ -923,206 +923,6 @@ body.dragging-active {
 /* =============================================================== */
 
 /* =============================================================== */
-/* ============= [新增] 锁屏组件专属样式 V1.0 ============= */
-/* =============================================================== */
-
-/* 让网格单元成为一个灵活的容器，以容纳中号和小号组件 */
-.grid-cell {
-    display: flex;
-    flex-wrap: wrap;
-    align-content: flex-start; /* 让内容从顶部开始排列 */
-    justify-content: flex-start; /* 让内容从左侧开始排列 */
-    gap: 8px; /* 组件之间的间隙 */
-    padding: 8px; /* 为单元格添加内边距 */
-    overflow: hidden; /* 隐藏任何意外溢出 */
-    border: none; /* 在有组件时，移除虚线边框 */
-    background: transparent; /* 在有组件时，背景透明 */
-}
-
-/* 当单元格为空时，恢复添加按钮的居中样式 */
-.grid-cell:empty {
-    border: 2px dashed rgba(128, 128, 128, 0.2);
-    background: rgba(128, 128, 128, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0; /* 空单元格不需要内边距 */
-}
-.grid-cell:empty::after {
-    content: ''; /* 伪元素确保 :empty 选择器在某些浏览器中正常工作 */
-}
-
-/* 组件通用样式 */
-.lockscreen-component {
-    border-radius: 12px;
-    background: var(--bg-day-element);
-    box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day);
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-day);
-    pointer-events: none; /* 核心要求：主屏幕组件不可点击 */
-}
-body.dark-mode .lockscreen-component {
-    background: var(--bg-night-element);
-    box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night);
-    color: var(--text-night);
-}
-body.theme-glass .lockscreen-component {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-}
-body.theme-glass.dark-mode .lockscreen-component {
-    background: rgba(20, 20, 20, 0.25);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
-
-/* --- 组件尺寸 --- */
-/* 超大尺寸：占据整行 */
-.lockscreen-component.size-super-large {
-    grid-column: span 2;
-    width: 100%;
-    height: 100%;
-}
-/* 大尺寸：占据一个单元格 */
-.lockscreen-component.size-large {
-    width: 100%;
-    height: 100%;
-}
-/* 中尺寸：占据半个单元格 */
-.lockscreen-component.size-medium {
-    /* 减去gap的一半，以适应2列布局 */
-    width: calc(50% - 4px);
-    height: 100%;
-}
-/* 小尺寸：占据四分之一个单元格 */
-.lockscreen-component.size-small {
-    /* 减去gap的一半，以适应2x2布局 */
-    width: calc(50% - 4px);
-    height: calc(50% - 4px);
-}
-
-/* --- 组件类型特定样式 --- */
-/* 1. 相册图片组件 */
-.component-photo img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* 核心：自动裁剪并填充，不变形 */
-    display: block;
-}
-
-/* 2. 备忘录组件 */
-.component-memo {
-    padding: 12px;
-    align-items: flex-start;
-    text-align: left;
-    flex-direction: column;
-    gap: 5px;
-}
-.component-memo .memo-title {
-    font-size: 16px;
-    font-weight: 700;
-    width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.component-memo .memo-content {
-    font-size: 13px;
-    opacity: 0.8;
-    width: 100%;
-    /* 多行文本溢出显示省略号 */
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 5; /* 根据大组件的高度微调 */
-    overflow: hidden;
-    line-height: 1.5;
-}
-
-/* 3. 自定义HTML组件 */
-.component-html {
-    padding: 10px;
-    align-items: stretch;
-    justify-content: stretch;
-}
-.component-html > div {
-    width: 100%;
-    height: 100%;
-    overflow: auto; /* 如果内容超出，允许滚动 */
-}
-
-/* 4. 快捷方式组件 */
-.component-shortcut {
-    width: 100%;
-    height: 100%;
-    border-radius: 50% !important; /* 强制圆形 */
-    font-size: 15px; /* 调整字体大小以适应小按钮 */
-    font-weight: 600;
-    padding: 5px;
-    text-align: center;
-    line-height: 1.2;
-    word-break: break-word;
-    /* 允许在设置界面点击，但在主屏幕上仍然由 .lockscreen-component 的 pointer-events: none 控制 */
-    pointer-events: auto; 
-    cursor: pointer;
-}
-
-/* --- 设置浮窗内的样式 --- */
-/* 让设置浮窗内的组件可点击 */
-.floating-project-window .lockscreen-component {
-    pointer-events: auto;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.floating-project-window .lockscreen-component:hover {
-    transform: scale(1.03);
-    box-shadow: 0 0 15px 2px var(--hold-border);
-}
-.floating-project-window .grid-cell {
-    cursor: pointer;
-}
-
-/* 组件选择模态框的特定样式 */
-#component-chooser-modal .modal-content { max-width: 450px; }
-#component-chooser-modal .modal-body { gap: 15px; }
-#component-chooser-modal .option-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-#component-chooser-modal .option-button {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-size: 16px;
-    font-weight: 600;
-}
-#component-chooser-modal .option-button .icon {
-    font-size: 28px;
-}
-#component-chooser-modal .size-selector {
-    display: flex;
-    justify-content: space-around;
-    gap: 10px;
-}
-#component-chooser-modal .size-selector label {
-    flex-grow: 1;
-}
-
-/* =============================================================== */
-/* ========================= [新增结束] ========================== */
-/* =============================================================== */
-
-
-/* =============================================================== */
 /* ============== [修正] 手机模式专属样式 V3 ================= */
 /* =============================================================== */
 
@@ -1344,6 +1144,133 @@ body.mobile-mode .page-slider:not(.show-home-screen) .home-screen-page > * {
 /* =============================================================== */
 /* ========================= [更新结束] ========================== */
 /* =============================================================== */
+/* =============================================================== */
+/* ============= [新增] 锁屏组件及设置相关样式 ============ */
+/* =============================================================== */
+
+/* 组件基础样式 */
+.widget {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-day);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    padding: 8px;
+    box-sizing: border-box;
+    text-align: center;
+}
+body.dark-mode .widget {
+    background: rgba(20, 20, 20, 0.25);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-night);
+}
+
+/* 超大组件 (占满一行) */
+.widget-xl {
+    grid-column: span 2;
+}
+/* 大组件 (默认，占满一格) */
+.widget-l {
+    /* 默认行为，无需额外样式 */
+}
+/* 中组件容器 (在一个格子里放两个) */
+.widget-m-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    gap: 8px; /* 组件间距 */
+}
+.widget-m {
+    flex: 1; /* 平分空间 */
+}
+/* 小组件容器 (在一个格子里放四个) */
+.widget-s-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 100%;
+    height: 100%;
+    gap: 6px; /* 组件间距 */
+}
+.widget-s {
+    font-size: 12px;
+}
+
+/* 组件选择弹窗 (上下文菜单) */
+.component-selection-popup {
+    position: fixed; /* 使用 fixed 定位，确保在最上层 */
+    z-index: 9999;
+    background: var(--bg-day-element);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+}
+.component-selection-popup.show {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}
+body.dark-mode .component-selection-popup {
+    background: var(--bg-night-element);
+}
+body.theme-glass .component-selection-popup {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+body.theme-glass.dark-mode .component-selection-popup {
+    background: rgba(30, 30, 30, 0.4);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+.component-popup-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    padding: 4px 8px;
+    color: #889;
+    border-bottom: 1px solid rgba(128,128,128,0.2);
+    margin-bottom: 4px;
+}
+.component-popup-button {
+    width: 100%;
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 15px;
+    font-weight: 500;
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.component-popup-button:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+body.dark-mode .component-popup-button:hover {
+    background-color: rgba(255,255,255,0.08);
+}
+
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
 
 
     </style>
@@ -1356,15 +1283,37 @@ body.mobile-mode .page-slider:not(.show-home-screen) .home-screen-page > * {
                         <!-- [新增] 锁屏页面 -->
             <div class="lock-screen-page" id="lockScreenPage">
                 <!-- [修改] 添加8格布局容器 -->
-                <div class="lockscreen-grid" id="lockscreenGrid">
-                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="0">+</button></div>
-                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="1">+</button></div>
-                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="2">+</button></div>
-                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="3">+</button></div>
-                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="4">+</button></div>
-                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="5">+</button></div>
-                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="6">+</button></div>
-                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="7">+</button></div>
+                                <div class="lockscreen-grid" id="lockscreenGrid">
+                    <!-- 示例：一个超大组件，占满第一行 -->
+                    <div class="grid-cell widget widget-xl" data-cell-index="0">超大组件 (占2格)</div>
+
+                    <!-- 示例：一个大组件 -->
+                    <div class="grid-cell widget widget-l" data-cell-index="2">大组件</div>
+
+                    <!-- 示例：一个包含两个中组件的格子 -->
+                    <div class="grid-cell" data-cell-index="3">
+                        <div class="widget-m-container">
+                            <div class="widget widget-m">中组件</div>
+                            <div class="widget widget-m">中组件</div>
+                        </div>
+                    </div>
+
+                    <!-- 示例：一个大组件 -->
+                    <div class="grid-cell widget widget-l" data-cell-index="4">大组件</div>
+
+                    <!-- 示例：一个包含四个小组件的格子 -->
+                    <div class="grid-cell" data-cell-index="5">
+                        <div class="widget-s-container">
+                            <div class="widget widget-s">小</div>
+                            <div class="widget widget-s">小</div>
+                            <div class="widget widget-s">小</div>
+                            <div class="widget widget-s">小</div>
+                        </div>
+                    </div>
+
+                    <!-- 示例：两个空的格子 -->
+                    <div class="grid-cell" data-cell-index="6"></div>
+                    <div class="grid-cell" data-cell-index="7"></div>
                 </div>
             </div>
             <!-- [新增] 主屏幕页面 (包裹原有内容) -->
@@ -2124,22 +2073,7 @@ body.mobile-mode .page-slider:not(.show-home-screen) .home-screen-page > * {
     let currentCategory = '全部';
     let photoObserver;
 
-        const getDefaultConfig = () => ({ 
-        title: 'JellyfishCenter', 
-        subtitle: '长按🌞打开工具栏 | By淡季水母', 
-        categories: [{ name: '全部', buttons: [] }], 
-        settings: { 
-            paginationEnabled: true, 
-            jellyBall: { enabled: false, swipeBack: true, functions: {}, customCSS: '' },
-            // [新增] 手机模式和锁屏组件的配置
-            mobileMode: {
-                enabled: false,
-                lockscreenComponents: {} // 使用对象，以cellIndex为键，方便查找
-            }
-        }, 
-        themePresets: [] 
-    });
-
+    const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按🌞打开工具栏 | By淡季水母', categories: [{ name: '全部', buttons: [] }], settings: { paginationEnabled: true, jellyBall: { enabled: false, swipeBack: true, functions: {}, customCSS: '' } }, themePresets: [] });
     let currentConfig = getDefaultConfig();
     
     // ===== [START] FLOATING PROJECT WINDOW MANAGER =====
@@ -5596,15 +5530,15 @@ const blob = b64toBlob(blobData.content, contentType);
         /* =============================================================== */
 
 
-        /* =============================================================== */
-        /* ============== [更新] 手机模式管理逻辑 V5 (带组件系统) ================= */
+         /* =============================================================== */
+        /* ============== [更新] 手机模式管理逻辑 V4 ================= */
         /* =============================================================== */
         const MobileModeManager = (() => {
             let isEnabled = false;
             let isSwiping = false;
             let startX = 0;
             let currentTranslate = 0;
-            let currentPage = 0; // 0: 锁屏, 1: 主屏幕
+            let currentPage = 0; // 0: 锁屏, 1: 主屏幕. 默认是 0
 
             const ui = {
                 toggle: document.getElementById('mobileModeToggle'),
@@ -5612,90 +5546,134 @@ const blob = b64toBlob(blobData.content, contentType);
                 slider: document.getElementById('pageSlider'),
                 settingsEntry: document.getElementById('lockscreenSettingsEntry'),
                 openSettingsBtn: document.getElementById('openLockscreenSettingsBtn'),
-                lockscreenGrid: document.getElementById('lockscreenGrid'),
             };
             
-            // --- 组件渲染核心逻辑 ---
-            async function renderLockscreenComponents() {
-                const components = currentConfig.settings.mobileMode?.lockscreenComponents || {};
-                const cells = ui.lockscreenGrid.querySelectorAll('.grid-cell');
-                const occupiedCells = new Set(); // 记录被超大组件占据的单元格索引
+            // [新增] 组件选择弹窗的全局引用
+            let selectionPopup = null;
 
-                // 第一次遍历：处理超大组件，标记被占用的格子
-                for (let i = 0; i < cells.length; i++) {
-                    const componentConfig = components[i];
-                    if (componentConfig && componentConfig.size === 'super-large') {
-                        occupiedCells.add(i + 1); // 标记下一个格子被占用
-                    }
+            // [新增] 关闭组件选择弹窗的函数
+            function closeSelectionPopup() {
+                if (selectionPopup) {
+                    selectionPopup.classList.remove('show');
+                    // 在动画结束后移除元素，保持DOM清洁
+                    selectionPopup.addEventListener('transitionend', () => selectionPopup.remove(), { once: true });
+                    selectionPopup = null;
                 }
-
-                // 第二次遍历：渲染所有组件
-                for (let i = 0; i < cells.length; i++) {
-                    const cell = cells[i];
-                    cell.innerHTML = ''; // 清空单元格
-
-                    if (occupiedCells.has(i)) {
-                        cell.style.display = 'none'; // 隐藏被超大组件占据的格子
-                        continue;
-                    }
-                    cell.style.display = 'flex';
-
-                    const componentConfig = components[i];
-                    if (componentConfig) {
-                        const componentEl = await createComponentElement(componentConfig);
-                        cell.appendChild(componentEl);
-                    } else {
-                        // 如果单元格应该为空，则恢复其 empty 样式（通过 :empty伪类实现）
-                    }
-                }
+                // 移除可能存在的全局点击监听器
+                document.removeEventListener('click', closeSelectionPopup, true);
             }
 
-            async function createComponentElement(config) {
-                const el = document.createElement('div');
-                el.className = `lockscreen-component component-${config.type} size-${config.size}`;
+            // [新增] 显示组件内容选择菜单
+            function showComponentContentMenu(cellIndex, size, event) {
+                const contentTypes = ['图片', '备忘录', 'HTML', '文字', '按钮'];
+                selectionPopup.innerHTML = '<div class="component-popup-title">选择内容</div>'; // 设置标题
+
+                contentTypes.forEach(type => {
+                    const button = document.createElement('button');
+                    button.className = 'component-popup-button';
+                    button.textContent = type;
+                    button.onclick = () => {
+                        // 按要求，此处仅用 alert 占位
+                        alert(`将在第 ${parseInt(cellIndex) + 1} 格添加一个 ${size} ${type} 组件。\n（功能待实现）`);
+                        closeSelectionPopup();
+                    };
+                    selectionPopup.appendChild(button);
+                });
+            }
+
+            // [新增] 显示组件尺寸选择菜单
+            function showComponentSizeMenu(cellIndex, event) {
+                closeSelectionPopup(); // 如果已存在则先关闭
                 
-                switch(config.type) {
-                    case 'photo':
-                        const imageUrl = await getSecureFileUrl(config.data.path);
-                        el.innerHTML = `<img src="${imageUrl}" alt="相册图片">`;
-                        break;
-                    case 'memo':
-                        el.innerHTML = `<div class="memo-title">${config.data.title}</div><div class="memo-content">${config.data.content}</div>`;
-                        break;
-                    case 'html':
-                        el.innerHTML = `<div>${config.data.html}</div>`; // 外部div用于滚动
-                        break;
-                    case 'shortcut':
-                        el.textContent = config.data.text;
-                        // 注意：主屏幕的不可点击是通过 .lockscreen-component 的 pointer-events: none 实现的
-                        break;
-                }
-                return el;
-            }
+                selectionPopup = document.createElement('div');
+                selectionPopup.className = 'component-selection-popup';
+                document.body.appendChild(selectionPopup);
 
-            // --- 组件设置UI逻辑 ---
-            async function openLockscreenSettingsWindow() {
-                // ...（此处省略创建浮窗的代码，专注于组件选择逻辑）
-                // 弹出选择组件类型的模态框
-                const cellIndex = 0; // 示例
-                const existingComponent = currentConfig.settings.mobileMode.lockscreenComponents[cellIndex];
-                await showComponentChooser(cellIndex, existingComponent);
+                selectionPopup.innerHTML = '<div class="component-popup-title">选择尺寸</div>'; // 设置标题
+                
+                const sizes = { '超大': '超大 (占一行)', '大': '大 (占一格)', '中': '中 (占半格)', '小': '小 (占1/4格)' };
+                Object.entries(sizes).forEach(([sizeKey, sizeText]) => {
+                    const button = document.createElement('button');
+                    button.className = 'component-popup-button';
+                    button.textContent = sizeText;
+                    button.dataset.size = sizeKey;
+                    button.onclick = (e) => {
+                        e.stopPropagation(); // 阻止事件冒泡到全局关闭监听器
+                        showComponentContentMenu(cellIndex, sizeKey, e);
+                    };
+                    selectionPopup.appendChild(button);
+                });
+
+                // 定位弹窗
+                const rect = event.target.getBoundingClientRect();
+                selectionPopup.style.left = `${rect.left}px`;
+                selectionPopup.style.top = `${rect.bottom + 8}px`;
+                
+                // 延迟一帧显示，以触发CSS动画
+                setTimeout(() => {
+                    selectionPopup.classList.add('show');
+                    // 添加全局点击监听器，用于点击外部关闭弹窗
+                    setTimeout(() => {
+                        document.addEventListener('click', closeSelectionPopup, { once: true, capture: true });
+                    }, 0);
+                }, 10);
             }
             
-            async function showComponentChooser(cellIndex, existingComponent = null) {
-                // ...（此处省略创建模态框的HTML和显示逻辑，专注于功能）
-                // 伪代码：
-                // 1. 创建一个模态框 (或使用现有模态框系统)
-                // 2. 模态框内有 "相册", "备忘录", "HTML", "快捷方式" 按钮
-                // 3. 以及 "超大", "大", "中", "小" 的尺寸选择器
-                // 4. 如果是编辑模式 (existingComponent 不为 null)，则显示 "删除组件" 按钮
-                // 5. 根据选择的组件类型，禁用不符合规则的尺寸选项
-                // 6. 点击类型按钮后，弹出对应的内容选择器 (相册选择器, 备忘录列表等)
-                // 7. 用户完成选择后，将组件数据保存到 currentConfig.settings.mobileMode.lockscreenComponents[cellIndex]
-                // 8. 调用 saveGlobalConfig() 和 renderLockscreenComponents() 更新
+            // [重构] 打开锁屏组件设置窗口的函数
+            function openLockscreenSettingsWindow() {
+                const windowId = 'fpw-lockscreen-settings';
+                // 如果窗口已存在，则将其置顶，不重复创建
+                const existingWindow = document.getElementById(windowId);
+                if (existingWindow) {
+                    existingWindow.style.zIndex = (parseInt(existingWindow.style.zIndex) || Z_INDEX_BASE) + 10;
+                    return;
+                }
+
+                // 使用模板字符串生成8个带按钮的格子
+                const gridContent = Array.from({ length: 8 }, (_, i) => `
+                    <div class="grid-cell">
+                        <button class="add-component-btn" data-cell-index="${i}" title="设置第 ${i + 1} 格组件">+</button>
+                    </div>
+                `).join('');
+
+                const contentHTML = `<div class="lockscreen-grid" style="height: 100%; max-width: none; padding: 15px; gap: 10px;">${gridContent}</div>`;
+
+                // 创建浮动窗口元素
+                const winEl = document.createElement('div');
+                winEl.className = 'floating-project-window visible';
+                winEl.id = windowId;
+                winEl.style.zIndex = 2020;
+                winEl.style.width = '320px';
+                winEl.style.height = '480px';
+                winEl.innerHTML = `
+                    <div class="fpw-header">
+                        <span class="fpw-title">锁屏组件设置</span>
+                        <div class="fpw-controls">
+                            <button class="fpw-close" title="关闭">×</button>
+                        </div>
+                    </div>
+                    <div class="fpw-content">${contentHTML}</div>
+                `;
+                document.getElementById('floating-projects-container').appendChild(winEl);
+
+                // 绑定关闭按钮事件
+                winEl.querySelector('.fpw-close').addEventListener('click', () => {
+                    closeSelectionPopup(); // 关闭窗口时也关闭可能打开的菜单
+                    winEl.remove();
+                });
+                
+                // [核心] 为所有“+”按钮绑定事件，点击后显示尺寸选择菜单
+                winEl.querySelectorAll('.add-component-btn').forEach(btn => {
+                    btn.addEventListener('click', (event) => {
+                        event.stopPropagation(); // 阻止事件冒泡
+                        const cellIndex = event.currentTarget.dataset.cellIndex;
+                        showComponentSizeMenu(cellIndex, event);
+                    });
+                });
             }
 
             function applyMode(enable) {
+                // 获取需要移动的核心内容元素及其容器
                 const homeScreenPage = document.getElementById('homeScreenPage');
                 const mainWrapper = document.getElementById('mainWrapper');
                 const elementsToMove = [
@@ -5703,181 +5681,130 @@ const blob = b64toBlob(blobData.content, contentType);
                     document.getElementById('titleCard'),
                     document.getElementById('categoryNavContainer'),
                     document.getElementById('navContainer')
-                ].filter(Boolean);
+                ].filter(el => el); // 过滤掉可能不存在的元素，增强代码健壮性
 
                 isEnabled = enable;
                 document.body.classList.toggle('mobile-mode', enable);
                 ui.settingsEntry.style.display = enable ? 'block' : 'none';
 
                 if (enable) {
+                    // [新增逻辑] 启用手机模式时：将核心内容移动到滑动容器的 homeScreenPage 内部
                     elementsToMove.forEach(el => homeScreenPage.appendChild(el));
-                    renderLockscreenComponents(); // 渲染组件
+
+                    // 重置滑块状态以确保干净的激活
+                    currentPage = 0;
+                    currentTranslate = 0;
+                    ui.slider.style.transition = 'none';
+                    ui.slider.style.transform = `translateX(0px)`;
+                    ui.slider.classList.remove('show-home-screen');
                     attachSwipeListeners();
                 } else {
+                    // [新增逻辑] 关闭手机模式时：将核心内容移出滑动容器，放回 body 中 mainWrapper 元素的前面
                     elementsToMove.forEach(el => document.body.insertBefore(el, mainWrapper));
+
+                    // 分离滑动监听器并重置滑块状态
                     detachSwipeListeners();
+                    ui.slider.style.transition = 'none';
+                    ui.slider.style.transform = `translateX(0px)`;
+                    ui.slider.classList.remove('show-home-screen');
                 }
-                
-                if (!currentConfig.settings.mobileMode) {
-                    currentConfig.settings.mobileMode = { enabled: false, lockscreenComponents: {} };
-                }
+
+                // 保存手机模式的设置状态
+                if (!currentConfig.settings.mobileMode) currentConfig.settings.mobileMode = {};
                 currentConfig.settings.mobileMode.enabled = enable;
                 saveGlobalConfig('Toggle mobile mode');
             }
 
-            // --- 滑动逻辑 (与你提供的代码基本一致，保持不变) ---
-            function handleTouchStart(e) { if (!isEnabled) return; ui.slider.style.transition = 'none'; startX = e.touches[0].clientX; const tm = window.getComputedStyle(ui.slider).transform; currentTranslate = tm !== 'none' ? parseFloat(tm.split(',')[4]) : 0; isSwiping = true; }
-            function handleTouchMove(e) { if (!isSwiping || !isEnabled) return; e.preventDefault(); const cX = e.touches[0].clientX; const dX = cX - startX; const nT = currentTranslate + dX; const pW = ui.slider.offsetWidth / 2; const lT = Math.max(-pW, Math.min(0, nT)); ui.slider.style.transform = `translateX(${lT}px)`; }
-            function handleTouchEnd(e) { if (!isSwiping || !isEnabled) return; isSwiping = false; const eX = e.changedTouches[0].clientX; const dX = eX - startX; const th = window.innerWidth / 4; if (Math.abs(dX) > th) { if (dX < 0 && currentPage === 0) { currentPage = 1; } else if (dX > 0 && currentPage === 1) { currentPage = 0; } } snapToPage(); }
-            function snapToPage() { const pW = ui.slider.offsetWidth / 2; const tT = currentPage === 1 ? -pW : 0; ui.slider.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'; ui.slider.style.transform = `translateX(${tT}px)`; currentTranslate = tT; ui.slider.classList.toggle('show-home-screen', currentPage === 1); document.body.classList.toggle('mobile-home-screen-active', currentPage === 1); }
-            function attachSwipeListeners() { ui.wrapper.addEventListener('touchstart', handleTouchStart, { passive: false }); ui.wrapper.addEventListener('touchmove', handleTouchMove, { passive: false }); ui.wrapper.addEventListener('touchend', handleTouchEnd, { passive: true }); }
-            function detachSwipeListeners() { ui.wrapper.removeEventListener('touchstart', handleTouchStart); ui.wrapper.removeEventListener('touchmove', handleTouchMove); ui.wrapper.removeEventListener('touchend', handleTouchEnd); }
 
-            // [核心替换] 重新实现锁屏设置浮窗
-            function openLockscreenSettingsWindow() {
-                const windowId = 'fpw-lockscreen-settings';
-                if (document.getElementById(windowId)) {
-                    const win = document.getElementById(windowId);
-                    win.style.zIndex = (parseInt(win.style.zIndex) || 2010) + 10;
-                    return;
+            function handleTouchStart(e) {
+                if (!isEnabled) return;
+                // [关键] 在每次触摸开始时，移除可能存在的动画，并获取当前精确位置
+                ui.slider.style.transition = 'none'; 
+                startX = e.touches[0].clientX;
+                // 从当前元素的 transform 属性中解析出平移值，比 getBoundingClientRect 更可靠
+                const transformMatrix = window.getComputedStyle(ui.slider).transform;
+                if (transformMatrix !== 'none') {
+                    currentTranslate = parseFloat(transformMatrix.split(',')[4]);
+                } else {
+                    currentTranslate = 0;
                 }
-
-                // 1. 创建浮窗框架
-                const winEl = document.createElement('div');
-                winEl.className = 'floating-project-window visible';
-                winEl.id = windowId;
-                winEl.style.cssText = 'z-index: 2020; width: 340px; height: 520px;';
-                winEl.innerHTML = `
-                    <div class="fpw-header">
-                        <span class="fpw-title">锁屏组件设置</span>
-                        <div class="fpw-controls"><button class="fpw-close" title="关闭">×</button></div>
-                    </div>
-                    <div class="fpw-content" style="overflow-y: auto;">
-                        <div class="lockscreen-grid" id="settings-lockscreen-grid" style="height: auto; max-width: none; padding: 15px; gap: 10px;"></div>
-                    </div>`;
-                document.getElementById('floating-projects-container').appendChild(winEl);
-                winEl.querySelector('.fpw-close').addEventListener('click', () => winEl.remove());
-                
-                const settingsGrid = winEl.querySelector('#settings-lockscreen-grid');
-
-                // 2. 渲染设置网格
-                async function renderSettingsGrid() {
-                    settingsGrid.innerHTML = '';
-                    const components = currentConfig.settings.mobileMode.lockscreenComponents || {};
-                    const occupiedCells = new Set();
-                    
-                    for (let i = 0; i < 8; i++) {
-                        if (components[i] && components[i].size === 'super-large') {
-                             occupiedCells.add(i + 1);
-                        }
-                    }
-
-                    for (let i = 0; i < 8; i++) {
-                        if (occupiedCells.has(i)) continue;
-                        
-                        const cell = document.createElement('div');
-                        cell.className = 'grid-cell';
-                        cell.dataset.cellIndex = i;
-                        
-                        const componentConfig = components[i];
-                        if (componentConfig) {
-                            const componentEl = await createComponentElement(componentConfig);
-                            cell.appendChild(componentEl);
-                        } else {
-                            const addBtn = document.createElement('button');
-                            addBtn.className = 'add-component-btn';
-                            addBtn.textContent = '+';
-                            cell.appendChild(addBtn);
-                        }
-                        settingsGrid.appendChild(cell);
-                    }
-                }
-
-                // 3. 绑定点击事件委托
-                settingsGrid.addEventListener('click', async (e) => {
-                    const targetCell = e.target.closest('.grid-cell');
-                    if (!targetCell) return;
-                    
-                    const cellIndex = parseInt(targetCell.dataset.cellIndex);
-                    const existingComponent = currentConfig.settings.mobileMode.lockscreenComponents[cellIndex] || null;
-                    
-                    const newConfig = await showComponentEditor(cellIndex, existingComponent);
-                    if (newConfig === 'delete') {
-                        delete currentConfig.settings.mobileMode.lockscreenComponents[cellIndex];
-                    } else if (newConfig) {
-                        currentConfig.settings.mobileMode.lockscreenComponents[cellIndex] = newConfig;
-                    }
-
-                    if (newConfig !== null) { // null 表示取消操作
-                        await saveGlobalConfig('Update lockscreen components');
-                        await renderLockscreenComponents();
-                        await renderSettingsGrid();
-                    }
-                });
-
-                renderSettingsGrid();
+                isSwiping = true;
             }
 
-            // 4. 组件编辑器（Promise-based Modal）
-            function showComponentEditor(cellIndex, existingConfig) {
-                return new Promise(async (resolve) => {
-                    // ... （此处省略模态框创建的重复代码）
-                    const modal = document.createElement('div');
-                    modal.id = 'component-editor-modal';
-                    modal.className = 'modal-overlay show';
-                    
-                    // 定义不同组件和尺寸的规则
-                    const rules = {
-                        photo: ['super-large', 'large'],
-                        memo: ['large'],
-                        html: ['super-large', 'large', 'medium'],
-                        shortcut: ['small']
-                    };
+            function handleTouchMove(e) {
+                if (!isSwiping || !isEnabled) return;
+                e.preventDefault(); // 阻止页面默认的滚动行为
+                
+                const currentX = e.touches[0].clientX;
+                const diffX = currentX - startX;
+                const newTranslate = currentTranslate + diffX;
 
-                    const type = existingConfig ? existingConfig.type : await chooseType();
-                    if (!type) { resolve(null); return; } // 用户取消选择类型
+                // 为了简单和稳定，暂时不添加弹性效果
+                const pageWidth = ui.slider.offsetWidth / 2; // 获取单页宽度
+                const limitedTranslate = Math.max(-pageWidth, Math.min(0, newTranslate));
 
-                    const size = await chooseSizeAndContent(type);
-                    if (!size) { resolve(null); return; } // 用户取消选择尺寸或内容
+                ui.slider.style.transform = `translateX(${limitedTranslate}px)`;
+            }
 
-                    if (size === 'delete') {
-                        resolve('delete');
-                    } else {
-                        resolve({ type: type, size: size.size, data: size.data });
+            function handleTouchEnd(e) {
+                if (!isSwiping || !isEnabled) return;
+                isSwiping = false;
+
+                const endX = e.changedTouches[0].clientX;
+                const diffX = endX - startX;
+                const threshold = window.innerWidth / 4;
+
+                // 判断是否切换页面
+                if (Math.abs(diffX) > threshold) {
+                    if (diffX < 0 && currentPage === 0) { // 向左滑 (解锁)
+                        currentPage = 1;
+                    } else if (diffX > 0 && currentPage === 1) { // 向右滑 (返回锁屏)
+                        currentPage = 0;
                     }
+                }
+                
+                // 执行吸附动画
+                snapToPage();
+            }
 
-                    // --- 嵌套函数，用于分步选择 ---
-                    async function chooseType() { /* ... 返回用户选择的类型或 null ... */
-                        // 伪代码: 创建一个带"相册"、"备忘录"等按钮的模态框
-                        // 用户点击后 resolve(type), 点击关闭 resolve(null)
-                        // 这里为了简洁，直接返回一个模拟值，实际应是UI交互
-                        // alert("请选择组件类型...");
-                        return 'photo'; // 模拟用户选择了相册
-                    }
-                    async function chooseSizeAndContent(type) {
-                        // 伪代码: 
-                        // 1. 创建新模态框
-                        // 2. 显示尺寸选项，并根据 rules[type] 禁用无效选项
-                        // 3. 显示内容选择器 (如相册列表)
-                        // 4. 用户点击保存后，resolve({size: 'large', data: {...}})
-                        // 5. 点击删除，resolve('delete')
-                        // 6. 点击关闭，resolve(null)
-                        
-                        // 模拟用户选择了大尺寸和一张图片
-                        const allPhotos = MemoryApp.getAlbumItems().filter(item => item.type === 'photo');
-                        if (allPhotos.length > 0) {
-                            return { size: 'large', data: { path: allPhotos[0].path } };
-                        } else {
-                            alert('相册中没有单张照片可供选择。');
-                            return null;
-                        }
-                    }
-                });
+             // [决定性修复]
+            function snapToPage() {
+                const pageWidth = ui.slider.offsetWidth / 2; // 动态获取单页宽度
+                const targetTranslate = currentPage === 1 ? -pageWidth : 0;
+
+                // 1. 重新启用动画
+                ui.slider.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+                
+                // 2. 直接命令元素到最终位置
+                ui.slider.style.transform = `translateX(${targetTranslate}px)`;
+
+                // 3. 更新内部状态变量，为下次拖动做准备
+                currentTranslate = targetTranslate;
+
+                // 4. 更新状态类（用于控制页面内部元素的动画，而非滑动本身）
+                ui.slider.classList.toggle('show-home-screen', currentPage === 1);
+                
+                // [新增] 同时给 body 添加一个状态类，用于全局控制UI
+                document.body.classList.toggle('mobile-home-screen-active', currentPage === 1);
+            }
+
+            
+            function attachSwipeListeners() {
+                // 使用 non-passive listener 以便调用 e.preventDefault()
+                ui.wrapper.addEventListener('touchstart', handleTouchStart, { passive: false });
+                ui.wrapper.addEventListener('touchmove', handleTouchMove, { passive: false });
+                ui.wrapper.addEventListener('touchend', handleTouchEnd, { passive: true });
+            }
+
+            function detachSwipeListeners() {
+                ui.wrapper.removeEventListener('touchstart', handleTouchStart);
+                ui.wrapper.removeEventListener('touchmove', handleTouchMove);
+                ui.wrapper.removeEventListener('touchend', handleTouchEnd);
             }
 
             return {
                 init() {
-                    const mobileSettings = currentConfig.settings.mobileMode || { enabled: false, lockscreenComponents: {} };
+                    const mobileSettings = currentConfig.settings.mobileMode || { enabled: false };
                     ui.toggle.checked = mobileSettings.enabled;
                     if (mobileSettings.enabled) {
                         applyMode(true);
