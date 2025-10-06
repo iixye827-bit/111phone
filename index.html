@@ -923,85 +923,174 @@ body.dragging-active {
 /* =============================================================== */
 
 /* =============================================================== */
-/* ================== [新增] 手机模式专属样式 ================== */
+/* ============= [最终修正版] 手机模式专属样式 V5 ============= */
 /* =============================================================== */
+
+/* 1. 默认状态下，滑动容器是隐藏的 */
 .main-wrapper {
-    /* 在非手机模式下，这个容器是完全隐藏的 */
     display: none;
 }
 
-body.mobile-mode {
-    /* 手机模式激活时，隐藏原始的主体内容，防止重叠 */
-    & > .title-card,
-    & > .category-nav-container,
-    & > .nav-container,
-    & > .page-overlay {
-        display: none !important;
-    }
-    /* 并且禁止body自身的滚动，由内部页面来滚动 */
-    overflow: hidden;
+/* 2. 当手机模式开启时 (body有.mobile-mode类) */
+
+/* (A) 隐藏原始的、直接在 body 下的元素 */
+body.mobile-mode > .title-card,
+body.mobile-mode > .category-nav-container,
+body.mobile-mode > .nav-container {
+    display: none;
 }
 
+/* (B) 显示滑动容器并使其全屏 */
 body.mobile-mode .main-wrapper {
-    display: block; /* 手机模式下显示滑动容器 */
-    position: fixed; /* 使用 fixed 定位铺满整个视口 */
+    display: block;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    overflow: hidden; /* 关键：隐藏横向溢出的部分 */
+    overflow: hidden;
 }
 
-body.mobile-mode .page-slider {
+/* (C) 确保 body 本身不产生滚动条 */
+body.mobile-mode {
+    overflow: hidden;
+}
+
+/* --- 以下是手机模式内部的样式，不会影响外部 --- */
+.page-slider {
     display: flex;
-    width: 200%; /* 内部容器宽度为两倍，容纳两个页面 */
+    width: 200%;
     height: 100%;
-    transform: translateX(-50%); /* 默认显示主屏幕 */
-    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: translateX(0); /* JS 会控制这里 */
 }
 
-/* 当滑动到锁屏时，移除 transform，回到初始位置 */
-body.mobile-mode .page-slider.show-lockscreen {
-    transform: translateX(0);
-}
-
-body.mobile-mode .lock-screen-page,
-body.mobile-mode .home-screen-page {
-    width: 50%; /* 每个页面占据滑动容器的一半宽度 */
+.lock-screen-page,
+.home-screen-page {
+    width: 50%;
     height: 100%;
     flex-shrink: 0;
-    overflow-y: auto; /* 允许每个页面独立垂直滚动 */
+    overflow-y: auto;
     padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* 锁屏页面的简单样式 */
-.lock-screen-page {
-    justify-content: center;
-    font-size: 1.5em;
-    font-weight: 300;
-    color: var(--text-day);
-    user-select: none;
-}
-body.dark-mode .lock-screen-page {
-    color: var(--text-night);
+.home-screen-page > * {
+    transition: transform 0.4s 0.2s ease-out, opacity 0.3s 0.2s ease-out;
+    transform: translateX(100px);
+    opacity: 0;
 }
 
-/* 主屏幕页面内元素的隐藏/显示动画 */
-.home-screen-page > * {
+.page-slider.show-home-screen .home-screen-page > * {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* 锁屏页网格样式... */
+.lock-screen-page { padding-top: 5vh; }
+.lockscreen-grid {
+    width: 100%;
+    max-width: 500px;
+    height: 80vh;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 15px;
+}
+.grid-cell { background: rgba(128, 128, 128, 0.1); border: 2px dashed rgba(128, 128, 128, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background-color .2s, border-color .2s; }
+.grid-cell:hover { background: rgba(128, 128, 128, 0.2); border-color: rgba(128, 128, 128, 0.4); }
+.add-component-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px); font-size: 24px; color: var(--text-day); cursor: pointer; transition: transform .2s, background .2s; }
+body.dark-mode .add-component-btn { color: var(--text-night); background: rgba(0, 0, 0, 0.1); }
+.add-component-btn:hover { transform: scale(1.1); background: rgba(255, 255, 255, 0.2); }
+body.dark-mode .add-component-btn:hover { background: rgba(0, 0, 0, 0.2); }
+
+
+
+
+/* [修改] 当需要显示主屏幕时，添加此类 */
+body.mobile-mode .page-slider.show-home-screen {
+    transform: translateX(-50%);
+}
+
+body.mobile-mode .lock-screen-page,
+body.mobile-mode .home-screen-page {
+    width: 50%;
+    height: 100%;
+    flex-shrink: 0;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* [新增] 锁屏网格样式 */
+.lock-screen-page {
+    padding-top: 5vh; /* 给顶部留出一些空间 */
+}
+.lockscreen-grid {
+    width: 100%;
+    max-width: 500px; /* 限制最大宽度 */
+    height: 80vh; /* 占据大部分视口高度 */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 15px;
+}
+.grid-cell {
+    background: rgba(128, 128, 128, 0.1);
+    border: 2px dashed rgba(128, 128, 128, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.grid-cell:hover {
+    background: rgba(128, 128, 128, 0.2);
+    border-color: rgba(128, 128, 128, 0.4);
+}
+.add-component-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    font-size: 24px;
+    color: var(--text-day);
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+body.dark-mode .add-component-btn {
+    color: var(--text-night);
+    background: rgba(0, 0, 0, 0.1);
+}
+.add-component-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
+}
+body.dark-mode .add-component-btn:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* 主屏幕页面元素的隐藏/显示动画 */
+.home-screen-page .title-card,
+.home-screen-page .category-nav-container,
+.home-screen-page .nav-container {
     transition: transform 0.4s ease-out, opacity 0.3s ease-out;
 }
 
-/* 当显示锁屏时，主屏幕的元素向右滑出并淡出 */
-.page-slider.show-lockscreen .home-screen-page > * {
+/* [修改] 当不显示主屏幕时 (即显示锁屏时)，元素滑出 */
+body.mobile-mode .page-slider:not(.show-home-screen) .home-screen-page > * {
     transform: translateX(100px);
     opacity: 0;
 }
 /* =============================================================== */
-/* ========================= [新增结束] ========================== */
+/* ========================= [更新结束] ========================== */
 /* =============================================================== */
+
 
     </style>
     <style id="custom-jelly-ball-styles"></style>
@@ -1010,10 +1099,19 @@ body.dark-mode .lock-screen-page {
     <!-- [新增] 手机模式滑动容器 -->
     <div class="main-wrapper" id="mainWrapper">
         <div class="page-slider" id="pageSlider">
-            <!-- [新增] 锁屏页面 -->
+                        <!-- [新增] 锁屏页面 -->
             <div class="lock-screen-page" id="lockScreenPage">
-                <!-- 您可以在这里添加锁屏界面的内容，例如时钟等 -->
-                <div id="lockscreen-placeholder">向右滑动解锁</div>
+                <!-- [修改] 添加8格布局容器 -->
+                <div class="lockscreen-grid" id="lockscreenGrid">
+                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="0">+</button></div>
+                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="1">+</button></div>
+                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="2">+</button></div>
+                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="3">+</button></div>
+                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="4">+</button></div>
+                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="5">+</button></div>
+                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="6">+</button></div>
+                    <div class="grid-cell"><button class="add-component-btn" data-cell-index="7">+</button></div>
+                </div>
             </div>
             <!-- [新增] 主屏幕页面 (包裹原有内容) -->
             <div class="home-screen-page" id="homeScreenPage">
@@ -1245,11 +1343,15 @@ body.dark-mode .lock-screen-page {
                         <div class="modal-body">
 
                 <!-- [新增] 手机模式开关 -->
-                <div class="toggle-section" style="flex-wrap: wrap; gap: 10px;">
-                    <span style="flex-basis: 100%; font-weight: 600;">手机模式</span>
+                                <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px;">
+                    <span style="font-weight: 600; width: 100%;">手机模式</span>
                     <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
                         <span>启用手机主题</span>
                         <label class="toggle-switch"><input type="checkbox" id="mobileModeToggle"><span class="slider"></span></label>
+                    </div>
+                    <!-- [新增] 锁屏设置入口 -->
+                    <div id="lockscreenSettingsEntry" style="width: 100%; display: none;">
+                         <button id="openLockscreenSettingsBtn" class="modal-button" style="width: 100%; margin-top: 10px;">锁屏组件设置</button>
                     </div>
                 </div>
                 <!-- [新增结束] -->
@@ -5226,106 +5328,123 @@ const blob = b64toBlob(blobData.content, contentType);
 
 
         /* =============================================================== */
-        /* ================== [新增] 手机模式管理逻辑 ================== */
+        /* ============== [更新] 手机模式管理逻辑 V4 ================= */
         /* =============================================================== */
         const MobileModeManager = (() => {
             let isEnabled = false;
             let isSwiping = false;
             let startX = 0;
             let currentTranslate = 0;
-            let currentPage = 1; // 0: 锁屏, 1: 主屏幕
+            let currentPage = 0; // 0: 锁屏, 1: 主屏幕. 默认是 0
 
             const ui = {
                 toggle: document.getElementById('mobileModeToggle'),
                 wrapper: document.getElementById('mainWrapper'),
                 slider: document.getElementById('pageSlider'),
+                settingsEntry: document.getElementById('lockscreenSettingsEntry'),
+                openSettingsBtn: document.getElementById('openLockscreenSettingsBtn'),
             };
+            
+            function openLockscreenSettingsWindow() { /* ... 此函数内容不变，为简洁省略 ... */ }
 
             function applyMode(enable) {
                 isEnabled = enable;
                 document.body.classList.toggle('mobile-mode', enable);
+                ui.settingsEntry.style.display = enable ? 'block' : 'none';
 
                 if (enable) {
-                    // 默认显示主屏幕
-                    currentPage = 1;
-                    currentTranslate = -window.innerWidth;
-                    ui.slider.style.transition = 'none'; // 初始设置时不使用动画
-                    ui.slider.style.transform = `translateX(${currentTranslate}px)`;
-                    ui.slider.classList.remove('show-lockscreen');
-                    setTimeout(() => ui.slider.style.transition = '', 50); // 恢复动画
-                    
+                    currentPage = 0;
+                    currentTranslate = 0;
+                    ui.slider.style.transition = 'none'; // 初始加载无动画
+                    ui.slider.style.transform = `translateX(0px)`;
+                    ui.slider.classList.remove('show-home-screen');
                     attachSwipeListeners();
                 } else {
                     detachSwipeListeners();
+                    // 关闭时，确保无动画地恢复到初始状态
+                    ui.slider.style.transition = 'none';
+                    ui.slider.style.transform = `translateX(0px)`;
+                    ui.slider.classList.remove('show-home-screen');
                 }
 
-                // 保存设置
-                if (!currentConfig.settings.mobileMode) {
-                    currentConfig.settings.mobileMode = {};
-                }
+                if (!currentConfig.settings.mobileMode) currentConfig.settings.mobileMode = {};
                 currentConfig.settings.mobileMode.enabled = enable;
                 saveGlobalConfig('Toggle mobile mode');
             }
 
             function handleTouchStart(e) {
                 if (!isEnabled) return;
+                // [关键] 在每次触摸开始时，移除可能存在的动画，并获取当前精确位置
+                ui.slider.style.transition = 'none'; 
                 startX = e.touches[0].clientX;
+                // 从当前元素的 transform 属性中解析出平移值，比 getBoundingClientRect 更可靠
+                const transformMatrix = window.getComputedStyle(ui.slider).transform;
+                if (transformMatrix !== 'none') {
+                    currentTranslate = parseFloat(transformMatrix.split(',')[4]);
+                } else {
+                    currentTranslate = 0;
+                }
                 isSwiping = true;
-                ui.slider.style.transition = 'none'; // 滑动时移除动画，实现跟随效果
             }
 
             function handleTouchMove(e) {
                 if (!isSwiping || !isEnabled) return;
-
+                e.preventDefault(); // 阻止页面默认的滚动行为
+                
                 const currentX = e.touches[0].clientX;
                 const diffX = currentX - startX;
                 const newTranslate = currentTranslate + diffX;
 
-                // 限制滑动范围，防止滑出边界
-                if (newTranslate > 0 || newTranslate < -window.innerWidth) {
-                    return;
-                }
-                ui.slider.style.transform = `translateX(${newTranslate}px)`;
+                // 为了简单和稳定，暂时不添加弹性效果
+                const pageWidth = ui.slider.offsetWidth / 2; // 获取单页宽度
+                const limitedTranslate = Math.max(-pageWidth, Math.min(0, newTranslate));
+
+                ui.slider.style.transform = `translateX(${limitedTranslate}px)`;
             }
 
             function handleTouchEnd(e) {
                 if (!isSwiping || !isEnabled) return;
-
                 isSwiping = false;
-                ui.slider.style.transition = ''; // 恢复动画
 
                 const endX = e.changedTouches[0].clientX;
                 const diffX = endX - startX;
-                const threshold = window.innerWidth / 4; // 滑动超过屏幕宽度的1/4就翻页
+                const threshold = window.innerWidth / 4;
 
+                // 判断是否切换页面
                 if (Math.abs(diffX) > threshold) {
-                    // 向右滑 (显示锁屏)
-                    if (diffX > 0 && currentPage === 1) {
-                        currentPage = 0;
-                    } 
-                    // 向左滑 (显示主屏幕)
-                    else if (diffX < 0 && currentPage === 0) {
+                    if (diffX < 0 && currentPage === 0) { // 向左滑 (解锁)
                         currentPage = 1;
+                    } else if (diffX > 0 && currentPage === 1) { // 向右滑 (返回锁屏)
+                        currentPage = 0;
                     }
                 }
                 
+                // 执行吸附动画
                 snapToPage();
             }
 
+            // [决定性修复]
             function snapToPage() {
-                if (currentPage === 0) { // 锁屏
-                    currentTranslate = 0;
-                    ui.slider.classList.add('show-lockscreen');
-                } else { // 主屏幕
-                    currentTranslate = -window.innerWidth;
-                    ui.slider.classList.remove('show-lockscreen');
-                }
-                ui.slider.style.transform = `translateX(${currentTranslate}px)`;
+                const pageWidth = ui.slider.offsetWidth / 2; // 动态获取单页宽度
+                const targetTranslate = currentPage === 1 ? -pageWidth : 0;
+
+                // 1. 重新启用动画
+                ui.slider.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+                
+                // 2. 直接命令元素到最终位置
+                ui.slider.style.transform = `translateX(${targetTranslate}px)`;
+
+                // 3. 更新内部状态变量，为下次拖动做准备
+                currentTranslate = targetTranslate;
+
+                // 4. 更新状态类（用于控制页面内部元素的动画，而非滑动本身）
+                ui.slider.classList.toggle('show-home-screen', currentPage === 1);
             }
             
             function attachSwipeListeners() {
-                ui.wrapper.addEventListener('touchstart', handleTouchStart, { passive: true });
-                ui.wrapper.addEventListener('touchmove', handleTouchMove, { passive: true });
+                // 使用 non-passive listener 以便调用 e.preventDefault()
+                ui.wrapper.addEventListener('touchstart', handleTouchStart, { passive: false });
+                ui.wrapper.addEventListener('touchmove', handleTouchMove, { passive: false });
                 ui.wrapper.addEventListener('touchend', handleTouchEnd, { passive: true });
             }
 
@@ -5337,20 +5456,25 @@ const blob = b64toBlob(blobData.content, contentType);
 
             return {
                 init() {
-                    // 初始化时检查配置
+                    // 确保 openLockscreenSettingsWindow 定义在 init 之前
+                    const originalOpenLockscreenSettingsWindow = openLockscreenSettingsWindow;
+                    openLockscreenSettingsWindow = () => {
+                         const windowId = 'fpw-lockscreen-settings'; if (document.getElementById(windowId)) { const e = document.getElementById(windowId); return e.style.zIndex = (parseInt(e.style.zIndex) || 2010) + 10, void 0; } const contentHTML = `<div class="lockscreen-grid" style="height: 100%; max-width: none; padding: 15px; gap: 10px;"> ${Array.from({ length: 8 }, (e, t) => `\n <div class="grid-cell">\n <button class="add-component-btn" data-cell-index="${t}" title="设置第 ${t + 1} 格组件">+</button>\n </div>\n `).join("")} </div>`; const winEl = document.createElement("div"); winEl.className = "floating-project-window visible", winEl.id = windowId, winEl.style.zIndex = 2020, winEl.style.width = "320px", winEl.style.height = "480px", winEl.innerHTML = ` <div class="fpw-header"> <span class="fpw-title">锁屏组件设置</span> <div class="fpw-controls"> <button class="fpw-close" title="关闭">×</button> </div> </div> <div class="fpw-content"> ${contentHTML} </div>`, document.getElementById("floating-projects-container").appendChild(winEl), winEl.querySelector(".fpw-close").addEventListener("click", () => winEl.remove()), winEl.querySelectorAll(".add-component-btn").forEach(e => { e.addEventListener("click", t => { const n = t.currentTarget.dataset.cellIndex; alert(`设置第 ${parseInt(n) + 1} 格组件的功能将在此处实现。\n\n可添加：\n- 相册图片\n- 指定备忘录\n- 自定义HTML`); }); }); 
+                    };
+
                     const mobileSettings = currentConfig.settings.mobileMode || { enabled: false };
                     ui.toggle.checked = mobileSettings.enabled;
                     if (mobileSettings.enabled) {
                         applyMode(true);
                     }
-
-                    // 绑定开关事件
-                    ui.toggle.addEventListener('change', (e) => {
-                        applyMode(e.target.checked);
-                    });
+                    ui.toggle.addEventListener('change', (e) => applyMode(e.target.checked));
+                    ui.openSettingsBtn.addEventListener('click', openLockscreenSettingsWindow);
                 }
             };
         })();
+
+
+
 
         // 初始化手机模式管理器
         MobileModeManager.init();
