@@ -113,6 +113,7 @@
     },
     "mobileMode": {
       "enabled": true,
+      "lockscreenComponents": {},
       "lockScreen": {
         "customCSS": "",
         "widgets": []
