@@ -922,25 +922,120 @@ body.dragging-active {
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
 
+/* =============================================================== */
+/* ================== [新增] 手机模式专属样式 ================== */
+/* =============================================================== */
+.main-wrapper {
+    /* 在非手机模式下，这个容器是完全隐藏的 */
+    display: none;
+}
+
+body.mobile-mode {
+    /* 手机模式激活时，隐藏原始的主体内容，防止重叠 */
+    & > .title-card,
+    & > .category-nav-container,
+    & > .nav-container,
+    & > .page-overlay {
+        display: none !important;
+    }
+    /* 并且禁止body自身的滚动，由内部页面来滚动 */
+    overflow: hidden;
+}
+
+body.mobile-mode .main-wrapper {
+    display: block; /* 手机模式下显示滑动容器 */
+    position: fixed; /* 使用 fixed 定位铺满整个视口 */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden; /* 关键：隐藏横向溢出的部分 */
+}
+
+body.mobile-mode .page-slider {
+    display: flex;
+    width: 200%; /* 内部容器宽度为两倍，容纳两个页面 */
+    height: 100%;
+    transform: translateX(-50%); /* 默认显示主屏幕 */
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* 当滑动到锁屏时，移除 transform，回到初始位置 */
+body.mobile-mode .page-slider.show-lockscreen {
+    transform: translateX(0);
+}
+
+body.mobile-mode .lock-screen-page,
+body.mobile-mode .home-screen-page {
+    width: 50%; /* 每个页面占据滑动容器的一半宽度 */
+    height: 100%;
+    flex-shrink: 0;
+    overflow-y: auto; /* 允许每个页面独立垂直滚动 */
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 锁屏页面的简单样式 */
+.lock-screen-page {
+    justify-content: center;
+    font-size: 1.5em;
+    font-weight: 300;
+    color: var(--text-day);
+    user-select: none;
+}
+body.dark-mode .lock-screen-page {
+    color: var(--text-night);
+}
+
+/* 主屏幕页面内元素的隐藏/显示动画 */
+.home-screen-page > * {
+    transition: transform 0.4s ease-out, opacity 0.3s ease-out;
+}
+
+/* 当显示锁屏时，主屏幕的元素向右滑出并淡出 */
+.page-slider.show-lockscreen .home-screen-page > * {
+    transform: translateX(100px);
+    opacity: 0;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
 
     </style>
     <style id="custom-jelly-ball-styles"></style>
 </head>
 <body>
-    <div class="page-overlay" id="pageOverlay"></div>
-    <div class="title-card" id="titleCard">
-        <h1 class="editable-title" id="title">JellyfishCenter</h1>
-        <div class="editable-subtitle" id="subtitle">长按🌞打开工具栏 | By淡季水母</div>
+    <!-- [新增] 手机模式滑动容器 -->
+    <div class="main-wrapper" id="mainWrapper">
+        <div class="page-slider" id="pageSlider">
+            <!-- [新增] 锁屏页面 -->
+            <div class="lock-screen-page" id="lockScreenPage">
+                <!-- 您可以在这里添加锁屏界面的内容，例如时钟等 -->
+                <div id="lockscreen-placeholder">向右滑动解锁</div>
+            </div>
+            <!-- [新增] 主屏幕页面 (包裹原有内容) -->
+            <div class="home-screen-page" id="homeScreenPage">
+                <div class="page-overlay" id="pageOverlay"></div>
+                <div class="title-card" id="titleCard">
+                    <h1 class="editable-title" id="title">JellyfishCenter</h1>
+                    <div class="editable-subtitle" id="subtitle">长按🌞打开工具栏 | By淡季水母</div>
+                </div>
+                
+                <div class="category-nav-container" id="categoryNavContainer">
+                    <div class="category-nav" id="categoryNav"></div>
+                </div>
+            
+                <div class="nav-container" id="navContainer">
+                    <p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <div class="category-nav-container" id="categoryNavContainer">
-        <div class="category-nav" id="categoryNav"></div>
-    </div>
+    <!-- [新增结束] -->
 
-    <div class="nav-container" id="navContainer">
-        <p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>
-    </div>
-
+    <!-- 注意：悬浮按钮和模态框需要放在滑动容器之外，以保证它们在所有页面上都能正常显示和交互 -->
     <div class="fab-container" id="fabContainer">
         <div class="fab-drawer" id="fabDrawer">
             <button class="fab-drawer-item" id="helpBtn" title="使用指南">📧</button>
@@ -1147,7 +1242,17 @@ body.dragging-active {
                 <div class="modal-title-group"><span>主题设置</span></div>
                 <button class="close-btn" data-modal-id="colorPaletteModal">&times;</button>
             </div>
-            <div class="modal-body">
+                        <div class="modal-body">
+
+                <!-- [新增] 手机模式开关 -->
+                <div class="toggle-section" style="flex-wrap: wrap; gap: 10px;">
+                    <span style="flex-basis: 100%; font-weight: 600;">手机模式</span>
+                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                        <span>启用手机主题</span>
+                        <label class="toggle-switch"><input type="checkbox" id="mobileModeToggle"><span class="slider"></span></label>
+                    </div>
+                </div>
+                <!-- [新增结束] -->
                 
                 <div class="toggle-section" style="flex-wrap: wrap; gap: 10px;">
                     <span style="flex-basis: 100%; font-weight: 600;">网页内悬浮球</span>
@@ -5113,13 +5218,147 @@ const blob = b64toBlob(blobData.content, contentType);
             };
         })();
 
-        // 初始化拖拽排序功能
+                // 初始化拖拽排序功能
         DragAndSort.init();
         /* =============================================================== */
         /* ========================= [新增结束] ========================== */
         /* =============================================================== */
 
+
+        /* =============================================================== */
+        /* ================== [新增] 手机模式管理逻辑 ================== */
+        /* =============================================================== */
+        const MobileModeManager = (() => {
+            let isEnabled = false;
+            let isSwiping = false;
+            let startX = 0;
+            let currentTranslate = 0;
+            let currentPage = 1; // 0: 锁屏, 1: 主屏幕
+
+            const ui = {
+                toggle: document.getElementById('mobileModeToggle'),
+                wrapper: document.getElementById('mainWrapper'),
+                slider: document.getElementById('pageSlider'),
+            };
+
+            function applyMode(enable) {
+                isEnabled = enable;
+                document.body.classList.toggle('mobile-mode', enable);
+
+                if (enable) {
+                    // 默认显示主屏幕
+                    currentPage = 1;
+                    currentTranslate = -window.innerWidth;
+                    ui.slider.style.transition = 'none'; // 初始设置时不使用动画
+                    ui.slider.style.transform = `translateX(${currentTranslate}px)`;
+                    ui.slider.classList.remove('show-lockscreen');
+                    setTimeout(() => ui.slider.style.transition = '', 50); // 恢复动画
+                    
+                    attachSwipeListeners();
+                } else {
+                    detachSwipeListeners();
+                }
+
+                // 保存设置
+                if (!currentConfig.settings.mobileMode) {
+                    currentConfig.settings.mobileMode = {};
+                }
+                currentConfig.settings.mobileMode.enabled = enable;
+                saveGlobalConfig('Toggle mobile mode');
+            }
+
+            function handleTouchStart(e) {
+                if (!isEnabled) return;
+                startX = e.touches[0].clientX;
+                isSwiping = true;
+                ui.slider.style.transition = 'none'; // 滑动时移除动画，实现跟随效果
+            }
+
+            function handleTouchMove(e) {
+                if (!isSwiping || !isEnabled) return;
+
+                const currentX = e.touches[0].clientX;
+                const diffX = currentX - startX;
+                const newTranslate = currentTranslate + diffX;
+
+                // 限制滑动范围，防止滑出边界
+                if (newTranslate > 0 || newTranslate < -window.innerWidth) {
+                    return;
+                }
+                ui.slider.style.transform = `translateX(${newTranslate}px)`;
+            }
+
+            function handleTouchEnd(e) {
+                if (!isSwiping || !isEnabled) return;
+
+                isSwiping = false;
+                ui.slider.style.transition = ''; // 恢复动画
+
+                const endX = e.changedTouches[0].clientX;
+                const diffX = endX - startX;
+                const threshold = window.innerWidth / 4; // 滑动超过屏幕宽度的1/4就翻页
+
+                if (Math.abs(diffX) > threshold) {
+                    // 向右滑 (显示锁屏)
+                    if (diffX > 0 && currentPage === 1) {
+                        currentPage = 0;
+                    } 
+                    // 向左滑 (显示主屏幕)
+                    else if (diffX < 0 && currentPage === 0) {
+                        currentPage = 1;
+                    }
+                }
+                
+                snapToPage();
+            }
+
+            function snapToPage() {
+                if (currentPage === 0) { // 锁屏
+                    currentTranslate = 0;
+                    ui.slider.classList.add('show-lockscreen');
+                } else { // 主屏幕
+                    currentTranslate = -window.innerWidth;
+                    ui.slider.classList.remove('show-lockscreen');
+                }
+                ui.slider.style.transform = `translateX(${currentTranslate}px)`;
+            }
+            
+            function attachSwipeListeners() {
+                ui.wrapper.addEventListener('touchstart', handleTouchStart, { passive: true });
+                ui.wrapper.addEventListener('touchmove', handleTouchMove, { passive: true });
+                ui.wrapper.addEventListener('touchend', handleTouchEnd, { passive: true });
+            }
+
+            function detachSwipeListeners() {
+                ui.wrapper.removeEventListener('touchstart', handleTouchStart);
+                ui.wrapper.removeEventListener('touchmove', handleTouchMove);
+                ui.wrapper.removeEventListener('touchend', handleTouchEnd);
+            }
+
+            return {
+                init() {
+                    // 初始化时检查配置
+                    const mobileSettings = currentConfig.settings.mobileMode || { enabled: false };
+                    ui.toggle.checked = mobileSettings.enabled;
+                    if (mobileSettings.enabled) {
+                        applyMode(true);
+                    }
+
+                    // 绑定开关事件
+                    ui.toggle.addEventListener('change', (e) => {
+                        applyMode(e.target.checked);
+                    });
+                }
+            };
+        })();
+
+        // 初始化手机模式管理器
+        MobileModeManager.init();
+        /* =============================================================== */
+        /* ========================= [新增结束] ========================== */
+        /* =============================================================== */
     });
+
     </script>
 </body>
 </html>
