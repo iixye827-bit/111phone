@@ -926,21 +926,20 @@ body.dragging-active {
 /* ============== [修正] 手机模式专属样式 V3 ================= */
 /* =============================================================== */
 
-/* 1. 默认状态下，我们新增的滑动容器是完全隐藏的 */
+/* 默认状态下，滑动容器是完全不存在的 */
 .main-wrapper {
     display: none;
 }
 
-
-/* 2. 仅当手机模式开启时 (body有.mobile-mode类)，应用以下所有样式 */
+/* 仅当手机模式开启时，应用以下所有样式 */
 body.mobile-mode {
-    /* 强制 body 停止原有的 flex 布局，并禁止页面滚动 */
+    /* 1. 强制 body 停止原有的 flex 布局，并禁止滚动 */
     display: block !important;
     overflow: hidden !important;
 }
 
 body.mobile-mode .main-wrapper {
-    /* 显示滑动容器并使其铺满整个屏幕 */
+    /* 2. 显示滑动容器并使其铺满整个屏幕 */
     display: block;
     position: fixed;
     top: 0;
@@ -950,30 +949,23 @@ body.mobile-mode .main-wrapper {
     overflow: hidden;
 }
 
-/* 关键修复：在手机模式下，隐藏原始的主页元素 */
+/* 3. 原始的主页元素在手机模式下需要被隐藏，以避免冲突 */
 body.mobile-mode > .title-card,
 body.mobile-mode > .category-nav-container,
 body.mobile-mode > .nav-container {
     display: none !important;
 }
 
-
-/* --- 以下是手机模式内部的样式，都以 body.mobile-mode 开头 --- */
-
 body.mobile-mode .page-slider {
     display: flex;
     width: 200%;
     height: 100%;
-    /* transform 由 JS 控制，这里设个初始值即可 */
-    transform: translateX(0); 
-    /* transition 也由 JS 控制 */
+    transform: translateX(0); /* 默认展示锁屏 */
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-body.mobile-mode .page-slider.show-home-screen .home-screen-page > * {
-    /* 当切换到主屏幕时，内部元素淡入动画 */
-    transform: translateX(0);
-    opacity: 1;
-    transition: transform 0.4s 0.2s ease-out, opacity 0.3s 0.2s ease-out; /* 延迟出现 */
+body.mobile-mode .page-slider.show-home-screen {
+    transform: translateX(-50%); /* 滑动到主屏幕 */
 }
 
 body.mobile-mode .lock-screen-page,
@@ -988,7 +980,6 @@ body.mobile-mode .home-screen-page {
     align-items: center;
 }
 
-/* --- 锁屏页样式 --- */
 .lock-screen-page {
     padding-top: 5vh;
 }
@@ -1038,17 +1029,19 @@ body.dark-mode .add-component-btn:hover {
     background: rgba(0, 0, 0, 0.2);
 }
 
-/* --- 主屏幕页（包含原始元素的副本）样式 --- */
 .home-screen-page .title-card,
 .home-screen-page .category-nav-container,
 .home-screen-page .nav-container {
+    transition: transform 0.4s ease-out, opacity 0.3s ease-out;
+}
+
+body.mobile-mode .page-slider:not(.show-home-screen) .home-screen-page > * {
     transform: translateX(100px);
     opacity: 0;
 }
 /* =============================================================== */
 /* ========================= [修正结束] ========================== */
 /* =============================================================== */
-
 
 
 /* [修改] 当需要显示主屏幕时，添加此类 */
@@ -5391,29 +5384,48 @@ const blob = b64toBlob(blobData.content, contentType);
             function openLockscreenSettingsWindow() { /* ... 此函数内容不变，为简洁省略 ... */ }
 
             function applyMode(enable) {
+                // 获取需要移动的核心内容元素及其容器
+                const homeScreenPage = document.getElementById('homeScreenPage');
+                const mainWrapper = document.getElementById('mainWrapper');
+                const elementsToMove = [
+                    document.getElementById('pageOverlay'),
+                    document.getElementById('titleCard'),
+                    document.getElementById('categoryNavContainer'),
+                    document.getElementById('navContainer')
+                ].filter(el => el); // 过滤掉可能不存在的元素，增强代码健壮性
+
                 isEnabled = enable;
                 document.body.classList.toggle('mobile-mode', enable);
                 ui.settingsEntry.style.display = enable ? 'block' : 'none';
 
                 if (enable) {
+                    // [新增逻辑] 启用手机模式时：将核心内容移动到滑动容器的 homeScreenPage 内部
+                    elementsToMove.forEach(el => homeScreenPage.appendChild(el));
+
+                    // 重置滑块状态以确保干净的激活
                     currentPage = 0;
                     currentTranslate = 0;
-                    ui.slider.style.transition = 'none'; // 初始加载无动画
+                    ui.slider.style.transition = 'none';
                     ui.slider.style.transform = `translateX(0px)`;
                     ui.slider.classList.remove('show-home-screen');
                     attachSwipeListeners();
                 } else {
+                    // [新增逻辑] 关闭手机模式时：将核心内容移出滑动容器，放回 body 中 mainWrapper 元素的前面
+                    elementsToMove.forEach(el => document.body.insertBefore(el, mainWrapper));
+
+                    // 分离滑动监听器并重置滑块状态
                     detachSwipeListeners();
-                    // 关闭时，确保无动画地恢复到初始状态
                     ui.slider.style.transition = 'none';
                     ui.slider.style.transform = `translateX(0px)`;
                     ui.slider.classList.remove('show-home-screen');
                 }
 
+                // 保存手机模式的设置状态
                 if (!currentConfig.settings.mobileMode) currentConfig.settings.mobileMode = {};
                 currentConfig.settings.mobileMode.enabled = enable;
                 saveGlobalConfig('Toggle mobile mode');
             }
+
 
             function handleTouchStart(e) {
                 if (!isEnabled) return;
