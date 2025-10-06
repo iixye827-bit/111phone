@@ -113,7 +113,15 @@
     },
     "mobileMode": {
       "enabled": true,
-      "lockscreenComponents": {},
+      "lockscreenComponents": {
+        "0": {
+          "type": "photo",
+          "size": "large",
+          "data": {
+            "path": "memory/photos/1759762928721_IMG_6060.jpeg"
+          }
+        }
+      },
       "lockScreen": {
         "customCSS": "",
         "widgets": []
