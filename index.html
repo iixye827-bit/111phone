@@ -6134,10 +6134,14 @@ const blob = b64toBlob(blobData.content, contentType);
                 document.removeEventListener('click', closeSelectionPopup, true);
             }
             
-             // [修正] 内容选择逻辑
-            function showComponentContentMenu(cellIndex, size, event) {
+            // [修正 V2] 内容选择逻辑
+            function showComponentContentMenu(cellIndex, size) { //不再需要event参数
+                // [功能添加] 让图片和备忘录都支持超大尺寸
                 const contentTypes = {
-                    'image': ['xl', 'l'], 'memo': ['xl', 'l'], 'html': ['xl', 'l', 'm'], 'shortcut': ['s']
+                    'image': ['xl', 'l'], 
+                    'memo': ['xl', 'l'], // 增加了 'xl'
+                    'html': ['xl', 'l', 'm'], 
+                    'shortcut': ['s']
                 };
                 const typeLabels = {image: '图片', memo: '备忘录', html: 'HTML', shortcut: '快捷方式'};
                 
@@ -6148,8 +6152,7 @@ const blob = b64toBlob(blobData.content, contentType);
                         const button = document.createElement('button');
                         button.className = 'component-popup-button';
                         button.textContent = typeLabels[type];
-                        button.onclick = (e) => { // [BUG修复] 接收事件对象 e
-                            e.stopPropagation(); // [BUG修复] 阻止事件冒泡
+                        button.onclick = () => { // onclick事件不需要e参数了
                             const newWidget = { id: Date.now(), type, size };
                             switch (type) {
                                 case 'image': showImagePicker(path => { newWidget.content = path; saveWidgetConfig(cellIndex, newWidget); }); break;
@@ -6164,7 +6167,7 @@ const blob = b64toBlob(blobData.content, contentType);
             }
 
 
-             // [修正] 尺寸选择逻辑
+            // [修正 V2] 尺寸选择逻辑
             function showComponentSizeMenu(cellIndex, availableSpace, event) {
                 closeAnyOpenWindow();
                 selectionPopup = document.createElement('div');
@@ -6177,21 +6180,28 @@ const blob = b64toBlob(blobData.content, contentType);
                 const widgets = currentConfig.lockscreenWidgets || {};
 
                 Object.entries(sizes).forEach(([sizeKey, spaceNeeded]) => {
-                    if (availableSpace >= spaceNeeded) {
-                        // 超大组件的判断逻辑
-                        if (sizeKey === 'xl') {
-                            const isEven = cellIndex % 2 === 0;
-                            // 必须从偶数位开始，并且右边的格子必须是空的
-                            if (!isEven || (widgets[cellIndex + 1] && widgets[cellIndex + 1].length > 0)) {
-                               return;
-                            }
+                    let canShow = false;
+                    // [逻辑修改] 为“超大”尺寸设置独立的显示条件
+                    if (sizeKey === 'xl') {
+                        const isLeftCell = cellIndex % 2 === 0;
+                        const isRightCellEmpty = !widgets[cellIndex + 1] || widgets[cellIndex + 1].length === 0;
+                        // 必须是左侧的格子，且它自己和它右边的格子都必须是完全空的
+                        if (isLeftCell && availableSpace === 4 && isRightCellEmpty) {
+                            canShow = true;
                         }
+                    } else {
+                        // 其他尺寸沿用旧逻辑
+                        if (availableSpace >= spaceNeeded) {
+                            canShow = true;
+                        }
+                    }
+
+                    if (canShow) {
                         const button = document.createElement('button');
                         button.className = 'component-popup-button';
                         button.textContent = sizeLabels[sizeKey];
-                        button.onclick = (e) => {
-                            e.stopPropagation(); // [BUG修复] 同样在此处阻止冒泡
-                            showComponentContentMenu(cellIndex, sizeKey, e);
+                        button.onclick = () => { //onclick事件不需要e参数了，因为冒泡由父级处理
+                            showComponentContentMenu(cellIndex, sizeKey);
                         };
                         selectionPopup.appendChild(button);
                     }
@@ -6203,11 +6213,14 @@ const blob = b64toBlob(blobData.content, contentType);
                 
                 setTimeout(() => {
                     selectionPopup.classList.add('show');
-                    // [BUG修复] 确保点击 popup 自身不会立即关闭它
+                    // [BUG修复 V2] 这是最关键的修复：为整个弹出菜单容器添加阻止冒泡的监听器
+                    // 这样无论菜单内容如何变化，点击菜单内部都不会意外关闭它。
                     selectionPopup.addEventListener('click', e => e.stopPropagation());
+                    // 延迟后在 document 上添加一次性关闭事件
                     setTimeout(() => document.addEventListener('click', closeSelectionPopup, { once: true }), 0);
                 }, 10);
             }
+
 
             
             function renderSettingsCell(cell, cellIndex) {
