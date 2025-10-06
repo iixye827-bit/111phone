@@ -147,5 +147,15 @@
     "jellyBallCss": ""
   },
   "themePresets": [],
-  "lockscreenWidgets": {}
+  "lockscreenWidgets": {
+    "0": [
+      {
+        "id": 1759765200556,
+        "type": "shortcut",
+        "size": "s",
+        "content": "https://raw.githack.com/iixye827-bit/111phone/main/projects/33聊天室/index.html",
+        "text": "33聊天室"
+      }
+    ]
+  }
 }
