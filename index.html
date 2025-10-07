@@ -1786,6 +1786,59 @@ body.dark-mode .simulated-phone-screen {
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
+/* =============================================================== */
+/* ============= [V5 新增] 模拟器删除按钮优化样式 ============ */
+/* =============================================================== */
+/* 组件容器，用于定位和 hover 效果 */
+.widget-container-wrapper {
+    position: relative;
+    /* grid-area 将由 JS 设置 */
+}
+
+/* 删除按钮的包裹层，用于居中和捕获点击 */
+.widget-delete-wrapper {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.3);
+    opacity: 0;
+    pointer-events: none; /* 默认不可见不可点 */
+    transition: opacity 0.2s ease;
+}
+
+/* 仅当包裹层被 hover 时，显示删除按钮 */
+.widget-container-wrapper:hover .widget-delete-wrapper {
+    opacity: 1;
+    pointer-events: auto; /* hover 时可点击 */
+}
+
+/* 居中且更大的删除按钮本体 */
+.widget-delete-btn-centered {
+    width: 28px;
+    height: 28px;
+    background-color: rgba(245, 101, 101, 0.8);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 26px; /* 垂直居中叉号 */
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.widget-delete-btn-centered:hover {
+    transform: scale(1.1);
+    background-color: #f56565;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
 
     </style>
 
@@ -6131,6 +6184,7 @@ const blob = b64toBlob(blobData.content, contentType);
         const MobileModeManager = (() => {
             let isEnabled = false;
             let currentPickerWindow = null;
+            let pendingWidgetContent = null; // [V5 新增] 用于暂存待生成的组件内容
             let ghostEl = null;
             let draggedWidgetInfo = null;
             let dragTargetCell = null;
@@ -6422,54 +6476,83 @@ const blob = b64toBlob(blobData.content, contentType);
                         display.textContent = newValue;
                     });
                 });
+                // [V5 新增] 监听类型选择器，当选择“图片”时立即触发选择流程
+                adderContainer.querySelector('#widget-type-selector').addEventListener('change', function() {
+                    if (this.value === 'image') {
+                        // 清空预览区和已选择信息，因为要开始新的选择了
+                        const previewArea = adderContainer.querySelector('#new-widget-preview-area');
+                        previewArea.innerHTML = '将生成的组件拖入上方屏幕';
+                        previewArea.classList.remove('has-widget');
+                        pendingWidgetContent = null;
+                        
+                        const existingInfo = adderContainer.querySelector('#selection-info');
+                        if(existingInfo) existingInfo.remove();
+
+                        // 打开相册选择器
+                        showAlbumPicker(photoData => { // photoData: {path, title}
+                            // 当用户选好图片后，设置待处理内容
+                            const width = widthDisplay.textContent;
+                            const height = heightDisplay.textContent;
+                            pendingWidgetContent = {
+                                type: 'image',
+                                size: `${width}x${height}`,
+                                content: photoData.path
+                            };
+
+                            // 在“确认”按钮上方显示已选择信息
+                            const infoSpan = document.createElement('span');
+                            infoSpan.id = 'selection-info';
+                            infoSpan.style.fontSize = '12px';
+                            infoSpan.style.color = '#889';
+                            infoSpan.style.textAlign = 'center';
+                            infoSpan.style.display = 'block';
+                            infoSpan.style.marginTop = '-10px';
+                            infoSpan.style.marginBottom = '10px';
+                            infoSpan.textContent = `已选择：${photoData.title}`;
+                            
+                            const confirmBtn = adderContainer.querySelector('#confirm-widget-btn');
+                            adderContainer.insertBefore(infoSpan, confirmBtn);
+                        });
+                    }
+                });
+
 
                  adderContainer.querySelector('#confirm-widget-btn').addEventListener('click', () => {
                     const width = widthDisplay.textContent;
                     const height = heightDisplay.textContent;
                     const type = adderContainer.querySelector('#widget-type-selector').value;
                     const size = `${width}x${height}`;
+                    const previewArea = adderContainer.querySelector('#new-widget-preview-area');
 
                     // 清空之前的选择提示信息
                     const existingInfo = adderContainer.querySelector('#selection-info');
                     if(existingInfo) existingInfo.remove();
 
-                    // 1. [核心逻辑] 根据类型分发任务
-                    if (type === 'image') {
-                        // 对于图片类型，启动图片选择流程
-                        showAlbumPicker(photoData => { // photoData 包含 {path, title}
-                            // B. 图片被选中后的回调函数
-                            const previewArea = adderContainer.querySelector('#new-widget-preview-area');
-                            previewArea.innerHTML = ''; // 清空预览区
-                            
-                            // 创建带真实图片缩略图的预览项
-                            const previewItem = document.createElement('div');
-                            previewItem.className = 'widget-preview-item';
-                            previewItem.style.padding = '0'; // 图片组件不需要内边距
-                            previewItem.style.overflow = 'hidden';
-                            previewItem.dataset.widgetSize = size;
-                            previewItem.dataset.widgetType = type;
-                            previewItem.dataset.widgetContent = photoData.path; // 存储图片路径
-                            previewItem.draggable = true;
-                            
-                            const img = document.createElement('img');
-                            img.style.width = '100%';
-                            img.style.height = '100%';
-                            img.style.objectFit = 'cover';
-                            img.style.pointerEvents = 'none'; // 防止图片干扰拖拽
-                            
-                            // 使用 getSecureFileUrl 获取压缩后的图片进行预览
-                            getSecureFileUrl(photoData.path).then(url => { if(url) img.src = url; });
-                            
-                            previewItem.appendChild(img);
-                            previewItem.addEventListener('mousedown', handleDragStart);
-                            previewItem.addEventListener('touchstart', handleDragStart, { passive: false });
-                            previewArea.appendChild(previewItem);
-                            previewArea.classList.add('has-widget');
-                        });
-                    } else {
-                        // 对于其他类型，保持原有逻辑：生成文本预览块
+                    // [V5 核心逻辑]
+                    if (pendingWidgetContent && pendingWidgetContent.type === 'image') {
+                        // 情况一：已经通过选择器暂存了图片信息
+                        previewArea.innerHTML = ''; // 清空预览区
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'widget-preview-item';
+                        previewItem.style.padding = '0';
+                        previewItem.style.overflow = 'hidden';
+                        previewItem.dataset.widgetSize = pendingWidgetContent.size; // 使用暂存的尺寸
+                        previewItem.dataset.widgetType = 'image';
+                        previewItem.dataset.widgetContent = pendingWidgetContent.content; // 暂存的图片路径
+                        previewItem.draggable = true;
+                        
+                        const img = document.createElement('img');
+                        img.style.cssText = 'width:100%; height:100%; object-fit:cover; pointer-events:none;';
+                        getSecureFileUrl(pendingWidgetContent.content).then(url => { if(url) img.src = url; });
+                        
+                        previewItem.appendChild(img);
+                        previewItem.addEventListener('mousedown', handleDragStart);
+                        previewItem.addEventListener('touchstart', handleDragStart, { passive: false });
+                        previewArea.appendChild(previewItem);
+                        pendingWidgetContent = null; // 清空暂存
+                    } else if (type !== 'image') {
+                        // 情况二：处理非图片类型的其他组件
                         const typeTextMap = { 'shortcut': '快捷方式', 'memo': '备忘录', 'html': 'HTML' };
-                        const previewArea = adderContainer.querySelector('#new-widget-preview-area');
                         previewArea.innerHTML = '';
                         const previewItem = document.createElement('div');
                         previewItem.className = 'widget-preview-item';
@@ -6480,17 +6563,20 @@ const blob = b64toBlob(blobData.content, contentType);
                         previewItem.addEventListener('mousedown', handleDragStart);
                         previewItem.addEventListener('touchstart', handleDragStart, { passive: false });
                         previewArea.appendChild(previewItem);
-                        previewArea.classList.add('has-widget');
+                    } else {
+                        // 情况三：选择了图片但还没选定图片，提示用户
+                        alert('请先从弹出的窗口中选择一张图片。');
                     }
-                });
 
+                    previewArea.classList.toggle('has-widget', previewArea.childElementCount > 0);
+                });
             }
 
-             // [V7 修正] 渲染带真实预览的网格 (叠加策略)
+            // [V5 重构] 渲染网格，并集成新的可点击删除按钮
             async function renderSettingsGrid(gridContainer) {
                 gridContainer.innerHTML = ''; // 清空容器
 
-                // 步骤 1: 创建一个稳定的、包含全部32个单元格的底层网格
+                // 1. 创建底层虚线网格
                 for (let i = 0; i < 32; i++) {
                     const cell = document.createElement('div');
                     cell.className = 'settings-grid-cell';
@@ -6500,68 +6586,68 @@ const blob = b64toBlob(blobData.content, contentType);
 
                 const widgets = currentConfig.lockscreenWidgets || {};
 
-                // 步骤 2: 遍历所有已配置的组件
+                // 2. 遍历已配置的组件，为每个组件创建独立的包裹层
                 for (const startIndexStr in widgets) {
                     const startIndex = parseInt(startIndexStr);
-                    const widgetConfig = widgets[startIndex][0];
+                    const widgetConfig = widgets[startIndex]?.[0];
                     if (!widgetConfig) continue;
 
                     const [cols, rows] = widgetConfig.size.split('x').map(Number);
                     
-                    // 创建组件的视觉占位符 (placeholder)
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'widget-placeholder';
+                    // A. 创建最外层的容器
+                    const container = document.createElement('div');
+                    container.className = 'widget-container-wrapper';
 
-                    // **[核心修正]** 使用CSS Grid的 `grid-area` 属性来精确定位和定义大小
-                    // `grid-area: a / b / c / d;` -> `起始行 / 起始列 / 结束行 / 结束列`
                     const startRow = Math.floor(startIndex / 4) + 1;
                     const startCol = (startIndex % 4) + 1;
-                    const endRow = startRow + rows;
-                    const endCol = startCol + cols;
-                    placeholder.style.gridArea = `${startRow} / ${startCol} / ${endRow} / ${endCol}`;
+                    container.style.gridArea = `${startRow} / ${startCol} / ${startRow + rows} / ${startCol + cols}`;
 
-                    // 填充占位符的内容
+                    // B. 创建组件预览内容的占位符
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'widget-placeholder';
+                    placeholder.style.position = 'absolute'; // 让其在容器内绝对定位
+                    placeholder.style.inset = '0'; // 填满容器
+                    
                     switch (widgetConfig.type) {
                         case 'image':
-                            placeholder.textContent = '🖼️';
-                            getSecureFileUrl(widgetConfig.content).then(url => {
-                                if (url) {
-                                    placeholder.style.backgroundImage = `url(${url})`;
-                                    placeholder.textContent = '';
-                                }
-                            });
+                            getSecureFileUrl(widgetConfig.content).then(url => { if (url) placeholder.style.backgroundImage = `url(${url})`; });
                             break;
                         case 'memo':
                             const memo = memoryCache.memo.notes.find(n => n.id === widgetConfig.content);
-                            if (memo) {
-                                placeholder.innerHTML = `<div class="settings-widget-preview-memo-title">${memo.title || '无标题'}</div><div class="settings-widget-preview-memo-content">${memo.content || ''}</div>`;
-                            } else {
-                                placeholder.textContent = '备忘录丢失';
-                            }
+                            placeholder.innerHTML = memo ? `<div class="settings-widget-preview-memo-title">${memo.title||'无标题'}</div><div class="settings-widget-preview-memo-content">${memo.content||''}</div>` : '备忘录丢失';
                             break;
                         case 'shortcut':
                             const btnCfg = findButtonConfigByHref(widgetConfig.content);
                             placeholder.textContent = btnCfg ? btnCfg.text : '快捷方式丢失';
                             break;
                         case 'html':
-                            placeholder.textContent = 'HTML 组件';
+                            placeholder.textContent = 'HTML';
                             break;
                     }
-
-                    // 创建删除按钮
+                    
+                    // C. 创建删除按钮及其包裹层
+                    const deleteWrapper = document.createElement('div');
+                    deleteWrapper.className = 'widget-delete-wrapper';
+                    
                     const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'widget-placeholder-delete';
+                    deleteBtn.className = 'widget-delete-btn-centered';
                     deleteBtn.innerHTML = '&times;';
                     deleteBtn.onclick = (e) => {
                         e.stopPropagation();
-                        deleteWidgetFromCell(startIndex);
+                        if (confirm('确定要删除这个组件吗？')) {
+                            deleteWidgetFromCell(startIndex);
+                        }
                     };
-
-                    // 将占位符和删除按钮都添加到 grid 容器中，它们会根据 grid-area 自动定位
-                    placeholder.appendChild(deleteBtn);
-                    gridContainer.appendChild(placeholder);
+                    
+                    deleteWrapper.appendChild(deleteBtn);
+                    
+                    // D. 组装并添加到网格中
+                    container.appendChild(placeholder);
+                    container.appendChild(deleteWrapper);
+                    gridContainer.appendChild(container);
                 }
             }
+
 
 
             function handleDragStart(e) {
