@@ -5754,91 +5754,83 @@ const blob = b64toBlob(blobData.content, contentType);
         }
         
         // [重构] 渲染锁屏组件
-        function renderLockscreenWidgets() {
+         function renderLockscreenWidgets() {
             const grid = document.getElementById('lockscreenGrid');
             if (!grid) return;
             grid.innerHTML = '';
 
             const widgetsData = currentConfig.lockscreenWidgets || {};
             const occupiedCells = new Set();
-            const cellElements = {};
 
-            // 1. 创建所有格子并处理被大组件占用的情况
+            // 使用单次循环来创建和填充，这是更安全的方法
             for (let i = 0; i < 32; i++) {
-                if (occupiedCells.has(i)) continue;
-
+                if (occupiedCells.has(i)) {
+                    continue; // 如果此单元格已被大组件覆盖，则跳过
+                }
+                
                 const cell = document.createElement('div');
                 cell.className = 'grid-cell';
                 cell.dataset.cellIndex = i;
                 grid.appendChild(cell);
-                cellElements[i] = cell;
 
-                const widgetsInCell = widgetsData[i] || [];
-                if (widgetsInCell.length > 0) {
-                    const mainWidget = widgetsInCell[0]; // 假设每个起始格子只有一个大组件
-                    if (mainWidget.size === '2x2') {
+                const widgetsInCell = widgetsData[i];
+                if (widgetsInCell && widgetsInCell.length > 0) {
+                    const widgetConfig = widgetsInCell[0]; // 每个起始格只处理一个组件
+
+                    // 应用尺寸并标记占用的格子
+                    if (widgetConfig.size === '2x2') {
                         cell.classList.add('widget-size-2x2');
                         occupiedCells.add(i + 1); occupiedCells.add(i + 4); occupiedCells.add(i + 5);
-                    } else if (mainWidget.size === '4x2') {
+                    } else if (widgetConfig.size === '4x2') {
                         cell.classList.add('widget-size-4x2');
                         for(let j=1; j<4; j++) occupiedCells.add(i+j);
                         for(let j=0; j<4; j++) occupiedCells.add(i+4+j);
                     }
+                    
+                    const widgetEl = document.createElement('div');
+                    widgetEl.className = 'widget'; // 基础类
+
+                    // 填充内容
+                    switch (widgetConfig.type) {
+                        case 'image':
+                            // 对于图片，我们直接设置单元格背景，而不是创建子元素
+                            getSecureFileUrl(widgetConfig.content).then(url => {
+                                if(url) cell.style.backgroundImage = `url(${url})`;
+                            });
+                            cell.classList.add('widget'); // 赋予单元格组件样式
+                            break;
+                        case 'memo':
+                            const memo = memoryCache.memo.notes.find(n => n.id === widgetConfig.content);
+                            widgetEl.classList.add('widget-memo');
+                            if (memo) {
+                                widgetEl.innerHTML = `<div class="widget-memo-title">${memo.title || '无标题'}</div><div class="widget-memo-content">${memo.content || '没有内容'}</div>`;
+                                widgetEl.style.cursor = 'pointer';
+                                widgetEl.onclick = () => showMemoPopup(widgetConfig.content);
+                            } else {
+                                widgetEl.textContent = '备忘录未找到';
+                            }
+                            cell.appendChild(widgetEl);
+                            break;
+                        case 'shortcut':
+                            const buttonConfig = findButtonConfigByHref(widgetConfig.content);
+                            widgetEl.classList.add('widget-shortcut');
+                            widgetEl.textContent = buttonConfig ? buttonConfig.text : '快捷方式';
+                            widgetEl.dataset.href = widgetConfig.content;
+                            widgetEl.addEventListener('click', function(e) {
+                                e.stopPropagation();
+                                if (buttonConfig && buttonConfig.openExternally) {
+                                    window.open(this.dataset.href, '_blank', 'noopener,noreferrer');
+                                } else {
+                                    openIframeModal(this.dataset.href);
+                                }
+                            });
+                             cell.appendChild(widgetEl);
+                            break;
+                    }
                 }
             }
-
-            // 2. 填充内容
-            Object.keys(widgetsData).forEach(cellIndexStr => {
-                const cellIndex = parseInt(cellIndexStr, 10);
-                const cell = cellElements[cellIndex];
-                if (!cell) return;
-
-                const widgetsInCell = widgetsData[cellIndex];
-                
-                // 为了简化，我们假设一个格子要不就是各种小组件的容器，要不就是一个大组件的起点
-                const widgetConfig = widgetsInCell[0]; // 只处理第一个
-                
-                const widgetEl = document.createElement('div');
-                widgetEl.className = `widget widget-size-${widgetConfig.size}`;
-                
-                switch (widgetConfig.type) {
-                    case 'image':
-                        getSecureFileUrl(widgetConfig.content).then(url => { 
-                            if(url) cell.style.backgroundImage = `url(${url})`;
-                            cell.style.backgroundSize = 'cover';
-                            cell.style.backgroundPosition = 'center';
-                        });
-                        break;
-                    case 'memo':
-                        const memo = memoryCache.memo.notes.find(n => n.id === widgetConfig.content);
-                        widgetEl.classList.add('widget-memo');
-                        if (memo) {
-                            widgetEl.innerHTML = `<div class="widget-memo-title">${memo.title || '无标题'}</div><div class="widget-memo-content">${memo.content || '没有内容'}</div>`;
-                            widgetEl.style.cursor = 'pointer';
-                            widgetEl.onclick = () => showMemoPopup(widgetConfig.content);
-                        } else {
-                            widgetEl.textContent = '备忘录未找到';
-                        }
-                        cell.appendChild(widgetEl);
-                        break;
-                     case 'shortcut':
-                        const buttonConfig = findButtonConfigByHref(widgetConfig.content);
-                        widgetEl.classList.add('widget-shortcut');
-                        widgetEl.textContent = buttonConfig ? buttonConfig.text : '快捷方式';
-                        widgetEl.dataset.href = widgetConfig.content;
-                        widgetEl.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            if (buttonConfig && buttonConfig.openExternally) {
-                                window.open(this.dataset.href, '_blank', 'noopener,noreferrer');
-                            } else {
-                                openIframeModal(this.dataset.href);
-                            }
-                        });
-                        cell.appendChild(widgetEl);
-                        break;
-                }
-            });
         }
+
 
         const MobileModeManager = (() => {
             let isEnabled = false;
@@ -5849,6 +5841,12 @@ const blob = b64toBlob(blobData.content, contentType);
             let draggedWidgetInfo = null;
             let dragTargetCell = null;
 
+            // 滑动状态
+            let isSwiping = false;
+            let startX = 0;
+            let currentTranslate = 0;
+            let currentPage = 0; 
+            
             const ui = {
                 toggle: document.getElementById('mobileModeToggle'),
                 wrapper: document.getElementById('mainWrapper'),
@@ -5887,16 +5885,17 @@ const blob = b64toBlob(blobData.content, contentType);
             function showImagePicker(onSelect) {
                 const grid = document.createElement('div');
                 grid.className = 'picker-grid';
-                const allPhotos = memoryCache.album.items.filter(item => item.type === 'photo');
+                const allPhotos = memoryCache.album.items.filter(item => item.type === 'photo' || (item.type === 'photoset' && item.photos.length > 0));
                 if (allPhotos.length === 0) grid.textContent = '相册中没有图片。';
                 else {
                     allPhotos.forEach(item => {
+                       const photoToShow = item.type === 'photo' ? item : item.photos[0];
                        const gridItem = document.createElement('div');
                        gridItem.className = 'picker-grid-item';
                        const img = document.createElement('img');
-                       getSecureFileUrl(item.path).then(url => { if(url) img.src = url; });
+                       getSecureFileUrl(photoToShow.path).then(url => { if(url) img.src = url; });
                        gridItem.appendChild(img);
-                       gridItem.onclick = () => onSelect(item.path);
+                       gridItem.onclick = () => onSelect(photoToShow.path);
                        grid.appendChild(gridItem);
                     });
                 }
@@ -5925,7 +5924,8 @@ const blob = b64toBlob(blobData.content, contentType);
                 const allButtons = currentConfig.categories.flatMap(c => c.buttons);
                 if (allButtons.length === 0) list.textContent = '没有已添加的项目。';
                 else {
-                    allButtons.forEach(btn => {
+                    const uniqueButtons = Array.from(new Map(allButtons.map(item => [item.href, item])).values());
+                    uniqueButtons.forEach(btn => {
                         const itemEl = document.createElement('div');
                         itemEl.className = 'picker-item';
                         itemEl.textContent = btn.text;
@@ -5937,16 +5937,14 @@ const blob = b64toBlob(blobData.content, contentType);
             }
 
             async function saveWidgetConfig(cellIndex, widgetData) {
-                if (!currentConfig.lockscreenWidgets[cellIndex]) currentConfig.lockscreenWidgets[cellIndex] = [];
-                currentConfig.lockscreenWidgets[cellIndex].push(widgetData);
+                currentConfig.lockscreenWidgets[cellIndex] = [widgetData];
                 await saveGlobalConfig(`Add widget to cell ${cellIndex}`);
                 renderLockscreenWidgets();
                 closeAnyOpenWindow();
-                 // 重新渲染设置界面以反映变化
                 const settingsWindow = document.getElementById('fpw-lockscreen-settings');
                 if(settingsWindow) {
-                    settingsWindow.querySelector('.fpw-close').click();
-                    openLockscreenSettingsWindow();
+                    const grid = settingsWindow.querySelector('.settings-grid');
+                    renderSettingsGrid(grid);
                 }
             }
             
@@ -5956,12 +5954,12 @@ const blob = b64toBlob(blobData.content, contentType);
                  renderLockscreenWidgets();
                  const settingsWindow = document.getElementById('fpw-lockscreen-settings');
                  if(settingsWindow) {
-                    settingsWindow.querySelector('.fpw-close').click();
-                    openLockscreenSettingsWindow();
+                    const grid = settingsWindow.querySelector('.settings-grid');
+                    renderSettingsGrid(grid);
                  }
             }
 
-            function openLockscreenSettingsWindow() {
+             function openLockscreenSettingsWindow() {
                 const windowId = 'fpw-lockscreen-settings';
                 if (document.getElementById(windowId)) return;
 
@@ -5985,10 +5983,8 @@ const blob = b64toBlob(blobData.content, contentType);
 
                 settingsContainer.append(gridContainer, paletteContainer);
                 
-                // 渲染网格和已存在的组件
                 renderSettingsGrid(gridContainer);
                 
-                // 绑定拖拽事件
                 paletteContainer.querySelectorAll('.palette-item').forEach(item => {
                     item.addEventListener('mousedown', handleDragStart);
                     item.addEventListener('touchstart', handleDragStart, { passive: false });
@@ -6012,13 +6008,10 @@ const blob = b64toBlob(blobData.content, contentType);
                  gridContainer.innerHTML = '';
                  const widgets = currentConfig.lockscreenWidgets || {};
                  const occupied = new Set();
-                 const placeholders = {};
                  
-                 // 预计算占位
                  Object.keys(widgets).forEach(iStr => {
                      const i = parseInt(iStr);
                      const w = widgets[i][0];
-                     placeholders[i] = w;
                      occupied.add(i);
                      if(w.size === '2x2') { for (let x of [i+1, i+4, i+5]) occupied.add(x); }
                      if(w.size === '4x2') { for (let x of [i+1, i+2, i+3, i+4, i+5, i+6, i+7]) occupied.add(x) }
@@ -6028,22 +6021,28 @@ const blob = b64toBlob(blobData.content, contentType);
                      const cell = document.createElement('div');
                      cell.className = 'settings-grid-cell';
                      cell.dataset.cellIndex = i;
-                     if(placeholders[i]){
-                         const w = placeholders[i];
+
+                     if(widgets[i]){
+                         const w = widgets[i][0];
                          const ph = document.createElement('div');
                          ph.className = 'widget-placeholder';
-                         ph.textContent = {image: '🖼️ 图片', memo: '📝 备忘录', shortcut: '🔗 快捷方式'}[w.type];
-                         ph.style.gridColumn = w.size.startsWith('4') ? 'span 4' : (w.size.startsWith('2') ? 'span 2' : 'span 1');
-                         ph.style.gridRow = w.size.endsWith('2') ? 'span 2' : 'span 1';
+                         ph.textContent = {image: '🖼️', memo: '📝', shortcut: '🔗'}[w.type];
+                         
+                         const sizeMap = {'1x1': [1,1], '2x2': [2,2], '4x2': [4,2]};
+                         const [cols, rows] = sizeMap[w.size];
+                         
+                         ph.style.gridColumn = `span ${cols}`;
+                         ph.style.gridRow = `span ${rows}`;
                          
                          const del = document.createElement('button');
                          del.className = 'widget-placeholder-delete';
                          del.innerHTML = '&times;';
                          del.onclick = (e) => { e.stopPropagation(); deleteWidgetFromCell(i); };
                          
-                         ph.appendChild(del);
                          cell.appendChild(ph);
+                         cell.appendChild(del);
                      }
+                     
                      if(occupied.has(i)) cell.style.background = 'rgba(128,128,128,0.1)';
                      gridContainer.appendChild(cell);
                  }
@@ -6061,8 +6060,8 @@ const blob = b64toBlob(blobData.content, contentType);
                 
                 const [cols, rows] = draggedWidgetInfo.size.split('x').map(Number);
                 const rect = item.getBoundingClientRect();
-                ghostEl.style.width = `${cols * (rect.width/2)}px`; 
-                ghostEl.style.height = `${rows * (rect.width/2)}px`;
+                ghostEl.style.width = `${cols * 40}px`; 
+                ghostEl.style.height = `${rows * 40}px`;
 
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -6134,26 +6133,107 @@ const blob = b64toBlob(blobData.content, contentType);
                 const widgets = currentConfig.lockscreenWidgets || {};
                 const startIndex = parseInt(startCell.dataset.cellIndex, 10);
                 const [cols, rows] = size.split('x').map(Number);
-                if ((startIndex % 4) + cols > 4) return false; // 超出右边界
+                if ((startIndex % 4) + cols > 4) return false;
 
                 for (let r = 0; r < rows; r++) {
                     for (let c = 0; c < cols; c++) {
-                        if (widgets[startIndex + r * 4 + c]) return false; // 已被占用
+                        if (widgets[startIndex + r * 4 + c]) return false;
                     }
                 }
                 return true;
             }
 
-            // ... (rest of the MobileModeManager functions like applyMode, swipe handlers)
-            function applyMode(e){"use strict";let t=document.getElementById("homeScreenPage"),o=document.getElementById("mainWrapper"),n=[document.getElementById("pageOverlay"),document.getElementById("titleCard"),document.getElementById("categoryNavContainer"),document.getElementById("navContainer")].filter(Boolean);isEnabled=e,document.body.classList.toggle("mobile-mode",e),ui.settingsEntry.style.display=e?"block":"none",e?(n.forEach(e=>t.appendChild(e)),(a={currentPage:0,currentTranslate:0}).slider.style.transition="none",a.slider.style.transform="translateX(0px)",a.slider.classList.remove("show-home-screen"),renderLockscreenWidgets(),function(){let e={passive:!1};a.wrapper.addEventListener("touchstart",c,e),a.wrapper.addEventListener("touchmove",i,e),a.wrapper.addEventListener("touchend",l,e)}()):(n.forEach(e=>document.body.insertBefore(e,o)),function(){let e={passive:!1};a.wrapper.removeEventListener("touchstart",c,e),a.wrapper.removeEventListener("touchmove",i,e),a.wrapper.removeEventListener("touchend",l,e)}(),a.slider.style.transition="none",a.slider.style.transform="translateX(0px)",a.slider.classList.remove("show-home-screen")),currentConfig.settings.mobileMode||(currentConfig.settings.mobileMode={}),currentConfig.settings.mobileMode.enabled=e,saveGlobalConfig("Toggle mobile mode")}const a={wrapper:document.getElementById("mainWrapper"),slider:document.getElementById("pageSlider"),...ui};let s=0,d=0,r=0;function c(e){a.slider.style.transition="none",s=e.touches[0].clientX;const t=window.getComputedStyle(a.slider).transform;d="none"!==t?parseFloat(t.split(",")[4]):0,r=1}function i(e){if(!r)return;e.preventDefault();const t=e.touches[0].clientX-s,o=a.slider.offsetWidth/2,n=Math.max(-o,Math.min(0,d+t));a.slider.style.transform=`translateX(${n}px)`}function l(e){if(!r)return;r=!1;const t=e.changedTouches[0].clientX-s,o=window.innerWidth/4;Math.abs(t)>o&&(t<0&&0===a.currentPage?a.currentPage=1:t>0&&1===a.currentPage&&(a.currentPage=0)),(()=>{const e=a.slider.offsetWidth/2,t=1===a.currentPage?-e:0;a.slider.style.transition="transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)",a.slider.style.transform=`translateX(${t}px)`,d=t,a.slider.classList.toggle("show-home-screen",1===a.currentPage),document.body.classList.toggle("mobile-home-screen-active",1===a.currentPage)})()}
+            // [恢复] 正确的、分离的函数
+            function applyMode(enable) {
+                const homeScreenPage = document.getElementById('homeScreenPage');
+                const mainWrapper = document.getElementById('mainWrapper');
+                const elementsToMove = [document.getElementById('pageOverlay'), document.getElementById('titleCard'), document.getElementById('categoryNavContainer'), document.getElementById('navContainer')].filter(Boolean);
+                isEnabled = enable;
+                document.body.classList.toggle('mobile-mode', enable);
+                ui.settingsEntry.style.display = enable ? 'block' : 'none';
+                if (enable) {
+                    elementsToMove.forEach(el => homeScreenPage.appendChild(el));
+                    currentPage = 0;
+                    currentTranslate = 0;
+                    ui.slider.style.transition = 'none';
+                    ui.slider.style.transform = `translateX(0px)`;
+                    ui.slider.classList.remove('show-home-screen');
+                    renderLockscreenWidgets();
+                    attachSwipeListeners();
+                } else {
+                    elementsToMove.forEach(el => document.body.insertBefore(el, mainWrapper));
+                    detachSwipeListeners();
+                    ui.slider.style.transition = 'none';
+                    ui.slider.style.transform = `translateX(0px)`;
+                    ui.slider.classList.remove('show-home-screen');
+                }
+                if (!currentConfig.settings.mobileMode) currentConfig.settings.mobileMode = {};
+                currentConfig.settings.mobileMode.enabled = enable;
+                saveGlobalConfig('Toggle mobile mode');
+            }
+
+            function handleTouchStart(e) {
+                if (!isEnabled) return;
+                ui.slider.style.transition = 'none'; 
+                startX = e.touches[0].clientX;
+                const transformMatrix = window.getComputedStyle(ui.slider).transform;
+                currentTranslate = (transformMatrix !== 'none') ? parseFloat(transformMatrix.split(',')[4]) : 0;
+                isSwiping = true;
+            }
+
+            function handleTouchMove(e) {
+                if (!isSwiping || !isEnabled) return;
+                e.preventDefault();
+                const diffX = e.touches[0].clientX - startX;
+                const pageWidth = ui.slider.offsetWidth / 2;
+                const limitedTranslate = Math.max(-pageWidth, Math.min(0, currentTranslate + diffX));
+                ui.slider.style.transform = `translateX(${limitedTranslate}px)`;
+            }
+
+            function handleTouchEnd(e) {
+                if (!isSwiping || !isEnabled) return;
+                isSwiping = false;
+                const diffX = e.changedTouches[0].clientX - startX;
+                const threshold = window.innerWidth / 4;
+                if (Math.abs(diffX) > threshold) {
+                    if (diffX < 0 && currentPage === 0) currentPage = 1;
+                    else if (diffX > 0 && currentPage === 1) currentPage = 0;
+                }
+                snapToPage();
+            }
+
+            function snapToPage() {
+                const pageWidth = ui.slider.offsetWidth / 2;
+                const targetTranslate = currentPage === 1 ? -pageWidth : 0;
+                ui.slider.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+                ui.slider.style.transform = `translateX(${targetTranslate}px)`;
+                currentTranslate = targetTranslate;
+                ui.slider.classList.toggle('show-home-screen', currentPage === 1);
+                document.body.classList.toggle('mobile-home-screen-active', currentPage === 1);
+            }
+
+            function attachSwipeListeners() {
+                const options = { passive: false };
+                ui.wrapper.addEventListener('touchstart', handleTouchStart, options);
+                ui.wrapper.addEventListener('touchmove', handleTouchMove, options);
+                ui.wrapper.addEventListener('touchend', handleTouchEnd, { passive: true });
+            }
+
+            function detachSwipeListeners() {
+                 const options = { passive: false };
+                ui.wrapper.removeEventListener('touchstart', handleTouchStart, options);
+                ui.wrapper.removeEventListener('touchmove', handleTouchMove, options);
+                ui.wrapper.removeEventListener('touchend', handleTouchEnd, { passive: true });
+            }
 
             return {
                 init() {
                     const mobileSettings = currentConfig.settings.mobileMode || { enabled: false };
                     ui.toggle.checked = mobileSettings.enabled;
                     if (!currentConfig.lockscreenWidgets) currentConfig.lockscreenWidgets = {};
-                    if (mobileSettings.enabled) applyMode(true);
-                    
+                    if (mobileSettings.enabled) {
+                        applyMode(true);
+                    }
                     ui.toggle.addEventListener('change', (e) => applyMode(e.target.checked));
                     ui.openSettingsBtn.addEventListener('click', openLockscreenSettingsWindow);
                 }
