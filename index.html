@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -1839,6 +1840,65 @@ body.dark-mode .simulated-phone-screen {
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
+/* =============================================================== */
+/* ============= [V7 新增] 居中加载指示器样式 ============= */
+/* =============================================================== */
+.loading-indicator-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* 确保在最顶层 */
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.loading-indicator-overlay.show {
+    opacity: 1;
+}
+
+.loading-indicator-box {
+    background-color: var(--content-bg);
+    padding: 25px 40px;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    text-align: center;
+    transform: scale(0.95);
+    transition: transform 0.2s ease-in-out;
+}
+
+.loading-indicator-overlay.show .loading-indicator-box {
+    transform: scale(1);
+}
+
+.loading-indicator-text {
+    font-size: 16px;
+    color: var(--text-color);
+    margin-bottom: 20px;
+}
+
+.loading-indicator-cancel-btn {
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.loading-indicator-cancel-btn:hover {
+    background-color: #c53030;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
 
     </style>
 
@@ -3299,27 +3359,60 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
         }
     }
     
-    async function fetchFromGithub(path, endpoint = 'contents') {
+    async function fetchFromGithub(path, method = 'GET', body = null, signal = null) {
         if (!checkConfig(false)) return { data: null, error: "GitHub未配置" };
-        if (endpoint === 'contents') updateSyncStatus('syncing', `正在从云端读取...`);
         
+        let endpoint, displayContext, showSyncIndicator = false;
+        if(method === 'contents' || method === 'git') { // Legacy compatibility
+            endpoint = method;
+            method = 'GET';
+        } else {
+            endpoint = 'contents';
+        }
+
+        if(path.startsWith('git/blobs')) {
+            endpoint = 'git'; // Override for blob fetches
+            path = path.substring(4);
+            displayContext = '读取文件内容';
+        } else {
+            displayContext = `读取 ${path}`;
+            showSyncIndicator = true;
+        }
+
+        if (showSyncIndicator) updateSyncStatus('syncing', `正在从云端读取...`);
+
         const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/${endpoint}/${path}`;
+        
         try {
-            const response = await fetch(url, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }, cache: 'no-cache' });
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` },
+                body: body ? JSON.stringify(body) : null,
+                signal: signal, // Pass the signal to fetch
+                cache: 'no-cache'
+            });
+
             if (response.status === 404) return { data: null, error: null, response };
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(`${response.status}: ${JSON.stringify(errorData)}`);
+                 const errorData = await response.json().catch(() => ({}));
+                 throw new Error(`${response.status}: ${JSON.stringify(errorData)}`);
             }
+            
             const data = await response.json();
-            if (endpoint === 'contents') updateSyncStatus('synced', '读取成功');
+            if (showSyncIndicator) updateSyncStatus('synced', '读取成功');
             return { data, response };
+
         } catch (error) {
-            const userMessage = await handleApiError(`读取 ${path}`, error);
-            if (endpoint === 'contents') updateSyncStatus('error', userMessage);
+            if (error.name === 'AbortError') {
+                console.log('Fetch aborted by user.');
+                return { data: null, error: '用户取消了操作' };
+            }
+            const userMessage = await handleApiError(displayContext, error);
+            if (showSyncIndicator) updateSyncStatus('error', userMessage);
             return { data: null, error: userMessage, response: null };
         }
     }
+
 
     async function saveToGithub(path, content, commitMessage, sha = null) {
         if (!checkConfig(true)) {
@@ -6380,53 +6473,83 @@ const blob = b64toBlob(blobData.content, contentType);
             }
 
             
-             // [V6 优化] 创建设置窗口，集成智能缓存数据加载器
+            // [V7 修复与优化] 创建设置窗口，集成可取消的加载指示器
             function openLockscreenSettingsWindow() {
                 const modalId = 'lockscreen-settings-modal';
                 if (document.getElementById(modalId)) return;
 
-                // [V6 核心优化] 智能缓存数据加载器
-                async function ensureMemoryDataIsLoaded() {
-                    // 策略一：优先使用已存在的缓存，速度最快
-                    if (memoryCache && memoryCache.album) {
-                        return true;
+                // [V7 核心] 加载指示器管理器
+                const LoadingIndicator = (() => {
+                    let overlay = null;
+                    let abortController = null;
+
+                    function show(message, onCancel) {
+                        if (overlay) return; // 防止重复显示
+                        abortController = new AbortController();
+
+                        overlay = document.createElement('div');
+                        overlay.className = 'loading-indicator-overlay';
+                        overlay.innerHTML = `
+                            <div class="loading-indicator-box">
+                                <div class="loading-indicator-text">${message}</div>
+                                <button class="loading-indicator-cancel-btn">取消</button>
+                            </div>
+                        `;
+                        document.body.appendChild(overlay);
+
+                        overlay.querySelector('.loading-indicator-cancel-btn').onclick = () => {
+                            abortController.abort(); // 发送中止信号
+                            hide();
+                            if (onCancel) onCancel();
+                        };
+                        
+                        // 触发 CSS 过渡
+                        requestAnimationFrame(() => overlay.classList.add('show'));
                     }
 
-                    // 策略二：如果缓存不存在，则从 GitHub 加载
-                    const MEMORY_DATA_PATH = 'memory/data.json';
-                    // 使用 fetchFromGithub 并传递 'blobs' 端点来避免触发全局的 "syncing" 状态提示
-                    const { data, error } = await fetchFromGithub(MEMORY_DATA_PATH, 'blobs'); 
+                    function hide() {
+                        if (!overlay) return;
+                        overlay.classList.remove('show');
+                        overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+                        overlay = null;
+                        abortController = null;
+                    }
 
+                    return {
+                        show,
+                        hide,
+                        getSignal: () => abortController?.signal
+                    };
+                })();
+
+                // [V7 修复] 智能缓存数据加载器
+                async function ensureMemoryDataIsLoaded(signal) {
+                    if (memoryCache && memoryCache.album) return { success: true };
+                    
+                    const MEMORY_DATA_PATH = 'memory/data.json';
+                    const { data, error } = await fetchFromGithub(MEMORY_DATA_PATH, 'GET', null, signal);
+
+                    if (signal?.aborted) return { success: false, reason: 'cancelled' };
                     if (error) {
                         alert(`加载相册数据失败: ${error}\n\n请确保网络连接正常，或先进入“记忆”功能完成数据初始化。`);
-                        return false;
+                        return { success: false, reason: 'error' };
                     }
 
-                    // 定义一个函数来获取初始空数据结构
-                    const getInitialData = () => ({
-                        memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] },
-                        album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] }
-                    });
-
-                    // 将加载的数据赋给全局的 memoryCache，供本次会话后续使用
+                    const getInitialData = () => ({ memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] }, album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] } });
                     memoryCache = data ? JSON.parse(b64_to_utf8(data.content)) : getInitialData();
-                    
-                    // 保证数据结构完整性，防止因旧版配置文件出错
                     if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
                     if (!memoryCache.album) memoryCache.album = { folders: [], items: [] };
 
-                    return true;
+                    return { success: true };
                 }
 
-                // --- UI 创建部分 (与之前版本相同) ---
+                // --- UI 创建部分 (保持不变) ---
                 const modalOverlay = document.createElement('div');
                 modalOverlay.id = modalId;
                 modalOverlay.className = 'modal-overlay show';
                 modalOverlay.style.zIndex = '1001';
-
                 const modalContent = document.createElement('div');
                 modalContent.className = 'modal-content';
-                
                 const settingsContainer = document.createElement('div');
                 settingsContainer.style.cssText = 'display: flex; flex-direction: column; height: 100%;';
                 const header = document.createElement('div');
@@ -6440,7 +6563,6 @@ const blob = b64toBlob(blobData.content, contentType);
                 const gridContainer = document.createElement('div');
                 gridContainer.className = 'settings-grid';
                 phoneScreen.appendChild(gridContainer);
-                
                 const adderContainer = document.createElement('div');
                 adderContainer.className = 'component-adder';
                 adderContainer.innerHTML = `
@@ -6456,47 +6578,49 @@ const blob = b64toBlob(blobData.content, contentType);
                 modalContent.appendChild(settingsContainer);
                 modalOverlay.appendChild(modalContent);
                 document.body.appendChild(modalOverlay);
-                
+
                 // --- 事件监听器设置 ---
                 const closeModal = () => { closeAnyOpenWindow(); modalOverlay.classList.remove('show'); modalOverlay.addEventListener('transitionend', () => modalOverlay.remove(), { once: true }); };
                 header.querySelector('.close-btn').onclick = closeModal;
                 modalOverlay.onclick = (e) => { if (e.target === modalOverlay) closeModal(); };
-                
                 renderSettingsGrid(gridContainer);
-                
                 const widthDisplay = adderContainer.querySelector('#width-display'), heightDisplay = adderContainer.querySelector('#height-display');
                 adderContainer.querySelectorAll('.roller-btn').forEach(btn => btn.addEventListener('click', () => { const t = btn.dataset.roller, d = parseInt(btn.dataset.dir, 10), el = t === 'width' ? widthDisplay : heightDisplay, max = t === 'width' ? 4 : 8; let val = parseInt(el.textContent, 10) + d; el.textContent = Math.max(1, Math.min(val, max)); }));
 
-                // [V6 优化] 类型选择器的事件监听器
+                // [V7 优化] 类型选择器的事件监听器
                 adderContainer.querySelector('#widget-type-selector').addEventListener('change', async function() {
+                    if (this.value !== 'image') return;
+                    
                     const selector = this;
-                    if (selector.value === 'image') {
-                        adderContainer.querySelector('#new-widget-preview-area').innerHTML = '将生成的组件拖入上方屏幕';
-                        adderContainer.querySelector('#new-widget-preview-area').classList.remove('has-widget');
-                        pendingWidgetContent = null;
-                        adderContainer.querySelector('#selection-info')?.remove();
+                    const originalSelectedIndex = selector.selectedIndex; // 记录原始选项
 
-                        selector.disabled = true;
-                        const originalOption = selector.options[selector.selectedIndex];
-                        const originalText = originalOption.textContent;
-                        originalOption.textContent = '加载相册中...';
-                        
-                        try {
-                            const success = await ensureMemoryDataIsLoaded();
-                            if (success) {
-                                showAlbumPicker(photoData => {
-                                    pendingWidgetContent = { type: 'image', size: `${widthDisplay.textContent}x${heightDisplay.textContent}`, content: photoData.path };
-                                    const infoSpan = document.createElement('span');
-                                    infoSpan.id = 'selection-info';
-                                    infoSpan.style.cssText = 'font-size:12px;color:#889;text-align:center;display:block;margin-top:-10px;margin-bottom:10px;';
-                                    infoSpan.textContent = `已选择：${photoData.title}`;
-                                    adderContainer.insertBefore(infoSpan, adderContainer.querySelector('#confirm-widget-btn'));
-                                });
-                            }
-                        } finally {
-                            selector.disabled = false;
-                            originalOption.textContent = originalText;
-                        }
+                    // 清理工作
+                    adderContainer.querySelector('#new-widget-preview-area').innerHTML = '将生成的组件拖入上方屏幕';
+                    adderContainer.querySelector('#new-widget-preview-area').classList.remove('has-widget');
+                    pendingWidgetContent = null;
+                    adderContainer.querySelector('#selection-info')?.remove();
+                    
+                    const onCancel = () => {
+                        selector.selectedIndex = originalSelectedIndex; // 恢复选择
+                        console.log('相册加载已取消');
+                    };
+
+                    LoadingIndicator.show('正在加载相册...', onCancel);
+                    
+                    const { success, reason } = await ensureMemoryDataIsLoaded(LoadingIndicator.getSignal());
+                    LoadingIndicator.hide();
+
+                    if (success) {
+                        showAlbumPicker(photoData => {
+                            pendingWidgetContent = { type: 'image', size: `${widthDisplay.textContent}x${heightDisplay.textContent}`, content: photoData.path };
+                            const infoSpan = document.createElement('span');
+                            infoSpan.id = 'selection-info';
+                            infoSpan.style.cssText = 'font-size:12px;color:#889;text-align:center;display:block;margin-top:-10px;margin-bottom:10px;';
+                            infoSpan.textContent = `已选择：${photoData.title}`;
+                            adderContainer.insertBefore(infoSpan, adderContainer.querySelector('#confirm-widget-btn'));
+                        });
+                    } else if(reason !== 'cancelled') {
+                        selector.selectedIndex = originalSelectedIndex; // 加载失败也恢复选择
                     }
                 });
                 
@@ -6531,12 +6655,11 @@ const blob = b64toBlob(blobData.content, contentType);
                         item.addEventListener('touchstart', handleDragStart, { passive: false });
                         previewArea.appendChild(item);
                     } else {
-                        alert('请等待相册加载完毕后，从弹出的窗口中选择一张图片。');
+                        alert('请先选择“图片”类型，并从弹出的窗口中选择一张图片。');
                     }
                     previewArea.classList.toggle('has-widget', previewArea.childElementCount > 0);
                 });
             }
-
 
 
             // [V5 重构] 渲染网格，并集成新的可点击删除按钮
