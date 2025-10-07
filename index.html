@@ -6380,40 +6380,45 @@ const blob = b64toBlob(blobData.content, contentType);
             }
 
             
-            // [V5 重构] 创建设置窗口, 包含模拟器和按需数据加载
+             // [V6 优化] 创建设置窗口，集成智能缓存数据加载器
             function openLockscreenSettingsWindow() {
                 const modalId = 'lockscreen-settings-modal';
                 if (document.getElementById(modalId)) return;
 
-                // [新增] 按需加载 MemoryApp 数据的辅助函数
+                // [V6 核心优化] 智能缓存数据加载器
                 async function ensureMemoryDataIsLoaded() {
-                    // 如果 memoryCache 已被 MemoryApp 加载过，则直接返回 true
-                    if (memoryCache) return true;
+                    // 策略一：优先使用已存在的缓存，速度最快
+                    if (memoryCache && memoryCache.album) {
+                        return true;
+                    }
 
-                    // 否则，独立加载一次数据
+                    // 策略二：如果缓存不存在，则从 GitHub 加载
                     const MEMORY_DATA_PATH = 'memory/data.json';
-                    const { data, error } = await fetchFromGithub(MEMORY_DATA_PATH);
+                    // 使用 fetchFromGithub 并传递 'blobs' 端点来避免触发全局的 "syncing" 状态提示
+                    const { data, error } = await fetchFromGithub(MEMORY_DATA_PATH, 'blobs'); 
 
                     if (error) {
-                        alert(`加载相册数据失败: ${error}\n\n请先进入“记忆”功能初始化一次数据。`);
+                        alert(`加载相册数据失败: ${error}\n\n请确保网络连接正常，或先进入“记忆”功能完成数据初始化。`);
                         return false;
                     }
 
+                    // 定义一个函数来获取初始空数据结构
                     const getInitialData = () => ({
                         memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] },
                         album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] }
                     });
 
-                    // 将加载的数据赋给全局的 memoryCache，供后续使用
+                    // 将加载的数据赋给全局的 memoryCache，供本次会话后续使用
                     memoryCache = data ? JSON.parse(b64_to_utf8(data.content)) : getInitialData();
                     
-                    // 确保数据结构完整（从 MemoryApp 借鉴的健壮性代码）
+                    // 保证数据结构完整性，防止因旧版配置文件出错
                     if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
                     if (!memoryCache.album) memoryCache.album = { folders: [], items: [] };
 
                     return true;
                 }
 
+                // --- UI 创建部分 (与之前版本相同) ---
                 const modalOverlay = document.createElement('div');
                 modalOverlay.id = modalId;
                 modalOverlay.className = 'modal-overlay show';
@@ -6446,13 +6451,13 @@ const blob = b64toBlob(blobData.content, contentType);
                     <button id="confirm-widget-btn" class="modal-button">确认并生成</button>
                     <div id="new-widget-preview-area">将生成的组件拖入上方屏幕</div>
                 `;
-
                 body.append(phoneScreen, adderContainer);
                 settingsContainer.append(header, body);
                 modalContent.appendChild(settingsContainer);
                 modalOverlay.appendChild(modalContent);
                 document.body.appendChild(modalOverlay);
                 
+                // --- 事件监听器设置 ---
                 const closeModal = () => { closeAnyOpenWindow(); modalOverlay.classList.remove('show'); modalOverlay.addEventListener('transitionend', () => modalOverlay.remove(), { once: true }); };
                 header.querySelector('.close-btn').onclick = closeModal;
                 modalOverlay.onclick = (e) => { if (e.target === modalOverlay) closeModal(); };
@@ -6462,43 +6467,44 @@ const blob = b64toBlob(blobData.content, contentType);
                 const widthDisplay = adderContainer.querySelector('#width-display'), heightDisplay = adderContainer.querySelector('#height-display');
                 adderContainer.querySelectorAll('.roller-btn').forEach(btn => btn.addEventListener('click', () => { const t = btn.dataset.roller, d = parseInt(btn.dataset.dir, 10), el = t === 'width' ? widthDisplay : heightDisplay, max = t === 'width' ? 4 : 8; let val = parseInt(el.textContent, 10) + d; el.textContent = Math.max(1, Math.min(val, max)); }));
 
-                // [FIXED] 修改类型选择器的事件监听器
+                // [V6 优化] 类型选择器的事件监听器
                 adderContainer.querySelector('#widget-type-selector').addEventListener('change', async function() {
-                    if (this.value === 'image') {
-                        const previewArea = adderContainer.querySelector('#new-widget-preview-area');
-                        previewArea.innerHTML = '将生成的组件拖入上方屏幕';
-                        previewArea.classList.remove('has-widget');
+                    const selector = this;
+                    if (selector.value === 'image') {
+                        adderContainer.querySelector('#new-widget-preview-area').innerHTML = '将生成的组件拖入上方屏幕';
+                        adderContainer.querySelector('#new-widget-preview-area').classList.remove('has-widget');
                         pendingWidgetContent = null;
                         adderContainer.querySelector('#selection-info')?.remove();
 
-                        this.disabled = true;
-                        const originalOption = this.options[this.selectedIndex];
+                        selector.disabled = true;
+                        const originalOption = selector.options[selector.selectedIndex];
+                        const originalText = originalOption.textContent;
                         originalOption.textContent = '加载相册中...';
-
-                        const success = await ensureMemoryDataIsLoaded();
                         
-                        this.disabled = false;
-                        originalOption.textContent = '图片';
-                        
-                        if (!success) return; // 如果加载失败，则中断流程
-
-                        showAlbumPicker(photoData => {
-                            pendingWidgetContent = { type: 'image', size: `${widthDisplay.textContent}x${heightDisplay.textContent}`, content: photoData.path };
-                            const infoSpan = document.createElement('span');
-                            infoSpan.id = 'selection-info';
-                            infoSpan.style.cssText = 'font-size:12px;color:#889;text-align:center;display:block;margin-top:-10px;margin-bottom:10px;';
-                            infoSpan.textContent = `已选择：${photoData.title}`;
-                            adderContainer.insertBefore(infoSpan, adderContainer.querySelector('#confirm-widget-btn'));
-                        });
+                        try {
+                            const success = await ensureMemoryDataIsLoaded();
+                            if (success) {
+                                showAlbumPicker(photoData => {
+                                    pendingWidgetContent = { type: 'image', size: `${widthDisplay.textContent}x${heightDisplay.textContent}`, content: photoData.path };
+                                    const infoSpan = document.createElement('span');
+                                    infoSpan.id = 'selection-info';
+                                    infoSpan.style.cssText = 'font-size:12px;color:#889;text-align:center;display:block;margin-top:-10px;margin-bottom:10px;';
+                                    infoSpan.textContent = `已选择：${photoData.title}`;
+                                    adderContainer.insertBefore(infoSpan, adderContainer.querySelector('#confirm-widget-btn'));
+                                });
+                            }
+                        } finally {
+                            selector.disabled = false;
+                            originalOption.textContent = originalText;
+                        }
                     }
                 });
                 
-                // [FIXED] 确认按钮的逻辑保持不变
+                // 确认按钮逻辑保持不变
                 adderContainer.querySelector('#confirm-widget-btn').addEventListener('click', () => {
                     const type = adderContainer.querySelector('#widget-type-selector').value;
                     const previewArea = adderContainer.querySelector('#new-widget-preview-area');
                     adderContainer.querySelector('#selection-info')?.remove();
-
                     if (pendingWidgetContent && pendingWidgetContent.type === 'image') {
                         previewArea.innerHTML = '';
                         const item = document.createElement('div');
@@ -6530,6 +6536,7 @@ const blob = b64toBlob(blobData.content, contentType);
                     previewArea.classList.toggle('has-widget', previewArea.childElementCount > 0);
                 });
             }
+
 
 
             // [V5 重构] 渲染网格，并集成新的可点击删除按钮
