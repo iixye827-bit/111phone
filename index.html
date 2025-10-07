@@ -6380,10 +6380,39 @@ const blob = b64toBlob(blobData.content, contentType);
             }
 
             
-            // [重构] 创建设置窗口, 包含模拟器
+            // [V5 重构] 创建设置窗口, 包含模拟器和按需数据加载
             function openLockscreenSettingsWindow() {
                 const modalId = 'lockscreen-settings-modal';
                 if (document.getElementById(modalId)) return;
+
+                // [新增] 按需加载 MemoryApp 数据的辅助函数
+                async function ensureMemoryDataIsLoaded() {
+                    // 如果 memoryCache 已被 MemoryApp 加载过，则直接返回 true
+                    if (memoryCache) return true;
+
+                    // 否则，独立加载一次数据
+                    const MEMORY_DATA_PATH = 'memory/data.json';
+                    const { data, error } = await fetchFromGithub(MEMORY_DATA_PATH);
+
+                    if (error) {
+                        alert(`加载相册数据失败: ${error}\n\n请先进入“记忆”功能初始化一次数据。`);
+                        return false;
+                    }
+
+                    const getInitialData = () => ({
+                        memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] },
+                        album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] }
+                    });
+
+                    // 将加载的数据赋给全局的 memoryCache，供后续使用
+                    memoryCache = data ? JSON.parse(b64_to_utf8(data.content)) : getInitialData();
+                    
+                    // 确保数据结构完整（从 MemoryApp 借鉴的健壮性代码）
+                    if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
+                    if (!memoryCache.album) memoryCache.album = { folders: [], items: [] };
+
+                    return true;
+                }
 
                 const modalOverlay = document.createElement('div');
                 modalOverlay.id = modalId;
@@ -6395,53 +6424,24 @@ const blob = b64toBlob(blobData.content, contentType);
                 
                 const settingsContainer = document.createElement('div');
                 settingsContainer.style.cssText = 'display: flex; flex-direction: column; height: 100%;';
-
                 const header = document.createElement('div');
                 header.className = 'modal-header';
                 header.innerHTML = `<div class="modal-title-group"><span>锁屏组件设置</span></div><button class="close-btn">&times;</button>`;
-                
                 const body = document.createElement('div');
                 body.className = 'modal-body';
                 body.style.paddingTop = '10px';
-
-                // [新增] 模拟手机屏幕
                 const phoneScreen = document.createElement('div');
                 phoneScreen.className = 'simulated-phone-screen';
-                
                 const gridContainer = document.createElement('div');
                 gridContainer.className = 'settings-grid';
                 phoneScreen.appendChild(gridContainer);
                 
-                // [重构] 新的添加器
                 const adderContainer = document.createElement('div');
                 adderContainer.className = 'component-adder';
                 adderContainer.innerHTML = `
                     <div class="adder-controls-row">
-                        <div class="adder-control-group">
-                            <label>尺寸 (宽x高)</label>
-                            <div class="size-selector">
-                                <div class="roller-container">
-                                    <button class="roller-btn" data-roller="width" data-dir="-1">-</button>
-                                    <span class="roller-display" id="width-display">1</span>
-                                    <button class="roller-btn" data-roller="width" data-dir="1">+</button>
-                                </div>
-                                <span>&times;</span>
-                                <div class="roller-container">
-                                    <button class="roller-btn" data-roller="height" data-dir="-1">-</button>
-                                    <span class="roller-display" id="height-display">1</span>
-                                    <button class="roller-btn" data-roller="height" data-dir="1">+</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="adder-control-group">
-                            <label>类型</label>
-                            <select id="widget-type-selector" class="modal-select">
-                                <option value="shortcut">快捷按钮</option>
-                                <option value="image">图片</option>
-                                <option value="memo">备忘录</option>
-                                <option value="html">HTML</option>
-                            </select>
-                        </div>
+                        <div class="adder-control-group"> <label>尺寸 (宽x高)</label> <div class="size-selector"> <div class="roller-container"> <button class="roller-btn" data-roller="width" data-dir="-1">-</button> <span class="roller-display" id="width-display">1</span> <button class="roller-btn" data-roller="width" data-dir="1">+</button> </div> <span>&times;</span> <div class="roller-container"> <button class="roller-btn" data-roller="height" data-dir="-1">-</button> <span class="roller-display" id="height-display">1</span> <button class="roller-btn" data-roller="height" data-dir="1">+</button> </div> </div> </div>
+                        <div class="adder-control-group"> <label>类型</label> <select id="widget-type-selector" class="modal-select"> <option value="shortcut">快捷按钮</option> <option value="image">图片</option> <option value="memo">备忘录</option> <option value="html">HTML</option> </select> </div>
                     </div>
                     <button id="confirm-widget-btn" class="modal-button">确认并生成</button>
                     <div id="new-widget-preview-area">将生成的组件拖入上方屏幕</div>
@@ -6453,124 +6453,84 @@ const blob = b64toBlob(blobData.content, contentType);
                 modalOverlay.appendChild(modalContent);
                 document.body.appendChild(modalOverlay);
                 
-                const closeModal = () => {
-                    closeAnyOpenWindow();
-                    modalOverlay.classList.remove('show');
-                    modalOverlay.addEventListener('transitionend', () => modalOverlay.remove(), { once: true });
-                };
+                const closeModal = () => { closeAnyOpenWindow(); modalOverlay.classList.remove('show'); modalOverlay.addEventListener('transitionend', () => modalOverlay.remove(), { once: true }); };
                 header.querySelector('.close-btn').onclick = closeModal;
                 modalOverlay.onclick = (e) => { if (e.target === modalOverlay) closeModal(); };
                 
                 renderSettingsGrid(gridContainer);
                 
-                const widthDisplay = adderContainer.querySelector('#width-display');
-                const heightDisplay = adderContainer.querySelector('#height-display');
-                adderContainer.querySelectorAll('.roller-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const targetRoller = btn.dataset.roller;
-                        const direction = parseInt(btn.dataset.dir, 10);
-                        const display = targetRoller === 'width' ? widthDisplay : heightDisplay;
-                        const max = targetRoller === 'width' ? 4 : 8;
-                        let newValue = parseInt(display.textContent, 10) + direction;
-                        if (newValue < 1) newValue = 1; if (newValue > max) newValue = max;
-                        display.textContent = newValue;
-                    });
-                });
-                // [V5 新增] 监听类型选择器，当选择“图片”时立即触发选择流程
-                adderContainer.querySelector('#widget-type-selector').addEventListener('change', function() {
+                const widthDisplay = adderContainer.querySelector('#width-display'), heightDisplay = adderContainer.querySelector('#height-display');
+                adderContainer.querySelectorAll('.roller-btn').forEach(btn => btn.addEventListener('click', () => { const t = btn.dataset.roller, d = parseInt(btn.dataset.dir, 10), el = t === 'width' ? widthDisplay : heightDisplay, max = t === 'width' ? 4 : 8; let val = parseInt(el.textContent, 10) + d; el.textContent = Math.max(1, Math.min(val, max)); }));
+
+                // [FIXED] 修改类型选择器的事件监听器
+                adderContainer.querySelector('#widget-type-selector').addEventListener('change', async function() {
                     if (this.value === 'image') {
-                        // 清空预览区和已选择信息，因为要开始新的选择了
                         const previewArea = adderContainer.querySelector('#new-widget-preview-area');
                         previewArea.innerHTML = '将生成的组件拖入上方屏幕';
                         previewArea.classList.remove('has-widget');
                         pendingWidgetContent = null;
+                        adderContainer.querySelector('#selection-info')?.remove();
+
+                        this.disabled = true;
+                        const originalOption = this.options[this.selectedIndex];
+                        originalOption.textContent = '加载相册中...';
+
+                        const success = await ensureMemoryDataIsLoaded();
                         
-                        const existingInfo = adderContainer.querySelector('#selection-info');
-                        if(existingInfo) existingInfo.remove();
+                        this.disabled = false;
+                        originalOption.textContent = '图片';
+                        
+                        if (!success) return; // 如果加载失败，则中断流程
 
-                        // 打开相册选择器
-                        showAlbumPicker(photoData => { // photoData: {path, title}
-                            // 当用户选好图片后，设置待处理内容
-                            const width = widthDisplay.textContent;
-                            const height = heightDisplay.textContent;
-                            pendingWidgetContent = {
-                                type: 'image',
-                                size: `${width}x${height}`,
-                                content: photoData.path
-                            };
-
-                            // 在“确认”按钮上方显示已选择信息
+                        showAlbumPicker(photoData => {
+                            pendingWidgetContent = { type: 'image', size: `${widthDisplay.textContent}x${heightDisplay.textContent}`, content: photoData.path };
                             const infoSpan = document.createElement('span');
                             infoSpan.id = 'selection-info';
-                            infoSpan.style.fontSize = '12px';
-                            infoSpan.style.color = '#889';
-                            infoSpan.style.textAlign = 'center';
-                            infoSpan.style.display = 'block';
-                            infoSpan.style.marginTop = '-10px';
-                            infoSpan.style.marginBottom = '10px';
+                            infoSpan.style.cssText = 'font-size:12px;color:#889;text-align:center;display:block;margin-top:-10px;margin-bottom:10px;';
                             infoSpan.textContent = `已选择：${photoData.title}`;
-                            
-                            const confirmBtn = adderContainer.querySelector('#confirm-widget-btn');
-                            adderContainer.insertBefore(infoSpan, confirmBtn);
+                            adderContainer.insertBefore(infoSpan, adderContainer.querySelector('#confirm-widget-btn'));
                         });
                     }
                 });
-
-
-                 adderContainer.querySelector('#confirm-widget-btn').addEventListener('click', () => {
-                    const width = widthDisplay.textContent;
-                    const height = heightDisplay.textContent;
+                
+                // [FIXED] 确认按钮的逻辑保持不变
+                adderContainer.querySelector('#confirm-widget-btn').addEventListener('click', () => {
                     const type = adderContainer.querySelector('#widget-type-selector').value;
-                    const size = `${width}x${height}`;
                     const previewArea = adderContainer.querySelector('#new-widget-preview-area');
+                    adderContainer.querySelector('#selection-info')?.remove();
 
-                    // 清空之前的选择提示信息
-                    const existingInfo = adderContainer.querySelector('#selection-info');
-                    if(existingInfo) existingInfo.remove();
-
-                    // [V5 核心逻辑]
                     if (pendingWidgetContent && pendingWidgetContent.type === 'image') {
-                        // 情况一：已经通过选择器暂存了图片信息
-                        previewArea.innerHTML = ''; // 清空预览区
-                        const previewItem = document.createElement('div');
-                        previewItem.className = 'widget-preview-item';
-                        previewItem.style.padding = '0';
-                        previewItem.style.overflow = 'hidden';
-                        previewItem.dataset.widgetSize = pendingWidgetContent.size; // 使用暂存的尺寸
-                        previewItem.dataset.widgetType = 'image';
-                        previewItem.dataset.widgetContent = pendingWidgetContent.content; // 暂存的图片路径
-                        previewItem.draggable = true;
-                        
-                        const img = document.createElement('img');
-                        img.style.cssText = 'width:100%; height:100%; object-fit:cover; pointer-events:none;';
-                        getSecureFileUrl(pendingWidgetContent.content).then(url => { if(url) img.src = url; });
-                        
-                        previewItem.appendChild(img);
-                        previewItem.addEventListener('mousedown', handleDragStart);
-                        previewItem.addEventListener('touchstart', handleDragStart, { passive: false });
-                        previewArea.appendChild(previewItem);
-                        pendingWidgetContent = null; // 清空暂存
+                        previewArea.innerHTML = '';
+                        const item = document.createElement('div');
+                        item.className = 'widget-preview-item';
+                        item.style.cssText = 'padding:0; overflow:hidden;';
+                        Object.assign(item.dataset, { widgetSize: pendingWidgetContent.size, widgetType: 'image', widgetContent: pendingWidgetContent.content });
+                        item.draggable = true;
+                        item.innerHTML = `<img style="width:100%;height:100%;object-fit:cover;pointer-events:none;">`;
+                        getSecureFileUrl(pendingWidgetContent.content).then(url => { if(url) item.querySelector('img').src = url; });
+                        item.addEventListener('mousedown', handleDragStart);
+                        item.addEventListener('touchstart', handleDragStart, { passive: false });
+                        previewArea.appendChild(item);
+                        pendingWidgetContent = null;
                     } else if (type !== 'image') {
-                        // 情况二：处理非图片类型的其他组件
+                        const size = `${widthDisplay.textContent}x${heightDisplay.textContent}`;
                         const typeTextMap = { 'shortcut': '快捷方式', 'memo': '备忘录', 'html': 'HTML' };
                         previewArea.innerHTML = '';
-                        const previewItem = document.createElement('div');
-                        previewItem.className = 'widget-preview-item';
-                        previewItem.dataset.widgetSize = size;
-                        previewItem.dataset.widgetType = type;
-                        previewItem.draggable = true;
-                        previewItem.textContent = `${size} ${typeTextMap[type]}`;
-                        previewItem.addEventListener('mousedown', handleDragStart);
-                        previewItem.addEventListener('touchstart', handleDragStart, { passive: false });
-                        previewArea.appendChild(previewItem);
+                        const item = document.createElement('div');
+                        item.className = 'widget-preview-item';
+                        Object.assign(item.dataset, { widgetSize: size, widgetType: type });
+                        item.draggable = true;
+                        item.textContent = `${size} ${typeTextMap[type]}`;
+                        item.addEventListener('mousedown', handleDragStart);
+                        item.addEventListener('touchstart', handleDragStart, { passive: false });
+                        previewArea.appendChild(item);
                     } else {
-                        // 情况三：选择了图片但还没选定图片，提示用户
-                        alert('请先从弹出的窗口中选择一张图片。');
+                        alert('请等待相册加载完毕后，从弹出的窗口中选择一张图片。');
                     }
-
                     previewArea.classList.toggle('has-widget', previewArea.childElementCount > 0);
                 });
             }
+
 
             // [V5 重构] 渲染网格，并集成新的可点击删除按钮
             async function renderSettingsGrid(gridContainer) {
