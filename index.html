@@ -6587,14 +6587,19 @@ const blob = b64toBlob(blobData.content, contentType);
                 const widthDisplay = adderContainer.querySelector('#width-display'), heightDisplay = adderContainer.querySelector('#height-display');
                 adderContainer.querySelectorAll('.roller-btn').forEach(btn => btn.addEventListener('click', () => { const t = btn.dataset.roller, d = parseInt(btn.dataset.dir, 10), el = t === 'width' ? widthDisplay : heightDisplay, max = t === 'width' ? 4 : 8; let val = parseInt(el.textContent, 10) + d; el.textContent = Math.max(1, Math.min(val, max)); }));
 
-                // [V7 优化] 类型选择器的事件监听器
+                // [V7 优化 & V8 缺陷修复] 类型选择器的事件监听器
                 adderContainer.querySelector('#widget-type-selector').addEventListener('change', async function() {
-                    if (this.value !== 'image') return;
-                    
+                    if (this.value !== 'image') {
+                        // 当选择非图片类型时，确保清理任何图片相关的状态
+                        pendingWidgetContent = null;
+                        adderContainer.querySelector('#selection-info')?.remove();
+                        return;
+                    }
+
                     const selector = this;
                     const originalSelectedIndex = selector.selectedIndex; // 记录原始选项
 
-                    // 清理工作
+                    // 预先清理UI状态
                     adderContainer.querySelector('#new-widget-preview-area').innerHTML = '将生成的组件拖入上方屏幕';
                     adderContainer.querySelector('#new-widget-preview-area').classList.remove('has-widget');
                     pendingWidgetContent = null;
@@ -6605,12 +6610,17 @@ const blob = b64toBlob(blobData.content, contentType);
                         console.log('相册加载已取消');
                     };
 
+                    // 显示加载指示器
                     LoadingIndicator.show('正在加载相册...', onCancel);
                     
+                    // 异步加载数据
                     const { success, reason } = await ensureMemoryDataIsLoaded(LoadingIndicator.getSignal());
+
+                    // 【核心修复】无论成功与否，都要先隐藏加载指示器，再执行后续操作
                     LoadingIndicator.hide();
 
                     if (success) {
+                        // 成功加载数据后，才显示相册选择器
                         showAlbumPicker(photoData => {
                             pendingWidgetContent = { type: 'image', size: `${widthDisplay.textContent}x${heightDisplay.textContent}`, content: photoData.path };
                             const infoSpan = document.createElement('span');
@@ -6619,10 +6629,12 @@ const blob = b64toBlob(blobData.content, contentType);
                             infoSpan.textContent = `已选择：${photoData.title}`;
                             adderContainer.insertBefore(infoSpan, adderContainer.querySelector('#confirm-widget-btn'));
                         });
-                    } else if(reason !== 'cancelled') {
-                        selector.selectedIndex = originalSelectedIndex; // 加载失败也恢复选择
+                    } else if (reason !== 'cancelled') {
+                        // 如果不是用户主动取消，而是加载失败，则恢复下拉框的原始选择
+                        selector.selectedIndex = originalSelectedIndex;
                     }
                 });
+
                 
                 // 确认按钮逻辑保持不变
                 adderContainer.querySelector('#confirm-widget-btn').addEventListener('click', () => {
