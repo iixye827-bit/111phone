@@ -5263,7 +5263,7 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
 
 
 
-        return {
+return {
             open: () => {
                 if (!checkConfig(true)) { document.getElementById('settingsModal').classList.add('show'); return; }
                 ui.modal.classList.add('show');
@@ -5321,6 +5321,10 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                 ui.uploadBtn.addEventListener("click", uploadFile);
             },
             getAlbumItems: () => memoryCache ? memoryCache.album.items : [],
+            // [V9 新增] 暴露 syncWithGithub 方法给外部调用
+            syncWithGithub,
+            // [V9 新增] 暴露一个安全的 getter 来访问内部缓存
+            getCache: () => memoryCache,
         };
     })();
     // ===== [END] MEMORY APP LOGIC =====
