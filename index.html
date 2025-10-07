@@ -5941,7 +5941,7 @@ const blob = b64toBlob(blobData.content, contentType);
                 await saveGlobalConfig(`Add widget to cell ${cellIndex}`);
                 renderLockscreenWidgets();
                 closeAnyOpenWindow();
-                const settingsWindow = document.getElementById('fpw-lockscreen-settings');
+                const settingsWindow = document.getElementById('lockscreen-settings-modal');
                 if(settingsWindow) {
                     const grid = settingsWindow.querySelector('.settings-grid');
                     renderSettingsGrid(grid);
@@ -5952,20 +5952,39 @@ const blob = b64toBlob(blobData.content, contentType);
                  delete currentConfig.lockscreenWidgets[cellIndex];
                  await saveGlobalConfig(`Delete widget from cell ${cellIndex}`);
                  renderLockscreenWidgets();
-                 const settingsWindow = document.getElementById('fpw-lockscreen-settings');
+                 const settingsWindow = document.getElementById('lockscreen-settings-modal');
                  if(settingsWindow) {
                     const grid = settingsWindow.querySelector('.settings-grid');
                     renderSettingsGrid(grid);
                  }
             }
 
-             function openLockscreenSettingsWindow() {
-                const windowId = 'fpw-lockscreen-settings';
-                if (document.getElementById(windowId)) return;
+            // [修正] 使用标准 Modal 弹窗替代浮动窗口
+            function openLockscreenSettingsWindow() {
+                const modalId = 'lockscreen-settings-modal';
+                if (document.getElementById(modalId)) return;
 
+                const modalOverlay = document.createElement('div');
+                modalOverlay.id = modalId;
+                modalOverlay.className = 'modal-overlay show';
+                modalOverlay.style.zIndex = '1001'; // 高于父级弹窗
+
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+                modalContent.style.maxWidth = '420px';
+                modalContent.style.height = '70vh';
+                
                 const settingsContainer = document.createElement('div');
                 settingsContainer.style.cssText = 'display: flex; flex-direction: column; height: 100%;';
                 
+                const header = document.createElement('div');
+                header.className = 'modal-header';
+                header.innerHTML = `<div class="modal-title-group"><span>锁屏组件设置</span></div><button class="close-btn">&times;</button>`;
+                
+                const body = document.createElement('div');
+                body.className = 'modal-body';
+                body.style.paddingTop = '10px';
+
                 const gridContainer = document.createElement('div');
                 gridContainer.className = 'settings-grid';
                 gridContainer.style.flexGrow = '1';
@@ -5981,7 +6000,20 @@ const blob = b64toBlob(blobData.content, contentType);
                         <div class="palette-item" data-widget-size="4x2" data-widget-type="image">图片 (4x2)</div>
                     </div>`;
 
-                settingsContainer.append(gridContainer, paletteContainer);
+                body.append(gridContainer, paletteContainer);
+                settingsContainer.append(header, body);
+                modalContent.appendChild(settingsContainer);
+                modalOverlay.appendChild(modalContent);
+                document.body.appendChild(modalOverlay);
+
+                const closeModal = () => {
+                    closeAnyOpenWindow();
+                    modalOverlay.classList.remove('show');
+                    modalOverlay.addEventListener('transitionend', () => modalOverlay.remove(), { once: true });
+                };
+
+                header.querySelector('.close-btn').onclick = closeModal;
+                modalOverlay.onclick = (e) => { if(e.target === modalOverlay) closeModal(); };
                 
                 renderSettingsGrid(gridContainer);
                 
@@ -5989,19 +6021,6 @@ const blob = b64toBlob(blobData.content, contentType);
                     item.addEventListener('mousedown', handleDragStart);
                     item.addEventListener('touchstart', handleDragStart, { passive: false });
                 });
-                
-                const winEl = document.createElement('div');
-                winEl.className = 'floating-project-window visible';
-                winEl.id = windowId;
-                winEl.style.cssText = 'z-index: 2020; width: 380px; height: 650px;';
-                winEl.innerHTML = `
-                    <div class="fpw-header"><span class="fpw-title">锁屏组件设置</span>
-                    <div class="fpw-controls"><button class="fpw-close" title="关闭">×</button></div></div>
-                    <div class="fpw-content"></div>`;
-                winEl.querySelector('.fpw-content').appendChild(settingsContainer);
-                document.getElementById('floating-projects-container').appendChild(winEl);
-                
-                winEl.querySelector('.fpw-close').addEventListener('click', () => { closeAnyOpenWindow(); winEl.remove(); });
             }
 
             function renderSettingsGrid(gridContainer) {
@@ -6027,12 +6046,6 @@ const blob = b64toBlob(blobData.content, contentType);
                          const ph = document.createElement('div');
                          ph.className = 'widget-placeholder';
                          ph.textContent = {image: '🖼️', memo: '📝', shortcut: '🔗'}[w.type];
-                         
-                         const sizeMap = {'1x1': [1,1], '2x2': [2,2], '4x2': [4,2]};
-                         const [cols, rows] = sizeMap[w.size];
-                         
-                         ph.style.gridColumn = `span ${cols}`;
-                         ph.style.gridRow = `span ${rows}`;
                          
                          const del = document.createElement('button');
                          del.className = 'widget-placeholder-delete';
@@ -6067,6 +6080,7 @@ const blob = b64toBlob(blobData.content, contentType);
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
                 ghostEl.style.left = `${clientX - ghostEl.offsetWidth/2}px`;
                 ghostEl.style.top = `${clientY - ghostEl.offsetHeight/2}px`;
+                ghostEl.style.zIndex = '9999'; //确保虚影在最上层
                 
                 document.addEventListener('mousemove', handleDragMove);
                 document.addEventListener('mouseup', handleDragEnd, { once: true });
@@ -6105,7 +6119,7 @@ const blob = b64toBlob(blobData.content, contentType);
                     const newWidget = { id: Date.now(), ...draggedWidgetInfo };
 
                     const onSelectContent = (data) => {
-                        if (typeof data === 'object') {
+                        if (typeof data === 'object' && data !== null) {
                             newWidget.content = data.content;
                             newWidget.text = data.text;
                         } else {
@@ -6143,7 +6157,6 @@ const blob = b64toBlob(blobData.content, contentType);
                 return true;
             }
 
-            // [恢复] 正确的、分离的函数
             function applyMode(enable) {
                 const homeScreenPage = document.getElementById('homeScreenPage');
                 const mainWrapper = document.getElementById('mainWrapper');
@@ -6173,7 +6186,7 @@ const blob = b64toBlob(blobData.content, contentType);
             }
 
             function handleTouchStart(e) {
-                if (!isEnabled) return;
+                if (!isEnabled || e.target.closest('.widget-placeholder, .palette-item')) return;
                 ui.slider.style.transition = 'none'; 
                 startX = e.touches[0].clientX;
                 const transformMatrix = window.getComputedStyle(ui.slider).transform;
@@ -6228,6 +6241,7 @@ const blob = b64toBlob(blobData.content, contentType);
 
             return {
                 init() {
+                    if (!currentConfig.settings) currentConfig.settings = {};
                     const mobileSettings = currentConfig.settings.mobileMode || { enabled: false };
                     ui.toggle.checked = mobileSettings.enabled;
                     if (!currentConfig.lockscreenWidgets) currentConfig.lockscreenWidgets = {};
@@ -6239,6 +6253,7 @@ const blob = b64toBlob(blobData.content, contentType);
                 }
             };
         })();
+
 
 
         // 初始化手机模式管理器
