@@ -1491,7 +1491,7 @@ body.dark-mode .memo-popup-content {
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
 /* =============================================================== */
-/* ============= [新增] 锁屏设置 V3.1 响应式布局 ================ */
+/* ============= [新增] 锁屏设置 V3 交互样式 ================ */
 /* =============================================================== */
 /* 整体添加器布局 */
 .component-adder {
@@ -1501,39 +1501,32 @@ body.dark-mode .memo-popup-content {
     flex-direction: column;
     gap: 15px;
 }
-.component-adder > label {
+.component-adder label {
     font-size: 14px;
     font-weight: 600;
     color: #889;
     padding-left: 5px;
 }
 
-/* 新的响应式配置行 */
-.widget-config-row {
+/* 尺寸选择器 */
+.size-selector {
     display: flex;
-    flex-wrap: wrap; /* 关键：在小屏上自动换行 */
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    gap: 15px;
     padding: 10px;
     border-radius: 12px;
     background: var(--bg-day-element);
     box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day);
 }
-body.dark-mode .widget-config-row {
+body.dark-mode .size-selector {
     background: var(--bg-night-element);
     box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night);
 }
-
-.widget-config-row > * {
-    margin: 4px 0; /* 为换行时提供垂直间距 */
-}
-
-/* 尺寸选择器 (内部) */
 .roller-container {
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-shrink: 0;
 }
 .roller-btn {
     width: 32px;
@@ -1565,21 +1558,20 @@ body.dark-mode .roller-btn:active {
     min-width: 25px;
     text-align: center;
 }
-.widget-config-row > span {
+.size-selector > span {
     font-size: 20px;
     font-weight: 500;
     color: #aaa;
-    flex-shrink: 0;
 }
 
-/* 类型选择器与确认按钮 */
-.widget-config-row .modal-select {
-    flex-grow: 1; /* 关键：让选择框占据剩余空间 */
-    min-width: 120px; /* 防止被过度压缩 */
+/* 类型选择器&确认按钮 */
+.type-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
-.widget-config-row .modal-button {
-    flex-shrink: 0;
-    padding: 12px 18px; /* 调整按钮内边距以适应行内布局 */
+#confirm-widget-btn {
+    margin-top: 5px;
 }
 
 /* 新组件预览区 */
@@ -1619,7 +1611,6 @@ body.dark-mode .widget-preview-item {
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
-
 /* =============================================================== */
 /* ============= [新增] 锁屏设置 V4 模拟器样式 ================ */
 /* =============================================================== */
@@ -1690,8 +1681,64 @@ body.dark-mode .simulated-phone-screen {
     height: 85vh !important;
 }
 
+/* ========================================================================= */
+/* ============== [V5 新增] 锁屏组件添加器紧凑布局样式 =============== */
+/* ========================================================================= */
+.adder-controls-row {
+    display: flex;
+    flex-wrap: nowrap; /* 强制不换行 */
+    gap: 12px;
+    align-items: flex-end; /* 底部对齐，使整体更整洁 */
+}
+
+.adder-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* 减小标签和控件之间的间距 */
+}
+
+.adder-control-group label {
+    font-size: 13px; /* 缩小标签字体 */
+    font-weight: 500;
+    color: #889;
+    padding-left: 2px;
+}
+
+/* 精确调整尺寸选择器内部 */
+.adder-controls-row .size-selector {
+    padding: 6px 8px; /* 减小内边距 */
+    gap: 8px;
+}
+.adder-controls-row .roller-container {
+    gap: 6px;
+}
+.adder-controls-row .roller-btn {
+    width: 26px; /* 缩小按钮 */
+    height: 26px;
+    font-size: 18px; /* 减小按钮内字体 */
+}
+.adder-controls-row .roller-display {
+    font-size: 20px; /* 减小数字字体 */
+    min-width: 20px;
+}
+.adder-controls-row .size-selector > span {
+    font-size: 16px;
+}
+
+/* 精确调整类型选择器（下拉框） */
+.adder-controls-row .modal-select {
+    padding: 6px 10px; /* 减小内边距以匹配高度 */
+    font-size: 14px;
+    height: 40px; /* 固定高度以对齐 */
+    flex-grow: 1; /* 让其填充剩余空间 */
+    min-width: 110px; /* 设置最小宽度防止被过度压缩 */
+}
+/* ========================================================================= */
+/* ============================== [新增结束] =============================== */
+/* ========================================================================= */
 
     </style>
+
     <style id="custom-jelly-ball-styles"></style>
 </head>
 <body>
@@ -6193,33 +6240,36 @@ const blob = b64toBlob(blobData.content, contentType);
                 const adderContainer = document.createElement('div');
                 adderContainer.className = 'component-adder';
                 adderContainer.innerHTML = `
-                    <label>创建新组件</label>
-                    <div class="widget-config-row">
-                        <!-- 尺寸选择器部分 -->
-                        <div class="roller-container">
-                            <button class="roller-btn" data-roller="width" data-dir="-1">-</button>
-                            <span class="roller-display" id="width-display">1</span>
-                            <button class="roller-btn" data-roller="width" data-dir="1">+</button>
+                    <div class="adder-controls-row">
+                        <div class="adder-control-group">
+                            <label>尺寸 (宽x高)</label>
+                            <div class="size-selector">
+                                <div class="roller-container">
+                                    <button class="roller-btn" data-roller="width" data-dir="-1">-</button>
+                                    <span class="roller-display" id="width-display">1</span>
+                                    <button class="roller-btn" data-roller="width" data-dir="1">+</button>
+                                </div>
+                                <span>&times;</span>
+                                <div class="roller-container">
+                                    <button class="roller-btn" data-roller="height" data-dir="-1">-</button>
+                                    <span class="roller-display" id="height-display">1</span>
+                                    <button class="roller-btn" data-roller="height" data-dir="1">+</button>
+                                </div>
+                            </div>
                         </div>
-                        <span>&times;</span>
-                        <div class="roller-container">
-                            <button class="roller-btn" data-roller="height" data-dir="-1">-</button>
-                            <span class="roller-display" id="height-display">1</span>
-                            <button class="roller-btn" data-roller="height" data-dir="1">+</button>
+                        <div class="adder-control-group">
+                            <label>类型</label>
+                            <select id="widget-type-selector" class="modal-select">
+                                <option value="shortcut">快捷按钮</option>
+                                <option value="image">图片</option>
+                                <option value="memo">备忘录</option>
+                                <option value="html">HTML</option>
+                            </select>
                         </div>
-                        <!-- 类型选择器部分 -->
-                        <select id="widget-type-selector" class="modal-select">
-                           <option value="shortcut">快捷按钮</option>
-                           <option value="image">图片</option>
-                           <option value="memo">备忘录</option>
-                           <option value="html">HTML</option>
-                        </select>
-                        <!-- 确认按钮部分 -->
-                        <button id="confirm-widget-btn" class="modal-button">生成</button>
                     </div>
+                    <button id="confirm-widget-btn" class="modal-button">确认并生成</button>
                     <div id="new-widget-preview-area">将生成的组件拖入上方屏幕</div>
                 `;
-
 
                 body.append(phoneScreen, adderContainer);
                 settingsContainer.append(header, body);
