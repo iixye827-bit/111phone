@@ -147,5 +147,14 @@
     "jellyBallCss": ""
   },
   "themePresets": [],
-  "lockscreenWidgets": {}
+  "lockscreenWidgets": {
+    "8": [
+      {
+        "id": 1759896273693,
+        "size": "1x1",
+        "type": "image",
+        "content": "memory/photos/1759858920827_IMG_6319.jpeg"
+      }
+    ]
+  }
 }
