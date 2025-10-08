@@ -10,13 +10,13 @@
   "settings": {
     "paginationEnabled": true,
     "jellyBall": {
-      "enabled": true,
+      "enabled": false,
       "swipeBack": true,
       "functions": {},
       "customCSS": ""
     },
     "mobileMode": {
-      "enabled": false
+      "enabled": true
     }
   },
   "themePresets": [],
