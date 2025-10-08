@@ -29,6 +29,15 @@
         "shape": "square",
         "content": "memory/photos/1759762928721_IMG_6060.jpeg"
       }
+    ],
+    "8": [
+      {
+        "id": 1759919829239,
+        "size": "1x1",
+        "type": "image",
+        "shape": "circle",
+        "content": "memory/photos/1759858912776_IMG_6320.jpeg"
+      }
     ]
   }
 }
