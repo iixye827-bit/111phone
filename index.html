@@ -6378,25 +6378,26 @@ const blob = b64toBlob(blobData.content, contentType);
             function closeAnyOpenWindow() {
                 if (currentPickerWindow) {
                     const windowContainerToClose = currentPickerWindow;
+                    // [核心修复] 将引用立即置空，防止后续逻辑误判
+                    currentPickerWindow = null; 
+
                     const innerWindow = windowContainerToClose.querySelector('.floating-project-window');
 
-                    // 如果内部窗口存在，则触发它的关闭动画
-                    if (innerWindow) {
+                    if (innerWindow && innerWindow.classList.contains('visible')) {
+                        // 如果窗口可见，则执行平滑的关闭动画
                         innerWindow.classList.remove('visible');
-                        
-                        // 监听动画结束事件，在动画完成后再安全地移除整个容器
                         innerWindow.addEventListener('transitionend', () => {
+                            // 动画结束后，无论如何都移除整个容器
                             if (windowContainerToClose.parentNode) {
                                 windowContainerToClose.remove();
                             }
                         }, { once: true });
                     } else {
-                        // 如果没有内部窗口，作为备用方案直接移除
-                        windowContainerToClose.remove();
+                        // 如果窗口不存在或已隐藏，则直接、同步地移除容器
+                        if (windowContainerToClose.parentNode) {
+                            windowContainerToClose.remove();
+                        }
                     }
-
-                    // 立即将引用设为 null，以便新窗口可以被创建
-                    currentPickerWindow = null;
                 }
             }
 
