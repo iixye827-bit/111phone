@@ -11,7 +11,7 @@
     "paginationEnabled": true,
     "jellyBall": {
       "enabled": true,
-      "swipeBack": false,
+      "swipeBack": true,
       "functions": {},
       "customCSS": ""
     },
