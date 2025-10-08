@@ -6632,15 +6632,16 @@ const blob = b64toBlob(blobData.content, contentType);
                         requestAnimationFrame(() => overlay.classList.add('show'));
                     }
 
-                    function hide() {
-                        if (!overlay) return;
-                        const overlayToRemove = overlay; // [修复] 捕获当前的 DOM 元素
-                        overlayToRemove.classList.remove('show');
-                        // [修复] 在事件监听器中使用捕获的元素，而不是会被置空的变量
-                        overlayToRemove.addEventListener('transitionend', () => overlayToRemove.remove(), { once: true });
-                        overlay = null; // 立即将主变量置空，防止重复调用
-                        abortController = null;
-                    }
+                        function hide() {
+                            if (!overlay) return;
+                            const overlayToRemove = overlay; // [核心修复] 捕获当前的 DOM 元素
+                            overlayToRemove.classList.remove('show');
+                            // [核心修复] 在事件监听器中使用捕获的元素，而不是会被置空的变量
+                            overlayToRemove.addEventListener('transitionend', () => overlayToRemove.remove(), { once: true });
+                            overlay = null; // 立即将主变量置空，防止重复调用
+                            abortController = null;
+                        }
+
 
 
                     return {
