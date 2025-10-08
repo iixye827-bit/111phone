@@ -28,6 +28,14 @@
         "type": "image",
         "content": "memory/photos/1759762928721_IMG_6060.jpeg"
       }
+    ],
+    "20": [
+      {
+        "id": 1759912273911,
+        "size": "1x1",
+        "type": "html",
+        "content": "<!DOCTYPE html>\n<html>\n<head>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<style>\n    body, html {\n        margin: 0;\n        padding: 0;\n        width: 100%;\n        height: 100%;\n        display: flex;\n        flex-direction: column;\n        align-items: center;\n        justify-content: center;\n        background: linear-gradient(135deg, #87CEEB, #B0E0E6);\n        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n        color: white;\n        text-shadow: 1px 1px 3px rgba(0,0,0,0.2);\n        overflow: hidden;\n        border-radius: 16px; /* 匹配您的小组件圆角 */\n    }\n    .weather-icon {\n        /* 使用vw单位实现响应式字体大小，5vw表示字体大小为视口宽度的5% */\n        /* min()函数确保在非常大的容器中字体也不会过大 */\n        font-size: min(10vw, 48px); \n        line-height: 1;\n    }\n    .temperature {\n        font-size: min(8vw, 36px);\n        font-weight: 700;\n        margin-top: 5px;\n    }\n</style>\n</head>\n<body>\n    <div class=\"weather-icon\">☀️</div>\n    <div class=\"temperature\">25°</div>\n</body>\n</html>"
+      }
     ]
   }
 }
