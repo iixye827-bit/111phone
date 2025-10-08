@@ -38,6 +38,15 @@
         "shape": "circle",
         "content": "memory/photos/1759858912776_IMG_6320.jpeg"
       }
+    ],
+    "12": [
+      {
+        "id": 1759919834857,
+        "size": "1x1",
+        "type": "image",
+        "shape": "circle",
+        "content": "memory/photos/1759858912776_IMG_6320.jpeg"
+      }
     ]
   }
 }
