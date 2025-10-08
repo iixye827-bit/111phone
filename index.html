@@ -6238,25 +6238,34 @@ const blob = b64toBlob(blobData.content, contentType);
                         });
                         widgetEl.appendChild(img);
                         break;
+                    
+                    // [核心修改] 重写备忘录组件的渲染逻辑
                     case 'memo':
                         const memo = memoryCache.memo.notes.find(n => n.id === widgetConfig.content);
-                        widgetEl.classList.add('widget-memo');
-                        widgetEl.style.cursor = 'pointer';
-
                         if (memo) {
-                            // [核心修改] 处理1x1尺寸的特殊显示
-                            if (widgetConfig.size === '1x1') {
-                                widgetEl.textContent = '✉';
-                                widgetEl.style.fontSize = '24px'; // 让图标更清晰
-                                widgetEl.style.fontFamily = 'Arial, sans-serif'; // 确保是字符而非Emoji
-                            } else {
-                                widgetEl.innerHTML = `<div class="widget-memo-title">${memo.title || '无标题'}</div>`;
-                            }
+                            widgetEl.style.cursor = 'pointer';
                             widgetEl.onclick = () => showMemoPopup(widgetConfig.content);
+
+                            // 判断尺寸
+                            if (widgetConfig.size === '1x1') {
+                                // 1x1 尺寸显示图标
+                                widgetEl.innerHTML = '✉';
+                                widgetEl.style.fontSize = '24px'; // 适当放大图标
+                                widgetEl.style.fontFamily = 'Arial, sans-serif'; // 确保是字符而不是Emoji
+                            } else {
+                                // 其他尺寸仅显示标题
+                                widgetEl.classList.add('widget-memo');
+                                widgetEl.innerHTML = `<div class="widget-memo-title">${memo.title || '无标题'}</div>`;
+                                // 为了垂直居中，移除内容区并调整样式
+                                widgetEl.style.justifyContent = 'center';
+                                widgetEl.style.alignItems = 'center';
+                                widgetEl.querySelector('.widget-memo-title').style.textAlign = 'center';
+                            }
                         } else {
                             widgetEl.textContent = '备忘录未找到';
                         }
                         break;
+
                     case 'shortcut':
                         const buttonConfig = findButtonConfigByHref(widgetConfig.content);
                         widgetEl.classList.add('widget-shortcut');
@@ -6368,17 +6377,24 @@ const blob = b64toBlob(blobData.content, contentType);
                 createPickerWindow('选择一张图片', grid);
             }
 
-            function showMemoPicker(onSelect) {
+            // [新增] 显示备忘录选择器
+            function showMemoPicker(onSelectCallback) {
                 const list = document.createElement('div');
                 list.className = 'picker-list';
                 if (!memoryCache.memo.notes || memoryCache.memo.notes.length === 0) {
-                    list.textContent = '没有备忘录。';
+                    list.textContent = '没有备忘录。请先在“记忆”功能中创建。';
                 } else {
-                    memoryCache.memo.notes.forEach(note => {
+                    // 按时间倒序排列
+                    const sortedNotes = [...memoryCache.memo.notes].sort((a, b) => b.timestamp - a.timestamp);
+                    sortedNotes.forEach(note => {
                         const itemEl = document.createElement('div');
                         itemEl.className = 'picker-item';
                         itemEl.textContent = note.title || '无标题';
-                        itemEl.onclick = () => onSelect(note.id);
+                        itemEl.onclick = () => {
+                             // 选中后，关闭悬浮窗并执行回调
+                            closeAnyOpenWindow();
+                            onSelectCallback(note); // 传递整个note对象
+                        };
                         list.appendChild(itemEl);
                     });
                 }
@@ -6648,7 +6664,7 @@ const blob = b64toBlob(blobData.content, contentType);
                 phoneScreen.appendChild(gridContainer);
                 const adderContainer = document.createElement('div');
                 adderContainer.className = 'component-adder';
-                adderContainer.innerHTML = `
+                                adderContainer.innerHTML = `
                     <div class="adder-controls-row">
                         <div class="adder-control-group"> <label>尺寸 (宽x高)</label> <div class="size-selector"> <div class="roller-container"> <button class="roller-btn" data-roller="width" data-dir="-1">-</button> <span class="roller-display" id="width-display">1</span> <button class="roller-btn" data-roller="width" data-dir="1">+</button> </div> <span>&times;</span> <div class="roller-container"> <button class="roller-btn" data-roller="height" data-dir="-1">-</button> <span class="roller-display" id="height-display">1</span> <button class="roller-btn" data-roller="height" data-dir="1">+</button> </div> </div> </div>
                         <div class="adder-control-group"> <label>类型</label> <select id="widget-type-selector" class="modal-select"> <option value="shortcut">快捷按钮</option> <option value="image">图片</option> <option value="memo">备忘录</option> <option value="html">HTML</option> </select> </div>
@@ -6656,6 +6672,7 @@ const blob = b64toBlob(blobData.content, contentType);
                     <button id="confirm-widget-btn" class="modal-button">确认并生成</button>
                     <div id="new-widget-preview-area">将生成的组件拖入上方屏幕</div>
                 `;
+
                 body.append(phoneScreen, adderContainer);
                 settingsContainer.append(header, body);
                 modalContent.appendChild(settingsContainer);
@@ -6712,30 +6729,37 @@ const blob = b64toBlob(blobData.content, contentType);
                 });
 
                 
-                // [V10 修正] 确认按钮逻辑，集成备忘录选择流程
+                // [重构] 确认并生成组件预览的逻辑
                 adderContainer.querySelector('#confirm-widget-btn').addEventListener('click', () => {
                     const type = adderContainer.querySelector('#widget-type-selector').value;
                     const size = `${widthDisplay.textContent}x${heightDisplay.textContent}`;
                     const previewArea = adderContainer.querySelector('#new-widget-preview-area');
+                    
+                    adderContainer.querySelector('#selection-info')?.remove(); // 清理旧的选择信息
+                    previewArea.innerHTML = ''; // 清空预览区
 
-                    const createPreviewItem = (widgetInfo) => {
-                        previewArea.innerHTML = ''; // 清空预览区
+                    // 内部函数，用于创建可拖拽的预览项目
+                    const createPreviewItem = (config) => {
                         const item = document.createElement('div');
                         item.className = 'widget-preview-item';
                         item.draggable = true;
+                        
                         Object.assign(item.dataset, {
-                            widgetSize: widgetInfo.size,
-                            widgetType: widgetInfo.type,
-                            widgetContent: widgetInfo.content || '',
+                            widgetSize: config.size,
+                            widgetType: config.type,
+                            widgetContent: config.content || '',
+                            widgetText: config.text || '' // 保存备忘录标题等文本
                         });
 
-                        if (widgetInfo.type === 'image' && widgetInfo.content) {
+                        // 根据类型设置预览外观
+                        if (config.type === 'image') {
                             item.style.cssText = 'padding:0; overflow:hidden;';
-                            item.innerHTML = `<img style="width:100%;height:100%;object-fit:cover;pointer-events:none;" alt="预览">`;
-                            getSecureFileUrl(widgetInfo.content).then(url => { if (url) item.querySelector('img').src = url; });
+                            item.innerHTML = `<img style="width:100%;height:100%;object-fit:cover;pointer-events:none;">`;
+                            getSecureFileUrl(config.content).then(url => {
+                                if (url) item.querySelector('img').src = url;
+                            });
                         } else {
-                            const typeTextMap = { 'shortcut': '快捷方式', 'memo': '备忘录', 'html': 'HTML' };
-                            item.textContent = `${widgetInfo.size} ${typeTextMap[widgetInfo.type]}`;
+                            item.textContent = `${config.size} ${config.text}`;
                         }
                         
                         item.addEventListener('mousedown', handleDragStart);
@@ -6743,26 +6767,35 @@ const blob = b64toBlob(blobData.content, contentType);
                         previewArea.appendChild(item);
                         previewArea.classList.add('has-widget');
                     };
-                    
-                    adderContainer.querySelector('#selection-info')?.remove();
 
+                    // 根据组件类型执行不同逻辑
                     if (type === 'image') {
-                        if (pendingWidgetContent && pendingWidgetContent.type === 'image') {
-                            createPreviewItem(pendingWidgetContent);
+                        if (pendingWidgetContent?.type === 'image') {
+                            createPreviewItem({ ...pendingWidgetContent, size });
                             pendingWidgetContent = null;
                         } else {
-                            alert('请先选择“图片”类型，并从弹出的窗口中选择一张图片。');
+                            alert('请先通过上方的类型选择器，选择一张图片。');
                         }
                     } else if (type === 'memo') {
-                        // 调用备忘录选择器
-                        showMemoPicker(memoId => {
-                            if (memoId) {
-                                createPreviewItem({ type: 'memo', size, content: memoId });
-                                closeAnyOpenWindow();
-                            }
+                        if (pendingWidgetContent?.type === 'memo') {
+                             createPreviewItem({
+                                size: size,
+                                type: 'memo',
+                                content: pendingWidgetContent.id, // 存储ID
+                                text: pendingWidgetContent.title || '备忘录' // 存储标题
+                            });
+                            pendingWidgetContent = null;
+                        } else {
+                            alert('请先选择“备忘录”类型，并从弹出的窗口中选择一篇备忘录。');
+                        }
+                    } else {
+                        // 处理快捷方式和HTML
+                        const typeTextMap = { 'shortcut': '快捷方式', 'html': 'HTML' };
+                        createPreviewItem({
+                            size: size,
+                            type: type,
+                            text: typeTextMap[type]
                         });
-                    } else { // shortcut 和 html
-                        createPreviewItem({ type, size });
                     }
                 });
             }
@@ -6883,15 +6916,17 @@ const blob = b64toBlob(blobData.content, contentType);
 
 
 
-            function handleDragStart(e) {
+             function handleDragStart(e) {
                 e.preventDefault();
                 const item = e.currentTarget;
-                // [核心修改] 将 content 信息也加入拖拽数据中
-                draggedWidgetInfo = { 
-                    size: item.dataset.widgetSize, 
+                // [核心修改] 将 content 和 text 信息都加入拖拽数据中
+                draggedWidgetInfo = {
+                    size: item.dataset.widgetSize,
                     type: item.dataset.widgetType,
-                    content: item.dataset.widgetContent // 对于图片类型，这里会是图片的路径
+                    content: item.dataset.widgetContent,
+                    text: item.dataset.widgetText // 新增，用于备忘录标题等
                 };
+
                 ghostEl = document.createElement('div');
                 ghostEl.className = 'widget-ghost';
                 ghostEl.textContent = item.textContent;
@@ -6968,33 +7003,28 @@ const blob = b64toBlob(blobData.content, contentType);
                 }
             }
             
-            function handleDragEnd() {
+             function handleDragEnd() {
                 if (dragTargetCell) {
                     dragTargetCell.classList.remove('drag-over');
                     const cellIndex = parseInt(dragTargetCell.dataset.cellIndex, 10);
-                    // 包含了 size, type, 以及 image 类型的 content
                     const newWidget = { id: Date.now(), ...draggedWidgetInfo };
 
-                    const onSelectContent = (data) => {
-                         // 对于非图片类型，在这里设置 content
-                        if (typeof data === 'object' && data !== null) {
-                            newWidget.content = data.content; newWidget.text = data.text;
-                        } else if (data) {
-                            newWidget.content = data;
-                        }
-                        saveWidgetConfig(cellIndex, newWidget);
+                    // 内部函数，用于最终保存
+                    const finalizeAndSave = (finalData) => {
+                        saveWidgetConfig(cellIndex, finalData);
                     };
 
-                    // [核心修改] 根据类型决定后续操作
-                    if (newWidget.type === 'image') {
-                        // 如果是图片，并且 content 已经存在 (从预览块拖拽而来)，直接保存
-                        saveWidgetConfig(cellIndex, newWidget);
-                    } else if (newWidget.type === 'memo') {
-                        showMemoPicker(onSelectContent);
+                    // [V3 核心修改] 由于内容已在预览生成时选好，现在拖拽后直接保存或为需要二次选择的类型（如快捷方式）弹出选择器
+                    if (newWidget.type === 'image' || newWidget.type === 'memo' || newWidget.type === 'html') {
+                        // 图片和备忘录的内容已在拖拽数据中，直接保存
+                        finalizeAndSave(newWidget);
                     } else if (newWidget.type === 'shortcut') {
-                        showShortcutPicker(onSelectContent);
-                    } else if (newWidget.type === 'html') {
-                        onSelectContent(null); // HTML 不需要额外内容
+                        // 快捷方式需要弹出选择器来确定具体链接
+                        showShortcutPicker((selectedData) => {
+                            newWidget.content = selectedData.content;
+                            newWidget.text = selectedData.text;
+                            finalizeAndSave(newWidget);
+                        });
                     }
                 }
                 if (ghostEl) ghostEl.remove();
@@ -7002,6 +7032,7 @@ const blob = b64toBlob(blobData.content, contentType);
                 document.removeEventListener('mousemove', handleDragMove);
                 document.removeEventListener('touchmove', handleDragMove);
             }
+
 
 
             function applyMode(enable) {
