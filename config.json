@@ -20,5 +20,14 @@
     }
   },
   "themePresets": [],
-  "lockscreenWidgets": {}
+  "lockscreenWidgets": {
+    "26": [
+      {
+        "id": 1759907767717,
+        "size": "1x1",
+        "type": "memo",
+        "content": 1759901567637
+      }
+    ]
+  }
 }
