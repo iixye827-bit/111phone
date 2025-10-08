@@ -4392,13 +4392,14 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
     document.getElementById('nukeDataBtn').addEventListener('click', nukeAllData);
     
     // ===== [START] MEMORY APP LOGIC =====
+    let memoryCache = null; // [修复] 将 memoryCache 提升到模块共享作用域
     const MemoryApp = (() => {
         const MEMORY_DATA_PATH = 'memory/data.json';
         const MEMORY_PHOTOS_PATH = 'memory/photos/';
-        let memoryCache = null;
         let memoryDataSha = null;
         let isSaving = false;
         let saveTimeout = null;
+
         
         const ui = {
             modal: document.getElementById('memoryModal'),
@@ -5263,7 +5264,7 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
 
 
 
-return {
+        return {
             open: () => {
                 if (!checkConfig(true)) { document.getElementById('settingsModal').classList.add('show'); return; }
                 ui.modal.classList.add('show');
@@ -5321,10 +5322,6 @@ return {
                 ui.uploadBtn.addEventListener("click", uploadFile);
             },
             getAlbumItems: () => memoryCache ? memoryCache.album.items : [],
-            // [V9 新增] 暴露 syncWithGithub 方法给外部调用
-            syncWithGithub,
-            // [V9 新增] 暴露一个安全的 getter 来访问内部缓存
-            getCache: () => memoryCache,
         };
     })();
     // ===== [END] MEMORY APP LOGIC =====
@@ -6299,10 +6296,29 @@ const blob = b64toBlob(blobData.content, contentType);
 
             function closeAnyOpenWindow() {
                 if (currentPickerWindow) {
-                    currentPickerWindow.remove();
+                    const windowContainerToClose = currentPickerWindow;
+                    const innerWindow = windowContainerToClose.querySelector('.floating-project-window');
+
+                    // 如果内部窗口存在，则触发它的关闭动画
+                    if (innerWindow) {
+                        innerWindow.classList.remove('visible');
+                        
+                        // 监听动画结束事件，在动画完成后再安全地移除整个容器
+                        innerWindow.addEventListener('transitionend', () => {
+                            if (windowContainerToClose.parentNode) {
+                                windowContainerToClose.remove();
+                            }
+                        }, { once: true });
+                    } else {
+                        // 如果没有内部窗口，作为备用方案直接移除
+                        windowContainerToClose.remove();
+                    }
+
+                    // 立即将引用设为 null，以便新窗口可以被创建
                     currentPickerWindow = null;
                 }
             }
+
 
             function createPickerWindow(title, content) {
                 closeAnyOpenWindow();
@@ -6512,11 +6528,14 @@ const blob = b64toBlob(blobData.content, contentType);
 
                     function hide() {
                         if (!overlay) return;
-                        overlay.classList.remove('show');
-                        overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
-                        overlay = null;
+                        const overlayToRemove = overlay; // [修复] 捕获当前的 DOM 元素
+                        overlayToRemove.classList.remove('show');
+                        // [修复] 在事件监听器中使用捕获的元素，而不是会被置空的变量
+                        overlayToRemove.addEventListener('transitionend', () => overlayToRemove.remove(), { once: true });
+                        overlay = null; // 立即将主变量置空，防止重复调用
                         abortController = null;
                     }
+
 
                     return {
                         show,
@@ -6525,55 +6544,61 @@ const blob = b64toBlob(blobData.content, contentType);
                     };
                 })();
 
-                // [V9 最终修复] 智能缓存数据加载器
+                // [V8 修复] 增强的智能缓存数据加载器 (针对移动端优化)
                 async function ensureMemoryDataIsLoaded(signal) {
-                    // 路径 1: 快速通道。如果全局缓存已存在有效数据，直接使用。
-                    // 这是最高效的情况，例如用户已经打开过“记忆”功能。
+                    // 如果缓存已存在，直接成功返回
                     if (memoryCache && memoryCache.album) {
-                        console.log("Lockscreen Settings: Using existing memory cache.");
                         return { success: true };
                     }
 
-                    // 路径 2: 独立加载通道。当缓存不存在时（例如首次直接进入设置），
-                    // 此函数将独立、安全地完成一次数据加载。
-                    console.log("Lockscreen Settings: Memory cache not found, performing isolated fetch.");
-
                     const MEMORY_DATA_PATH = 'memory/data.json';
-                    // 使用传入的 signal 来支持取消操作
-                    const { data, error } = await fetchFromGithub(MEMORY_DATA_PATH, 'GET', null, signal);
-
-                    // 检查加载过程是否被用户取消
-                    if (signal?.aborted) {
-                        return { success: false, reason: 'cancelled' };
-                    }
-
-                    // 检查网络或权限等错误
-                    if (error) {
-                        alert(`加载相册数据失败: ${error}\n\n请确保网络连接正常，或先进入“记忆”功能完成数据初始化。`);
-                        return { success: false, reason: 'error' };
-                    }
-
-                    // 定义一个健壮的初始数据结构
-                    const getInitialData = () => ({ 
-                        memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] }, 
-                        album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] } 
-                    });
                     
-                    // 解析数据，如果云端没有数据文件(data为null)，则使用初始结构
-                    const loadedData = data ? JSON.parse(b64_to_utf8(data.content)) : getInitialData();
-                    
-                    // 【核心修复】将加载到的数据，安全地写入全局的 memoryCache 变量中
-                    // 确保即使是第一次加载，后续操作也能访问到这份数据。
-                    if (!memoryCache) {
-                        memoryCache = {};
-                    }
-                    memoryCache.memo = loadedData.memo || getInitialData().memo;
-                    memoryCache.album = loadedData.album || getInitialData().album;
+                    try {
+                        const { data, error, response } = await fetchFromGithub(MEMORY_DATA_PATH, 'GET', null, signal);
+                        
+                        // 1. 检查用户是否主动取消
+                        if (signal?.aborted) {
+                            console.log('Data loading cancelled by user.');
+                            return { success: false, reason: 'cancelled' };
+                        }
 
-                    console.log("Lockscreen Settings: Isolated fetch successful, global cache populated.");
-                    return { success: true };
+                        // 2. 检查网络或权限等硬性错误
+                        // fetchFromGithub 内部已经处理了
+                        if (error) {
+                            // 直接将 fetchFromGithub 返回的、对用户友好的错误信息显示出来
+                            alert(`加载相册数据失败: ${error}\n\n请检查您的网络连接和GitHub配置。`);
+                            return { success: false, reason: 'error' };
+                        }
+                        
+                        // 3. 检查文件是否存在 (404 Not Found)
+                        // response.status === 404 意味着仓库里还没有 memory/data.json 文件
+                        if (response && response.status === 404) {
+                             console.log('memory/data.json not found on remote. Creating new initial data.');
+                             // 这是正常情况，比如用户第一次使用记忆功能，我们为其创建一个空的
+                             const getInitialData = () => ({ memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] }, album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] } });
+                             memoryCache = getInitialData();
+                        } else if (data) {
+                            // 4. 如果文件存在，则解析它
+                            memoryCache = JSON.parse(b64_to_utf8(data.content));
+                        } else {
+                            // 兜底情况，如果 data 和 error 都为 null，说明发生了未知问题
+                            throw new Error("从云端获取的数据为空，但没有明确错误。");
+                        }
+
+                        // 5. 确保数据结构完整
+                        if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
+                        if (!memoryCache.album) memoryCache.album = { folders: [], items: [] };
+
+                        // 6. 一切顺利，成功返回
+                        return { success: true };
+
+                    } catch (e) {
+                        // 捕获所有其他意外错误，例如 JSON 解析失败
+                        console.error('Critical error in ensureMemoryDataIsLoaded:', e);
+                        alert(`处理相册数据时发生严重错误: ${e.message}\n\n这可能是因为云端文件已损坏。您可以尝试进入“记忆”功能，它会自动尝试修复或重建数据。`);
+                        return { success: false, reason: 'critical' };
+                    }
                 }
-
 
                 // --- UI 创建部分 (保持不变) ---
                 const modalOverlay = document.createElement('div');
