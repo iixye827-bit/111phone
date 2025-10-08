@@ -6242,8 +6242,15 @@ const blob = b64toBlob(blobData.content, contentType);
                         const memo = memoryCache.memo.notes.find(n => n.id === widgetConfig.content);
                         widgetEl.classList.add('widget-memo');
                         if (memo) {
-                            widgetEl.innerHTML = `<div class="widget-memo-title">${memo.title || '无标题'}</div><div class="widget-memo-content">${memo.content || '没有内容'}</div>`;
+                            // 检查尺寸是否为 1x1
+                            if (widgetConfig.size === '1x1') {
+                                widgetEl.textContent = '✉'; // 使用字符而不是 Emoji
+                                widgetEl.style.fontSize = '24px'; // 调整图标大小
+                            } else {
+                                widgetEl.innerHTML = `<div class="widget-memo-title">${memo.title || '无标题'}</div>`;
+                            }
                             widgetEl.style.cursor = 'pointer';
+                            // 绑定点击事件，调用 showMemoPopup 函数
                             widgetEl.onclick = () => showMemoPopup(widgetConfig.content);
                         } else {
                             widgetEl.textContent = '备忘录未找到';
@@ -6264,6 +6271,7 @@ const blob = b64toBlob(blobData.content, contentType);
                         });
                         break;
                 }
+
                 
                 componentContainer.appendChild(widgetEl);
                 grid.appendChild(componentContainer);
@@ -6719,40 +6727,47 @@ const blob = b64toBlob(blobData.content, contentType);
 
 
                 
-                // 确认按钮逻辑保持不变
+                // [V10 升级] 确认按钮逻辑，分离处理回调和直接生成
                 adderContainer.querySelector('#confirm-widget-btn').addEventListener('click', () => {
                     const type = adderContainer.querySelector('#widget-type-selector').value;
+                    const size = `${widthDisplay.textContent}x${heightDisplay.textContent}`;
                     const previewArea = adderContainer.querySelector('#new-widget-preview-area');
                     adderContainer.querySelector('#selection-info')?.remove();
-                    if (pendingWidgetContent && pendingWidgetContent.type === 'image') {
-                        previewArea.innerHTML = '';
-                        const item = document.createElement('div');
-                        item.className = 'widget-preview-item';
-                        item.style.cssText = 'padding:0; overflow:hidden;';
-                        Object.assign(item.dataset, { widgetSize: pendingWidgetContent.size, widgetType: 'image', widgetContent: pendingWidgetContent.content });
-                        item.draggable = true;
-                        item.innerHTML = `<img style="width:100%;height:100%;object-fit:cover;pointer-events:none;">`;
-                        getSecureFileUrl(pendingWidgetContent.content).then(url => { if(url) item.querySelector('img').src = url; });
-                        item.addEventListener('mousedown', handleDragStart);
-                        item.addEventListener('touchstart', handleDragStart, { passive: false });
-                        previewArea.appendChild(item);
-                        pendingWidgetContent = null;
-                    } else if (type !== 'image') {
-                        const size = `${widthDisplay.textContent}x${heightDisplay.textContent}`;
-                        const typeTextMap = { 'shortcut': '快捷方式', 'memo': '备忘录', 'html': 'HTML' };
-                        previewArea.innerHTML = '';
-                        const item = document.createElement('div');
-                        item.className = 'widget-preview-item';
-                        Object.assign(item.dataset, { widgetSize: size, widgetType: type });
-                        item.draggable = true;
-                        item.textContent = `${size} ${typeTextMap[type]}`;
-                        item.addEventListener('mousedown', handleDragStart);
-                        item.addEventListener('touchstart', handleDragStart, { passive: false });
-                        previewArea.appendChild(item);
+                    
+                    let newPreviewItem = null;
+
+                    if (pendingWidgetContent && (pendingWidgetContent.type === 'image' || pendingWidgetContent.type === 'memo')) {
+                        newPreviewItem = document.createElement('div');
+                        newPreviewItem.className = 'widget-preview-item';
+                        Object.assign(newPreviewItem.dataset, { widgetSize: size, widgetType: pendingWidgetContent.type, widgetContent: pendingWidgetContent.content });
+
+                        if (pendingWidgetContent.type === 'image') {
+                            newPreviewItem.style.cssText = 'padding:0; overflow:hidden;';
+                            newPreviewItem.innerHTML = `<img style="width:100%;height:100%;object-fit:cover;pointer-events:none;">`;
+                            getSecureFileUrl(pendingWidgetContent.content).then(url => { if (url) newPreviewItem.querySelector('img').src = url; });
+                        } else { // type is 'memo'
+                            const memo = memoryCache.memo.notes.find(n => n.id === pendingWidgetContent.content);
+                            newPreviewItem.textContent = `${size} 备忘录: ${memo ? (memo.title || '无标题') : '未知'}`;
+                        }
+                    } else if (type !== 'image' && type !== 'memo') {
+                        newPreviewItem = document.createElement('div');
+                        newPreviewItem.className = 'widget-preview-item';
+                        const typeTextMap = { 'shortcut': '快捷方式', 'html': 'HTML' };
+                        Object.assign(newPreviewItem.dataset, { widgetSize: size, widgetType: type });
+                        newPreviewItem.textContent = `${size} ${typeTextMap[type]}`;
                     } else {
-                        alert('请先选择“图片”类型，并从弹出的窗口中选择一张图片。');
+                        alert(`请先选择一个“${type === 'image' ? '图片' : '备忘录'}”。`);
                     }
-                    previewArea.classList.toggle('has-widget', previewArea.childElementCount > 0);
+
+                    if (newPreviewItem) {
+                        previewArea.innerHTML = '';
+                        newPreviewItem.draggable = true;
+                        newPreviewItem.addEventListener('mousedown', handleDragStart);
+                        newPreviewItem.addEventListener('touchstart', handleDragStart, { passive: false });
+                        previewArea.appendChild(newPreviewItem);
+                        pendingWidgetContent = null;
+                        previewArea.classList.add('has-widget');
+                    }
                 });
             }
 
@@ -6846,6 +6861,7 @@ const blob = b64toBlob(blobData.content, contentType);
                             placeholder.textContent = 'HTML';
                             break;
                     }
+
 
                     
                     // D. 创建删除按钮及其包裹层 (内部逻辑不变)
