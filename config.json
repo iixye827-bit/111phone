@@ -10,8 +10,8 @@
   "settings": {
     "paginationEnabled": true,
     "jellyBall": {
-      "enabled": true,
-      "swipeBack": true,
+      "enabled": false,
+      "swipeBack": false,
       "functions": {},
       "customCSS": ""
     },
