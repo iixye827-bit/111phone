@@ -29,6 +29,14 @@
         "content": "memory/photos/1759762928721_IMG_6060.jpeg"
       }
     ],
+    "18": [
+      {
+        "id": 1759912336325,
+        "size": "2x2",
+        "type": "html",
+        "content": "<!DOCTYPE html>\n<html>\n<head>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<style>\n    body, html {\n        margin: 0;\n        padding: clamp(8px, 3vw, 16px); /* 响应式内边距 */\n        width: 100%;\n        height: 100%;\n        box-sizing: border-box;\n        display: flex;\n        flex-direction: column;\n        justify-content: space-around;\n        background: #FFECF5;\n        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;\n        color: #8C5E7F;\n        overflow: hidden;\n        border-radius: 16px; /* 匹配您的小组件圆角 */\n    }\n    .header {\n        font-size: clamp(12px, 3.5vw, 18px); /* 响应式字体大小 */\n        font-weight: 600;\n    }\n    .total-spent {\n        font-size: clamp(20px, 6vw, 40px);\n        font-weight: 700;\n        color: #D6336C;\n        margin: clamp(4px, 1.5vw, 8px) 0;\n    }\n    .progress-bar-container {\n        width: 100%;\n        height: clamp(8px, 2vw, 12px);\n        background-color: #F8DDE8;\n        border-radius: 10px;\n        overflow: hidden;\n    }\n    .progress-bar {\n        width: 65%; /* 模拟已用65% */\n        height: 100%;\n        background-color: #F06595;\n        border-radius: 10px;\n    }\n    .latest-transaction {\n        margin-top: clamp(8px, 2vw, 12px);\n        font-size: clamp(11px, 3vw, 15px);\n        display: flex;\n        justify-content: space-between;\n        align-items: center;\n    }\n    .item-name {\n        display: flex;\n        align-items: center;\n        gap: 6px; /* 图标和文字的间距 */\n    }\n</style>\n</head>\n<body>\n    <div class=\"header\">今日支出</div>\n    <div class=\"total-spent\">¥128.50</div>\n    <div class=\"progress-bar-container\">\n        <div class=\"progress-bar\"></div>\n    </div>\n    <div class=\"latest-transaction\">\n        <div class=\"item-name\">\n            <span>🍓</span>\n            <span>草莓蛋糕</span>\n        </div>\n        <div>- ¥28.00</div>\n    </div>\n</body>\n</html>"
+      }
+    ],
     "20": [
       {
         "id": 1759912273911,
