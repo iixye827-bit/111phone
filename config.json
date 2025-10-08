@@ -20,15 +20,5 @@
     }
   },
   "themePresets": [],
-  "lockscreenWidgets": {
-    "21": [
-      {
-        "id": 1759903020527,
-        "size": "1x1",
-        "type": "memo",
-        "content": "",
-        "text": "无标题"
-      }
-    ]
-  }
+  "lockscreenWidgets": {}
 }
