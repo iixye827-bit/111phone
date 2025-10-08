@@ -21,15 +21,6 @@
   },
   "themePresets": [],
   "lockscreenWidgets": {
-    "17": [
-      {
-        "id": 1759916913971,
-        "size": "1x1",
-        "type": "image",
-        "shape": "circle",
-        "content": "memory/photos/1759858920827_IMG_6319.jpeg"
-      }
-    ],
     "19": [
       {
         "id": 1759916961295,
