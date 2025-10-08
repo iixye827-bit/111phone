@@ -28,6 +28,15 @@
         "type": "image",
         "content": "memory/photos/1759762928721_IMG_6060.jpeg"
       }
+    ],
+    "25": [
+      {
+        "id": 1759916795866,
+        "size": "1x1",
+        "type": "image",
+        "shape": "circle",
+        "content": "memory/photos/1759762928721_IMG_6060.jpeg"
+      }
     ]
   }
 }
