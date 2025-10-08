@@ -3724,8 +3724,17 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
         localStorage.setItem('theme', i?'dark':'light');
         applyAllBackgrounds();
         WanderView.updateTheme();
-        renderLockscreenWidgets(); // 新增：切换主题时重新渲染组件
+        
+        // [核心修复] 同样确保在渲染前先加载数据
+        if (document.body.classList.contains('mobile-mode')) {
+            ensureMemoryDataIsLoaded().then(result => {
+                if (result.success) {
+                    renderLockscreenWidgets();
+                }
+            });
+        }
     };
+
 
     function setThemeStyle(styleName) {
         const pneumorphismSettings = document.getElementById('pneumorphism-settings');
@@ -6168,6 +6177,61 @@ const blob = b64toBlob(blobData.content, contentType);
         /* ============== [更新] 手机模式管理逻辑 V5 (功能实现版) ===== */
         /* =============================================================== */
 
+                // [V8 修复] 增强的智能缓存数据加载器 (针对移动端优化)
+                async function ensureMemoryDataIsLoaded(signal) {
+                    // 如果缓存已存在，直接成功返回
+                    if (memoryCache && memoryCache.album) {
+                        return { success: true };
+                    }
+
+                    const MEMORY_DATA_PATH = 'memory/data.json';
+                    
+                    try {
+                        const { data, error, response } = await fetchFromGithub(MEMORY_DATA_PATH, 'GET', null, signal);
+                        
+                        // 1. 检查用户是否主动取消
+                        if (signal?.aborted) {
+                            console.log('Data loading cancelled by user.');
+                            return { success: false, reason: 'cancelled' };
+                        }
+
+                        // 2. 检查网络或权限等硬性错误
+                        // fetchFromGithub 内部已经处理了
+                        if (error) {
+                            // 直接将 fetchFromGithub 返回的、对用户友好的错误信息显示出来
+                            alert(`加载相册数据失败: ${error}\n\n请检查您的网络连接和GitHub配置。`);
+                            return { success: false, reason: 'error' };
+                        }
+                        
+                        // 3. 检查文件是否存在 (404 Not Found)
+                        // response.status === 404 意味着仓库里还没有 memory/data.json 文件
+                        if (response && response.status === 404) {
+                             console.log('memory/data.json not found on remote. Creating new initial data.');
+                             // 这是正常情况，比如用户第一次使用记忆功能，我们为其创建一个空的
+                             const getInitialData = () => ({ memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] }, album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] } });
+                             memoryCache = getInitialData();
+                        } else if (data) {
+                            // 4. 如果文件存在，则解析它
+                            memoryCache = JSON.parse(b64_to_utf8(data.content));
+                        } else {
+                            // 兜底情况，如果 data 和 error 都为 null，说明发生了未知问题
+                            throw new Error("从云端获取的数据为空，但没有明确错误。");
+                        }
+
+                        // 5. 确保数据结构完整
+                        if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
+                        if (!memoryCache.album) memoryCache.album = { folders: [], items: [] };
+
+                        // 6. 一切顺利，成功返回
+                        return { success: true };
+
+                    } catch (e) {
+                        // 捕获所有其他意外错误，例如 JSON 解析失败
+                        console.error('Critical error in ensureMemoryDataIsLoaded:', e);
+                        alert(`处理相册数据时发生严重错误: ${e.message}\n\n这可能是因为云端文件已损坏。您可以尝试进入“记忆”功能，它会自动尝试修复或重建数据。`);
+                        return { success: false, reason: 'critical' };
+                    }
+                }
         // [新增] 在 MobileModeManager 外部定义一个渲染函数，方便多处调用
         function showMemoPopup(memoId) {
             const memo = memoryCache.memo.notes.find(n => n.id === memoId);
@@ -6586,61 +6650,7 @@ const blob = b64toBlob(blobData.content, contentType);
                     };
                 })();
 
-                // [V8 修复] 增强的智能缓存数据加载器 (针对移动端优化)
-                async function ensureMemoryDataIsLoaded(signal) {
-                    // 如果缓存已存在，直接成功返回
-                    if (memoryCache && memoryCache.album) {
-                        return { success: true };
-                    }
 
-                    const MEMORY_DATA_PATH = 'memory/data.json';
-                    
-                    try {
-                        const { data, error, response } = await fetchFromGithub(MEMORY_DATA_PATH, 'GET', null, signal);
-                        
-                        // 1. 检查用户是否主动取消
-                        if (signal?.aborted) {
-                            console.log('Data loading cancelled by user.');
-                            return { success: false, reason: 'cancelled' };
-                        }
-
-                        // 2. 检查网络或权限等硬性错误
-                        // fetchFromGithub 内部已经处理了
-                        if (error) {
-                            // 直接将 fetchFromGithub 返回的、对用户友好的错误信息显示出来
-                            alert(`加载相册数据失败: ${error}\n\n请检查您的网络连接和GitHub配置。`);
-                            return { success: false, reason: 'error' };
-                        }
-                        
-                        // 3. 检查文件是否存在 (404 Not Found)
-                        // response.status === 404 意味着仓库里还没有 memory/data.json 文件
-                        if (response && response.status === 404) {
-                             console.log('memory/data.json not found on remote. Creating new initial data.');
-                             // 这是正常情况，比如用户第一次使用记忆功能，我们为其创建一个空的
-                             const getInitialData = () => ({ memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] }, album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] } });
-                             memoryCache = getInitialData();
-                        } else if (data) {
-                            // 4. 如果文件存在，则解析它
-                            memoryCache = JSON.parse(b64_to_utf8(data.content));
-                        } else {
-                            // 兜底情况，如果 data 和 error 都为 null，说明发生了未知问题
-                            throw new Error("从云端获取的数据为空，但没有明确错误。");
-                        }
-
-                        // 5. 确保数据结构完整
-                        if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
-                        if (!memoryCache.album) memoryCache.album = { folders: [], items: [] };
-
-                        // 6. 一切顺利，成功返回
-                        return { success: true };
-
-                    } catch (e) {
-                        // 捕获所有其他意外错误，例如 JSON 解析失败
-                        console.error('Critical error in ensureMemoryDataIsLoaded:', e);
-                        alert(`处理相册数据时发生严重错误: ${e.message}\n\n这可能是因为云端文件已损坏。您可以尝试进入“记忆”功能，它会自动尝试修复或重建数据。`);
-                        return { success: false, reason: 'critical' };
-                    }
-                }
 
                 // --- UI 创建部分 (保持不变) ---
                 const modalOverlay = document.createElement('div');
@@ -6687,48 +6697,73 @@ const blob = b64toBlob(blobData.content, contentType);
                 const widthDisplay = adderContainer.querySelector('#width-display'), heightDisplay = adderContainer.querySelector('#height-display');
                 adderContainer.querySelectorAll('.roller-btn').forEach(btn => btn.addEventListener('click', () => { const t = btn.dataset.roller, d = parseInt(btn.dataset.dir, 10), el = t === 'width' ? widthDisplay : heightDisplay, max = t === 'width' ? 4 : 8; let val = parseInt(el.textContent, 10) + d; el.textContent = Math.max(1, Math.min(val, max)); }));
 
-                // [V7 优化] 类型选择器的事件监听器
+                // [V7 修复 & V8 备忘录集成] 重构类型选择器的事件监听器
                 adderContainer.querySelector('#widget-type-selector').addEventListener('change', async function() {
-                    if (this.value !== 'image') return;
-                    
+                    const selectedType = this.value;
                     const selector = this;
-                    const originalSelectedIndex = selector.selectedIndex; // 记录原始选项
+                    const originalSelectedIndex = selector.selectedIndex;
 
-                    // 清理工作
-                    adderContainer.querySelector('#new-widget-preview-area').innerHTML = '将生成的组件拖入上方屏幕';
-                    adderContainer.querySelector('#new-widget-preview-area').classList.remove('has-widget');
-                    pendingWidgetContent = null;
-                    adderContainer.querySelector('#selection-info')?.remove();
-                    
-                    const onCancel = () => {
-                        selector.selectedIndex = originalSelectedIndex; // 恢复选择
-                        console.log('相册加载已取消');
+                    // 统一的清理工作，当选择需要弹窗的类型时执行
+                    const cleanup = () => {
+                        adderContainer.querySelector('#new-widget-preview-area').innerHTML = '将生成的组件拖入上方屏幕';
+                        adderContainer.querySelector('#new-widget-preview-area').classList.remove('has-widget');
+                        pendingWidgetContent = null;
+                        adderContainer.querySelector('#selection-info')?.remove();
                     };
-
-                    LoadingIndicator.show('正在加载相册...', onCancel);
                     
-                    const { success, reason } = await ensureMemoryDataIsLoaded(LoadingIndicator.getSignal());
-                    LoadingIndicator.hide();
+                    // 根据选择的类型执行不同操作
+                    switch (selectedType) {
+                        case 'image': {
+                            cleanup();
+                            const onCancel = () => { selector.selectedIndex = originalSelectedIndex; console.log('相册加载已取消'); };
+                            LoadingIndicator.show('正在加载相册...', onCancel);
+                            const { success, reason } = await ensureMemoryDataIsLoaded(LoadingIndicator.getSignal());
+                            LoadingIndicator.hide();
 
-                    if (success) {
-                        showAlbumPicker(photoData => {
-                            pendingWidgetContent = { type: 'image', size: `${widthDisplay.textContent}x${heightDisplay.textContent}`, content: photoData.path };
+                            if (success) {
+                                showAlbumPicker(photoData => {
+                                    pendingWidgetContent = { type: 'image', content: photoData.path };
+                                    const infoSpan = document.createElement('span');
+                                    infoSpan.id = 'selection-info';
+                                    infoSpan.style.cssText = 'font-size:12px;color:#889;text-align:center;display:block;margin-top:-10px;margin-bottom:10px;';
+                                    infoSpan.textContent = `已选择：${photoData.title}`;
+                                    adderContainer.insertBefore(infoSpan, adderContainer.querySelector('#confirm-widget-btn'));
+                                });
+                            } else if (reason !== 'cancelled') {
+                                selector.selectedIndex = originalSelectedIndex;
+                            }
+                            break;
+                        }
                             
-                            // [核心修复] 在创建新的提示前，先移除旧的
-                            adderContainer.querySelector('#selection-info')?.remove();
+                        case 'memo': {
+                            cleanup();
+                            const onCancel = () => { selector.selectedIndex = originalSelectedIndex; console.log('备忘录加载已取消'); };
+                            LoadingIndicator.show('正在加载备忘录...', onCancel);
+                            const { success, reason } = await ensureMemoryDataIsLoaded(LoadingIndicator.getSignal());
+                            LoadingIndicator.hide();
+                            
+                            if (success) {
+                                showMemoPicker(note => {
+                                    pendingWidgetContent = { type: 'memo', id: note.id, title: note.title || '无标题' };
+                                    const infoSpan = document.createElement('span');
+                                    infoSpan.id = 'selection-info';
+                                    infoSpan.style.cssText = 'font-size:12px;color:#889;text-align:center;display:block;margin-top:-10px;margin-bottom:10px;';
+                                    infoSpan.textContent = `已选择：${note.title || '无标题'}`;
+                                    adderContainer.insertBefore(infoSpan, adderContainer.querySelector('#confirm-widget-btn'));
+                                });
+                            } else if (reason !== 'cancelled') {
+                                selector.selectedIndex = originalSelectedIndex;
+                            }
+                            break;
+                        }
 
-                            const infoSpan = document.createElement('span');
-                            infoSpan.id = 'selection-info';
-                            infoSpan.style.cssText = 'font-size:12px;color:#889;text-align:center;display:block;margin-top:-10px;margin-bottom:10px;';
-                            infoSpan.textContent = `已选择：${photoData.title}`;
-                            adderContainer.insertBefore(infoSpan, adderContainer.querySelector('#confirm-widget-btn'));
-                        });
-                    } else if(reason !== 'cancelled') {
-                        selector.selectedIndex = originalSelectedIndex; // 加载失败也恢复选择
+                        default:
+                            // 对于 "快捷方式" 和 "HTML"，选择时不需要立即执行操作，因此也做一次清理
+                            cleanup();
+                            break;
                     }
                 });
 
-                
                 // [重构] 确认并生成组件预览的逻辑
                 adderContainer.querySelector('#confirm-widget-btn').addEventListener('click', () => {
                     const type = adderContainer.querySelector('#widget-type-selector').value;
@@ -7048,9 +7083,19 @@ const blob = b64toBlob(blobData.content, contentType);
                     ui.slider.style.transition = 'none';
                     ui.slider.style.transform = `translateX(0px)`;
                     ui.slider.classList.remove('show-home-screen');
-                    renderLockscreenWidgets();
+
+                    // [核心修复] 确保在渲染前先加载数据
+                    ensureMemoryDataIsLoaded().then(result => {
+                        if (result.success) {
+                            renderLockscreenWidgets();
+                        } else {
+                            console.error("Failed to load memory data before rendering lockscreen widgets.");
+                        }
+                    });
+
                     attachSwipeListeners();
                 } else {
+
                     elementsToMove.forEach(el => document.body.insertBefore(el, mainWrapper));
                     detachSwipeListeners();
                     ui.slider.style.transition = 'none';
