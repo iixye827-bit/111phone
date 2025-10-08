@@ -148,6 +148,15 @@
   },
   "themePresets": [],
   "lockscreenWidgets": {
+    "5": [
+      {
+        "id": 1759896576858,
+        "size": "1x1",
+        "type": "shortcut",
+        "content": "https://raven7-7.github.io/Lemuria/",
+        "text": "Raven"
+      }
+    ],
     "6": [
       {
         "id": 1759896565473,
