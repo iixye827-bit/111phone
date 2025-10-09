@@ -7019,37 +7019,48 @@ const blob = b64toBlob(blobData.content, contentType);
 
 
 
-            async function saveWidgetConfig(cellIndex, widgetData) {
+             async function saveWidgetConfig(cellIndex, widgetData) {
                 if (!currentConfig.lockscreenWidgets[cellIndex]) {
                     currentConfig.lockscreenWidgets[cellIndex] = [];
                 }
                 currentConfig.lockscreenWidgets[cellIndex].unshift(widgetData); 
                 await saveGlobalConfig(`Add widget to cell ${cellIndex}`);
                 
-                // 立即反馈到真实锁屏和设置模拟器
+                // --- 核心修复点 ---
+                // 确保在数据更新后，立即重新渲染锁屏和设置模拟器
                 renderLockscreenWidgets();
+                
                 const settingsWindow = document.getElementById('lockscreen-settings-modal');
-                if (settingsWindow) {
+                if (settingsWindow && settingsWindow.classList.contains('show')) {
                     const grid = settingsWindow.querySelector('.settings-grid');
-                    renderSettingsGrid(grid); // 核心修改：立即重新渲染模拟器
+                    if (grid) {
+                        renderSettingsGrid(grid);
+                    }
                 }
+                // --- 修复结束 ---
                 
                 closeAnyOpenWindow();
             }
 
 
-            async function deleteWidgetFromCell(cellIndex) {
-                delete currentConfig.lockscreenWidgets[cellIndex];
-                await saveGlobalConfig(`Delete widget from cell ${cellIndex}`);
-                
-                // 立即反馈到真实锁屏和设置模拟器
-                renderLockscreenWidgets();
-                const settingsWindow = document.getElementById('lockscreen-settings-modal');
-                if (settingsWindow) {
-                    const grid = settingsWindow.querySelector('.settings-grid');
-                    renderSettingsGrid(grid); // 核心修改：立即重新渲染模拟器
+
+                async function deleteWidgetFromCell(cellIndex) {
+                    delete currentConfig.lockscreenWidgets[cellIndex];
+                    await saveGlobalConfig(`Delete widget from cell ${cellIndex}`);
+                    
+                    // --- 核心修复点 ---
+                    // 确保在数据更新后，立即重新渲染锁屏和设置模拟器
+                    renderLockscreenWidgets(); 
+                    
+                    const settingsWindow = document.getElementById('lockscreen-settings-modal');
+                    if (settingsWindow && settingsWindow.classList.contains('show')) {
+                        const grid = settingsWindow.querySelector('.settings-grid');
+                        if (grid) {
+                           renderSettingsGrid(grid);
+                        }
+                    }
+                    // --- 修复结束 ---
                 }
-            }
 
 
             function showAlbumPicker(onSelectCallback) {
