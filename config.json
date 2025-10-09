@@ -25,6 +25,16 @@
           "openExternally": false
         }
       ]
+    },
+    {
+      "name": "u",
+      "buttons": [
+        {
+          "text": "g",
+          "href": "发个",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
