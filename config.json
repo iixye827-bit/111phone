@@ -4,7 +4,13 @@
   "categories": [
     {
       "name": "全部",
-      "buttons": []
+      "buttons": [
+        {
+          "text": "1",
+          "href": "1",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
