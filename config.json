@@ -5,6 +5,16 @@
     {
       "name": "全部",
       "buttons": []
+    },
+    {
+      "name": "！",
+      "buttons": [
+        {
+          "text": "1",
+          "href": "2222",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
