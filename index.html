@@ -988,8 +988,8 @@ body.mobile-mode .home-screen-page {
     width: 50%;
     height: 100%;
     flex-shrink: 0;
-    overflow-y: auto;
-    padding: 20px;
+    overflow: hidden; /* [修复] 禁止页面滚动 */
+    padding: 4vh 30px; /* [核心修改] 增加垂直和水平内边距，压缩内容区 */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -997,31 +997,22 @@ body.mobile-mode .home-screen-page {
 
 
 
+
 .lock-screen-page {
     padding-top: 2vh;
     padding-bottom: 2vh;
+    overflow: hidden; /* 确保页面本身不滚动 */
 }
 .lockscreen-grid {
     width: 100%;
     max-width: 500px;
     flex-grow: 1;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    gap: 12px;
+    position: relative; /* [核心修改] 改为相对定位，作为绝对定位组件的容器 */
+    min-height: 0;
+    --widget-gap: 15px; /* [新增] 定义间距变量 */
 }
 
-.grid-cell {
-    /* 默认情况下，格子是完全透明的 */
-    background: transparent;
-    border: none;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s, border-color 0.2s;
-    position: relative;
-}
+
 
 .home-screen-page .title-card,
 .home-screen-page .category-nav-container,
@@ -1061,7 +1052,10 @@ body.mobile-mode .page-slider:not(.show-home-screen) .home-screen-page > * {
     box-sizing: border-box;
     text-align: center;
     overflow: hidden;
+    /* [核心修复] 允许flex容器收缩至小于其内容尺寸，防止iframe撑开布局 */
+    min-height: 0; 
 }
+
 body.dark-mode .widget {
     background: rgba(20, 20, 20, 0.25);
     border-color: rgba(255, 255, 255, 0.1);
@@ -1298,31 +1292,39 @@ body.dark-mode .widget-shortcut:active {
     box-shadow: inset 2px 2px 4px rgba(0,0,0,0.4), inset -2px -2px 4px rgba(255,255,255,0.1);
 }
 
-/* 备忘录组件样式 */
+/* --- 备忘录小组件样式 --- */
 .widget-memo {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    text-align: left;
-    gap: 5px;
+    box-sizing: border-box; /* 确保 padding 不会撑大元素 */
+    text-align: center;
+    color: var(--widget-text-color);
+    background-color: var(--widget-background-color);
 }
-.widget-memo-title {
-    font-size: 16px;
-    font-weight: bold;
+
+.widget-memo .widget-memo-title {
+    font-weight: 700;  /* [修改] 确保标题加粗 */
+    font-size: 1em;    /* 使用相对单位，使其能随小组件大小缩放 */
+    margin-bottom: 4px;
     width: 100%;
+    
+    /* [新增] 防止标题过长换行破坏布局 */
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; 
 }
-.widget-memo-content {
-    font-size: 13px;
-    font-weight: normal;
-    opacity: 0.8;
-    display: -webkit-box;
-    -webkit-line-clamp: 4; /* 根据组件大小调整显示行数 */
-    -webkit-box-orient: vertical;
+
+/* [新增] 备忘录内容样式 */
+.widget-memo .widget-memo-content {
+    font-weight: 300; /* 更细的字体 */
+    font-size: 0.8em;
+    opacity: 0.8;     /* 变淡的效果 */
+    width: 100%;
+    
+    /* 核心：实现多行文本溢出显示省略号 */
     overflow: hidden;
-    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3; /* 最多显示3行，你可以根据需要调整 */
+    line-height: 1.4;
 }
 /* 超大备忘录可以显示更多行 */
 .widget-xl .widget-memo-content { -webkit-line-clamp: 6; }
@@ -1608,6 +1610,31 @@ body.dark-mode .widget-preview-item {
     cursor: grabbing;
     transform: scale(0.95);
 }
+
+/* [新增] 胶囊形状样式 */
+.widget.widget-shape-capsule {
+    border-radius: 9999px;
+}
+
+/* [修复] 补充缺失的圆形样式 */
+.widget.widget-shape-circle {
+    border-radius: 50%;
+}
+
+/* 针对快捷方式组件的额外圆形样式优化 */
+.widget-shortcut.widget-shape-square {
+    border-radius: 16px; /* 让方形快捷按钮也保持统一的方正圆弧 */
+}
+/* [新增] 预览项形状样式 */
+.widget-preview-item.shape-circle {
+    border-radius: 50%;
+    /* 强制预览块为正方形，以显示完美的圆形 */
+    width: 80px; 
+    height: 80px;
+    padding: 10px; /* 调整内边距以适应大小 */
+    flex-shrink: 0; /* 防止被压缩 */
+}
+
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
@@ -1898,41 +1925,311 @@ body.dark-mode .simulated-phone-screen {
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
+/* [新增] 锁屏HTML组件容器精准约束样式 */
+.html-widget-container {
+    position: relative; /* 为绝对定位的子元素创建定位上下文 */
+}
+
+.html-widget-container > .widget {
+    position: absolute; /* 将widget脱离文档流，使其不再影响父容器的高度计算 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+/* =============================================================== */
+/* ============= [新增] 锁屏组件背景选择器样式 ============= */
+/* =============================================================== */
+.widget-bg-picker-popup {
+    position: absolute; /* 相对于父级容器定位 */
+    z-index: 1; /* 确保在同一个容器内，但在其他内容之上 */
+    background: var(--bg-day-element);
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+    width: 220px; /* 固定宽度，保持紧凑 */
+    margin-top: 8px; /* 与上方面板的间距 */
+}
+.widget-bg-picker-popup.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+body.dark-mode .widget-bg-picker-popup {
+    background: var(--bg-night-element);
+}
+body.theme-glass .widget-bg-picker-popup {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+body.theme-glass.dark-mode .widget-bg-picker-popup {
+    background: rgba(30, 30, 30, 0.4);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.widget-bg-picker-popup input[type="color"] {
+    -webkit-appearance: none;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: transparent; /* 移除默认背景，让伪元素生效 */
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.widget-bg-picker-popup input[type="color"]::-webkit-color-swatch {
+    border-radius: 6px;
+    border: 1px solid rgba(128,128,128,0.2);
+}
+
+.widget-bg-picker-popup .bg-picker-button {
+    flex-grow: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: inherit;
+    cursor: pointer;
+    background-color: rgba(0,0,0,0.05);
+    transition: background-color 0.2s;
+}
+
+.widget-bg-picker-popup .bg-picker-button:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+body.dark-mode .widget-bg-picker-popup .bg-picker-button {
+    background-color: rgba(255,255,255,0.08);
+}
+body.dark-mode .widget-bg-picker-popup .bg-picker-button:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+/* =============================================================== */
+/* =================== [V2 BUG修复] 弹窗层级修正 =================== */
+/* =============================================================== */
+#jelly-css-help-modal.modal-overlay {
+    z-index: 1003; /* 确保高于悬浮球设置弹窗(1002) */
+}
+/* =============================================================== */
+/* ========================= [修复结束] ========================== */
+/* =============================================================== */
+
+/* =============================================================== */
+/* ============= [新增] 备忘录编辑器 v2.0 样式 ============= */
+/* =============================================================== */
+#memoryModal #note-editor-view {
+    padding-bottom: 0; /* 为工具栏留出空间 */
+}
+#memoryModal .editor-content {
+    padding-bottom: 10px;
+}
+#memoryModal #note-content-editor {
+    flex-grow: 1;
+    resize: none;
+    line-height: 1.7;
+    font-size: 16px;
+    padding: 10px;
+    -webkit-user-select: text; /* 允许在iOS上选择文本 */
+    user-select: text;
+    overflow-y: auto; /* 允许内容区域滚动 */
+}
+#memoryModal #note-content-editor:focus {
+    outline: none;
+}
+#memoryModal #note-content-editor ul {
+    list-style: none;
+    padding-left: 0;
+}
+/* 通用待办清单样式 (编辑器 & 小组件) */
+#memoryModal #note-content-editor li,
+.widget-memo .widget-memo-content li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+#memoryModal #note-content-editor li::before,
+.widget-memo .widget-memo-content li::before {
+    content: '○';
+    font-size: 1.2em;
+    margin-right: 10px;
+    cursor: pointer;
+    color: #889;
+    font-weight: bold;
+    display: inline-block;
+    line-height: 1.5;
+}
+#memoryModal #note-content-editor li.completed::before,
+.widget-memo .widget-memo-content li.completed::before {
+    content: '●';
+    color: var(--hold-border);
+}
+#memoryModal #note-content-editor li.completed .todo-text,
+.widget-memo .widget-memo-content li.completed .todo-text {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.memo-toolbar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 15px;
+    background: var(--bg-day-element);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    border-top: 1px solid rgba(0,0,0,0.08);
+}
+body.dark-mode .memo-toolbar {
+    background: var(--bg-night-element);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
+    border-color: rgba(255,255,255,0.1);
+}
+.toolbar-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    color: inherit;
+    opacity: 0.7;
+    transition: opacity 0.2s, transform 0.2s;
+    padding: 5px;
+}
+.toolbar-btn:hover {
+    opacity: 1;
+}
+.toolbar-btn:active {
+    transform: scale(0.9);
+}
+.toolbar-btn.strikethrough {
+    text-decoration: line-through;
+}
+.toolbar-separator {
+    width: 1px;
+    height: 20px;
+    background-color: rgba(128,128,128,0.3);
+}
+.toolbar-btn-code-copy {
+    margin-left: auto; /* 靠右对齐 */
+    font-size: 16px;
+    font-weight: normal;
+    background-color: rgba(128,128,128,0.1);
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+/* =============================================================== */
+/* ============= [新增] 备忘录代码块 v1.0 样式 ================ */
+/* =============================================================== */
+.memo-code-block {
+    position: relative;
+    background-color: rgba(128,128,128,0.1);
+    border: 1px solid rgba(128,128,128,0.15);
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin: 10px 0;
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-size: 0.9em;
+}
+.code-block-copy-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.15);
+    color: inherit;
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s, background-color 0.2s;
+}
+.memo-code-block:hover .code-block-copy-btn {
+    opacity: 1;
+}
+.code-block-copy-btn:hover {
+    background-color: rgba(0,0,0,0.2);
+}
+body.dark-mode .memo-code-block {
+    background-color: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.1);
+}
+body.dark-mode .code-block-copy-btn {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+}
+body.dark-mode .code-block-copy-btn:hover {
+    background-color: rgba(255,255,255,0.2);
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+/* =============================================================== */
+/* ============= [新增] 备忘录工具栏激活状态 ================ */
+/* =============================================================== */
+.toolbar-btn.active {
+    font-weight: 900; /* 使用更粗的字重表示激活 */
+    opacity: 1;
+    transform: scale(1.1);
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
 
     </style>
 
     <style id="custom-jelly-ball-styles"></style>
 </head>
 <body>
-    <!-- [新增] 手机模式滑动容器 -->
+    <!-- 手机模式滑动容器 -->
     <div class="main-wrapper" id="mainWrapper">
         <div class="page-slider" id="pageSlider">
-                        <!-- [新增] 锁屏页面 -->
+            <!-- 锁屏页面 -->
             <div class="lock-screen-page" id="lockScreenPage">
-                <!-- [修改] 添加8格布局容器 -->
                 <div class="lockscreen-grid" id="lockscreenGrid">
-                    <!-- 这个容器现在将由 JavaScript 动态填充 -->
+                    <!-- JS 动态填充 -->
                 </div>
             </div>
-            <!-- [新增] 主屏幕页面 (包裹原有内容) -->
+            <!-- 主屏幕页面 (JS会将下面的内容移入此div) -->
             <div class="home-screen-page" id="homeScreenPage">
-                <div class="page-overlay" id="pageOverlay"></div>
-                <div class="title-card" id="titleCard">
-                    <h1 class="editable-title" id="title">JellyfishCenter</h1>
-                    <div class="editable-subtitle" id="subtitle">长按🌞打开工具栏 | By淡季水母</div>
-                </div>
-                
-                <div class="category-nav-container" id="categoryNavContainer">
-                    <div class="category-nav" id="categoryNav"></div>
-                </div>
-            
-                <div class="nav-container" id="navContainer">
-                    <p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>
-                </div>
+                <!-- JS 动态填充 -->
             </div>
         </div>
     </div>
-    <!-- [新增结束] -->
+
+    <!-- [核心修复] 将主页内容移出 mobile-wrapper，作为 body 的直接子元素 -->
+    <div class="page-overlay" id="pageOverlay"></div>
+    <div class="title-card" id="titleCard">
+        <h1 class="editable-title" id="title">JellyfishCenter</h1>
+        <div class="editable-subtitle" id="subtitle">长按🌞打开工具栏 | By淡季水母</div>
+    </div>
+    
+    <div class="category-nav-container" id="categoryNavContainer">
+        <div class="category-nav" id="categoryNav"></div>
+    </div>
+
+    <div class="nav-container" id="navContainer">
+        <p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>
+    </div>
 
     <!-- 注意：悬浮按钮和模态框需要放在滑动容器之外，以保证它们在所有页面上都能正常显示和交互 -->
     <div class="fab-container" id="fabContainer">
@@ -2157,37 +2454,16 @@ body.dark-mode .simulated-phone-screen {
                 </div>
                 <!-- [新增结束] -->
                 
-                <div class="toggle-section" style="flex-wrap: wrap; gap: 10px;">
-                    <span style="flex-basis: 100%; font-weight: 600;">网页内悬浮球</span>
+                <div class="toggle-section" id="jelly-ball-main-control" style="flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px;">
+                    <span style="font-weight: 600; width: 100%;">网页内悬浮球</span>
                     <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
                         <span>启用悬浮球</span>
                         <label class="toggle-switch"><input type="checkbox" id="jellyBallToggle"><span class="slider"></span></label>
                     </div>
-                </div>
-
-                <div id="jelly-ball-options-container" style="display: none; width: 100%; flex-direction: column; gap: 15px;">
-                    <div class="toggle-section">
-                        <span>启用左滑返回 (应用内网页)</span>
-                        <label class="toggle-switch"><input type="checkbox" id="jellySwipeBackToggle"><span class="slider"></span></label>
+                    <!-- [新增] 悬浮球设置入口 -->
+                    <div id="jellyBallSettingsEntry" style="width: 100%; display: none;">
+                         <button id="openJellyBallSettingsBtn" class="modal-button" style="width: 100%; margin-top: 10px;">悬浮球设置</button>
                     </div>
-
-                    <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px;">
-                        <label style="font-size: 14px; color: #5a6778; font-weight: 600;">自定义功能</label>
-                        <div id="jelly-function-checkboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 15px; width: 100%;"></div>
-                    </div>
-                    
-                                        <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 10px;">
-                        <label for="jellyBallCssTextarea" style="font-size: 14px; color: #5a6778; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                            <span>自定义CSS (云同步)</span>
-                            <button id="show-jelly-css-help" style="background:none; border:none; font-size: 20px; cursor:pointer; padding:0; line-height: 1;" title="CSS提示词向导">💡</button>
-                        </label>
-                        <div style="display: flex; gap: 10px; width:100%; align-items: flex-start;">
-                            <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="4" placeholder=".jelly-ball-wrapper {&#10;  /* 控制外圈辉光和位置 */&#10;}&#10;#floating-jellyfish-ball {&#10;  /* 控制中间圆球 */&#10;  background: #ff0000 !important;&#10;}" style="flex-grow: 1;"></textarea>
-                            <div id="jellyCssPreview" style="width: 52px; height: 52px; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background:var(--bg-day-element); box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day);"><div id="jellyCssPreviewBall" style="width: 42px; height: 42px; border-radius: 50%; font-size: 22px; display:flex; align-items:center; justify-content:center;">🪼</div></div>
-                        </div>
-                        <button id="applyJellyBallCssBtn" class="modal-button" style="width: 100%;">应用样式</button>
-                    </div>
-
                 </div>
 
                 <div class="theme-style-selector">
@@ -2398,7 +2674,16 @@ body.dark-mode .simulated-phone-screen {
                         </div>
                         <div class="editor-content">
                             <input type="text" id="note-title-input" placeholder="标题">
-                            <textarea id="note-content-textarea" placeholder="在这里输入内容..."></textarea>
+                            <div id="note-content-editor" contenteditable="true" placeholder="在这里输入内容..."></div>
+                        </div>
+                        <div class="memo-toolbar">
+                            <button class="toolbar-btn" data-command="todo" title="待办清单">✓</button>
+                            <div class="toolbar-separator"></div>
+                            <button class="toolbar-btn" data-command="bold" title="加粗">B</button>
+                            <button class="toolbar-btn" data-command="italic" title="斜体" style="font-style: italic;">I</button>
+                            <button class="toolbar-btn" data-command="underline" title="下划线" style="text-decoration: underline;">U</button>
+                            <button class="toolbar-btn strikethrough" data-command="strikeThrough" title="删除线">S</button>
+                            <button class="toolbar-btn" data-command="createCodeBlock" title="代码块" style="margin-left: auto;">&lt;/&gt;</button>
                         </div>
                     </div>
                 </div>
@@ -3192,94 +3477,133 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
 
         function _getEnabledFunctions() { const settings=currentConfig.settings.jellyBall?.functions||{}; return ALL_FUNCTIONS.filter(func=>settings[func.id]!==false); }
 
-        function initSettings() {
+         function initSettings() {
             const toggle = document.getElementById('jellyBallToggle');
-            const swipeBackToggle = document.getElementById('jellySwipeBackToggle');
-            const optionsContainer = document.getElementById('jelly-ball-options-container');
-            const cssTextarea = document.getElementById('jellyBallCssTextarea');
-            const applyCssBtn = document.getElementById('applyJellyBallCssBtn');
+            const settingsEntry = document.getElementById('jellyBallSettingsEntry');
+            const openSettingsBtn = document.getElementById('openJellyBallSettingsBtn');
             const customStyleTag = document.getElementById('custom-jelly-ball-styles');
-            const cssPreview = document.getElementById('jellyCssPreview');
-            const previewBall = document.getElementById('jellyCssPreviewBall');
-                        const checkboxContainer = document.getElementById('jelly-function-checkboxes');
-            let previewStyleTag = document.getElementById('jelly-preview-style');
-            if (!previewStyleTag) {
-                previewStyleTag = document.createElement('style');
-                previewStyleTag.id = 'jelly-preview-style';
-                document.head.appendChild(previewStyleTag);
-            }
-            
+
+            // 确保配置对象存在
             if (!currentConfig.settings.jellyBall) {
-                currentConfig.settings.jellyBall = { enabled: false, swipeBack: true, functions: {}, customCSS: ''};
+                currentConfig.settings.jellyBall = { enabled: false, swipeBack: true, functions: {}, customCSS: '' };
+            }
+            const settings = currentConfig.settings.jellyBall;
+            
+            // 动态创建悬浮球设置窗口
+            function openJellyBallSettingsWindow() {
+                const modalId = 'jelly-ball-settings-modal';
+                // [修复] 移除防止重复创建的判断，因为关闭时元素会被彻底销毁，需要能够重新创建
+                // if (document.getElementById(modalId)) return;
+
+                const modalOverlay = document.createElement('div');
+                modalOverlay.id = modalId;
+
+                modalOverlay.className = 'modal-overlay show';
+                modalOverlay.style.zIndex = '1002'; // 比主题设置高一级
+
+                const modalContent = document.createElement('div');
+                modalContent.className = 'modal-content';
+                modalContent.style.maxWidth = '400px';
+
+                modalContent.innerHTML = `
+                    <div class="modal-header">
+                        <div class="modal-title-group"><span>悬浮球设置</span></div>
+                        <button class="close-btn">&times;</button>
+                    </div>
+                    <div class="modal-body" id="jelly-ball-options-container" style="display: flex; flex-direction: column; gap: 15px;">
+                        <div class="toggle-section">
+                            <span>启用左滑返回 (应用内网页)</span>
+                            <label class="toggle-switch"><input type="checkbox" id="jellySwipeBackToggle"><span class="slider"></span></label>
+                        </div>
+                        <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px;">
+                            <label style="font-size: 14px; color: #5a6778; font-weight: 600;">自定义功能</label>
+                            <div id="jelly-function-checkboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 15px; width: 100%;"></div>
+                        </div>
+                        <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                            <label for="jellyBallCssTextarea" style="font-size: 14px; color: #5a6778; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                                <span>自定义CSS (云同步)</span>
+                                <button id="show-jelly-css-help" style="background:none; border:none; font-size: 20px; cursor:pointer; padding:0; line-height: 1;" title="CSS提示词向导">💡</button>
+                            </label>
+                            <div style="display: flex; gap: 10px; width:100%; align-items: flex-start;">
+                                <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="4" placeholder=".jelly-ball-wrapper { ... }"></textarea>
+                                <div id="jellyCssPreview" style="..."><div id="jellyCssPreviewBall" style="...">🪼</div></div>
+                            </div>
+                            <button id="applyJellyBallCssBtn" class="modal-button" style="width: 100%;">应用样式</button>
+                        </div>
+                    </div>
+                `;
+                
+                modalOverlay.appendChild(modalContent);
+                document.body.appendChild(modalOverlay);
+
+                // 在新窗口内部绑定事件和初始化状态
+                const closeBtn = modalContent.querySelector('.close-btn');
+                const swipeBackToggle = modalContent.querySelector('#jellySwipeBackToggle');
+                const checkboxContainer = modalContent.querySelector('#jelly-function-checkboxes');
+                const cssTextarea = modalContent.querySelector('#jellyBallCssTextarea');
+                const applyCssBtn = modalContent.querySelector('#applyJellyBallCssBtn');
+
+                // 关闭逻辑
+                const closeModal = () => { modalOverlay.classList.remove('show'); modalOverlay.addEventListener('transitionend', () => modalOverlay.remove(), { once: true }); };
+                closeBtn.onclick = closeModal;
+                modalOverlay.onclick = (e) => { if (e.target === modalOverlay) closeModal(); };
+
+                // 初始化控件状态
+                swipeBackToggle.checked = settings.swipeBack !== false;
+                checkboxContainer.innerHTML = '';
+                ALL_FUNCTIONS.forEach(func => {
+                    const isChecked = settings.functions?.[func.id] !== false;
+                    checkboxContainer.innerHTML += `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                           <label for="jelly_func_${func.id}" style="cursor:pointer;...">${func.icon} ${func.title}</label>
+                           <label class="toggle-switch"><input type="checkbox" id="jelly_func_${func.id}" data-function-id="${func.id}" ${isChecked ? 'checked' : ''}><span class="slider"></span></label>
+                        </div>`;
+                });
+                cssTextarea.value = settings.customCSS || '';
+
+                // 绑定事件监听
+                swipeBackToggle.addEventListener('change', () => { settings.swipeBack = swipeBackToggle.checked; saveGlobalConfig('Update Jellyfish Ball settings'); });
+                checkboxContainer.addEventListener('change', (e) => {
+                    const checkbox = e.target;
+                    if (checkbox.dataset.functionId) {
+                        if (!settings.functions) settings.functions = {};
+                        settings.functions[checkbox.dataset.functionId] = checkbox.checked;
+                        _renderMenuButtons();
+                        saveGlobalConfig('Update Jellyfish Ball settings');
+                    }
+                });
+                applyCssBtn.addEventListener('click', () => {
+                   settings.customCSS = cssTextarea.value;
+                   customStyleTag.innerHTML = settings.customCSS;
+                   if(ball) { _destroy(); _create(); } 
+                   saveGlobalConfig('Update Jellyfish Ball CSS');
+                   alert('自定义样式已应用并同步至云端！');
+                });
+                modalContent.querySelector('#show-jelly-css-help').addEventListener('click', () => {
+                    document.getElementById('jelly-css-help-modal').classList.add('show');
+                });
             }
 
-
-            const settings = currentConfig.settings.jellyBall;
-            toggle.checked = settings.enabled || false;
-            swipeBackToggle.checked = settings.swipeBack !== false;
-            
-            checkboxContainer.innerHTML = '';
-            ALL_FUNCTIONS.forEach(func => {
-                const isChecked = settings.functions?.[func.id] !== false;
-                const checkboxHtml = `
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                       <label for="jelly_func_${func.id}" style="cursor:pointer; display:flex; align-items:center; gap: 5px;">${func.icon} ${func.title}</label>
-                       <label class="toggle-switch"><input type="checkbox" id="jelly_func_${func.id}" data-function-id="${func.id}" ${isChecked ? 'checked' : ''}><span class="slider"></span></label>
-                    </div>`;
-                checkboxContainer.innerHTML += checkboxHtml;
-            });
-            
-            function updateUIVisibility() { optionsContainer.style.display = toggle.checked ? 'flex' : 'none'; }
-            
-            toggle.addEventListener('change', () => { settings.enabled = toggle.checked; updateUIVisibility(); if (settings.enabled) _create(); else _destroy(); saveGlobalConfig('Update Jellyfish Ball settings'); });
-            swipeBackToggle.addEventListener('change', () => { settings.swipeBack = swipeBackToggle.checked; saveGlobalConfig('Update Jellyfish Ball settings'); });
-            
-            checkboxContainer.addEventListener('change', (e) => {
-                const checkbox = e.target;
-                if (checkbox.dataset.functionId) {
-                    if (!settings.functions) settings.functions = {};
-                    settings.functions[checkbox.dataset.functionId] = checkbox.checked;
-                    _renderMenuButtons(); 
-                    saveGlobalConfig('Update Jellyfish Ball settings');
-                }
-            });
-
-            cssTextarea.value = settings.customCSS || '';
-            customStyleTag.innerHTML = settings.customCSS || '';
-            
-                                    const updatePreview = () => {
-                const previewCss = cssTextarea.value
-                    .replace(/\.jelly-ball-wrapper/g, `#${cssPreview.id}`)
-                    .replace(/#floating-jellyfish-ball/g, `#${previewBall.id}`)
-                    .replace(/\.jelly-ball-glow/g, 'display:none');
-                
-                const styleTag = document.getElementById('jelly-preview-style');
-                if (styleTag) {
-                    styleTag.textContent = previewCss; // 使用 textContent 效率更高
-                    // 强制浏览器重新计算样式，解决部分浏览器下的渲染延迟问题
-                    void previewBall.offsetWidth; 
-                }
+            // 主开关的UI和逻辑控制
+            const updateUIVisibility = () => {
+                settingsEntry.style.display = toggle.checked ? 'block' : 'none';
             };
+            
+            toggle.checked = settings.enabled || false;
+            customStyleTag.innerHTML = settings.customCSS || ''; // 初始加载CSS
 
-
-
-            cssTextarea.addEventListener('input', updatePreview);
-            applyCssBtn.addEventListener('click', () => {
-               settings.customCSS = cssTextarea.value;
-               customStyleTag.innerHTML = settings.customCSS;
-               if(ball) { _destroy(); _create(); } // Re-create to apply styles
-               saveGlobalConfig('Update Jellyfish Ball settings');
-               alert('自定义样式已应用并同步至云端！');
+            toggle.addEventListener('change', () => {
+                settings.enabled = toggle.checked;
+                updateUIVisibility();
+                if (settings.enabled) _create(); else _destroy();
+                saveGlobalConfig('Toggle Jellyfish Ball');
             });
+
+            openSettingsBtn.addEventListener('click', openJellyBallSettingsWindow);
             
             updateUIVisibility();
-            setTimeout(updatePreview, 100);
-
-            // New: CSS help modal logic
-            document.getElementById('show-jelly-css-help').addEventListener('click', () => {
-                document.getElementById('jelly-css-help-modal').classList.add('show');
-            });
         }
+
 
         return { init: initSettings, create: _create, destroy: _destroy };
     })();
@@ -3421,6 +3745,24 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
         updateSyncStatus('syncing', `正在同步: ${commitMessage}`);
         const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
         const body = { message: commitMessage, content: content, branch: 'main' };
+
+        // ============ [核心修复逻辑] ============
+        // 如果调用时没有提供 sha，主动去服务器查询一次
+        if (!sha) {
+            try {
+                const { data: remoteFileData } = await fetchFromGithub(path);
+                // 如果文件在服务器上已存在，就使用它的 sha
+                if (remoteFileData && remoteFileData.sha) {
+                    console.warn(`Local sha for "${path}" was missing. Fetched remote sha to prevent 422 error.`);
+                    sha = remoteFileData.sha;
+                }
+            } catch (e) {
+                // 如果查询失败，可能是网络问题，按原流程继续尝试，让错误处理接管
+                console.error(`Pre-save check for "${path}" failed`, e);
+            }
+        }
+        // =====================================
+
         if (sha) { body.sha = sha; }
 
         try {
@@ -3433,8 +3775,9 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                if (response.status === 409 || (errorData.message && errorData.message.includes("sha doesn't match"))) {
-                    const conflictMessage = `同步冲突：云端数据已被更新，请使用“手动同步与修复”功能后再试。`;
+                // 422 错误现在也应被更友好的冲突信息捕获
+                if (response.status === 409 || response.status === 422 || (errorData.message && errorData.message.includes("sha "))) {
+                    const conflictMessage = `同步冲突：云端数据已被更新。请刷新页面或使用“手动同步与修复”功能后再试。`;
                     updateSyncStatus('error', conflictMessage);
                     return { sha: null, error: conflictMessage };
                 }
@@ -3450,6 +3793,7 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
             return { sha: null, error: userMessage };
         }
     }
+
 
     
     async function uploadFileViaGitData({ file, path, commitMessage, onProgress }) {
@@ -4741,23 +5085,31 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                 }
             },
             'back-to-album-folders': () => { showView('album-folder-view', 'album-section'); state.currentAlbumId = null; },
-            'add-note': () => { state.currentNoteId = null; document.getElementById('note-title-input').value = ''; document.getElementById('note-content-textarea').value = ''; document.querySelector('[data-action="delete-note"]').style.display = 'none';
- showView('note-editor-view', 'memo-section'); },
-            'open-note': (target) => {
+            'add-note': () => {
+                state.currentNoteId = null;
+                document.getElementById('note-title-input').value = '';
+                document.getElementById('note-content-editor').innerHTML = ''; // 修正点：清空 contenteditable div
+                document.querySelector('[data-action="delete-note"]').style.display = 'none';
+                showView('note-editor-view', 'memo-section');
+            },
+
+
+             'open-note': (target) => {
                 const noteId = parseInt(target.closest('[data-note-id]').dataset.noteId, 10);
                 const note = memoryCache.memo.notes.find(n => n.id === noteId);
                 if (note) {
                     state.currentNoteId = note.id;
                     document.getElementById('note-title-input').value = note.title;
-                    document.getElementById('note-content-textarea').value = note.content;
+                    // 使用 innerHTML 设置内容
+                    document.getElementById('note-content-editor').innerHTML = note.content; 
                     document.querySelector('[data-action="delete-note"]').style.display = 'inline-block';
-
                     showView('note-editor-view', 'memo-section');
                 }
             },
             'save-note': () => {
                 const title = document.getElementById('note-title-input').value.trim();
-                const content = document.getElementById('note-content-textarea').value.trim();
+                // 从 contenteditable div 获取 innerHTML
+                const content = document.getElementById('note-content-editor').innerHTML;
                 const now = Date.now();
                 if (state.currentNoteId) {
                     const note = memoryCache.memo.notes.find(n => n.id === state.currentNoteId);
@@ -4773,6 +5125,7 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                 renderNotes();
                 scheduleSave();
             },
+
             'cancel-note': () => {
                 showView('notes-view', 'memo-section');
             },
@@ -5293,6 +5646,152 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                         actions[target.dataset.action](target);
                     }
                 });
+                // [新增] 备忘录富文本编辑器逻辑 v2
+                const editor = document.getElementById('note-content-editor');
+                const toolbar = document.querySelector('.memo-toolbar');
+
+                const updateToolbarState = () => {
+                    const commands = ['bold', 'italic', 'underline', 'strikeThrough'];
+                    commands.forEach(command => {
+                        const button = toolbar.querySelector(`[data-command="${command}"]`);
+                        if (button) {
+                            button.classList.toggle('active', document.queryCommandState(command));
+                        }
+                    });
+                };
+
+                toolbar.addEventListener('click', (e) => {
+                    const button = e.target.closest('.toolbar-btn');
+                    if (!button) return;
+
+                    const command = button.dataset.command;
+                    editor.focus();
+
+                    if (command === 'createCodeBlock') {
+                        const selection = window.getSelection();
+                        if (!selection.rangeCount || selection.isCollapsed) {
+                            showTopToast('请先选择一段文字', 2000);
+                            return;
+                        }
+                        const range = selection.getRangeAt(0);
+                        const selectedText = range.toString();
+                        const codeBlock = document.createElement('div');
+                        codeBlock.className = 'memo-code-block';
+                        const pre = document.createElement('pre');
+                        pre.style.margin = '0';
+                        pre.textContent = selectedText;
+                        const copyBtn = document.createElement('button');
+                        copyBtn.className = 'code-block-copy-btn';
+                        copyBtn.contentEditable = 'false'; // 核心修复点
+                        copyBtn.textContent = '❏';
+                        copyBtn.title = '复制';
+                        codeBlock.appendChild(copyBtn);
+                        codeBlock.appendChild(pre);
+                        range.deleteContents();
+                        const fragment = document.createDocumentFragment();
+                        fragment.appendChild(codeBlock);
+                        fragment.appendChild(document.createTextNode('\u200B'));
+                        range.insertNode(fragment);
+                        range.setStartAfter(codeBlock.nextSibling);
+                        range.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    } else if (command === 'todo') {
+                        document.execCommand('insertUnorderedList', false, null);
+                        setTimeout(() => {
+                            const listItems = editor.querySelectorAll('li');
+                            listItems.forEach(li => {
+                                if (!li.querySelector('.todo-text')) {
+                                    const textNode = document.createTextNode(li.textContent.trim());
+                                    const span = document.createElement('span');
+                                    span.className = 'todo-text';
+                                    span.appendChild(textNode);
+                                    li.innerHTML = '';
+                                    li.appendChild(span);
+                                }
+                            });
+                        }, 50);
+                    } else {
+                        document.execCommand(command, false, null);
+                    }
+                    setTimeout(updateToolbarState, 0); // 延迟更新以获取最新状态
+                });
+
+                editor.addEventListener('keyup', updateToolbarState);
+                editor.addEventListener('mouseup', updateToolbarState);
+                 // 编辑器内部的交互事件（待办清单完成/代码块复制）
+                editor.addEventListener('click', (e) => {
+                    const li = e.target.closest('li');
+                    const copyBtn = e.target.closest('.code-block-copy-btn');
+
+                    if (li) {
+                        li.classList.toggle('completed');
+                    } else if (copyBtn) {
+                        const codeBlock = copyBtn.closest('.memo-code-block');
+                        const textToCopy = codeBlock.querySelector('pre')?.textContent || '';
+                        
+                        // 核心修复点：添加剪贴板 API 兼容性处理
+                        if (navigator.clipboard && window.isSecureContext) {
+                            navigator.clipboard.writeText(textToCopy).then(() => {
+                                const originalText = copyBtn.textContent;
+                                copyBtn.textContent = '✓';
+                                setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
+                            }).catch(err => {
+                                console.error('Copy failed:', err);
+                                showTopToast('复制失败', 2000);
+                            });
+                        } else {
+                            // Fallback for insecure contexts (like file://)
+                            const textArea = document.createElement("textarea");
+                            textArea.value = textToCopy;
+                            textArea.style.position = "fixed";
+                            textArea.style.left = "-9999px";
+                            document.body.appendChild(textArea);
+                            textArea.focus();
+                            textArea.select();
+                            try {
+                                document.execCommand('copy');
+                                const originalText = copyBtn.textContent;
+                                copyBtn.textContent = '✓';
+                                setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
+                            } catch (err) {
+                                console.error('Fallback copy failed', err);
+                                showTopToast('复制失败', 2000);
+                            }
+                            document.body.removeChild(textArea);
+                        }
+                    }
+                     // 点击编辑器任何地方都更新一下工具栏状态
+                    updateToolbarState();
+                });
+
+
+
+                // 编辑器内部的交互事件（待办清单完成/代码块复制）
+                editor.addEventListener('click', (e) => {
+                    const li = e.target.closest('li');
+                    const copyBtn = e.target.closest('.code-block-copy-btn');
+
+                    if (li) {
+                        li.classList.toggle('completed');
+                    } else if (copyBtn) {
+                        const codeBlock = copyBtn.closest('.memo-code-block');
+                        const textToCopy = codeBlock.querySelector('pre')?.textContent || '';
+                        
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                            const originalText = copyBtn.textContent;
+                            copyBtn.textContent = '✓';
+                            setTimeout(() => {
+                                copyBtn.textContent = originalText;
+                            }, 1500);
+                        }).catch(err => {
+                            console.error('Copy failed:', err);
+                            showTopToast('复制失败', 2000);
+                        });
+                    }
+                });
+
+
                 ui.folderModal.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target) actions[target.dataset.action]?.(); });
                 ui.photoDetailsModal.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target) actions[target.dataset.action]?.(); });
                 ui.photoViewer.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target) actions[target.dataset.action]?.(); });
@@ -5322,9 +5821,12 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                 ui.uploadBtn.addEventListener("click", uploadFile);
             },
             getAlbumItems: () => memoryCache ? memoryCache.album.items : [],
+            scheduleSave // 新增这一行
         };
+
     })();
     // ===== [END] MEMORY APP LOGIC =====
+
 
     // ===== [START] WANDER VIEW 4.0 LOGIC (Architecture) =====
     const WanderView = (() => {
@@ -6202,29 +6704,29 @@ const blob = b64toBlob(blobData.content, contentType);
             grid.innerHTML = ''; // 清空，准备重新渲染
 
             const widgetsData = currentConfig.lockscreenWidgets || {};
-
-            // [V-最终修复] 直接遍历存在的组件，并为它们设置精确的网格位置
+            
             Object.keys(widgetsData).forEach(startIndexStr => {
                 const startIndex = parseInt(startIndexStr, 10);
                 const widgetConfig = widgetsData[startIndex]?.[0];
 
-                if (!widgetConfig) return; // 安全检查
+                if (!widgetConfig) return;
 
-                // 1. 根据索引计算出起始行列
                 const startRow = Math.floor(startIndex / 4) + 1;
                 const startCol = (startIndex % 4) + 1;
                 const [cols, rows] = widgetConfig.size.split('x').map(Number);
 
-                // 2. 创建组件的容器
                 const componentContainer = document.createElement('div');
-
-                // 3. [核心] 使用 style 属性直接定义其在网格中的位置和跨度
+                
+                // [最终修复] 如果是HTML组件，则添加特殊类以应用绝对定位策略
+                if (widgetConfig.type === 'html') {
+                    componentContainer.classList.add('html-widget-container');
+                }
+                
                 componentContainer.style.gridRowStart = startRow;
                 componentContainer.style.gridColumnStart = startCol;
                 componentContainer.style.gridRowEnd = `span ${rows}`;
                 componentContainer.style.gridColumnEnd = `span ${cols}`;
                 
-                // 4. 创建内部的 widget 元素并填充内容 (这部分逻辑不变)
                 const widgetEl = document.createElement('div');
                 widgetEl.className = 'widget';
 
@@ -6241,26 +6743,45 @@ const blob = b64toBlob(blobData.content, contentType);
                     case 'memo':
                         const memo = memoryCache.memo.notes.find(n => n.id === widgetConfig.content);
                         widgetEl.classList.add('widget-memo');
-                        if (memo) {
-                            // 检查尺寸是否为 1x1
-                            if (widgetConfig.size === '1x1') {
-                                widgetEl.innerHTML = '&#9993;'; // 使用字符“✉”
-                                widgetEl.style.fontSize = '24px'; // 调整图标大小
-                                widgetEl.style.lineHeight = '1';
-                                widgetEl.style.display = 'flex';
-                                widgetEl.style.alignItems = 'center';
-                                widgetEl.style.justifyContent = 'center';
 
-                            } else {
-                                // 默认只显示标题
-                                widgetEl.innerHTML = `<div class="widget-memo-title">${memo.title || '无标题'}</div>`;
-                            }
-                            widgetEl.style.cursor = 'pointer';
-                            widgetEl.onclick = () => showMemoPopup(widgetConfig.content);
+                        // 统一设置基础样式
+                         Object.assign(widgetEl.style, { 
+                            flexDirection: 'column', 
+                            alignItems: 'flex-start', 
+                            justifyContent: 'flex-start', 
+                            padding: '10px', 
+                            textAlign: 'left',
+                            fontSize: '12px'  // 为内容设置一个基础字号
+                        });
+
+                        if (memo) {
+                            // 标题
+                            const titleEl = document.createElement('div');
+                            titleEl.className = 'widget-memo-title';
+                            titleEl.textContent = memo.title || '无标题';
+                            titleEl.style.cssText = 'font-size: 1.1em; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px;';
+                            widgetEl.appendChild(titleEl);
+
+                            // 内容
+                            const contentContainer = document.createElement('div');
+                            contentContainer.className = 'widget-memo-content';
+                            contentContainer.innerHTML = memo.content;
+                            contentContainer.style.cssText = 'width: 100%; overflow: hidden; font-size: 0.9em; line-height: 1.5;';
+                            
+                            // 关键：为待办事项添加交互所需的数据
+                            contentContainer.querySelectorAll('li').forEach((li, index) => {
+                                li.dataset.noteId = memo.id;
+                                li.dataset.lineIndex = index;
+                                li.style.cursor = 'pointer'; // 提示可点击
+                            });
+
+                            widgetEl.appendChild(contentContainer);
+
                         } else {
                             widgetEl.textContent = '备忘录未找到';
                         }
                         break;
+
                     case 'shortcut':
                         const buttonConfig = findButtonConfigByHref(widgetConfig.content);
                         widgetEl.classList.add('widget-shortcut');
@@ -6275,8 +6796,16 @@ const blob = b64toBlob(blobData.content, contentType);
                             }
                         });
                         break;
+                    case 'html':
+                        widgetEl.style.padding = '0';
+                        widgetEl.style.overflow = 'hidden';
+                        const iframe = document.createElement('iframe');
+                        iframe.className = 'widget-html-iframe';
+                        iframe.srcdoc = widgetConfig.content || '<p style="color: inherit; opacity: 0.6;">未提供HTML内容</p>';
+                        iframe.scrolling = 'no';
+                        widgetEl.appendChild(iframe);
+                        break;
                 }
-
                 
                 componentContainer.appendChild(widgetEl);
                 grid.appendChild(componentContainer);
@@ -6284,12 +6813,10 @@ const blob = b64toBlob(blobData.content, contentType);
         }
 
 
-
-
         const MobileModeManager = (() => {
             let isEnabled = false;
             let currentPickerWindow = null;
-            let pendingWidgetContent = null; // [V5 新增] 用于暂存待生成的组件内容
+            let pendingWidgetContent = null; 
             let ghostEl = null;
             let draggedWidgetInfo = null;
             let dragTargetCell = null;
@@ -6310,23 +6837,16 @@ const blob = b64toBlob(blobData.content, contentType);
                 if (currentPickerWindow) {
                     const windowContainerToClose = currentPickerWindow;
                     const innerWindow = windowContainerToClose.querySelector('.floating-project-window');
-
-                    // 如果内部窗口存在，则触发它的关闭动画
                     if (innerWindow) {
                         innerWindow.classList.remove('visible');
-                        
-                        // 监听动画结束事件，在动画完成后再安全地移除整个容器
                         innerWindow.addEventListener('transitionend', () => {
                             if (windowContainerToClose.parentNode) {
                                 windowContainerToClose.remove();
                             }
                         }, { once: true });
                     } else {
-                        // 如果没有内部窗口，作为备用方案直接移除
                         windowContainerToClose.remove();
                     }
-
-                    // 立即将引用设为 null，以便新窗口可以被创建
                     currentPickerWindow = null;
                 }
             }
@@ -6388,68 +6908,150 @@ const blob = b64toBlob(blobData.content, contentType);
                 createPickerWindow('选择一个备忘录', list);
             }
 
-             function showShortcutPicker(onSelect) {
-                const list = document.createElement('div');
-                list.className = 'picker-list';
-                const allButtons = currentConfig.categories.flatMap(c => c.buttons);
-                if (allButtons.length === 0) list.textContent = '没有已添加的项目。';
-                else {
-                    const uniqueButtons = Array.from(new Map(allButtons.map(item => [item.href, item])).values());
-                    uniqueButtons.forEach(btn => {
-                        const itemEl = document.createElement('div');
-                        itemEl.className = 'picker-item';
-                        itemEl.textContent = btn.text;
-                        itemEl.onclick = () => onSelect({ content: btn.href, text: btn.text });
-                        list.appendChild(itemEl);
-                    });
+             function showContentAndBackgroundPicker(type, onSelect) {
+                let listContent;
+                let pickerTitle = '';
+                let tempSelectedBg = null;
+
+                if (type === 'shortcut') {
+                    pickerTitle = '选择一个快捷方式';
+                    listContent = document.createElement('div');
+                    listContent.className = 'picker-list';
+                    const allButtons = currentConfig.categories.flatMap(c => c.buttons);
+                    if (allButtons.length === 0) {
+                        listContent.textContent = '没有已添加的项目。';
+                    } else {
+                        const uniqueButtons = Array.from(new Map(allButtons.map(item => [item.href, item])).values());
+                        uniqueButtons.forEach(btn => {
+                            const itemEl = document.createElement('div');
+                            itemEl.className = 'picker-item';
+                            itemEl.textContent = btn.text;
+                            itemEl.onclick = () => onSelect({ content: btn.href, text: btn.text, background: tempSelectedBg });
+                            listContent.appendChild(itemEl);
+                        });
+                    }
+                } else if (type === 'memo') {
+                    pickerTitle = '选择一个备忘录';
+                    listContent = document.createElement('div');
+                    listContent.className = 'picker-list';
+                    if (!memoryCache.memo.notes || memoryCache.memo.notes.length === 0) {
+                        listContent.textContent = '没有备忘录。';
+                    } else {
+                        memoryCache.memo.notes.forEach(note => {
+                            const itemEl = document.createElement('div');
+                            itemEl.className = 'picker-item';
+                            itemEl.textContent = note.title || '无标题';
+                            itemEl.onclick = () => onSelect({ content: note.id, background: tempSelectedBg });
+                            listContent.appendChild(itemEl);
+                        });
+                    }
                 }
-                createPickerWindow('选择一个快捷方式', list);
+
+                const pickerContainer = createPickerWindow(pickerTitle, listContent);
+                const pickerWindow = pickerContainer.querySelector('.floating-project-window');
+
+                // 创建并附加背景选择器
+                const bgPicker = document.createElement('div');
+                bgPicker.className = 'widget-bg-picker-popup';
+                bgPicker.innerHTML = `
+                    <input type="color" id="widgetBgColorPicker" value="#ffffff">
+                    <button class="bg-picker-button">导入图片</button>
+                    <input type="file" accept="image/*" style="display:none;">
+                `;
+                pickerWindow.querySelector('.fpw-content').appendChild(bgPicker);
+                
+                const colorInput = bgPicker.querySelector('input[type="color"]');
+                const fileInput = bgPicker.querySelector('input[type="file"]');
+                const fileButton = bgPicker.querySelector('.bg-picker-button');
+
+                // 事件监听
+                colorInput.addEventListener('input', () => {
+                    tempSelectedBg = colorInput.value;
+                    // [新增] 选择颜色时，重置图片选择按钮和文件输入
+                    fileButton.textContent = '导入图片';
+                    fileInput.value = ''; 
+                });
+                
+                fileButton.addEventListener('click', () => fileInput.click());
+
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            tempSelectedBg = event.target.result; // base64 string
+                             // [新增] 选择图片后，更新按钮文本并重置颜色选择
+                            fileButton.textContent = '已选择图片';
+                            colorInput.value = '#ffffff';
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // 显示背景选择器
+                setTimeout(() => bgPicker.classList.add('show'), 50);
             }
 
-            function showMemoPicker(onSelect) {
-                const list = document.createElement('div');
-                list.className = 'picker-list';
-                if (!memoryCache.memo.notes || memoryCache.memo.notes.length === 0) list.textContent = '没有备忘录。';
-                else {
-                    memoryCache.memo.notes.forEach(note => {
-                        const itemEl = document.createElement('div');
-                        itemEl.className = 'picker-item';
-                        itemEl.textContent = note.title || '无标题';
-                        itemEl.onclick = () => onSelect(note.id);
-                        list.appendChild(itemEl);
-                    });
-                }
-                createPickerWindow('选择一个备忘录', list);
+            
+            function showHtmlInputWindow(onSave) {
+                const contentWrapper = document.createElement('div');
+                contentWrapper.style.display = 'flex';
+                contentWrapper.style.flexDirection = 'column';
+                contentWrapper.style.gap = '15px';
+
+                const textarea = document.createElement('textarea');
+                textarea.className = 'modal-textarea html-editor-textarea';
+                textarea.placeholder = '在此输入您的HTML代码...';
+                
+                const completeButton = document.createElement('button');
+                completeButton.className = 'modal-button';
+                completeButton.textContent = '完成';
+                
+                completeButton.onclick = () => {
+                    onSave(textarea.value);
+                };
+
+                contentWrapper.appendChild(textarea);
+                contentWrapper.appendChild(completeButton);
+                
+                createPickerWindow('输入HTML内容', contentWrapper);
             }
+
 
 
             async function saveWidgetConfig(cellIndex, widgetData) {
                 if (!currentConfig.lockscreenWidgets[cellIndex]) {
                     currentConfig.lockscreenWidgets[cellIndex] = [];
                 }
-                currentConfig.lockscreenWidgets[cellIndex].unshift(widgetData); // Add to the beginning
+                currentConfig.lockscreenWidgets[cellIndex].unshift(widgetData); 
                 await saveGlobalConfig(`Add widget to cell ${cellIndex}`);
+                
+                // 立即反馈到真实锁屏和设置模拟器
                 renderLockscreenWidgets();
-                closeAnyOpenWindow();
                 const settingsWindow = document.getElementById('lockscreen-settings-modal');
                 if (settingsWindow) {
                     const grid = settingsWindow.querySelector('.settings-grid');
-                    renderSettingsGrid(grid);
+                    renderSettingsGrid(grid); // 核心修改：立即重新渲染模拟器
                 }
+                
+                closeAnyOpenWindow();
             }
+
 
             async function deleteWidgetFromCell(cellIndex) {
                 delete currentConfig.lockscreenWidgets[cellIndex];
                 await saveGlobalConfig(`Delete widget from cell ${cellIndex}`);
+                
+                // 立即反馈到真实锁屏和设置模拟器
                 renderLockscreenWidgets();
                 const settingsWindow = document.getElementById('lockscreen-settings-modal');
                 if (settingsWindow) {
                     const grid = settingsWindow.querySelector('.settings-grid');
-                    renderSettingsGrid(grid);
+                    renderSettingsGrid(grid); // 核心修改：立即重新渲染模拟器
                 }
             }
 
-            // [V4 新增] 显示相册文件夹列表的悬浮窗
+
             function showAlbumPicker(onSelectCallback) {
                 const list = document.createElement('div');
                 list.className = 'picker-list';
@@ -6464,7 +7066,6 @@ const blob = b64toBlob(blobData.content, contentType);
                         itemEl.className = 'picker-item';
                         itemEl.innerHTML = `<span>${folder.name}</span><span style="font-size: 0.8em; color: #889; float: right;">${itemCount} ></span>`;
                         itemEl.onclick = () => {
-                            // 点击文件夹后，打开该文件夹内的图片列表
                             showPhotosInAlbumPicker(folder.id, onSelectCallback);
                         };
                         list.appendChild(itemEl);
@@ -6473,7 +7074,6 @@ const blob = b64toBlob(blobData.content, contentType);
                 createPickerWindow('选择一个相册', list);
             }
 
-            // [V4 新增] 显示指定相册内图片网格的悬浮窗
             function showPhotosInAlbumPicker(albumId, onSelectCallback) {
                 const grid = document.createElement('div');
                 grid.className = 'picker-grid';
@@ -6494,7 +7094,6 @@ const blob = b64toBlob(blobData.content, contentType);
                         gridItem.onclick = () => {
                             const adderContainer = document.getElementById('lockscreen-settings-modal').querySelector('.component-adder');
                             
-                            // 在“确认”按钮上方显示已选择信息
                             const infoSpan = document.createElement('span');
                             infoSpan.id = 'selection-info';
                             infoSpan.style.fontSize = '12px';
@@ -6509,7 +7108,6 @@ const blob = b64toBlob(blobData.content, contentType);
                             const confirmBtn = adderContainer.querySelector('#confirm-widget-btn');
                             adderContainer.insertBefore(infoSpan, confirmBtn);
 
-                            // 关闭悬浮窗并执行最终的回调
                             closeAnyOpenWindow();
                             onSelectCallback({ path: photo.path, title: photo.title || fileName });
                         };
@@ -6521,18 +7119,58 @@ const blob = b64toBlob(blobData.content, contentType);
             }
 
             
-            // [V7 修复与优化] 创建设置窗口，集成可取消的加载指示器
+            async function ensureMemoryDataIsLoaded(signal) {
+                if (memoryCache && memoryCache.album) {
+                    return { success: true };
+                }
+
+                const MEMORY_DATA_PATH = 'memory/data.json';
+                
+                try {
+                    const { data, error, response } = await fetchFromGithub(MEMORY_DATA_PATH, 'GET', null, signal);
+                    
+                    if (signal?.aborted) {
+                        console.log('Data loading cancelled by user.');
+                        return { success: false, reason: 'cancelled' };
+                    }
+
+                    if (error) {
+                        alert(`加载相册数据失败: ${error}\n\n请检查您的网络连接和GitHub配置。`);
+                        return { success: false, reason: 'error' };
+                    }
+                    
+                    if (response && response.status === 404) {
+                         console.log('memory/data.json not found on remote. Creating new initial data.');
+                         const getInitialData = () => ({ memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] }, album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] } });
+                         memoryCache = getInitialData();
+                    } else if (data) {
+                        memoryCache = JSON.parse(b64_to_utf8(data.content));
+                    } else {
+                        throw new Error("从云端获取的数据为空，但没有明确错误。");
+                    }
+                    if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
+                    if (!memoryCache.album) memoryCache.album = { folders: [], items: [] };
+
+                    return { success: true };
+
+                } catch (e) {
+                    console.error('Critical error in ensureMemoryDataIsLoaded:', e);
+                    alert(`处理相册数据时发生严重错误: ${e.message}\n\n这可能是因为云端文件已损坏。您可以尝试进入“记忆”功能，它会自动尝试修复或重建数据。`);
+                    return { success: false, reason: 'critical' };
+                }
+            }
+            
             function openLockscreenSettingsWindow() {
                 const modalId = 'lockscreen-settings-modal';
-                if (document.getElementById(modalId)) return;
-
-                // [V7 核心] 加载指示器管理器
+                // [修复] 移除防止重复创建的判断，因为关闭时元素会被彻底销毁，需要能够重新创建
+                // if (document.getElementById(modalId)) return;
                 const LoadingIndicator = (() => {
                     let overlay = null;
+
                     let abortController = null;
 
                     function show(message, onCancel) {
-                        if (overlay) return; // 防止重复显示
+                        if (overlay) return;
                         abortController = new AbortController();
 
                         overlay = document.createElement('div');
@@ -6546,25 +7184,22 @@ const blob = b64toBlob(blobData.content, contentType);
                         document.body.appendChild(overlay);
 
                         overlay.querySelector('.loading-indicator-cancel-btn').onclick = () => {
-                            abortController.abort(); // 发送中止信号
+                            abortController.abort();
                             hide();
                             if (onCancel) onCancel();
                         };
                         
-                        // 触发 CSS 过渡
                         requestAnimationFrame(() => overlay.classList.add('show'));
                     }
 
                     function hide() {
                         if (!overlay) return;
-                        const overlayToRemove = overlay; // [修复] 捕获当前的 DOM 元素
+                        const overlayToRemove = overlay;
                         overlayToRemove.classList.remove('show');
-                        // [修复] 在事件监听器中使用捕获的元素，而不是会被置空的变量
                         overlayToRemove.addEventListener('transitionend', () => overlayToRemove.remove(), { once: true });
-                        overlay = null; // 立即将主变量置空，防止重复调用
+                        overlay = null;
                         abortController = null;
                     }
-
 
                     return {
                         show,
@@ -6572,64 +7207,6 @@ const blob = b64toBlob(blobData.content, contentType);
                         getSignal: () => abortController?.signal
                     };
                 })();
-
-                // [V8 修复] 增强的智能缓存数据加载器 (针对移动端优化)
-                async function ensureMemoryDataIsLoaded(signal) {
-                    // 如果缓存已存在，直接成功返回
-                    if (memoryCache && memoryCache.album) {
-                        return { success: true };
-                    }
-
-                    const MEMORY_DATA_PATH = 'memory/data.json';
-                    
-                    try {
-                        const { data, error, response } = await fetchFromGithub(MEMORY_DATA_PATH, 'GET', null, signal);
-                        
-                        // 1. 检查用户是否主动取消
-                        if (signal?.aborted) {
-                            console.log('Data loading cancelled by user.');
-                            return { success: false, reason: 'cancelled' };
-                        }
-
-                        // 2. 检查网络或权限等硬性错误
-                        // fetchFromGithub 内部已经处理了
-                        if (error) {
-                            // 直接将 fetchFromGithub 返回的、对用户友好的错误信息显示出来
-                            alert(`加载相册数据失败: ${error}\n\n请检查您的网络连接和GitHub配置。`);
-                            return { success: false, reason: 'error' };
-                        }
-                        
-                        // 3. 检查文件是否存在 (404 Not Found)
-                        // response.status === 404 意味着仓库里还没有 memory/data.json 文件
-                        if (response && response.status === 404) {
-                             console.log('memory/data.json not found on remote. Creating new initial data.');
-                             // 这是正常情况，比如用户第一次使用记忆功能，我们为其创建一个空的
-                             const getInitialData = () => ({ memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] }, album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] } });
-                             memoryCache = getInitialData();
-                        } else if (data) {
-                            // 4. 如果文件存在，则解析它
-                            memoryCache = JSON.parse(b64_to_utf8(data.content));
-                        } else {
-                            // 兜底情况，如果 data 和 error 都为 null，说明发生了未知问题
-                            throw new Error("从云端获取的数据为空，但没有明确错误。");
-                        }
-
-                        // 5. 确保数据结构完整
-                        if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
-                        if (!memoryCache.album) memoryCache.album = { folders: [], items: [] };
-
-                        // 6. 一切顺利，成功返回
-                        return { success: true };
-
-                    } catch (e) {
-                        // 捕获所有其他意外错误，例如 JSON 解析失败
-                        console.error('Critical error in ensureMemoryDataIsLoaded:', e);
-                        alert(`处理相册数据时发生严重错误: ${e.message}\n\n这可能是因为云端文件已损坏。您可以尝试进入“记忆”功能，它会自动尝试修复或重建数据。`);
-                        return { success: false, reason: 'critical' };
-                    }
-                }
-
-                // --- UI 创建部分 (保持不变) ---
                 const modalOverlay = document.createElement('div');
                 modalOverlay.id = modalId;
                 modalOverlay.className = 'modal-overlay show';
@@ -6657,7 +7234,7 @@ const blob = b64toBlob(blobData.content, contentType);
                         <div class="adder-control-group"> <label>类型</label> <select id="widget-type-selector" class="modal-select"> <option value="shortcut">快捷按钮</option> <option value="image">图片</option> <option value="memo">备忘录</option> <option value="html">HTML</option> </select> </div>
                     </div>
                     <button id="confirm-widget-btn" class="modal-button">确认并生成</button>
-                    <div id="new-widget-preview-area">将生成的组件拖入上方屏幕</div>
+                    <div id="new-widget-preview-area" style="display: flex; justify-content: center; align-items: center; gap: 15px;">将生成的组件拖入上方屏幕</div>
                 `;
                 body.append(phoneScreen, adderContainer);
                 settingsContainer.append(header, body);
@@ -6665,126 +7242,82 @@ const blob = b64toBlob(blobData.content, contentType);
                 modalOverlay.appendChild(modalContent);
                 document.body.appendChild(modalOverlay);
 
-                // --- 事件监听器设置 ---
                 const closeModal = () => { closeAnyOpenWindow(); modalOverlay.classList.remove('show'); modalOverlay.addEventListener('transitionend', () => modalOverlay.remove(), { once: true }); };
                 header.querySelector('.close-btn').onclick = closeModal;
                 modalOverlay.onclick = (e) => { if (e.target === modalOverlay) closeModal(); };
                 renderSettingsGrid(gridContainer);
                 const widthDisplay = adderContainer.querySelector('#width-display'), heightDisplay = adderContainer.querySelector('#height-display');
                 adderContainer.querySelectorAll('.roller-btn').forEach(btn => btn.addEventListener('click', () => { const t = btn.dataset.roller, d = parseInt(btn.dataset.dir, 10), el = t === 'width' ? widthDisplay : heightDisplay, max = t === 'width' ? 4 : 8; let val = parseInt(el.textContent, 10) + d; el.textContent = Math.max(1, Math.min(val, max)); }));
-
-                 // [V7 优化] 类型选择器的事件监听器
-                adderContainer.querySelector('#widget-type-selector').addEventListener('change', async function() {
-                    const selectedType = this.value;
-                    const selector = this;
-                    const originalSelectedIndex = selector.selectedIndex;
-
-                    // 通用清理工作
+                
+                adderContainer.querySelector('#widget-type-selector').addEventListener('change', function() {
                     adderContainer.querySelector('#new-widget-preview-area').innerHTML = '将生成的组件拖入上方屏幕';
                     adderContainer.querySelector('#new-widget-preview-area').classList.remove('has-widget');
                     pendingWidgetContent = null;
                     adderContainer.querySelector('#selection-info')?.remove();
-
-                    const onCancel = () => {
-                        selector.selectedIndex = originalSelectedIndex;
-                        console.log('Data loading cancelled');
-                    };
-
-                    // 现在只为 "图片" 类型预先加载数据和弹出选择器
-                    if (selectedType === 'image') {
-                        LoadingIndicator.show('正在加载数据...', onCancel);
-                        const { success, reason } = await ensureMemoryDataIsLoaded(LoadingIndicator.getSignal());
-                        LoadingIndicator.hide();
-
-                        if (!success) {
-                            if (reason !== 'cancelled') selector.selectedIndex = originalSelectedIndex;
-                            return;
-                        }
-                        
-                        showAlbumPicker(photoData => {
-                            pendingWidgetContent = { type: 'image', size: `${widthDisplay.textContent}x${heightDisplay.textContent}`, content: photoData.path };
-                            adderContainer.querySelector('#selection-info')?.remove();
-                            const infoSpan = document.createElement('span');
-                            infoSpan.id = 'selection-info';
-                            infoSpan.style.cssText = 'font-size:12px;color:#889;text-align:center;display:block;margin-top:-10px;margin-bottom:10px;';
-                            infoSpan.textContent = `已选择：${photoData.title}`;
-                            adderContainer.insertBefore(infoSpan, adderContainer.querySelector('#confirm-widget-btn'));
-                        });
-                    }
                 });
 
-
-
-                
+                // ============ [核心修改点 1: "确认并生成" 按钮逻辑] ============
                 adderContainer.querySelector('#confirm-widget-btn').addEventListener('click', () => {
                     const type = adderContainer.querySelector('#widget-type-selector').value;
                     const previewArea = adderContainer.querySelector('#new-widget-preview-area');
+
                     adderContainer.querySelector('#selection-info')?.remove();
-                    previewArea.innerHTML = ''; // 清空预览区
+                    previewArea.innerHTML = ''; 
 
-                    let newPreviewItem = null;
+                    const size = `${widthDisplay.textContent}x${heightDisplay.textContent}`;
+                    const typeTextMap = { 'shortcut': '快捷方式', 'image': '图片', 'memo': '备忘录', 'html': 'HTML' };
+                    const descriptiveText = `${size} ${typeTextMap[type] || type}`;
+                    
+                    // 创建函数，用于生成一个预览项
+                    const createPreviewItem = (shape) => {
+                        const item = document.createElement('div');
+                        item.className = 'widget-preview-item';
+                        if (shape === 'circle') {
+                            item.classList.add('shape-circle');
+                        }
+                        Object.assign(item.dataset, { 
+                            widgetSize: size, 
+                            widgetType: type,
+                            widgetShape: shape // [新增] 将形状信息存入 dataset
+                        });
+                        item.textContent = descriptiveText;
+                        item.draggable = true;
+                        item.addEventListener('mousedown', handleDragStart);
+                        item.addEventListener('touchstart', handleDragStart, { passive: false });
+                        return item;
+                    };
 
-                    // 优先处理已经预选了内容的图片类型
-                    if (pendingWidgetContent && pendingWidgetContent.type === 'image') {
-                        newPreviewItem = document.createElement('div');
-                        newPreviewItem.className = 'widget-preview-item';
-                        newPreviewItem.style.cssText = 'padding:0; overflow:hidden;';
-                        Object.assign(newPreviewItem.dataset, { widgetSize: pendingWidgetContent.size, widgetType: 'image', widgetContent: pendingWidgetContent.content });
-                        newPreviewItem.innerHTML = `<img style="width:100%;height:100%;object-fit:cover;pointer-events:none;">`;
-                        getSecureFileUrl(pendingWidgetContent.content).then(url => { if (url) newPreviewItem.querySelector('img').src = url; });
-                        pendingWidgetContent = null; // 清空
-                    } 
-                    // 对于其他所有类型（包括备忘录），都生成一个通用的占位符
-                    else if (type !== 'image') { 
-                        const size = `${widthDisplay.textContent}x${heightDisplay.textContent}`;
-                        const typeTextMap = { 'shortcut': '快捷方式', 'memo': '备忘录', 'html': 'HTML' }; // 把备忘录加回来
-                        newPreviewItem = document.createElement('div');
-                        newPreviewItem.className = 'widget-preview-item';
-                        Object.assign(newPreviewItem.dataset, { widgetSize: size, widgetType: type }); // `widgetContent` 在这里是空的
-                        newPreviewItem.textContent = `${size} ${typeTextMap[type]}`;
-                    } 
-                    // 如果是图片类型但没有预选内容，则提示用户
-                    else {
-                        alert(`请先选择一个"图片"。`);
-                    }
+                    // 创建并添加方形和圆形预览项
+                    const squarePreview = createPreviewItem('square');
+                    const circlePreview = createPreviewItem('circle');
 
-                    if (newPreviewItem) {
-                        newPreviewItem.draggable = true;
-                        newPreviewItem.addEventListener('mousedown', handleDragStart);
-                        newPreviewItem.addEventListener('touchstart', handleDragStart, { passive: false });
-                        previewArea.appendChild(newPreviewItem);
-                    }
+                    previewArea.appendChild(circlePreview);
+                    previewArea.appendChild(squarePreview);
+                    
                     previewArea.classList.toggle('has-widget', previewArea.childElementCount > 0);
                 });
             }
 
-
-            // [V5 重构 & V9 拖拽修复] 渲染网格，应用JS绝对定位布局
             async function renderSettingsGrid(gridContainer) {
-                gridContainer.innerHTML = ''; // 清空容器
-
-                // 1. 创建底层虚线网格 (保持不变)
+                gridContainer.innerHTML = ''; 
                 for (let i = 0; i < 32; i++) {
                     const cell = document.createElement('div');
                     cell.className = 'settings-grid-cell';
                     cell.dataset.cellIndex = i;
                     gridContainer.appendChild(cell);
                 }
-                 // --- [核心修改：JS 绝对定位布局] ---
                 const gridRect = gridContainer.getBoundingClientRect();
-                const gap = 4; // 从CSS中获取的gap值
+                const gap = 4;
                 const cellWidth = (gridRect.width - (3 * gap)) / 4;
                 const cellHeight = (gridRect.height - (7 * gap)) / 8;
 
-                // 检查计算是否有效，如果容器尚未渲染，则退出以避免错误
                 if (cellWidth <= 0 || cellHeight <= 0) {
                     console.warn("Grid container has no dimensions, skipping widget render.");
                     return;
                 }
 
                 const widgets = currentConfig.lockscreenWidgets || {};
-
-                // 2. 遍历已配置的组件，为每个组件创建独立的、绝对定位的包裹层
+                
                 for (const startIndexStr in widgets) {
                     const startIndex = parseInt(startIndexStr);
                     const widgetConfig = widgets[startIndex]?.[0];
@@ -6792,7 +7325,6 @@ const blob = b64toBlob(blobData.content, contentType);
 
                     const [cols, rows] = widgetConfig.size.split('x').map(Number);
                     
-                    // A. 计算精确的像素位置和大小
                     const startRow_0based = Math.floor(startIndex / 4);
                     const startCol_0based = startIndex % 4;
 
@@ -6801,7 +7333,6 @@ const blob = b64toBlob(blobData.content, contentType);
                     const width = cols * cellWidth + (cols - 1) * gap;
                     const height = rows * cellHeight + (rows - 1) * gap;
 
-                    // B. 创建最外层的容器并应用绝对定位样式
                     const container = document.createElement('div');
                     container.className = 'widget-container-wrapper';
                     Object.assign(container.style, {
@@ -6811,8 +7342,7 @@ const blob = b64toBlob(blobData.content, contentType);
                         width: `${width}px`,
                         height: `${height}px`,
                     });
-
-                    // C. 创建组件预览内容的占位符 (内部逻辑不变)
+                    
                     const placeholder = document.createElement('div');
                     placeholder.className = 'widget-placeholder';
                     placeholder.style.position = 'absolute';
@@ -6820,15 +7350,14 @@ const blob = b64toBlob(blobData.content, contentType);
                     
                     switch (widgetConfig.type) {
                         case 'image':
-                            // [核心修复] 使用 <img> 元素替代背景图，以实现更好的缩放控制
-                            placeholder.style.padding = '0'; // 图片组件不需要内边距
-                            placeholder.style.overflow = 'hidden'; // 确保图片不超出圆角
+                            placeholder.style.padding = '0';
+                            placeholder.style.overflow = 'hidden';
                             const img = document.createElement('img');
                             Object.assign(img.style, {
                                 width: '100%',
                                 height: '100%',
-                                objectFit: 'cover', // 保证图片按比例填充，裁剪多余部分
-                                borderRadius: 'inherit' // 继承父容器的圆角
+                                objectFit: 'cover',
+                                borderRadius: 'inherit'
                             });
                             img.alt = 'Image Preview';
                             getSecureFileUrl(widgetConfig.content).then(url => {
@@ -6849,8 +7378,6 @@ const blob = b64toBlob(blobData.content, contentType);
                             break;
                     }
 
-                    
-                    // D. 创建删除按钮及其包裹层 (内部逻辑不变)
                     const deleteWrapper = document.createElement('div');
                     deleteWrapper.className = 'widget-delete-wrapper';
                     const deleteBtn = document.createElement('button');
@@ -6863,8 +7390,6 @@ const blob = b64toBlob(blobData.content, contentType);
                         }
                     };
                     deleteWrapper.appendChild(deleteBtn);
-                    
-                    // E. 组装并添加到网格中
                     container.appendChild(placeholder);
                     container.appendChild(deleteWrapper);
                     gridContainer.appendChild(container);
@@ -6872,37 +7397,36 @@ const blob = b64toBlob(blobData.content, contentType);
             }
 
 
-
-
+            // ============ [核心修改点 2: 拖拽开始时捕获形状信息] ============
             function handleDragStart(e) {
                 e.preventDefault();
                 const item = e.currentTarget;
-                // [核心修改] 将 content 信息也加入拖拽数据中
                 draggedWidgetInfo = { 
                     size: item.dataset.widgetSize, 
                     type: item.dataset.widgetType,
-                    content: item.dataset.widgetContent // 对于图片类型，这里会是图片的路径
+                    shape: item.dataset.widgetShape, // [新增] 捕获形状
+                    content: item.dataset.widgetContent
                 };
                 ghostEl = document.createElement('div');
                 ghostEl.className = 'widget-ghost';
+                if (draggedWidgetInfo.shape === 'circle') { // [新增] 让拖拽虚影也变成圆形
+                    ghostEl.style.borderRadius = '50%';
+                }
                 ghostEl.textContent = item.textContent;
                 document.body.appendChild(ghostEl);
                 
-                // [核心修改] 
-                // 动态计算 ghost 尺寸，使其与模拟器中的格子比例完全一致
                 const gridEl = document.querySelector('#lockscreen-settings-modal .settings-grid');
                 if (!gridEl) return;
                 
                 const gridRect = gridEl.getBoundingClientRect();
-                const singleCellWidth = (gridRect.width - (3 * 5)) / 4; // (总宽 - 3个间距) / 4列
-                const singleCellHeight = (gridRect.height - (7 * 5)) / 8; // (总高 - 7个间距) / 8行
-                const gap = 5; // grid-gap
+                const singleCellWidth = (gridRect.width - (3 * 5)) / 4;
+                const singleCellHeight = (gridRect.height - (7 * 5)) / 8;
+                const gap = 5;
 
                 const [cols, rows] = draggedWidgetInfo.size.split('x').map(Number);
 
                 ghostEl.style.width = `${cols * singleCellWidth + (cols - 1) * gap}px`;
                 ghostEl.style.height = `${rows * singleCellHeight + (rows - 1) * gap}px`;
-                // [修改结束]
 
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -6959,36 +7483,34 @@ const blob = b64toBlob(blobData.content, contentType);
                 }
             }
             
-            async function handleDragEnd() { // 将函数声明为 async
+            async function handleDragEnd() {
                 if (dragTargetCell) {
                     dragTargetCell.classList.remove('drag-over');
                     const cellIndex = parseInt(dragTargetCell.dataset.cellIndex, 10);
                     const newWidget = { id: Date.now(), ...draggedWidgetInfo };
 
-                    const onSelectContent = (data) => {
-                        if (typeof data === 'object' && data !== null) {
-                            newWidget.content = data.content; 
-                            newWidget.text = data.text;
-                        } else if (data) {
-                            newWidget.content = data;
-                        }
+         const onSelectContent = (data) => {
+                        // data is now an object: { content, text?, background? }
+                        newWidget.content = data.content;
+                        if (data.text) newWidget.text = data.text;
+                        if (data.background) newWidget.background = data.background;
+                        
                         saveWidgetConfig(cellIndex, newWidget);
                     };
 
-                    // 根据类型决定后续操作
-                    if (newWidget.type === 'image') {
-                        saveWidgetConfig(cellIndex, newWidget);
-                    } else if (newWidget.type === 'memo') {
-                        // 在此加载数据，修复报错
+                    if (newWidget.type === 'memo' || newWidget.type === 'image' || newWidget.type === 'shortcut') {
                         const { success } = await ensureMemoryDataIsLoaded();
                         if (success) {
-                            showMemoPicker(onSelectContent);
+                            if (newWidget.type === 'memo' || newWidget.type === 'shortcut') {
+                                showContentAndBackgroundPicker(newWidget.type, onSelectContent);
+                            } else { // type === 'image'
+                                showAlbumPicker(photoData => onSelectContent({ content: photoData.path }));
+                            }
                         }
-                    } else if (newWidget.type === 'shortcut') {
-                        showShortcutPicker(onSelectContent);
                     } else if (newWidget.type === 'html') {
-                        onSelectContent(null);
+                        showHtmlInputWindow(htmlContent => onSelectContent({ content: htmlContent }));
                     }
+
                 }
                 if (ghostEl) ghostEl.remove();
                 ghostEl = null; draggedWidgetInfo = null; dragTargetCell = null;
@@ -6996,15 +7518,20 @@ const blob = b64toBlob(blobData.content, contentType);
                 document.removeEventListener('touchmove', handleDragMove);
             }
 
-
-            function applyMode(enable) {
+            async function applyMode(enable) {
                 const homeScreenPage = document.getElementById('homeScreenPage');
                 const mainWrapper = document.getElementById('mainWrapper');
                 const elementsToMove = [document.getElementById('pageOverlay'), document.getElementById('titleCard'), document.getElementById('categoryNavContainer'), document.getElementById('navContainer')].filter(Boolean);
                 isEnabled = enable;
                 document.body.classList.toggle('mobile-mode', enable);
                 ui.settingsEntry.style.display = enable ? 'block' : 'none';
+                
                 if (enable) {
+                    const { success } = await ensureMemoryDataIsLoaded();
+                    if (!success) {
+                        alert("加载锁屏组件数据失败，部分组件可能无法显示。请检查网络后刷新重试。");
+                    }
+                    
                     elementsToMove.forEach(el => homeScreenPage.appendChild(el));
                     currentPage = 0; currentTranslate = 0;
                     ui.slider.style.transition = 'none';
@@ -7020,10 +7547,12 @@ const blob = b64toBlob(blobData.content, contentType);
                     ui.slider.classList.remove('show-home-screen');
                     document.body.classList.remove('mobile-home-screen-active');
                 }
+                
                 if (!currentConfig.settings.mobileMode) currentConfig.settings.mobileMode = {};
                 currentConfig.settings.mobileMode.enabled = enable;
                 saveGlobalConfig('Toggle mobile mode');
             }
+
 
             function handleTouchStart(e) {
                 if (!isEnabled || e.target.closest('.widget, .widget-placeholder, .component-adder')) return;
@@ -7091,6 +7620,131 @@ const blob = b64toBlob(blobData.content, contentType);
             };
         })();
 
+        // ============ [核心修改点 3: 渲染锁屏组件时应用形状] ============
+        function renderLockscreenWidgets() {
+            const grid = document.getElementById('lockscreenGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const gridRect = grid.getBoundingClientRect();
+            const gap = 15;
+            const totalWidth = gridRect.width;
+            const totalHeight = gridRect.height;
+
+            if (totalWidth <= 0 || totalHeight <= 0) return;
+
+            const cellWidth = (totalWidth - (3 * gap)) / 4;
+            const cellHeight = (totalHeight - (7 * gap)) / 8;
+
+            const widgetsData = currentConfig.lockscreenWidgets || {};
+            
+            Object.keys(widgetsData).forEach(startIndexStr => {
+                const startIndex = parseInt(startIndexStr, 10);
+                const widgetConfig = widgetsData[startIndex]?.[0];
+
+                if (!widgetConfig) return;
+
+                const startRow_0based = Math.floor(startIndex / 4);
+                const startCol_0based = startIndex % 4;
+                const [cols, rows] = widgetConfig.size.split('x').map(Number);
+                
+                const top = startRow_0based * (cellHeight + gap);
+                const left = startCol_0based * (cellWidth + gap);
+                const width = (cols * cellWidth) + ((cols - 1) * gap);
+                const height = (rows * cellHeight) + ((rows - 1) * gap);
+
+                const componentContainer = document.createElement('div');
+                componentContainer.style.position = 'absolute';
+                Object.assign(componentContainer.style, { top: `${top}px`, left: `${left}px`, width: `${width}px`, height: `${height}px` });
+
+                if (widgetConfig.type === 'html') componentContainer.classList.add('html-widget-container');
+                
+                const widgetEl = document.createElement('div');
+                widgetEl.className = 'widget';
+
+                if (widgetConfig.shape === 'circle') {
+                    widgetEl.classList.add(cols === rows ? 'widget-shape-circle' : 'widget-shape-capsule');
+                } else {
+                    widgetEl.classList.add('widget-shape-square');
+                }
+
+                // ============ [新功能实现] 应用背景样式 ============
+                if (widgetConfig.background) {
+                    if (widgetConfig.background.startsWith('data:image')) {
+                        widgetEl.style.backgroundImage = `url(${widgetConfig.background})`;
+                        widgetEl.style.backgroundSize = 'cover';
+                        widgetEl.style.backgroundPosition = 'center';
+                        // 针对快捷按钮，如果背景是图片，则隐藏文字
+                        if (widgetConfig.type === 'shortcut') {
+                           widgetEl.style.color = 'transparent'; // 隐藏文字
+                           widgetEl.style.textIndent = '9999px'; // 确保文字被移出可视区域
+                           widgetEl.style.overflow = 'hidden';
+                        }
+                    } else { // 假定是颜色
+                        widgetEl.style.backgroundColor = widgetConfig.background;
+                        widgetEl.style.backgroundImage = 'none'; // 清除可能存在的图片背景
+                    }
+                }
+                // ===============================================
+
+                switch (widgetConfig.type) {
+                    case 'image':
+                        widgetEl.classList.add('widget-image');
+                        const img = document.createElement('img');
+                        img.alt = 'Image Widget';
+                        getSecureFileUrl(widgetConfig.content).then(url => { if (url) img.src = url; });
+                        widgetEl.appendChild(img);
+                        break;
+                    case 'memo':
+                        const memo = memoryCache.memo.notes.find(n => n.id === widgetConfig.content);
+                        widgetEl.classList.add('widget-memo');
+                        if (memo) {
+                            if (widgetConfig.size === '1x1') {
+                                widgetEl.innerHTML = '&#9993;';
+                                widgetEl.style.fontSize = '2em';
+                            } else {
+                                widgetEl.classList.remove('widget-shape-circle', 'widget-shape-capsule');
+                                widgetEl.classList.add('widget-shape-square');
+                                widgetEl.innerHTML = `<div class="widget-memo-title">${memo.title || '无标题'}</div> <div class="widget-memo-content">${memo.content || '无内容'}</div>`;
+                                Object.assign(widgetEl.style, { flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', padding: '12px', textAlign: 'left' });
+                            }
+                            widgetEl.style.cursor = 'pointer';
+                            widgetEl.onclick = () => showMemoPopup(widgetConfig.content);
+                        } else {
+                            widgetEl.textContent = '备忘录未找到';
+                        }
+                        break;
+                    case 'shortcut':
+                        const buttonConfig = findButtonConfigByHref(widgetConfig.content);
+                        widgetEl.classList.add('widget-shortcut');
+                        widgetEl.textContent = buttonConfig ? buttonConfig.text : '快捷方式';
+                        widgetEl.dataset.href = widgetConfig.content;
+                        widgetEl.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            const href = this.dataset.href;
+                            const config = findButtonConfigByHref(href);
+                            if (config && config.openExternally) {
+                                window.open(href, '_blank', 'noopener,noreferrer');
+                            } else {
+                                openIframeModal(href);
+                            }
+                        });
+                        break;
+                    case 'html':
+                        Object.assign(widgetEl.style, { padding: '0', overflow: 'hidden' });
+                        const iframe = document.createElement('iframe');
+                        iframe.className = 'widget-html-iframe';
+                        iframe.srcdoc = widgetConfig.content || '<p style="color: inherit; opacity: 0.6;">未提供HTML内容</p>';
+                        iframe.scrolling = 'no';
+                        widgetEl.appendChild(iframe);
+                        break;
+                }
+                
+                componentContainer.appendChild(widgetEl);
+                grid.appendChild(componentContainer);
+            });
+        }
+
 
 
         // 初始化手机模式管理器
@@ -7099,6 +7753,37 @@ const blob = b64toBlob(blobData.content, contentType);
         /* ========================= [新增结束] ========================== */
         /* =============================================================== */
     });
+            // [新增] 锁屏组件交互事件监听
+            document.getElementById('lockscreenGrid').addEventListener('click', (e) => {
+                const li = e.target.closest('li[data-note-id]');
+                if (!li) return;
+
+                const noteId = parseInt(li.dataset.noteId, 10);
+                const lineIndex = parseInt(li.dataset.lineIndex, 10);
+
+                const note = memoryCache.memo.notes.find(n => n.id === noteId);
+                if (!note) return;
+                
+                // 解析 note.content 为一个临时的DOM结构
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = note.content;
+
+                const targetLi = tempDiv.querySelectorAll('li')[lineIndex];
+                if (targetLi) {
+                    // 切换完成状态
+                    targetLi.classList.toggle('completed');
+
+                    // 将修改后的 HTML 写回数据模型
+                    note.content = tempDiv.innerHTML;
+
+                    // 立即重新渲染锁屏以提供即时反馈
+                    renderLockscreenWidgets();
+
+                    // 安排云同步
+                    MemoryApp.scheduleSave(); // 复用 MemoryApp 的保存逻辑
+                }
+            });
+
 
     </script>
 </body>
