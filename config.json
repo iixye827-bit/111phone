@@ -31,6 +31,15 @@
   },
   "themePresets": [],
   "lockscreenWidgets": {
+    "0": [
+      {
+        "id": 1760014599536,
+        "size": "4x1",
+        "type": "image",
+        "shape": "circle",
+        "content": "memory/photos/1759762928721_IMG_6060.jpeg"
+      }
+    ],
     "8": [
       {
         "id": 1760013968713,
