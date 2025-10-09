@@ -31,6 +31,17 @@
   },
   "themePresets": [],
   "lockscreenWidgets": {
+    "0": [
+      {
+        "id": 1760026809893,
+        "size": "1x1",
+        "type": "shortcut",
+        "shape": "circle",
+        "content": "3",
+        "text": "2",
+        "background": "#3c071b"
+      }
+    ],
     "13": [
       {
         "id": 1760026643321,
