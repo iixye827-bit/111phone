@@ -36,19 +36,9 @@
       "customCSS": ""
     },
     "mobileMode": {
-      "enabled": true
+      "enabled": false
     }
   },
   "themePresets": [],
-  "lockscreenWidgets": {
-    "16": [
-      {
-        "id": 1760021446164,
-        "size": "2x2",
-        "type": "memo",
-        "shape": "circle",
-        "content": 1759600256491
-      }
-    ]
-  }
+  "lockscreenWidgets": {}
 }
