@@ -1044,8 +1044,10 @@ body.mobile-mode .home-screen-page {
     padding: 4vh 0 2vh 0; /* 修改：移除左右内边距，给底部留一点空间 */
     display: flex;
     flex-direction: column;
-    /* align-items: center; /* 移除此行，以允许子元素占满宽度 */
+    align-items: center; /* [核心修改] 新增此行，使其内部元素水平居中 */
+    justify-content: center; /* [核心修改] 新增此行，使其内部元素垂直居中 */
 }
+
 
 /* ===== [新增] 手机模式下，主屏幕内部元素的布局控制 ===== */
 
@@ -7008,120 +7010,6 @@ const blob = b64toBlob(blobData.content, contentType);
             setTimeout(() => overlay.classList.add('show'), 10);
         }
         
-        // [重构] 渲染锁屏组件
-        function renderLockscreenWidgets() {
-            const grid = document.getElementById('lockscreenGrid');
-            if (!grid) return;
-            grid.innerHTML = ''; // 清空，准备重新渲染
-
-            const widgetsData = currentConfig.lockscreenWidgets || {};
-            
-            Object.keys(widgetsData).forEach(startIndexStr => {
-                const startIndex = parseInt(startIndexStr, 10);
-                const widgetConfig = widgetsData[startIndex]?.[0];
-
-                if (!widgetConfig) return;
-
-                const startRow = Math.floor(startIndex / 4) + 1;
-                const startCol = (startIndex % 4) + 1;
-                const [cols, rows] = widgetConfig.size.split('x').map(Number);
-
-                const componentContainer = document.createElement('div');
-                
-                // [最终修复] 如果是HTML组件，则添加特殊类以应用绝对定位策略
-                if (widgetConfig.type === 'html') {
-                    componentContainer.classList.add('html-widget-container');
-                }
-                
-                componentContainer.style.gridRowStart = startRow;
-                componentContainer.style.gridColumnStart = startCol;
-                componentContainer.style.gridRowEnd = `span ${rows}`;
-                componentContainer.style.gridColumnEnd = `span ${cols}`;
-                
-                const widgetEl = document.createElement('div');
-                widgetEl.className = 'widget';
-
-                switch (widgetConfig.type) {
-                    case 'image':
-                        widgetEl.classList.add('widget-image');
-                        const img = document.createElement('img');
-                        img.alt = 'Image Widget';
-                        getSecureFileUrl(widgetConfig.content).then(url => {
-                            if (url) img.src = url;
-                        });
-                        widgetEl.appendChild(img);
-                        break;
-                    case 'memo':
-                        const memo = memoryCache.memo.notes.find(n => n.id === widgetConfig.content);
-                        widgetEl.classList.add('widget-memo');
-
-                        // 统一设置基础样式
-                         Object.assign(widgetEl.style, { 
-                            flexDirection: 'column', 
-                            alignItems: 'flex-start', 
-                            justifyContent: 'flex-start', 
-                            padding: '10px', 
-                            textAlign: 'left',
-                            fontSize: '12px'  // 为内容设置一个基础字号
-                        });
-
-                        if (memo) {
-                            // 标题
-                            const titleEl = document.createElement('div');
-                            titleEl.className = 'widget-memo-title';
-                            titleEl.textContent = memo.title || '无标题';
-                            titleEl.style.cssText = 'font-size: 1.1em; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px;';
-                            widgetEl.appendChild(titleEl);
-
-                            // 内容
-                            const contentContainer = document.createElement('div');
-                            contentContainer.className = 'widget-memo-content';
-                            contentContainer.innerHTML = memo.content;
-                            contentContainer.style.cssText = 'width: 100%; overflow: hidden; font-size: 0.9em; line-height: 1.5;';
-                            
-                            // 关键：为待办事项添加交互所需的数据
-                            contentContainer.querySelectorAll('li').forEach((li, index) => {
-                                li.dataset.noteId = memo.id;
-                                li.dataset.lineIndex = index;
-                                li.style.cursor = 'pointer'; // 提示可点击
-                            });
-
-                            widgetEl.appendChild(contentContainer);
-
-                        } else {
-                            widgetEl.textContent = '备忘录未找到';
-                        }
-                        break;
-
-                    case 'shortcut':
-                        const buttonConfig = findButtonConfigByHref(widgetConfig.content);
-                        widgetEl.classList.add('widget-shortcut');
-                        widgetEl.textContent = buttonConfig ? buttonConfig.text : '快捷方式';
-                        widgetEl.dataset.href = widgetConfig.content;
-                        widgetEl.addEventListener('click', function (e) {
-                            e.stopPropagation();
-                            if (buttonConfig && buttonConfig.openExternally) {
-                                window.open(this.dataset.href, '_blank', 'noopener,noreferrer');
-                            } else {
-                                openIframeModal(this.dataset.href);
-                            }
-                        });
-                        break;
-                    case 'html':
-                        widgetEl.style.padding = '0';
-                        widgetEl.style.overflow = 'hidden';
-                        const iframe = document.createElement('iframe');
-                        iframe.className = 'widget-html-iframe';
-                        iframe.srcdoc = widgetConfig.content || '<p style="color: inherit; opacity: 0.6;">未提供HTML内容</p>';
-                        iframe.scrolling = 'no';
-                        widgetEl.appendChild(iframe);
-                        break;
-                }
-                
-                componentContainer.appendChild(widgetEl);
-                grid.appendChild(componentContainer);
-            });
-        }
 
 
         const MobileModeManager = (() => {
@@ -8021,31 +7909,46 @@ const blob = b64toBlob(blobData.content, contentType);
             if (!grid) return;
             grid.innerHTML = '';
 
-            const gridRect = grid.getBoundingClientRect();
+            // [V2 核心重构]
+            // 让网格容器自适应宽度，但强制其高度，以确保内部单元格为1:1
+            const gridContainerParent = grid.parentElement;
+            if (!gridContainerParent) return;
+            
+            // 1. 获取父容器的宽度作为计算基准
+            const parentRect = gridContainerParent.getBoundingClientRect();
+            const gridMaxWidth = Math.min(parentRect.width, 500); // 遵循CSS中的max-width
+            
             const gap = 15;
-            const totalWidth = gridRect.width;
-            const totalHeight = gridRect.height;
-            if (totalWidth <= 0 || totalHeight <= 0) return;
+            
+            // 2. 根据宽度计算出完美的1:1单元格尺寸
+            const cellSize = (gridMaxWidth - (3 * gap)) / 4;
+            
+            if (cellSize <= 0) return; // 防止无效计算
 
-            const cellWidth = (totalWidth - (3 * gap)) / 4;
-            const cellHeight = cellWidth; // 核心修改：强制让格子高度等于宽度，确保1:1
+            // 3. 根据单元格尺寸，反向计算出网格容器应有的总高度
+            const requiredGridHeight = (8 * cellSize) + (7 * gap);
+            
+            // 4. 将计算出的尺寸应用到网格容器上
+            grid.style.width = `${gridMaxWidth}px`;
+            grid.style.height = `${requiredGridHeight}px`;
 
             const widgetsData = currentConfig.lockscreenWidgets || {};
-
             
             Object.keys(widgetsData).forEach(startIndexStr => {
                 const startIndex = parseInt(startIndexStr, 10);
                 const widgetConfig = widgetsData[startIndex]?.[0];
+
                 if (!widgetConfig) return;
 
                 const startRow_0based = Math.floor(startIndex / 4);
                 const startCol_0based = startIndex % 4;
                 const [cols, rows] = widgetConfig.size.split('x').map(Number);
                 
-                const top = startRow_0based * (cellHeight + gap);
-                const left = startCol_0based * (cellWidth + gap);
-                const width = (cols * cellWidth) + ((cols - 1) * gap);
-                const height = (rows * cellHeight) + ((rows - 1) * gap);
+                // 5. 使用统一的 cellSize 进行所有位置和尺寸的计算
+                const top = startRow_0based * (cellSize + gap);
+                const left = startCol_0based * (cellSize + gap);
+                const width = (cols * cellSize) + ((cols - 1) * gap);
+                const height = (rows * cellSize) + ((rows - 1) * gap);
 
                 const componentContainer = document.createElement('div');
                 componentContainer.style.position = 'absolute';
@@ -8151,8 +8054,6 @@ const blob = b64toBlob(blobData.content, contentType);
                 grid.appendChild(componentContainer);
             });
         }
-
-
 
 
         // 初始化手机模式管理器
