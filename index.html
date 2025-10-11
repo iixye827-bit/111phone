@@ -7314,25 +7314,6 @@ const blob = b64toBlob(blobData.content, contentType);
             }
 
 
-                async function deleteWidgetFromCell(cellIndex) {
-                    delete currentConfig.lockscreenWidgets[cellIndex];
-                    await saveGlobalConfig(`Delete widget from cell ${cellIndex}`);
-                    
-                    // --- 核心修复点 ---
-                    // 确保在数据更新后，立即重新渲染锁屏和设置模拟器
-                    renderLockscreenWidgets(); 
-                    
-                    const settingsWindow = document.getElementById('lockscreen-settings-modal');
-                    if (settingsWindow && settingsWindow.classList.contains('show')) {
-                        const grid = settingsWindow.querySelector('.settings-grid');
-                        if (grid) {
-                           renderSettingsGrid(grid);
-                        }
-                    }
-                    // --- 修复结束 ---
-                }
-
-
             function showAlbumPicker(onSelectCallback) {
                 const list = document.createElement('div');
                 list.className = 'picker-list';
