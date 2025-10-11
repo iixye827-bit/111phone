@@ -76,6 +76,46 @@
         "timestamp": 1759858931935,
         "path": "memory/photos/1759858926514_IMG_6318.jpeg",
         "sha": "b88b501bf3d66ee03fe3c760e00f9cebb0721453"
+      },
+      {
+        "id": 1760161241349,
+        "albumId": 1759414098705,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1760161241349,
+        "path": "memory/photos/1760161235016_IMG_5531.jpeg",
+        "sha": "4973e68c478e3cbcf1d4954871d0287c79189f49"
+      },
+      {
+        "id": 1760161245864,
+        "albumId": 1759414098705,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1760161245863,
+        "path": "memory/photos/1760161242217_IMG_5025.jpeg",
+        "sha": "48d2d01663c543b6a001944e77e420633c099546"
+      },
+      {
+        "id": 1760161261664,
+        "albumId": 1759414098705,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1760161261662,
+        "path": "memory/photos/1760161256553_IMG_4448.jpeg",
+        "sha": "af34b84d0e9faf9895683cb9c922e7da16354951"
+      },
+      {
+        "id": 1760161310137,
+        "albumId": 1759414098705,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1760161310134,
+        "path": "memory/photos/1760161305278_IMG_4451.jpeg",
+        "sha": "53ff14f22283d858a97182d446236b02dcf9b6fc"
       }
     ]
   }
