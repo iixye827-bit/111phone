@@ -1082,13 +1082,14 @@ body.mobile-mode .home-screen-page > .scrollable-nav-wrapper {
 
 
 .lock-screen-page {
-    padding-top: 2vh;
-    padding-bottom: 2vh;
+    padding: 2vh 20px; /* 修改：增加左右20px的内边距 */
     overflow: hidden; /* 确保页面本身不滚动 */
+    box-sizing: border-box; /* 新增：确保内边距不会撑开容器 */
 }
 .lockscreen-grid {
     width: 100%;
     max-width: 500px;
+    margin: 0 auto; /* 新增：让网格在有内边距的父容器中水平居中 */
     flex-grow: 1;
     position: relative; /* [核心修改] 改为相对定位，作为绝对定位组件的容器 */
     min-height: 0;
@@ -8027,9 +8028,10 @@ const blob = b64toBlob(blobData.content, contentType);
             if (totalWidth <= 0 || totalHeight <= 0) return;
 
             const cellWidth = (totalWidth - (3 * gap)) / 4;
-            const cellHeight = (totalHeight - (7 * gap)) / 8;
+            const cellHeight = cellWidth; // 核心修改：强制让格子高度等于宽度，确保1:1
 
             const widgetsData = currentConfig.lockscreenWidgets || {};
+
             
             Object.keys(widgetsData).forEach(startIndexStr => {
                 const startIndex = parseInt(startIndexStr, 10);
