@@ -36,6 +36,16 @@
   },
   "themePresets": [],
   "lockscreenWidgets": {
+    "20": [
+      {
+        "id": 1760161516322,
+        "size": "2x2",
+        "type": "memo",
+        "shape": "square",
+        "content": 1760027725471,
+        "background": "#ebf9ff"
+      }
+    ],
     "28": [
       {
         "id": 1760161458120,
