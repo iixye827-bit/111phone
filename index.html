@@ -1084,20 +1084,24 @@ body.mobile-mode .home-screen-page > .scrollable-nav-wrapper {
 
 
 .lock-screen-page {
-    padding: 2vh 20px; /* 修改：增加左右20px的内边距 */
+    padding-top: 2vh;
+    padding-bottom: 2vh;
     overflow: hidden; /* 确保页面本身不滚动 */
-    box-sizing: border-box; /* 新增：确保内边距不会撑开容器 */
+    /* [核心修改] 父容器只负责垂直布局和水平居中其子元素 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 .lockscreen-grid {
-    width: 100%;
+    /* [核心修改] 模仿 title-card 的布局模式 */
+    width: calc(100% - 40px); /* 关键：自身宽度为父容器宽度减去两侧边距 */
     max-width: 500px;
-    margin: 0 auto; /* 新增：让网格在有内边距的父容器中水平居中 */
-    flex-grow: 1;
-    position: relative; /* [核心修改] 改为相对定位，作为绝对定位组件的容器 */
+    /* [移除] margin: 0 auto; 和 flex-grow: 1; 由JS动态控制高度 */
+    position: relative; 
     min-height: 0;
-    --widget-gap: 15px; /* [新增] 定义间距变量 */
+    --widget-gap: 15px;
 }
-
 
 
 .home-screen-page .title-card,
@@ -7909,27 +7913,29 @@ const blob = b64toBlob(blobData.content, contentType);
             if (!grid) return;
             grid.innerHTML = '';
 
-            // [V2 核心重构]
-            // 让网格容器自适应宽度，但强制其高度，以确保内部单元格为1:1
-            const gridContainerParent = grid.parentElement;
-            if (!gridContainerParent) return;
+            // [V3 最终修复] 
+            // 采用 title-card 模式，直接读取 grid 自身的渲染宽度
             
-            // 1. 获取父容器的宽度作为计算基准
-            const parentRect = gridContainerParent.getBoundingClientRect();
-            const gridMaxWidth = Math.min(parentRect.width, 500); // 遵循CSS中的max-width
-            
+            // 1. 获取 grid 元素当前的实际宽度 (由 CSS 'width: calc(100% - 40px)' 决定)
+            const gridRect = grid.getBoundingClientRect();
+            const actualGridWidth = gridRect.width;
+
+            if (actualGridWidth <= 0) { // 如果元素不可见，则延迟执行
+                setTimeout(renderLockscreenWidgets, 50);
+                return;
+            }
+
             const gap = 15;
-            
-            // 2. 根据宽度计算出完美的1:1单元格尺寸
-            const cellSize = (gridMaxWidth - (3 * gap)) / 4;
+
+            // 2. 根据 grid 的实际宽度，计算出完美的1:1单元格尺寸
+            const cellSize = (actualGridWidth - (3 * gap)) / 4;
             
             if (cellSize <= 0) return; // 防止无效计算
 
             // 3. 根据单元格尺寸，反向计算出网格容器应有的总高度
             const requiredGridHeight = (8 * cellSize) + (7 * gap);
             
-            // 4. 将计算出的尺寸应用到网格容器上
-            grid.style.width = `${gridMaxWidth}px`;
+            // 4. 关键：只强制设置高度，宽度由CSS类控制
             grid.style.height = `${requiredGridHeight}px`;
 
             const widgetsData = currentConfig.lockscreenWidgets || {};
