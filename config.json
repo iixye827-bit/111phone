@@ -44,6 +44,15 @@
         "shape": "square",
         "content": "memory/photos/1760161235016_IMG_5531.jpeg"
       }
+    ],
+    "8": [
+      {
+        "id": 1760161672832,
+        "size": "2x1",
+        "type": "image",
+        "shape": "square",
+        "content": "memory/photos/1760161305278_IMG_4451.jpeg"
+      }
     ]
   }
 }
