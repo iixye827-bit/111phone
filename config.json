@@ -29,6 +29,9 @@
       "swipeBack": true,
       "functions": {},
       "customCSS": ""
+    },
+    "mobileMode": {
+      "enabled": true
     }
   },
   "themePresets": [],
