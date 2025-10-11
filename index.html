@@ -29,16 +29,17 @@
             --shadow-light-night: rgba(40, 52, 79, 0.9); --shadow-dark-night: rgba(0, 0, 0, 0.3);
         }
         body { 
-            min-height: 100vh; 
+            height: 100vh; /* 使用vh确保占满屏幕高度 */
             background-color: var(--day-color1);
             background-image: linear-gradient(135deg, var(--day-color1) 0%, var(--day-color2) 100%); 
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            padding: 20px; 
+            padding: 0; /* [核心修改] 移除所有padding，让子元素可以触及屏幕边缘 */
             display: flex; flex-direction: column; align-items: center; 
             transition: background 0.5s ease; 
-            touch-action: manipulation; overflow-x: hidden; 
+            touch-action: manipulation; 
+            overflow: hidden; /* 禁止body本身滚动 */
         }
         body.dark-mode { 
             background-color: var(--night-color1);
@@ -52,7 +53,16 @@
         body.dark-mode.theme-glass .nav-btn {
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
         }
-        .title-card { width: 100%; max-width: 800px; padding: 40px 20px; margin: 20px 0; border-radius: 16px; box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); background: var(--bg-day-element); backdrop-filter: blur(8px); text-align: center; transition: all 0.5s ease; background-size: cover; background-position: center; }
+        .title-card { 
+            width: 100%; max-width: 800px; padding: 40px 20px; margin: 20px; /* [核心修改] 将左右margin设为20px来替代body的padding */
+            box-sizing: border-box; /* [新增] 确保padding和border包含在width内 */
+            border-radius: 16px; 
+            box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day); 
+            background: var(--bg-day-element); backdrop-filter: blur(8px); text-align: center; 
+            transition: all 0.5s ease; background-size: cover; background-position: center;
+            flex-shrink: 0; /* 防止此元素在Flex布局中被压缩 */
+        }
+
         body.dark-mode .title-card { box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night); background: var(--bg-night-element); }
         .editable-title, .editable-subtitle { opacity: 0; transition: opacity 0.5s ease; background-color: rgba(255,255,255,0.1); backdrop-filter: blur(4px); } /* FOUC Fix */
         .editable-title { font-size: 36px; font-weight: 700; color: var(--text-day); margin-bottom: 20px; cursor: pointer; padding: 6px 12px; border-radius: 8px; display: block; width: fit-content; margin: 0 auto 20px auto; user-select: none; }
@@ -62,7 +72,14 @@
         body.dark-mode .editable-subtitle { color: #c0c6cc; background-color: rgba(0,0,0,0.1); }
         .editable-subtitle:hover { background-color: rgba(255, 255, 255, 0.8); color: var(--text-day); } body.dark-mode .editable-subtitle:hover { background-color: rgba(50, 55, 75, 0.8); color: var(--text-night); }
         
-        .category-nav-container { width: 100%; max-width: 1200px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding: 10px 0; margin-bottom: 10px; }
+        .category-nav-container { 
+            width: 100%; max-width: 1200px; overflow-x: auto; -webkit-overflow-scrolling: touch; 
+            scrollbar-width: none; padding: 10px 20px; /* [核心修改] 增加左右padding */
+            margin-bottom: 10px;
+            box-sizing: border-box; /* [新增] 确保padding和border包含在width内 */
+            flex-shrink: 0; /* 防止此元素在Flex布局中被压缩 */
+        }
+
         .category-nav-container::-webkit-scrollbar { display: none; }
         .category-nav { display: flex; flex-wrap: nowrap; gap: 12px; padding: 0 20px; }
         .category-pill { flex-shrink: 0; padding: 8px 18px; border: none; border-radius: 20px; background: var(--bg-day-element); box-shadow: none; color: var(--text-day); font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; opacity: 0.6; }
@@ -72,7 +89,35 @@
         body.theme-glass .category-pill.active { background: rgba(255, 255, 255, 0.4); border-color: rgba(255, 255, 255, 0.6); opacity: 1; transform: scale(1.05); color: #000; }
         body.dark-mode.theme-glass .category-pill.active { color: #fff; background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.3); }
 
-        .nav-container { width: 100%; max-width: 1200px; margin: 10px 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; padding: 20px; position: relative; z-index: 10; touch-action: pan-y; }
+        /* ===== [新增] 包裹和滚动容器的样式 (V2 - 无感边界) ===== */
+        .scrollable-nav-wrapper {
+            width: 100%;
+            flex-grow: 1; /* 让此容器占据所有剩余的垂直空间 */
+            overflow-y: auto; /* 当内容超出时，只在此容器内显示垂直滚动条 */
+            min-height: 0; /* Flex布局中的重要技巧，防止内容撑开容器 */
+            padding-bottom: 30px; /* 保留底部空间，避免按钮紧贴屏幕边缘 */
+            /* [核心修改] 使用遮罩创建无感的渐变分界线 */
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15px);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 15px);
+        }
+        /* 美化滚动条 (可选，但推荐) */
+        .scrollable-nav-wrapper::-webkit-scrollbar {
+            width: 5px;
+        }
+        .scrollable-nav-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(128, 128, 128, 0.3);
+            border-radius: 3px;
+        }
+        /* ===== [新增结束] ===== */
+
+
+        .nav-container { 
+            width: 100%; max-width: 1200px; margin: 0 auto; /* [修改] 移除垂直margin，改为水平居中 */
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            gap: 25px; padding: 10px 20px; /* [修改] 调整内边距 */
+            position: relative; z-index: 10; touch-action: pan-y; 
+        }
+
         .nav-btn { position: relative; padding: 22px 16px; border: none; border-radius: 14px; box-shadow: 10px 10px 20px var(--shadow-dark-day), -10px -10px 20px var(--shadow-light-day); background: var(--bg-day-element); backdrop-filter: blur(8px); font-size: 17px; font-weight: 600; color: var(--text-day); cursor: pointer; transition: all 0.3s ease; text-align: center; user-select: none; -webkit-tap-highlight-color: transparent; }
         .nav-btn.hold { border: 2px solid var(--hold-border); transform: scale(1.02); z-index: 5; box-shadow: 8px 8px 16px rgba(174, 190, 212, 0.5), -8px -8px 16px rgba(255, 255, 255, 0.8), 0 0 0 2px rgba(91, 153, 226, 0.3); }
         body.dark-mode .nav-btn { box-shadow: 10px 10px 20px var(--shadow-dark-night), -10px -10px 20px var(--shadow-light-night); background: var(--bg-night-element); color: var(--text-night); }
@@ -293,7 +338,14 @@
         #fileListStatus { flex-grow: 1; text-align: center; color: #a0aec0; display: flex; align-items: center; justify-content: center; min-height: 50px; } body.dark-mode #fileListStatus { color:#889; }
         .file-info { flex-grow: 1; cursor: pointer; min-width: 0; }
         .file-name { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 16px; }
-        .file-meta { font-size: 12px; font-weight: 300; color: #9A86A4; }
+                .file-meta { 
+            font-size: 12px; 
+            font-weight: 300; 
+            color: #9A86A4; 
+            flex-shrink: 0; /* [新增] 防止此元素在flex布局中被过度压缩 */
+            margin-left: 10px; /* [新增] 与文件名保持一点间距 */
+            white-space: nowrap; /* [新增] 确保大小和日期不换行 */
+        }
         .delete-btn { background:transparent; border:none; cursor:pointer; padding:0; flex-shrink:0; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:background .2s,color .2s; color:#bbb; font-size:22px; font-weight:bold; line-height:1; }
         .delete-btn:hover { background:#f0f0f0; color:#e53e3e; } body.dark-mode .delete-btn { color:#889; } body.dark-mode .delete-btn:hover { background:rgba(255,255,255,0.1); color:#fc8181; }
 
@@ -988,13 +1040,44 @@ body.mobile-mode .home-screen-page {
     width: 50%;
     height: 100%;
     flex-shrink: 0;
-    overflow: hidden; /* [修复] 禁止页面滚动 */
-    padding: 4vh 30px; /* [核心修改] 增加垂直和水平内边距，压缩内容区 */
+    overflow: hidden; /* 页面本身不滚动，这是正确的 */
+    padding: 4vh 0 2vh 0; /* 修改：移除左右内边距，给底部留一点空间 */
     display: flex;
     flex-direction: column;
-    align-items: center;
+    /* align-items: center; /* 移除此行，以允许子元素占满宽度 */
 }
 
+/* ===== [新增] 手机模式下，主屏幕内部元素的布局控制 ===== */
+
+/* 手机模式下，标题卡片的自适应宽度和间距 (新版本) */
+body.mobile-mode .home-screen-page > .title-card {
+    width: 90%;          /* 关键：设定一个相对于父容器的固定百分比宽度 */
+    max-width: 450px;      /* 可选：在非常宽的屏幕上（如平板）限制最大宽度 */
+    margin-left: auto;   /* 关键：让浏览器自动计算左边距 */
+    margin-right: auto;  /* 关键：让浏览器自动计算右边距 */
+    flex-shrink: 0;      
+}
+
+/* 如果分类导航也需要修改，可以采用类似的方法 */
+body.mobile-mode .home-screen-page > .category-nav-container {
+    flex-shrink: 0;
+    /* 保持原样或根据需要调整，目前分类导航占满宽度左右滑动是比较常见的体验 */
+    width: 100%; 
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+
+/* 2. 可滚动元素 (按钮区域) 填满所有剩余空间并开启内部滚动 */
+body.mobile-mode .home-screen-page > .scrollable-nav-wrapper {
+    flex-grow: 1;         /* 关键：占据所有剩余的垂直空间 */
+    overflow-y: auto;     /* 关键：当内容超出时，只在这个容器内显示垂直滚动条 */
+    min-height: 0;        /* 关键：Flex布局中的重要技巧，防止内容撑开容器 */
+    width: 100%;          /* 确保占满容器宽度 */
+    padding-left: 10px;   /* 将水平内边距应用到子元素上 */
+    padding-right: 10px;
+    padding-bottom: 80px; /* 为底部留出额外空间，避免按钮紧贴屏幕边缘 */
+}
 
 
 
@@ -1294,40 +1377,46 @@ body.dark-mode .widget-shortcut:active {
 
 /* --- 备忘录小组件样式 --- */
 .widget-memo {
-    box-sizing: border-box; /* 确保 padding 不会撑大元素 */
-    text-align: center;
+    /* [V2 修复] 改为 Flex 布局以精确控制子元素 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 12px;
+    text-align: left;
     color: var(--widget-text-color);
     background-color: var(--widget-background-color);
 }
 
 .widget-memo .widget-memo-title {
-    font-weight: 700;  /* [修改] 确保标题加粗 */
-    font-size: 1em;    /* 使用相对单位，使其能随小组件大小缩放 */
-    margin-bottom: 4px;
+    /* [V2 修复] 确保标题不会被压缩 */
+    flex-shrink: 0; 
+    font-weight: 700;
+    font-size: 1em;
+    margin-bottom: 6px; /* 稍微增加与内容的间距 */
     width: 100%;
-    
-    /* [新增] 防止标题过长换行破坏布局 */
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; 
+    text-overflow: ellipsis;
 }
 
-/* [新增] 备忘录内容样式 */
 .widget-memo .widget-memo-content {
-    font-weight: 300; /* 更细的字体 */
-    font-size: 0.8em;
-    opacity: 0.8;     /* 变淡的效果 */
+    /* [V2 修复] 让内容区域填满剩余空间并应用截断 */
+    flex-grow: 1; 
+    min-height: 0; /* 允许 flex item 收缩 */
+    font-weight: 400; /* [优化] 调整字重以提高可读性 */
+    font-size: 0.9em;
+    opacity: 0.85;
     width: 100%;
+    line-height: 1.5;
     
-    /* 核心：实现多行文本溢出显示省略号 */
+    /* 核心截断逻辑 */
     overflow: hidden;
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3; /* 最多显示3行，你可以根据需要调整 */
-    line-height: 1.4;
+    /* line-clamp 将由 JS 动态设置 */
 }
-/* 超大备忘录可以显示更多行 */
-.widget-xl .widget-memo-content { -webkit-line-clamp: 6; }
+
 
 
 /* 图片组件样式 */
@@ -1383,6 +1472,7 @@ body.dark-mode .widget-shortcut:active {
     top: 50%;
     transform: translate(-50%, -50%);
 }
+
 .picker-list {
     max-height: 300px;
     overflow-y: auto;
@@ -2082,6 +2172,13 @@ body.dark-mode .widget-bg-picker-popup .bg-picker-button:hover {
     text-decoration: line-through;
     opacity: 0.6;
 }
+/* [V3 修复] 允许待办事项的文本内容换行 */
+.todo-text {
+    flex: 1; /* 让文本容器占据所有剩余空间 */
+    min-width: 0; /* 关键：允许 flex item 收缩并换行其内容 */
+    word-break: break-word; /* 确保长单词或URL也能正确换行 */
+}
+
 
 .memo-toolbar {
     flex-shrink: 0;
@@ -2194,6 +2291,42 @@ body.dark-mode .code-block-copy-btn:hover {
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
+/* =============================================================== */
+/* ============= [新增] 悬浮球设置预览区样式 ================= */
+/* =============================================================== */
+#jelly-css-preview-container {
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-day-element);
+    border-radius: 12px;
+    box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day);
+    position: relative;
+    overflow: hidden; /* 隐藏超出边界的辉光效果 */
+    transform-style: preserve-3d; /* 提升渲染层级 */
+}
+body.dark-mode #jelly-css-preview-container {
+    background: var(--bg-night-element);
+    box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night);
+}
+
+/* 关键：重置预览球的位置，使其在容器内居中 */
+#jelly-css-preview-container .jelly-ball-wrapper {
+    position: relative;
+    transform: scale(0.9); /* 稍微缩小以适应容器 */
+    pointer-events: none; /* 确保预览球不可交互 */
+}
+
+/* [V2 BUG修复] 确保在主题设置弹窗关闭后，帮助弹窗依然可见 */
+#jelly-css-help-modal.modal-overlay {
+    z-index: 1003;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
 
     </style>
 
@@ -2223,12 +2356,15 @@ body.dark-mode .code-block-copy-btn:hover {
         <div class="editable-subtitle" id="subtitle">长按🌞打开工具栏 | By淡季水母</div>
     </div>
     
-    <div class="category-nav-container" id="categoryNavContainer">
-        <div class="category-nav" id="categoryNav"></div>
-    </div>
+    <!-- [新增] 可滚动的包裹容器 (结构调整) -->
+    <div class="scrollable-nav-wrapper">
+        <div class="category-nav-container" id="categoryNavContainer">
+            <div class="category-nav" id="categoryNav"></div>
+        </div>
 
-    <div class="nav-container" id="navContainer">
-        <p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>
+        <div class="nav-container" id="navContainer">
+            <p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>
+        </div>
     </div>
 
     <!-- 注意：悬浮按钮和模态框需要放在滑动容器之外，以保证它们在所有页面上都能正常显示和交互 -->
@@ -2328,16 +2464,32 @@ body.dark-mode .code-block-copy-btn:hover {
                     <li><strong>调整大小</strong>: 拖动窗口右下角可以等比例缩放窗口大小。</li>
                 </ul>
             </div>
+            <div class="important-note" style="margin-top: 15px;">
+                <h4>📱 锁屏组件</h4>
+                <p>通过 <code>主题设置 → 手机模式</code>，您可以开启一个模拟手机桌面的锁屏界面。在这里，您可以自由添加和布局多种实用小组件。</p>
+                <ul>
+                    <li><strong>自由布局</strong>: 在设置界面，通过拖拽即可将组件放置在锁屏网格的任意位置。</li>
+                    <li><strong>多种尺寸与形状</strong>: 支持创建不同尺寸（如2x2, 4x2）和形状（方形、圆形）的组件。</li>
+                    <li><strong>丰富组件类型</strong>:
+                        <ul>
+                            <li><strong>快捷方式</strong>: 将任意项目（链接或上传的应用）固定到锁屏，实现一键直达。</li>
+                            <li><strong>备忘录</strong>: 直接在锁屏上预览指定备忘录的内容，或实时查看和完成待办事项。</li>
+                            <li><strong>图片</strong>: 从“记忆相册”中选择一张图片作为锁屏背景或装饰。</li>
+                            <li><strong>HTML</strong>: 支持嵌入自定义HTML代码，实现天气、时钟等高度个性化功能。</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </details>
     <details>
         <summary>📷 记忆功能</summary>
         <div class="details-content">
-            <p>一个集成了备忘录、相册和文件云盘的私人空间，所有数据都安全地存储在您的GitHub私有仓库中。您可以从主入口进入相应模块进行管理。</p>
-            <h4>💫 漫游模式</h4>
+            <p>一个集成了备忘录、相册和文件云盘的私人空间，所有数据都安全地存储在您的GitHub私有仓库中。</p>
             <ul>
-                <li><strong>音乐播放</strong>: 您可以上传自己的音乐和歌词文件，在漫游模式中播放。</li>
-                <li><strong>便捷播放</strong>: 在音乐设置的播放列表中，直接点击歌曲名即可自动进入漫游模式并开始播放。</li>
+                <li><strong>备忘录</strong>: 支持文件夹分类管理。编辑器提供待办清单、多种文字格式和可一键复制的代码块功能，满足不同的记录需求。</li>
+                <li><strong>相册</strong>: 支持创建多个相册，批量上传照片，并可进入沉浸式的“漫游模式”浏览，支持配合背景音乐播放。</li>
+                <li><strong>文件夹</strong>: 一个轻量级的文件云盘，支持按项目分类上传、下载和管理各类文件。</li>
             </ul>
         </div>
     </details>
@@ -2348,6 +2500,15 @@ body.dark-mode .code-block-copy-btn:hover {
                         <div class="update-header-info">
                             <p><strong>小红书ID:</strong> 淡季水母</p>
                             <p><strong>QQ交流群:</strong> 563191005</p>
+                        </div>
+                         <div class="update-log-entry">
+                            <h4>v5.3.0 <span class="update-date">- 2025.10.11</span></h4>
+                            <ul>
+                                <li><span class="tag new">新功能</span> <strong>锁屏组件</strong>: 新增手机模式与锁屏组件功能，支持高度自定义布局与多种组件类型。（详见“功能介绍”）</li>
+                                <li><span class="tag new">新功能</span> <strong>备忘录增强</strong>: 新增待办事项（清单）功能；支持加粗、斜体、下划线和删除线等文字格式；新增可一键复制代码块功能。</li>
+                                <li><span class="tag fix">修复</span> 解决了悬浮球在部分内嵌网页中无法显示的问题。</li>
+                                <li><span class="tag fix">修复</span> 修复了在悬浮球设置中，自定义CSS输入框无法实时预览样式的问题。</li>
+                            </ul>
                         </div>
                         <div class="update-log-entry">
                             <h4>v4.1.0 <span class="update-date">- 2025.10.04</span></h4>
@@ -2419,7 +2580,7 @@ body.dark-mode .code-block-copy-btn:hover {
                         </div>
                         
                         <footer class="update-footer">
-                            当前版本: v4.1.0
+                            当前版本: v5.3.0
                         </footer>
                     </div>
                     <div id="help-page-3" class="help-page-content">
@@ -2610,14 +2771,16 @@ body.dark-mode .code-block-copy-btn:hover {
                 <div class="modal-title-group"><span>⚠️ iOS 用户重要提示</span></div>
             </div>
             <div class="modal-body">
-                <p>尊敬的 iOS 用户，由于系统对 Web 应用沙箱（Sandbox）环境的严格限制，当您将本应用“添加到主屏幕”后，每次从后台彻底关闭应用（上划清除）都可能导致 <strong>iframe 内的项目数据被清除</strong>。</p>
-                <p>为避免数据丢失，我们建议您：</p>
+                <p>尊敬的 iOS 用户，由于系统对 Web 应用沙箱（Sandbox）环境的严格限制，当您将本应用“添加到主屏幕”后，每次从后台彻底关闭应用（上划清除）都可能导致 iframe 内的项目数据被清除。</p>
+                <div class="important-note">
+                    <p><strong>强烈建议您在使用依赖数据保存的项目前，先进行少量操作测试，确保数据能够正常导入、导出和保存，避免重要数据意外丢失。</strong></p>
+                </div>
+                <p style="margin-top: 15px;">为最大程度保障数据安全，建议：</p>
                 <ol style="margin-left: 20px; line-height: 1.7;">
-                    <li><strong>使用“标签页模式”打开项目</strong>：在“管理项目”页面上传或编辑项目时，开启“在新标签页中打开”开关。这会使用系统浏览器打开，数据更安全，但可能无法实现完全全屏。</li>
-                    <li><strong>直接在浏览器中使用</strong>：通过 Safari 等浏览器直接访问本站，而不是通过桌面图标，这是最稳妥的方式。</li>
+                    <li><strong>使用“文件版”上传项目</strong>：对于您拥有源代码的项目，通过“管理项目”中的“上传项目”功能进行上传。</li>
+                    <li><strong>使用浏览器打开</strong>：对于外部网站链接，在添加或编辑时，开启“在新标签页中打开”开关。项目将通过Safari等系统浏览器打开，数据由浏览器自身管理，更稳定。</li>
                 </ol>
-                <p style="margin-top: 15px;">为保障您的数据安全，强烈建议您<strong>定期备份</strong>重要数据。</p>
-                <button id="iosWarningConfirmBtn" class="modal-button" style="margin-top: 15px;">我已知晓</button>
+                <button id="iosWarningConfirmBtn" class="modal-button" style="margin-top: 15px;">我已了解风险</button>
             </div>
         </div>
     </div>
@@ -3492,19 +3655,15 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
             // 动态创建悬浮球设置窗口
             function openJellyBallSettingsWindow() {
                 const modalId = 'jelly-ball-settings-modal';
-                // [修复] 移除防止重复创建的判断，因为关闭时元素会被彻底销毁，需要能够重新创建
-                // if (document.getElementById(modalId)) return;
-
+                
                 const modalOverlay = document.createElement('div');
                 modalOverlay.id = modalId;
-
                 modalOverlay.className = 'modal-overlay show';
-                modalOverlay.style.zIndex = '1002'; // 比主题设置高一级
+                modalOverlay.style.zIndex = '1002'; 
 
                 const modalContent = document.createElement('div');
                 modalContent.className = 'modal-content';
-                modalContent.style.maxWidth = '400px';
-
+                
                 modalContent.innerHTML = `
                     <div class="modal-header">
                         <div class="modal-title-group"><span>悬浮球设置</span></div>
@@ -3521,14 +3680,22 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                         </div>
                         <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 10px;">
                             <label for="jellyBallCssTextarea" style="font-size: 14px; color: #5a6778; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                                <span>自定义CSS (云同步)</span>
+                                <span>自定义CSS</span>
                                 <button id="show-jelly-css-help" style="background:none; border:none; font-size: 20px; cursor:pointer; padding:0; line-height: 1;" title="CSS提示词向导">💡</button>
                             </label>
-                            <div style="display: flex; gap: 10px; width:100%; align-items: flex-start;">
-                                <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="4" placeholder=".jelly-ball-wrapper { ... }"></textarea>
-                                <div id="jellyCssPreview" style="..."><div id="jellyCssPreviewBall" style="...">🪼</div></div>
+                            <div style="display: flex; gap: 15px; width:100%; align-items: center;">
+                                <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="5" placeholder="清空此处可恢复默认样式" style="flex: 1;"></textarea>
+                                <div id="jelly-css-preview-container">
+                                    <!-- 核心修改：移除 style 标签，让默认样式在 JS 中定义 -->
+                                    <div class="jelly-ball-wrapper">
+                                        <div class="jelly-ball-glow"></div>
+                                        <div id="floating-jellyfish-ball">
+                                            <span>🪼</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <button id="applyJellyBallCssBtn" class="modal-button" style="width: 100%;">应用样式</button>
+                            <button id="applyJellyBallCssBtn" class="modal-button" style="width: 100%;">应用并保存样式</button>
                         </div>
                     </div>
                 `;
@@ -3536,32 +3703,100 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                 modalOverlay.appendChild(modalContent);
                 document.body.appendChild(modalOverlay);
 
-                // 在新窗口内部绑定事件和初始化状态
                 const closeBtn = modalContent.querySelector('.close-btn');
                 const swipeBackToggle = modalContent.querySelector('#jellySwipeBackToggle');
                 const checkboxContainer = modalContent.querySelector('#jelly-function-checkboxes');
                 const cssTextarea = modalContent.querySelector('#jellyBallCssTextarea');
                 const applyCssBtn = modalContent.querySelector('#applyJellyBallCssBtn');
+                
+                // [核心修改] 预览区不再需要自己的 style 标签，直接操作元素 style
+                const previewWrapper = modalContent.querySelector('#jelly-css-preview-container .jelly-ball-wrapper');
 
-                // 关闭逻辑
                 const closeModal = () => { modalOverlay.classList.remove('show'); modalOverlay.addEventListener('transitionend', () => modalOverlay.remove(), { once: true }); };
                 closeBtn.onclick = closeModal;
                 modalOverlay.onclick = (e) => { if (e.target === modalOverlay) closeModal(); };
 
-                // 初始化控件状态
                 swipeBackToggle.checked = settings.swipeBack !== false;
                 checkboxContainer.innerHTML = '';
                 ALL_FUNCTIONS.forEach(func => {
                     const isChecked = settings.functions?.[func.id] !== false;
                     checkboxContainer.innerHTML += `
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                           <label for="jelly_func_${func.id}" style="cursor:pointer;...">${func.icon} ${func.title}</label>
+                           <label for="jelly_func_${func.id}" style="cursor:pointer;">${func.icon} ${func.title}</label>
                            <label class="toggle-switch"><input type="checkbox" id="jelly_func_${func.id}" data-function-id="${func.id}" ${isChecked ? 'checked' : ''}><span class="slider"></span></label>
                         </div>`;
                 });
                 cssTextarea.value = settings.customCSS || '';
+                
+                // [核心修改] 新的实时预览函数
+                function updatePreview() {
+                    const cssText = cssTextarea.value.trim();
+                    const previewBall = previewWrapper.querySelector('#floating-jellyfish-ball');
+                    const previewGlow = previewWrapper.querySelector('.jelly-ball-glow');
 
-                // 绑定事件监听
+                    // 1. 定义一个稳定的、隔离的默认样式
+                    const defaultStyles = `
+                        .jelly-ball-wrapper {
+                            position: relative;
+                            width: 42px; height: 42px;
+                            display: flex; align-items: center; justify-content: center;
+                            transform: scale(0.9); pointer-events: none;
+                        }
+                        .jelly-ball-glow {
+                            position: absolute; width: 100%; height: 100%;
+                            border-radius: 50%;
+                            animation: jelly-glow 2.5s infinite ease-in-out;
+                        }
+                        #floating-jellyfish-ball {
+                            position: relative; width: 100%; height: 100%;
+                            background: rgba(255, 255, 255, 0.6);
+                            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+                            border-radius: 50%;
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 22px; user-select: none;
+                            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                            border: 1px solid rgba(255, 255, 255, 0.5);
+                        }
+                        body.dark-mode #floating-jellyfish-ball {
+                             background: rgba(30, 30, 30, 0.6);
+                             border-color: rgba(255, 255, 255, 0.15);
+                        }
+                    `;
+                    
+                    // 2. 将默认样式注入到一个动态创建的 style 标签中
+                    let styleTag = previewWrapper.querySelector('.preview-default-styles');
+                    if (!styleTag) {
+                        styleTag = document.createElement('style');
+                        styleTag.className = 'preview-default-styles';
+                        // 作用域隔离
+                        styleTag.innerHTML = defaultStyles.replace(/([^{}]+)\{/g, (match, selector) => `#jelly-css-preview-container ${selector.trim()} {`);
+                        previewWrapper.prepend(styleTag);
+                    }
+                    
+                    // 3. 将用户的自定义 CSS 作为内联样式应用，这样它总能覆盖默认样式
+                    let customStyleTag = previewWrapper.querySelector('.preview-custom-styles');
+                    if (!customStyleTag) {
+                        customStyleTag = document.createElement('style');
+                        customStyleTag.className = 'preview-custom-styles';
+                        previewWrapper.appendChild(customStyleTag);
+                    }
+                    
+                    if (cssText) {
+                        // 作用域隔离
+                        const scopedCss = cssText.replace(/(^|\})([^{}]+)\{/g, (match, p1, p2) => {
+                            const selectors = p2.split(',').map(s => `#jelly-css-preview-container ${s.trim()}`).join(', ');
+                            return `${p1} ${selectors} {`;
+                        });
+                        customStyleTag.innerHTML = scopedCss;
+                    } else {
+                        // 如果用户清空了文本框，我们就清空自定义样式，让默认样式生效
+                        customStyleTag.innerHTML = '';
+                    }
+                }
+
+                updatePreview();
+                cssTextarea.addEventListener('input', updatePreview);
+                
                 swipeBackToggle.addEventListener('change', () => { settings.swipeBack = swipeBackToggle.checked; saveGlobalConfig('Update Jellyfish Ball settings'); });
                 checkboxContainer.addEventListener('change', (e) => {
                     const checkbox = e.target;
@@ -3572,17 +3807,21 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                         saveGlobalConfig('Update Jellyfish Ball settings');
                     }
                 });
+                
                 applyCssBtn.addEventListener('click', () => {
                    settings.customCSS = cssTextarea.value;
                    customStyleTag.innerHTML = settings.customCSS;
                    if(ball) { _destroy(); _create(); } 
                    saveGlobalConfig('Update Jellyfish Ball CSS');
-                   alert('自定义样式已应用并同步至云端！');
+                   showTopToast('自定义样式已应用并同步至云端！', 2000);
                 });
+                
                 modalContent.querySelector('#show-jelly-css-help').addEventListener('click', () => {
                     document.getElementById('jelly-css-help-modal').classList.add('show');
                 });
             }
+
+
 
             // 主开关的UI和逻辑控制
             const updateUIVisibility = () => {
@@ -4229,7 +4468,32 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
         btn.disabled = true;
 
         try {
-            btn.textContent = '获取云端配置...';
+            btn.textContent = '正在验证连接...';
+
+            // 1. 新增的验证性请求 (Pre-flight Check)
+            const validationUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`;
+            let validationResponse;
+            try {
+                validationResponse = await fetch(validationUrl, {
+                    headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` },
+                    cache: 'no-cache'
+                });
+            } catch (networkError) {
+                // 捕获 fetch 本身的网络错误
+                throw new Error('NetworkError');
+            }
+
+            // 2. 分析响应，提供精准错误信息
+            if (!validationResponse.ok) {
+                // 根据状态码抛出特定错误
+                if (validationResponse.status === 401) throw new Error('401 Unauthorized');
+                if (validationResponse.status === 403) throw new Error('403 Forbidden');
+                if (validationResponse.status === 404) throw new Error('404 Not Found');
+                throw new Error(`HTTP Error ${validationResponse.status}`);
+            }
+
+            // --- 如果验证通过，才继续执行原有的同步逻辑 ---
+            btn.textContent = '验证成功，正在同步...';
             let fetchedConfig = await fetchConfigFromGithub();
             
             const defaultConfig = getDefaultConfig();
@@ -4244,19 +4508,20 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                  if (wasMigrated) btn.textContent = '迁移旧版配置...';
 
                  const mergedConfig = mergeDeep({}, defaultConfig, fetchedConfig);
+                 // 核心逻辑不变
                  if (JSON.stringify(mergedConfig) !== JSON.stringify(fetchedConfig) || wasMigrated) {
                      currentConfig = mergedConfig;
                      needsSave = true;
                  }
             } else {
-                 btn.textContent = '创建新配置...';
+                 btn.textContent = '云端无配置，正在创建...';
                  currentConfig = defaultConfig;
-                 configSha = null;
+                 configSha = null; // 确保是创建新文件
                  needsSave = true;
             }
             
             if (needsSave) {
-                 btn.textContent = '正在保存...';
+                 btn.textContent = '正在保存至云端...';
                  await saveGlobalConfig(wasMigrated ? 'Manual sync: Migrated legacy config' : 'Manual sync and repair');
                  btn.textContent = '同步完成，即将刷新';
                  alert("同步与修复完成！页面将刷新以应用最新配置。");
@@ -4266,15 +4531,30 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                  alert("配置已是最新，无需修复。");
             }
         } catch (e) {
+            // 3. 捕获上面抛出的特定错误，并显示给用户
+            let userMessage = `手动同步失败: ${e.message}`;
+            if (e.message.includes('401 Unauthorized')) {
+                userMessage = "认证失败 (401): 您的Personal Access Token无效、已过期或被撤销。请重新生成并更新。";
+            } else if (e.message.includes('403 Forbidden')) {
+                userMessage = "权限不足 (403): 您的Token有效，但缺少对仓库的访问权限。请确保已勾选 `repo` 作用域。";
+            } else if (e.message.includes('404 Not Found')) {
+                userMessage = "仓库未找到 (404): 请检查您的仓库地址 '用户名/仓库名' 是否填写正确。";
+            } else if (e.message.includes('NetworkError')) {
+                userMessage = "网络连接失败: 无法连接到GitHub API。请检查您的网络设置、代理或VPN。";
+            }
+            
             btn.textContent = '同步失败';
-            alert(`手动同步失败: ${e.message}`);
+            alert(userMessage);
+
         } finally {
+            // 无论成功失败，3秒后恢复按钮状态
             setTimeout(() => {
                 btn.disabled = false;
                 btn.textContent = originalText;
             }, 3000);
         }
     });
+
 
     async function loadInitialData() { 
         navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>'; 
@@ -4618,15 +4898,16 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
         if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } 
         iframeEl.src = url; 
         iframeModal.classList.add('active'); 
-        FloatingBallManager.create();
+        // FloatingBallManager.create(); // <-- 核心修改：移除此行
     }
-    function closeIframeModal() { 
+
+     function closeIframeModal() { 
         FloatingProjectWindowManager.closeAll();
-        FloatingBallManager.destroy();
+        // FloatingBallManager.destroy(); // <-- 核心修改：移除此行
         hideReturnConfirmation(); 
         iframeModal.classList.remove('active'); 
-        // setTimeout(() => { iframeEl.src = 'about:blank'; }, 400); // <-- 已注释掉
     }
+
     function showReturnConfirmation() { returnConfirmationToast.classList.add('show'); }
     function hideReturnConfirmation() { returnConfirmationToast.classList.remove('show'); }
     document.getElementById('confirmReturnBtn').addEventListener('click', closeIframeModal);
@@ -5387,50 +5668,86 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
             fetchFilesFromGithubProject(projectHref);
         }
 
+                // [新增] 辅助函数：格式化文件大小
+                function formatFileSize(bytes) {
+                    if (bytes === 0) return '0 B';
+                    if (!bytes) return '...'; // 处理 undefined 或 null 的情况
+
+                    const k = 1024;
+                    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    
+                    // 使用 toFixed(1) 来保留一位小数
+                    const size = parseFloat((bytes / Math.pow(k, i)).toFixed(1));
+                    return `${size} ${sizes[i]}`;
+                }
+
+                // [新增] 辅助函数：通过GitHub API获取文件的最后提交日期
+                async function getFileCommitDate(filePath) {
+                    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(filePath)}&page=1&per_page=1`;
+                    try {
+                        const response = await fetch(url, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` } });
+                        if (!response.ok) return '日期未知';
+                        const commits = await response.json();
+                        if (commits && commits.length > 0) {
+                            const date = new Date(commits[0].commit.committer.date);
+                            // 格式化为 年-月-日
+                            return date.toISOString().split('T')[0];
+                        }
+                        return '日期未知';
+                    } catch (error) {
+                        console.error(`Error fetching commit date for ${filePath}:`, error);
+                        return '日期未知';
+                    }
+                }
+
                 async function fetchFilesFromGithubProject(projectHref) {
-            const projectConfig = findButtonConfigByHref(projectHref);
+                    const projectConfig = findButtonConfigByHref(projectHref);
 
-            // 如果没有有效的项目被选中（例如，下拉框是提示信息时），则直接显示提示
-            if (!projectConfig) {
-                ui.fileListStatus.textContent = "请选择一个项目以查看文件";
-                return;
-            }
+                    if (!projectConfig) {
+                        ui.fileListStatus.textContent = "请选择一个项目以查看文件";
+                        return;
+                    }
 
-            // 新逻辑：根据项目名称生成对应的安全文件夹路径
-            const projectName = projectConfig.text;
-            const folderName = projectName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-") || `project-${Date.now()}`;
-            
-            // 新逻辑：只从 'jellyfish_drive' 中读取数据
-            const projectPath = `jellyfish_drive/${folderName}`;
-            ui.fileListStatus.textContent = "加载中...";
-            
-            // fetchFromGithub 能优雅地处理 404 (文件夹不存在) 的情况
-            const { data: files, error } = await fetchFromGithub(projectPath);
-            if (error) { 
-                ui.fileListStatus.textContent = `加载失败: ${error}`; 
-                return; 
-            }
+                    const projectName = projectConfig.text;
+                    const folderName = projectName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-") || `project-${Date.now()}`;
+                    const projectPath = `jellyfish_drive/${folderName}`;
+                    ui.fileListStatus.textContent = "加载中...";
+                    
+                    const { data: files, error } = await fetchFromGithub(projectPath);
+                    if (error) { 
+                        ui.fileListStatus.textContent = `加载失败: ${error}`; 
+                        return; 
+                    }
 
-            // 如果 files 为 null (文件夹不存在) 或为空数组，都视为没有文件
-            if (!files || files.length === 0) {
-                ui.fileListStatus.textContent = "该项目下暂无文件";
-                return;
-            }
+                    if (!files || files.length === 0) {
+                        ui.fileListStatus.textContent = "该项目下暂无文件";
+                        return;
+                    }
 
-            ui.fileListStatus.style.display = "none";
-            files.forEach(async (file) => {
-                const li = document.createElement("li");
-                const sizeText = file.size ? `${(file.size / 1024).toFixed(1)} KB` : '...';
-                li.innerHTML = `<div class="file-info"><span class="file-name">${file.name}</span><span class="file-meta" data-path="${file.path}">${sizeText}</span></div><button class="delete-btn" data-sha="${file.sha}">&times;</button>`;
+                    ui.fileListStatus.style.display = "none";
+                    
+                    // [核心修改] 使用 for...of 循环来正确处理异步操作
+                    for (const file of files) {
+                        const li = document.createElement("li");
+                        
+                        // 1. 格式化文件大小
+                        const sizeText = formatFileSize(file.size); 
+                        
+                        // 2. 异步获取日期
+                        const dateText = await getFileCommitDate(file.path);
 
-                ui.fileList.appendChild(li);
-                
-                if (!file.size) { getLatestCommitDate(file.path).then(date => { const metaSpan = li.querySelector('.file-meta'); if (metaSpan) metaSpan.textContent = date.split('T')[0]; }); }
-                
-                li.querySelector(".file-info").addEventListener("click", () => forceDownload(file.path, file.name, li));
-                li.querySelector(".delete-btn").addEventListener("click", () => deleteFile(file.path, file.sha, li));
-            });
-        }
+                        // 3. 构建新的元信息字符串
+                        const metaText = `${sizeText} • ${dateText}`;
+
+                        li.innerHTML = `<div class="file-info"><span class="file-name">${file.name}</span><span class="file-meta" data-path="${file.path}">${metaText}</span></div><button class="delete-btn" data-sha="${file.sha}">&times;</button>`;
+                        ui.fileList.appendChild(li);
+                        
+                        li.querySelector(".file-info").addEventListener("click", () => forceDownload(file.path, file.name, li));
+                        li.querySelector(".delete-btn").addEventListener("click", () => deleteFile(file.path, file.sha, li));
+                    }
+                }
+
 
         async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString().split('T')[0];const o=await n.json();return o[0]?.commit.committer.date.split('T')[0]||(new Date(0)).toISOString().split('T')[0]}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString().split('T')[0]}}async function deleteFile(e,t,n){
     const originalFileName = n.querySelector(".file-name").textContent;
@@ -5682,7 +5999,7 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                         pre.textContent = selectedText;
                         const copyBtn = document.createElement('button');
                         copyBtn.className = 'code-block-copy-btn';
-                        copyBtn.contentEditable = 'false'; // 核心修复点
+                        copyBtn.contentEditable = 'false'; // [V2 修复] 将按钮设置为不可编辑
                         copyBtn.textContent = '❏';
                         copyBtn.title = '复制';
                         codeBlock.appendChild(copyBtn);
@@ -5690,7 +6007,7 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                         range.deleteContents();
                         const fragment = document.createDocumentFragment();
                         fragment.appendChild(codeBlock);
-                        fragment.appendChild(document.createTextNode('\u200B'));
+                        fragment.appendChild(document.createTextNode('\u200B')); // 零宽度空格，用于放置光标
                         range.insertNode(fragment);
                         range.setStartAfter(codeBlock.nextSibling);
                         range.collapse(true);
@@ -5714,58 +6031,28 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                     } else {
                         document.execCommand(command, false, null);
                     }
-                    setTimeout(updateToolbarState, 0); // 延迟更新以获取最新状态
+                    setTimeout(updateToolbarState, 0);
                 });
 
                 editor.addEventListener('keyup', updateToolbarState);
                 editor.addEventListener('mouseup', updateToolbarState);
-                 // 编辑器内部的交互事件（待办清单完成/代码块复制）
-                editor.addEventListener('click', (e) => {
-                    const li = e.target.closest('li');
-                    const copyBtn = e.target.closest('.code-block-copy-btn');
 
-                    if (li) {
-                        li.classList.toggle('completed');
-                    } else if (copyBtn) {
-                        const codeBlock = copyBtn.closest('.memo-code-block');
-                        const textToCopy = codeBlock.querySelector('pre')?.textContent || '';
-                        
-                        // 核心修复点：添加剪贴板 API 兼容性处理
-                        if (navigator.clipboard && window.isSecureContext) {
-                            navigator.clipboard.writeText(textToCopy).then(() => {
-                                const originalText = copyBtn.textContent;
-                                copyBtn.textContent = '✓';
-                                setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
-                            }).catch(err => {
-                                console.error('Copy failed:', err);
-                                showTopToast('复制失败', 2000);
-                            });
-                        } else {
-                            // Fallback for insecure contexts (like file://)
-                            const textArea = document.createElement("textarea");
-                            textArea.value = textToCopy;
-                            textArea.style.position = "fixed";
-                            textArea.style.left = "-9999px";
-                            document.body.appendChild(textArea);
-                            textArea.focus();
-                            textArea.select();
-                            try {
-                                document.execCommand('copy');
-                                const originalText = copyBtn.textContent;
-                                copyBtn.textContent = '✓';
-                                setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
-                            } catch (err) {
-                                console.error('Fallback copy failed', err);
-                                showTopToast('复制失败', 2000);
+                // [V2 新增] 监听输入事件，用于自动清理空的代码块
+                editor.addEventListener('input', () => {
+                   // 使用 setTimeout 延迟执行，确保在 DOM 更新后进行检查
+                   setTimeout(() => {
+                        const codeBlocks = editor.querySelectorAll('.memo-code-block pre');
+                        codeBlocks.forEach(pre => {
+                            // 如果 pre 标签内没有文本内容（注意 trim() 以处理空白字符）
+                            if (pre.textContent.trim() === '') {
+                                const parentBlock = pre.closest('.memo-code-block');
+                                if (parentBlock) {
+                                    parentBlock.remove(); // 移除整个代码块
+                                }
                             }
-                            document.body.removeChild(textArea);
-                        }
-                    }
-                     // 点击编辑器任何地方都更新一下工具栏状态
-                    updateToolbarState();
+                        });
+                   }, 0);
                 });
-
-
 
                 // 编辑器内部的交互事件（待办清单完成/代码块复制）
                 editor.addEventListener('click', (e) => {
@@ -5778,18 +6065,36 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                         const codeBlock = copyBtn.closest('.memo-code-block');
                         const textToCopy = codeBlock.querySelector('pre')?.textContent || '';
                         
-                        navigator.clipboard.writeText(textToCopy).then(() => {
-                            const originalText = copyBtn.textContent;
-                            copyBtn.textContent = '✓';
-                            setTimeout(() => {
-                                copyBtn.textContent = originalText;
-                            }, 1500);
-                        }).catch(err => {
-                            console.error('Copy failed:', err);
-                            showTopToast('复制失败', 2000);
-                        });
+                        if (navigator.clipboard && window.isSecureContext) {
+                            navigator.clipboard.writeText(textToCopy).then(() => {
+                                const originalText = copyBtn.textContent;
+                                copyBtn.textContent = '✓';
+                                setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
+                            }).catch(err => {
+                                showTopToast('复制失败', 2000);
+                            });
+                        } else {
+                            // 兼容非安全环境的降级方案
+                            const textArea = document.createElement("textarea");
+                            textArea.value = textToCopy;
+                            textArea.style.position = "fixed"; textArea.style.left = "-9999px";
+                            document.body.appendChild(textArea);
+                            textArea.focus();
+                            textArea.select();
+                            try {
+                                document.execCommand('copy');
+                                const originalText = copyBtn.textContent;
+                                copyBtn.textContent = '✓';
+                                setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
+                            } catch (err) {
+                                showTopToast('复制失败', 2000);
+                            }
+                            document.body.removeChild(textArea);
+                        }
                     }
+                    updateToolbarState();
                 });
+
 
 
                 ui.folderModal.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target) actions[target.dataset.action]?.(); });
@@ -6423,7 +6728,7 @@ const blob = b64toBlob(blobData.content, contentType);
         }
     }
 
-    window.addEventListener('load', async () => {
+ window.addEventListener('load', async () => {
         initTheme(); 
         loadGithubConfig();
         checkAppUpdate();
@@ -6431,12 +6736,17 @@ const blob = b64toBlob(blobData.content, contentType);
         setupModals();
         MemoryApp.init();
         WanderView.init();
-        FloatingBallManager.init();
+        // FloatingBallManager.init(); // <-- 核心修改：从这里移除
         setupBgImageManager();
         setupColorSync(colorModal.pickerD1, colorModal.hexD1, 'dayColor1'); 
         setupColorSync(colorModal.pickerD2, colorModal.hexD2, 'dayColor2');
         setupColorSync(colorModal.pickerN1, colorModal.hexN1, 'nightColor1'); 
         setupColorSync(colorModal.pickerN2, colorModal.hexN2, 'nightColor2');
+        // [核心新增] 将悬浮球初始化移至最后，并增加常驻逻辑
+        FloatingBallManager.init();
+        if (currentConfig.settings.jellyBall && currentConfig.settings.jellyBall.enabled) {
+            FloatingBallManager.create();
+        }
  function showIosWarning() {
             // 检查是否为 iOS 设备 (iPhone, iPad, iPod)
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -6836,6 +7146,16 @@ const blob = b64toBlob(blobData.content, contentType);
             function closeAnyOpenWindow() {
                 if (currentPickerWindow) {
                     const windowContainerToClose = currentPickerWindow;
+
+                    // [核心修复] 在移除主窗口前，先检查并移除其关联的“兄弟”窗口
+                    const siblingId = windowContainerToClose.dataset.siblingId;
+                    if (siblingId) {
+                        const siblingElement = document.getElementById(siblingId);
+                        if (siblingElement && siblingElement.parentNode) {
+                            siblingElement.remove();
+                        }
+                    }
+
                     const innerWindow = windowContainerToClose.querySelector('.floating-project-window');
                     if (innerWindow) {
                         innerWindow.classList.remove('visible');
@@ -6845,12 +7165,13 @@ const blob = b64toBlob(blobData.content, contentType);
                             }
                         }, { once: true });
                     } else {
-                        windowContainerToClose.remove();
+                        if (windowContainerToClose.parentNode) {
+                           windowContainerToClose.remove();
+                        }
                     }
                     currentPickerWindow = null;
                 }
             }
-
 
             function createPickerWindow(title, content) {
                 closeAnyOpenWindow();
@@ -6865,12 +7186,29 @@ const blob = b64toBlob(blobData.content, contentType);
                     <div class="fpw-content" style="padding: 15px;"></div>
                 `;
                 winEl.querySelector('.fpw-content').appendChild(content);
-                winEl.querySelector('.fpw-close').addEventListener('click', () => container.remove());
+
+                // [核心修正] 在这里添加联动关闭逻辑
+                winEl.querySelector('.fpw-close').addEventListener('click', () => {
+                    // 移除主窗口
+                    if (container && container.parentNode) {
+                        container.remove();
+                    }
+                    // 查找并移除与之关联的背景选择器窗口
+                    const siblingId = container.dataset.siblingId;
+                    if (siblingId) {
+                        const siblingElement = document.getElementById(siblingId);
+                        if (siblingElement && siblingElement.parentNode) {
+                            siblingElement.remove();
+                        }
+                    }
+                });
+
                 container.appendChild(winEl);
                 document.getElementById('floating-projects-container').appendChild(container);
                 currentPickerWindow = container;
                 return container;
             }
+
 
             function showImagePicker(onSelect) {
                 const grid = document.createElement('div');
@@ -6913,6 +7251,12 @@ const blob = b64toBlob(blobData.content, contentType);
                 let pickerTitle = '';
                 let tempSelectedBg = null;
 
+                let bgPickerContainer = null;
+                
+                const closeBothPickers = () => {
+                    closeAnyOpenWindow(); 
+                };
+
                 if (type === 'shortcut') {
                     pickerTitle = '选择一个快捷方式';
                     listContent = document.createElement('div');
@@ -6949,8 +7293,24 @@ const blob = b64toBlob(blobData.content, contentType);
 
                 const pickerContainer = createPickerWindow(pickerTitle, listContent);
                 const pickerWindow = pickerContainer.querySelector('.floating-project-window');
+                
+                pickerWindow.querySelector('.fpw-close').addEventListener('click', closeBothPickers);
 
                 // 创建并附加背景选择器
+                bgPickerContainer = document.createElement('div');
+                
+                // [核心修正：建立关联]
+                const siblingId = 'widget-bg-picker-container-' + Date.now();
+                bgPickerContainer.id = siblingId;
+                pickerContainer.dataset.siblingId = siblingId; // 将背景选择器的ID存到主窗口上
+
+                bgPickerContainer.style.cssText = `
+                    position: fixed;
+                    z-index: 2024; 
+                    pointer-events: none; 
+                    width: auto;
+                `;
+
                 const bgPicker = document.createElement('div');
                 bgPicker.className = 'widget-bg-picker-popup';
                 bgPicker.innerHTML = `
@@ -6958,16 +7318,23 @@ const blob = b64toBlob(blobData.content, contentType);
                     <button class="bg-picker-button">导入图片</button>
                     <input type="file" accept="image/*" style="display:none;">
                 `;
-                pickerWindow.querySelector('.fpw-content').appendChild(bgPicker);
+                bgPickerContainer.appendChild(bgPicker);
+                document.body.appendChild(bgPickerContainer);
                 
+                requestAnimationFrame(() => {
+                    const mainRect = pickerWindow.getBoundingClientRect();
+                    const bgPickerRect = bgPicker.getBoundingClientRect();
+                    
+                    bgPickerContainer.style.top = `${mainRect.bottom}px`;
+                    bgPickerContainer.style.left = `${mainRect.left + (mainRect.width / 2) - (bgPickerRect.width / 2)}px`;
+                });
+
                 const colorInput = bgPicker.querySelector('input[type="color"]');
                 const fileInput = bgPicker.querySelector('input[type="file"]');
                 const fileButton = bgPicker.querySelector('.bg-picker-button');
 
-                // 事件监听
                 colorInput.addEventListener('input', () => {
                     tempSelectedBg = colorInput.value;
-                    // [新增] 选择颜色时，重置图片选择按钮和文件输入
                     fileButton.textContent = '导入图片';
                     fileInput.value = ''; 
                 });
@@ -6979,20 +7346,18 @@ const blob = b64toBlob(blobData.content, contentType);
                     if (file) {
                         const reader = new FileReader();
                         reader.onload = (event) => {
-                            tempSelectedBg = event.target.result; // base64 string
-                             // [新增] 选择图片后，更新按钮文本并重置颜色选择
+                            tempSelectedBg = event.target.result; 
                             fileButton.textContent = '已选择图片';
                             colorInput.value = '#ffffff';
                         };
                         reader.readAsDataURL(file);
                     }
                 });
-
-                // 显示背景选择器
                 setTimeout(() => bgPicker.classList.add('show'), 50);
             }
 
-            
+
+
             function showHtmlInputWindow(onSave) {
                 const contentWrapper = document.createElement('div');
                 contentWrapper.style.display = 'flex';
@@ -7019,29 +7384,41 @@ const blob = b64toBlob(blobData.content, contentType);
 
 
 
-             async function saveWidgetConfig(cellIndex, widgetData) {
+             async function saveWidgetConfig(cellIndex, widgetData, onCompleteCallback) {
                 if (!currentConfig.lockscreenWidgets[cellIndex]) {
                     currentConfig.lockscreenWidgets[cellIndex] = [];
                 }
-                currentConfig.lockscreenWidgets[cellIndex].unshift(widgetData); 
+                currentConfig.lockscreenWidgets[cellIndex].unshift(widgetData);
+
+                // [V3 修复] 等待保存操作完成
                 await saveGlobalConfig(`Add widget to cell ${cellIndex}`);
-                
-                // --- 核心修复点 ---
-                // 确保在数据更新后，立即重新渲染锁屏和设置模拟器
+
+                // [V3 修复] 在保存完成后，才执行UI更新和回调
                 renderLockscreenWidgets();
-                
-                const settingsWindow = document.getElementById('lockscreen-settings-modal');
-                if (settingsWindow && settingsWindow.classList.contains('show')) {
-                    const grid = settingsWindow.querySelector('.settings-grid');
-                    if (grid) {
-                        renderSettingsGrid(grid);
-                    }
+                const settingsModal = document.getElementById('lockscreen-settings-modal');
+                if (settingsModal?.classList.contains('show')) {
+                    renderSettingsGrid(settingsModal.querySelector('.settings-grid'));
                 }
-                // --- 修复结束 ---
                 
-                closeAnyOpenWindow();
+                // [V3 修复] 执行传入的回调，例如关闭选择器窗口
+                if (typeof onCompleteCallback === 'function') {
+                    onCompleteCallback();
+                }
             }
 
+            async function deleteWidgetFromCell(cellIndex) {
+                delete currentConfig.lockscreenWidgets[cellIndex];
+                
+                // [V3 修复] 等待删除操作完成
+                await saveGlobalConfig(`Delete widget from cell ${cellIndex}`);
+
+                // [V3 修复] 在保存完成后，才执行UI更新
+                renderLockscreenWidgets();
+                const settingsModal = document.getElementById('lockscreen-settings-modal');
+                if (settingsModal?.classList.contains('show')) {
+                    renderSettingsGrid(settingsModal.querySelector('.settings-grid'));
+                }
+            }
 
 
                 async function deleteWidgetFromCell(cellIndex) {
@@ -7310,7 +7687,8 @@ const blob = b64toBlob(blobData.content, contentType);
             }
 
             async function renderSettingsGrid(gridContainer) {
-                gridContainer.innerHTML = ''; 
+                if (!gridContainer) return;
+                gridContainer.innerHTML = '';
                 for (let i = 0; i < 32; i++) {
                     const cell = document.createElement('div');
                     cell.className = 'settings-grid-cell';
@@ -7323,22 +7701,19 @@ const blob = b64toBlob(blobData.content, contentType);
                 const cellHeight = (gridRect.height - (7 * gap)) / 8;
 
                 if (cellWidth <= 0 || cellHeight <= 0) {
-                    console.warn("Grid container has no dimensions, skipping widget render.");
                     return;
                 }
 
                 const widgets = currentConfig.lockscreenWidgets || {};
-                
+
                 for (const startIndexStr in widgets) {
                     const startIndex = parseInt(startIndexStr);
                     const widgetConfig = widgets[startIndex]?.[0];
                     if (!widgetConfig) continue;
 
                     const [cols, rows] = widgetConfig.size.split('x').map(Number);
-                    
                     const startRow_0based = Math.floor(startIndex / 4);
                     const startCol_0based = startIndex % 4;
-
                     const top = startRow_0based * (cellHeight + gap);
                     const left = startCol_0based * (cellWidth + gap);
                     const width = cols * cellWidth + (cols - 1) * gap;
@@ -7346,34 +7721,21 @@ const blob = b64toBlob(blobData.content, contentType);
 
                     const container = document.createElement('div');
                     container.className = 'widget-container-wrapper';
-                    Object.assign(container.style, {
-                        position: 'absolute',
-                        top: `${top}px`,
-                        left: `${left}px`,
-                        width: `${width}px`,
-                        height: `${height}px`,
-                    });
-                    
+                    Object.assign(container.style, { position: 'absolute', top: `${top}px`, left: `${left}px`, width: `${width}px`, height: `${height}px` });
+
                     const placeholder = document.createElement('div');
                     placeholder.className = 'widget-placeholder';
                     placeholder.style.position = 'absolute';
                     placeholder.style.inset = '0';
-                    
+
                     switch (widgetConfig.type) {
                         case 'image':
                             placeholder.style.padding = '0';
                             placeholder.style.overflow = 'hidden';
                             const img = document.createElement('img');
-                            Object.assign(img.style, {
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                                borderRadius: 'inherit'
-                            });
+                            Object.assign(img.style, { width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' });
                             img.alt = 'Image Preview';
-                            getSecureFileUrl(widgetConfig.content).then(url => {
-                                if (url) img.src = url;
-                            });
+                            getSecureFileUrl(widgetConfig.content).then(url => { if (url) img.src = url; });
                             placeholder.appendChild(img);
                             break;
                         case 'memo':
@@ -7397,6 +7759,7 @@ const blob = b64toBlob(blobData.content, contentType);
                     deleteBtn.onclick = (e) => {
                         e.stopPropagation();
                         if (confirm('确定要删除这个组件吗？')) {
+                            // [V3 修复] 调用修改后的异步函数
                             deleteWidgetFromCell(startIndex);
                         }
                     };
@@ -7494,45 +7857,48 @@ const blob = b64toBlob(blobData.content, contentType);
                 }
             }
             
-            async function handleDragEnd() {
+              async function handleDragEnd() {
                 if (dragTargetCell) {
                     dragTargetCell.classList.remove('drag-over');
                     const cellIndex = parseInt(dragTargetCell.dataset.cellIndex, 10);
                     const newWidget = { id: Date.now(), ...draggedWidgetInfo };
 
-         const onSelectContent = (data) => {
-                        // data is now an object: { content, text?, background? }
+                    // [V3 修复] onSelectContent 现在调用带回调的 saveWidgetConfig
+                    const onSelectContent = (data) => {
                         newWidget.content = data.content;
                         if (data.text) newWidget.text = data.text;
                         if (data.background) newWidget.background = data.background;
                         
-                        saveWidgetConfig(cellIndex, newWidget);
+                        // 传入 closeAnyOpenWindow 作为保存成功后的回调函数
+                        saveWidgetConfig(cellIndex, newWidget, closeAnyOpenWindow);
                     };
 
-                    if (newWidget.type === 'memo' || newWidget.type === 'image' || newWidget.type === 'shortcut') {
+                    if (['memo', 'image', 'shortcut'].includes(newWidget.type)) {
                         const { success } = await ensureMemoryDataIsLoaded();
                         if (success) {
-                            if (newWidget.type === 'memo' || newWidget.type === 'shortcut') {
-                                showContentAndBackgroundPicker(newWidget.type, onSelectContent);
-                            } else { // type === 'image'
+                            if (newWidget.type === 'image') {
                                 showAlbumPicker(photoData => onSelectContent({ content: photoData.path }));
+                            } else {
+                                showContentAndBackgroundPicker(newWidget.type, onSelectContent);
                             }
                         }
                     } else if (newWidget.type === 'html') {
                         showHtmlInputWindow(htmlContent => onSelectContent({ content: htmlContent }));
                     }
-
                 }
+
                 if (ghostEl) ghostEl.remove();
                 ghostEl = null; draggedWidgetInfo = null; dragTargetCell = null;
                 document.removeEventListener('mousemove', handleDragMove);
                 document.removeEventListener('touchmove', handleDragMove);
             }
 
+
+
             async function applyMode(enable) {
                 const homeScreenPage = document.getElementById('homeScreenPage');
                 const mainWrapper = document.getElementById('mainWrapper');
-                const elementsToMove = [document.getElementById('pageOverlay'), document.getElementById('titleCard'), document.getElementById('categoryNavContainer'), document.getElementById('navContainer')].filter(Boolean);
+                const elementsToMove = [document.getElementById('pageOverlay'), document.getElementById('titleCard'), document.getElementById('categoryNavContainer'), document.querySelector('.scrollable-nav-wrapper')].filter(Boolean);
                 isEnabled = enable;
                 document.body.classList.toggle('mobile-mode', enable);
                 ui.settingsEntry.style.display = enable ? 'block' : 'none';
@@ -7566,6 +7932,23 @@ const blob = b64toBlob(blobData.content, contentType);
 
 
             function handleTouchStart(e) {
+                // --- [V2 优化] 同时处理垂直和水平滚动区域的事件冲突 ---
+
+                // 1. 检查垂直滚动的按钮区域
+                const vScrollContainer = document.querySelector('.home-screen-page .scrollable-nav-wrapper');
+                if (vScrollContainer && vScrollContainer.contains(e.target) && vScrollContainer.scrollHeight > vScrollContainer.clientHeight) {
+                    isSwiping = false; // 判定为垂直滚动意图，阻止页面切换
+                    return;
+                }
+
+                // 2. 检查水平滚动的分类区域
+                const hScrollContainer = document.querySelector('.home-screen-page .category-nav-container');
+                if (hScrollContainer && hScrollContainer.contains(e.target) && hScrollContainer.scrollWidth > hScrollContainer.clientWidth) {
+                    isSwiping = false; // 判定为水平滚动意图，阻止页面切换
+                    return;
+                }
+                
+                // 如果触摸点不在任何可滚动区域内，则执行页面切换逻辑
                 if (!isEnabled || e.target.closest('.widget, .widget-placeholder, .component-adder')) return;
                 ui.slider.style.transition = 'none';
                 startX = e.touches[0].clientX;
@@ -7576,6 +7959,7 @@ const blob = b64toBlob(blobData.content, contentType);
 
             function handleTouchMove(e) {
                 if (!isSwiping || !isEnabled) return;
+                // 只有当确定是左右滑动时，才阻止默认的上下滚动行为
                 e.preventDefault();
                 const diffX = e.touches[0].clientX - startX;
                 const pageWidth = ui.slider.offsetWidth / 2;
@@ -7631,7 +8015,6 @@ const blob = b64toBlob(blobData.content, contentType);
             };
         })();
 
-        // ============ [核心修改点 3: 渲染锁屏组件时应用形状] ============
         function renderLockscreenWidgets() {
             const grid = document.getElementById('lockscreenGrid');
             if (!grid) return;
@@ -7641,7 +8024,6 @@ const blob = b64toBlob(blobData.content, contentType);
             const gap = 15;
             const totalWidth = gridRect.width;
             const totalHeight = gridRect.height;
-
             if (totalWidth <= 0 || totalHeight <= 0) return;
 
             const cellWidth = (totalWidth - (3 * gap)) / 4;
@@ -7652,7 +8034,6 @@ const blob = b64toBlob(blobData.content, contentType);
             Object.keys(widgetsData).forEach(startIndexStr => {
                 const startIndex = parseInt(startIndexStr, 10);
                 const widgetConfig = widgetsData[startIndex]?.[0];
-
                 if (!widgetConfig) return;
 
                 const startRow_0based = Math.floor(startIndex / 4);
@@ -7679,24 +8060,21 @@ const blob = b64toBlob(blobData.content, contentType);
                     widgetEl.classList.add('widget-shape-square');
                 }
 
-                // ============ [新功能实现] 应用背景样式 ============
                 if (widgetConfig.background) {
                     if (widgetConfig.background.startsWith('data:image')) {
                         widgetEl.style.backgroundImage = `url(${widgetConfig.background})`;
                         widgetEl.style.backgroundSize = 'cover';
                         widgetEl.style.backgroundPosition = 'center';
-                        // 针对快捷按钮，如果背景是图片，则隐藏文字
                         if (widgetConfig.type === 'shortcut') {
-                           widgetEl.style.color = 'transparent'; // 隐藏文字
-                           widgetEl.style.textIndent = '9999px'; // 确保文字被移出可视区域
+                           widgetEl.style.color = 'transparent';
+                           widgetEl.style.textIndent = '9999px';
                            widgetEl.style.overflow = 'hidden';
                         }
-                    } else { // 假定是颜色
+                    } else {
                         widgetEl.style.backgroundColor = widgetConfig.background;
-                        widgetEl.style.backgroundImage = 'none'; // 清除可能存在的图片背景
+                        widgetEl.style.backgroundImage = 'none';
                     }
                 }
-                // ===============================================
 
                 switch (widgetConfig.type) {
                     case 'image':
@@ -7716,8 +8094,24 @@ const blob = b64toBlob(blobData.content, contentType);
                             } else {
                                 widgetEl.classList.remove('widget-shape-circle', 'widget-shape-capsule');
                                 widgetEl.classList.add('widget-shape-square');
-                                widgetEl.innerHTML = `<div class="widget-memo-title">${memo.title || '无标题'}</div> <div class="widget-memo-content">${memo.content || '无内容'}</div>`;
-                                Object.assign(widgetEl.style, { flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', padding: '12px', textAlign: 'left' });
+                                
+                                const titleEl = document.createElement('div');
+                                titleEl.className = 'widget-memo-title';
+                                titleEl.textContent = memo.title || '无标题';
+                                
+                                const contentEl = document.createElement('div');
+                                contentEl.className = 'widget-memo-content';
+                                contentEl.innerHTML = memo.content || '无内容';
+                                
+                                // [V2 修复] 计算并应用 line-clamp
+                                const heightInUnits = parseInt(rows, 10);
+                                if (heightInUnits > 0) {
+                                    const lineClampValue = 1 + (heightInUnits - 1) * 2;
+                                    contentEl.style.webkitLineClamp = lineClampValue;
+                                    contentEl.style.setProperty('-webkit-line-clamp', lineClampValue); // 确保生效
+                                }
+
+                                widgetEl.append(titleEl, contentEl);
                             }
                             widgetEl.style.cursor = 'pointer';
                             widgetEl.onclick = () => showMemoPopup(widgetConfig.content);
@@ -7758,6 +8152,7 @@ const blob = b64toBlob(blobData.content, contentType);
 
 
 
+
         // 初始化手机模式管理器
         MobileModeManager.init();
         /* =============================================================== */
@@ -7794,8 +8189,6 @@ const blob = b64toBlob(blobData.content, contentType);
                     MemoryApp.scheduleSave(); // 复用 MemoryApp 的保存逻辑
                 }
             });
-
-
     </script>
 </body>
 </html>
