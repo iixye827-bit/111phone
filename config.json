@@ -53,6 +53,16 @@
         "shape": "square",
         "content": "memory/photos/1760161305278_IMG_4451.jpeg"
       }
+    ],
+    "12": [
+      {
+        "id": 1760190438452,
+        "size": "1x1",
+        "type": "shortcut",
+        "shape": "circle",
+        "content": "111",
+        "text": "EVE"
+      }
     ]
   }
 }
