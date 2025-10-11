@@ -5,6 +5,16 @@
     {
       "name": "全部",
       "buttons": []
+    },
+    {
+      "name": "小手机",
+      "buttons": [
+        {
+          "text": "EVE",
+          "href": "111",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
