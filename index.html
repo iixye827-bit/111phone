@@ -2361,9 +2361,9 @@ body.theme-glass.dark-mode .memo-toolbar {
 
     </style>
 
-    <style id="custom-jelly-ball-styles"></style>
-</head>
-<body>
+ <style id="custom-jelly-ball-styles"></style>
+
+
     <!-- 手机模式滑动容器 -->
     <div class="main-wrapper" id="mainWrapper">
         <div class="page-slider" id="pageSlider">
@@ -2386,13 +2386,13 @@ body.theme-glass.dark-mode .memo-toolbar {
         <h1 class="editable-title" id="title">JellyfishCenter</h1>
         <div class="editable-subtitle" id="subtitle">长按🌞打开工具栏 | By淡季水母</div>
     </div>
-    
+
+    <div class="category-nav-container" id="categoryNavContainer">
+        <div class="category-nav" id="categoryNav"></div>
+    </div>
+
     <!-- [新增] 可滚动的包裹容器 (结构调整) -->
     <div class="scrollable-nav-wrapper">
-        <div class="category-nav-container" id="categoryNavContainer">
-            <div class="category-nav" id="categoryNav"></div>
-        </div>
-
         <div class="nav-container" id="navContainer">
             <p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>
         </div>
@@ -4634,7 +4634,10 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
         
         renderCategories();
         loadColorState(); 
+        
+  
     }
+
     
     function renderCategories() {
         const navContainerEl = document.getElementById('categoryNavContainer');
@@ -7301,6 +7304,8 @@ const blob = b64toBlob(blobData.content, contentType);
 
 
 
+
+
              async function saveWidgetConfig(cellIndex, widgetData, onCompleteCallback) {
                 if (!currentConfig.lockscreenWidgets[cellIndex]) {
                     currentConfig.lockscreenWidgets[cellIndex] = [];
@@ -7802,11 +7807,13 @@ const blob = b64toBlob(blobData.content, contentType);
                 ui.settingsEntry.style.display = enable ? 'block' : 'none';
                 
                 if (enable) {
+                    // 确保记忆数据已加载，以便锁屏组件能获取信息
                     const { success } = await ensureMemoryDataIsLoaded();
                     if (!success) {
                         alert("加载锁屏组件数据失败，部分组件可能无法显示。请检查网络后刷新重试。");
                     }
                     
+                    // 将主页元素移动到手机模式的 home-screen-page 中
                     elementsToMove.forEach(el => homeScreenPage.appendChild(el));
                     currentPage = 0; currentTranslate = 0;
                     ui.slider.style.transition = 'none';
@@ -7815,7 +7822,16 @@ const blob = b64toBlob(blobData.content, contentType);
                     renderLockscreenWidgets();
                     attachSwipeListeners();
                 } else {
-                    elementsToMove.forEach(el => document.body.insertBefore(el, mainWrapper));
+                    // 当关闭手机模式时，将元素移回 body
+                    elementsToMove.forEach(el => {
+                        // fab-container 是一个很好的参照点，我们将元素插到它前面
+                        const fabContainer = document.getElementById('fabContainer');
+                        if (fabContainer) {
+                             document.body.insertBefore(el, fabContainer);
+                        } else {
+                             document.body.appendChild(el); // 兜底方案
+                        }
+                    });
                     detachSwipeListeners();
                     ui.slider.style.transition = 'none';
                     ui.slider.style.transform = `translateX(0px)`;
@@ -7827,6 +7843,7 @@ const blob = b64toBlob(blobData.content, contentType);
                 currentConfig.settings.mobileMode.enabled = enable;
                 saveGlobalConfig('Toggle mobile mode');
             }
+
 
 
             function handleTouchStart(e) {
