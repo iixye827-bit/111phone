@@ -4172,8 +4172,11 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
     
     function toggleManagementMode(forceState) {
         isManagementMode = forceState !== undefined ? forceState : !isManagementMode;
-        pageOverlay.classList.toggle('show', isManagementMode);
-        pageOverlay.classList.toggle('management-overlay', isManagementMode);
+        
+        // [核心修复] 移除对 pageOverlay 的所有操作，不再显示那层“透明膜”
+        // pageOverlay.classList.toggle('show', isManagementMode);
+        // pageOverlay.classList.toggle('management-overlay', isManagementMode);
+
         document.body.classList.toggle('management-active', isManagementMode);
         document.querySelectorAll('.nav-btn').forEach(btn => {
             const deleteIcon = btn.querySelector('.delete-icon');
@@ -4195,7 +4198,6 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
         });
     }
 
-    pageOverlay.addEventListener('click', (e) => { if (isManagementMode && !e.target.closest('.nav-btn')) { toggleManagementMode(false); } if (fabContainer.classList.contains('active')) { toggleFabMenu(false); } });
     const fabContainer = document.getElementById('fabContainer'), fabMainBtn = document.getElementById('themeBtn');
     let fabPressTimer = null, isFabLongPress = false;
     function toggleFabMenu(forceState) { const isActive = forceState !== undefined ? forceState : !fabContainer.classList.contains('active'); fabContainer.classList.toggle('active', isActive); if (!isManagementMode) pageOverlay.classList.toggle('show', isActive); }
@@ -4204,7 +4206,30 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
     fabMainBtn.addEventListener('contextmenu', e => e.preventDefault());
     fabMainBtn.addEventListener('touchstart', e => { e.preventDefault(); fabMainBtn.dispatchEvent(new MouseEvent('mousedown')); }, { passive: false });
     fabMainBtn.addEventListener('touchend', e => { e.preventDefault(); fabMainBtn.dispatchEvent(new MouseEvent('mouseup')); }, { passive: false });
-    
+
+        // [核心修复 V2] 使用 body 监听全局点击，以精准退出管理模式
+    document.body.addEventListener('click', (e) => {
+        // 如果 fab 菜单是打开的，点击任何地方都应该关闭它
+        if (fabContainer.classList.contains('active') && !e.target.closest('.fab-container')) {
+            toggleFabMenu(false);
+        }
+
+        // 如果不是管理模式，则不执行后续逻辑
+        if (!isManagementMode) return;
+
+        // 定义哪些元素被认为是“管理区域”，点击它们不应退出管理模式
+        const isClickInsideManagementArea = 
+            e.target.closest('.nav-btn') ||         // 点击了导航按钮本身
+            e.target.closest('.modal-overlay') ||   // 点击了任何弹窗
+            e.target.closest('.fab-container') ||   // 点击了右下角悬浮按钮
+            e.target.closest('#addNavModalTitle');  // 兼容点击弹窗标题
+
+        // 只有当点击事件不在“管理区域”内时，才退出管理模式
+        if (!isClickInsideManagementArea) {
+            toggleManagementMode(false);
+        }
+    }, true); // 使用捕获阶段，确保比其他点击事件更早执行，避免冲突
+
     function attachButtonListeners(btn) {
         btn.addEventListener('click', async function(e) {
             if (isManagementMode) {
@@ -7846,52 +7871,75 @@ const blob = b64toBlob(blobData.content, contentType);
 
 
 
+            // [V3 终极修复] 重构滑动逻辑，解决事件冲突
+            let startY = 0, diffX = 0, diffY = 0, swipeIntention = null; // null, 'horizontal', 'vertical'
+
             function handleTouchStart(e) {
-                // --- [V2 优化] 同时处理垂直和水平滚动区域的事件冲突 ---
-
-                // 1. 检查垂直滚动的按钮区域
-                const vScrollContainer = document.querySelector('.home-screen-page .scrollable-nav-wrapper');
-                if (vScrollContainer && vScrollContainer.contains(e.target) && vScrollContainer.scrollHeight > vScrollContainer.clientHeight) {
-                    isSwiping = false; // 判定为垂直滚动意图，阻止页面切换
-                    return;
-                }
-
-                // 2. 检查水平滚动的分类区域
-                const hScrollContainer = document.querySelector('.home-screen-page .category-nav-container');
-                if (hScrollContainer && hScrollContainer.contains(e.target) && hScrollContainer.scrollWidth > hScrollContainer.clientWidth) {
-                    isSwiping = false; // 判定为水平滚动意图，阻止页面切换
-                    return;
-                }
+                // 如果正在滑动中，或者目标是组件等，则忽略新的触摸
+                if (isSwiping || !isEnabled || e.target.closest('.widget, .widget-placeholder, .component-adder')) return;
                 
-                // 如果触摸点不在任何可滚动区域内，则执行页面切换逻辑
-                if (!isEnabled || e.target.closest('.widget, .widget-placeholder, .component-adder')) return;
-                ui.slider.style.transition = 'none';
+                // 重置所有状态
+                swipeIntention = null;
                 startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                diffX = 0;
+                diffY = 0;
+
+                ui.slider.style.transition = 'none';
                 const transformMatrix = window.getComputedStyle(ui.slider).transform;
                 currentTranslate = (transformMatrix !== 'none') ? parseFloat(transformMatrix.split(',')[4]) : 0;
-                isSwiping = true;
+                
+                // 标记触摸 sequence 开始
+                isSwiping = true; 
             }
 
             function handleTouchMove(e) {
                 if (!isSwiping || !isEnabled) return;
-                // 只有当确定是左右滑动时，才阻止默认的上下滚动行为
-                e.preventDefault();
-                const diffX = e.touches[0].clientX - startX;
-                const pageWidth = ui.slider.offsetWidth / 2;
-                const limitedTranslate = Math.max(-pageWidth, Math.min(0, currentTranslate + diffX));
-                ui.slider.style.transform = `translateX(${limitedTranslate}px)`;
-            }
 
+                diffX = e.touches[0].clientX - startX;
+                diffY = e.touches[0].clientY - startY;
+
+                // 首次移动时，判断用户的意图
+                if (swipeIntention === null) {
+                    // 水平移动大于垂直移动，且超过阈值，判定为页面滑动
+                    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+                        swipeIntention = 'horizontal';
+                    } 
+                    // 垂直移动大于水平移动，判定为页面滚动 (或长按前的微小抖动)
+                    else if (Math.abs(diffY) > Math.abs(diffX)) {
+                        swipeIntention = 'vertical';
+                    }
+                }
+                
+                // 只有明确是水平滑动意图时，才阻止默认行为并移动页面
+                if (swipeIntention === 'horizontal') {
+                    e.preventDefault();
+                    const pageWidth = ui.slider.offsetWidth / 2;
+                    const limitedTranslate = Math.max(-pageWidth, Math.min(0, currentTranslate + diffX));
+                    ui.slider.style.transform = `translateX(${limitedTranslate}px)`;
+                } 
+                // 如果是垂直意图，或者意图未定（移动太小），则什么都不做
+                // 这允许了垂直滚动、点击和长按的正常触发
+            }
+            
             function handleTouchEnd(e) {
                 if (!isSwiping || !isEnabled) return;
-                isSwiping = false;
-                const diffX = e.changedTouches[0].clientX - startX;
-                const threshold = window.innerWidth / 4;
-                if (Math.abs(diffX) > threshold) {
-                    if (diffX < 0 && currentPage === 0) currentPage = 1; else if (diffX > 0 && currentPage === 1) currentPage = 0;
+                
+                // 只有当意图是水平滑动时，才处理页面切换逻辑
+                if (swipeIntention === 'horizontal') {
+                    const threshold = window.innerWidth / 4;
+                    if (Math.abs(diffX) > threshold) {
+                        if (diffX < 0 && currentPage === 0) currentPage = 1;
+                        else if (diffX > 0 && currentPage === 1) currentPage = 0;
+                    }
+                    snapToPage();
                 }
-                snapToPage();
+
+                // 重置状态，准备下一次触摸
+                isSwiping = false;
+                swipeIntention = null;
             }
+
 
             function snapToPage() {
                 const pageWidth = ui.slider.offsetWidth / 2;
