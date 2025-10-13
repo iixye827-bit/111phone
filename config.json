@@ -10,7 +10,7 @@
   "settings": {
     "paginationEnabled": true,
     "jellyBall": {
-      "enabled": false,
+      "enabled": true,
       "swipeBack": true,
       "functions": {},
       "customCSS": ""
