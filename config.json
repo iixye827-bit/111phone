@@ -16,7 +16,7 @@
       "customCSS": ""
     },
     "mobileMode": {
-      "enabled": true
+      "enabled": false
     }
   },
   "themePresets": [
