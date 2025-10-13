@@ -25,6 +25,15 @@
         "nightColor1": "#1f2a40",
         "nightColor2": "#16213e"
       }
+    },
+    {
+      "name": "1",
+      "colors": {
+        "dayColor1": "#858585",
+        "dayColor2": "#858585",
+        "nightColor1": "#1f2a40",
+        "nightColor2": "#16213e"
+      }
     }
   ],
   "lockscreenWidgets": {}
