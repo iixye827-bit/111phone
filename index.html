@@ -3865,14 +3865,21 @@ const getDefaultConfig = () => ({
                 btnEl.title = func.title;
                 btnEl.dataset.actionId = func.id;
                 
-                // [新增] 如果后台保活功能正在运行，为按钮添加激活样式
+                // 如果后台保活功能正在运行，为按钮添加激活样式
                 if (func.id === 'keep_alive' && isKeepAliveActive) {
                     btnEl.classList.add('active-keep-alive');
                 }
 
+                // [核心修复] 为每个菜单按钮直接添加点击事件监听器
+                btnEl.addEventListener('click', () => {
+                    _onMenuClick(btnEl);
+                    _closeMenu(); // 点击后立即关闭菜单，提供更好的反馈
+                });
+
                 menu.appendChild(btnEl);
             });
         }
+
 
         
         function _destroy() { if (ball) { ball.parentElement.remove(); ball = null; wrapper = null; } clearTimeout(idleTimer); clearTimeout(longPressTimer); document.removeEventListener('mousemove', _onDragMove); document.removeEventListener('touchmove', _onDragMove); document.removeEventListener('mouseup', _onDragEnd); document.removeEventListener('touchend', _onDragEnd); }
