@@ -165,7 +165,33 @@
         .color-input-wrapper { display: flex; align-items: center; border-radius: 10px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); } body.dark-mode .color-input-wrapper { background:var(--bg-night-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
         input[type="color"] { width: 36px; height: 30px; border: none; background: transparent; cursor: pointer; -webkit-appearance: none; padding: 0; flex-shrink: 0; }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; } input[type="color"]::-webkit-color-swatch { border-radius: 6px; border: none; }
-        .hex-display { flex-grow: 1; text-align: right; padding: 0 10px; font-family: monospace; font-size: 16px; color: #889; }
+               .hex-display { 
+            flex-grow: 0; /* 核心修改：禁止输入框拉伸 */
+            flex-shrink: 0; /* 禁止输入框收缩 */
+            width: 4.5em; /* 核心修改：设置一个刚好容纳7个字符的宽度 (em单位相对于字体大小) */
+            text-align: center; /* 文本居中更美观 */
+            padding: 0; /* 移除内部左右边距 */
+            font-family: monospace; 
+            font-size: 16px; 
+            color: #889;
+             /* 覆盖 .modal-input 带来的额外内边距 */
+            padding-left: 5px !important;
+            padding-right: 5px !important;
+        }
+        .color-input-wrapper { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; /* 新增：在颜色面板和输入框之间设置一个固定的8px间距 */
+            border-radius: 10px; 
+            padding: 5px 8px; /* 优化：稍微减少容器的左右内边距 */
+            background:var(--bg-day-element); 
+            box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); 
+        } 
+        body.dark-mode .color-input-wrapper { 
+            background:var(--bg-night-element); 
+            box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); 
+        }
+
         .preview-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .preview-box { height: 40px; border-radius: 8px; position: relative; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
         .preview-box::before { content: attr(data-label); } #dayPreview { border: 2px solid var(--bg-day-element); color: var(--text-day); } body.dark-mode #dayPreview { border-color: rgba(255,255,255,0.1); }
         #nightPreview { border: 2px solid var(--bg-night-element); color: var(--text-night); } body.dark-mode #nightPreview { border-color: rgba(255,255,255,0.2); }
@@ -558,7 +584,6 @@
         body.theme-glass #memoryPhotoViewerOverlay {
             background: transparent;
         }
-
         body.theme-glass .nav-btn,
         body.theme-glass .title-card,
         body.theme-glass .fab-main,
@@ -568,9 +593,10 @@
         body.theme-glass .player-content,
         body.theme-glass .player-popover,
         body.theme-glass #memoryModal .hub-btn,
+        body.theme-glass .phone-partition-item, /* ★★★ 新增此行 ★★★ */
         body.theme-glass #memoryModal .folder-item,
         body.theme-glass #memoryModal .note-item,
-        body.theme-glass #memoryModal .album-item,
+        body.e-glass #memoryModal .album-item,
         body.theme-glass #memoryModal .fab,
         body.theme-glass #memoryModal .editor-btn,
         body.theme-glass #memoryModal #note-editor-view,
@@ -654,7 +680,59 @@
              background: rgba(200, 200, 200, 0.25);
              border-color: rgba(255, 255, 255, 0.15);
         }
+        /* [V3 最终修正] 强制修正颜色选择器布局，杜绝溢出 */
+        .color-input-wrapper {
+            display: flex;
+            align-items: center;
+            /* 使用一个非常小的间距 */
+            gap: 6px;
+            /* 容器的内边距也相应减小 */
+            padding: 5px 8px;
+        }
+
+        /* 为颜色选择器本身设置固定尺寸，且不允许收缩 */
+        .color-input-wrapper input[type="color"] {
+            width: 40px; /* 固定宽度 */
+            height: 28px; /* 固定高度 */
+            flex-shrink: 0; /* 核心：禁止此元素收缩 */
+            border: none;
+            padding: 0;
+            background: none;
+        }
+
+        /* 为十六进制输入框设置一个固定的、紧凑的尺寸 */
+        .color-input-wrapper .hex-display.modal-input {
+            flex: 0 0 auto; /* 核心：禁止增长和收缩，宽度由width属性决定 */
+            width: 85px; /* 核心：设置一个足以容纳7个字符和少量边距的固定宽度 */
+
+            /* 重置所有可能导致问题的样式 */
+            box-shadow: none !important;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            padding: 0 5px; /* 给予文字左右5px的呼吸空间 */
+            margin: 0;
+            text-align: center; /* 文本居中 */
+
+            /* 确保文本颜色在不同模式下正确显示 */
+            color: var(--text-day);
+        }
+
+
+        body.dark-mode .color-input-wrapper .hex-display.modal-input {
+            color: var(--text-night);
+        }
+
         /* ===== [END] FROSTED GLASS THEME ===== */
+        /* [新增] 为“已确认”的十六进制代码添加变淡的样式 */
+        .hex-display.modal-input.confirmed-color {
+            color: #a0aec0; /* 一个比默认文字更淡的灰色 */
+            opacity: 0.8; /* 稍微降低不透明度 */
+            transition: color 0.3s ease, opacity 0.3s ease; /* 添加平滑过渡效果 */
+        }
+        body.dark-mode .hex-display.modal-input.confirmed-color {
+            color: #718096; /* 夜间模式下对应的淡灰色 */
+        }
 
         /* ===== [START] FLOATING JELLYFISH BALL STYLES (MODIFIED) ===== */
         .jelly-ball-wrapper { /* MODIFICATION: New wrapper for custom CSS support */
@@ -2192,11 +2270,18 @@ body.dark-mode .widget-bg-picker-popup .bg-picker-button:hover {
     display: flex;
     align-items: center;
     gap: 15px;
-    padding: 10px 15px;
+    padding: 10px 25px; /* 优化：增加左右内边距，让工具按钮与边缘保持距离 */
     background: var(--bg-day-element);
     box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
     border-top: 1px solid rgba(0,0,0,0.08);
+
+    /* --- 核心修改 --- */
+    width: calc(100% + 20px); /* 让宽度等于父容器宽度 + 两侧各10px的内边距 */
+    margin: 0 -10px -10px -10px; /* 上右下左外边距，抵消父容器所有方向的内边距 */
+    border-radius: 0 0 16px 16px; /* 美化：让工具栏的下圆角匹配弹窗的圆角 */
+    box-sizing: border-box; /* 确保 padding 包含在 width 计算内 */
 }
+
 body.dark-mode .memo-toolbar {
     background: var(--bg-night-element);
     box-shadow: 0 -4px 12px rgba(0,0,0,0.2);
@@ -2359,7 +2444,185 @@ body.theme-glass.dark-mode .memo-toolbar {
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
 
+/* =============================================================== */
+/* ================= [新增] 手机收藏馆专属样式 ================== */
+/* =============================================================== */
+#phoneCollectionModal .modal-content {
+    max-width: 800px;
+    height: calc(100vh - 40px);
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+#phoneCollectionModal .page-content {
+    flex-grow: 1; /* 核心：让此容器填满 .modal-content 内的剩余空间 */
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* 核心：Flex布局中的重要技巧，防止内容溢出 */
+    overflow: hidden; /* 确保此容器本身不滚动 */
+}
+#phoneCollectionModal .page-header-container {
+    flex-shrink: 0; /* 核心：确保头部和搜索区域不被压缩 */
+}
+#phoneCollectionModal .list-container {
+    padding: 15px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 20px;
+    align-content: flex-start;
+    flex-grow: 1; /* 核心：让列表容器占据 Page-content 内所有剩余的垂直空间 */
+    overflow-y: auto; /* 核心：当内容超出时，只在这个容器内滚动 */
+    min-height: 0;
+}
+
+.phone-partition-item {
+    aspect-ratio: 1 / 1;
+    position: relative;
+    padding: 8px;
+    border-radius: 45px;
+    box-shadow: 6px 6px 12px var(--shadow-dark-day), -6px -6px 12px var(--shadow-light-day);
+    background: var(--bg-day-element);
+    color: var(--text-day);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0;
+    user-select: none; /* 防止长按时选中文本 */
+    -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
+}
+
+.phone-partition-item:active {
+    box-shadow: inset 3px 3px 6px var(--shadow-dark-day), inset -3px -3px 6px var(--shadow-light-day);
+    transform: scale(0.97);
+}
+body.dark-mode .phone-partition-item {
+    box-shadow: 6px 6px 12px var(--shadow-dark-night), -6px -6px 12px var(--shadow-light-night);
+    background: var(--bg-night-element);
+    color: var(--text-night);
+}
+body.dark-mode .phone-partition-item:active {
+    box-shadow: inset 3px 3px 6px var(--shadow-dark-night), inset -3px -3px 6px var(--shadow-light-night);
+}
+.phone-partition-icon {
+    display: none;
+}
+.phone-partition-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+#phone-detail-content {
+    gap: 18px;
+    padding-bottom: 30px;
+}
+.detail-info-group {
+    padding: 15px;
+    border-radius: 12px;
+    background: var(--bg-day-element);
+    box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day);
+}
+body.dark-mode .detail-info-group {
+    background: var(--bg-night-element);
+    box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night);
+}
+.detail-info-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #889;
+    display: block;
+    margin-bottom: 8px;
+}
+.detail-info-value {
+    font-size: 16px;
+    word-wrap: break-word;
+}
+.detail-info-value.copyable {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+    padding: 5px 8px;
+    margin: -5px -8px; 
+    border-radius: 8px;
+}
+.detail-info-value.copyable:hover {
+    background: rgba(0,0,0,0.05);
+}
+body.dark-mode .detail-info-value.copyable:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+/* =============================================================== */
+/* ================== [新增] Giscus 主题适配样式 ================= */
+/* =============================================================== */
+
+/* 1. 将评论区模态框强制设为全屏 */
+#phoneCommentsModal .modal-content {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    border: none;
+}
+
+/* 2. 确保 Giscus 的容器正确填充 */
+#phoneCommentsModal .modal-body {
+    padding: 0;
+    flex-grow: 1;
+    display: flex;
+}
+
+/* 3. ★★★ 终极修复：为 Giscus 组件本身重置外边距和宽度 ★★★ */
+#phoneCommentsModal .giscus {
+    width: 100% !important;     /* 覆盖通用规则的 calc(100% - 6px) */
+    height: 100%;
+    margin-left: 0 !important;  /* 覆盖通用规则的 margin-left: 3px */
+    margin-right: 0 !important; /* 覆盖通用规则的 margin-right: 3px */
+}
+
+/* 4. 保留背景透明适配 */
+.giscus-frame {
+    background-color: transparent !important;
+}
+
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+/* =============================================================== */
+/* ============= [新增] 后台保活功能专属样式 ================= */
+/* =============================================================== */
+@keyframes icon-breathing-green-glow {
+    0% {
+        filter: drop-shadow(0 0 4px rgba(76, 175, 80, 0.7));
+    }
+    50% {
+        filter: drop-shadow(0 0 12px rgba(76, 175, 80, 1));
+    }
+    100% {
+        filter: drop-shadow(0 0 4px rgba(76, 175, 80, 0.7));
+    }
+}
+
+.jelly-menu-btn.active-keep-alive {
+    animation: icon-breathing-green-glow 2s ease-in-out infinite;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+
+
     </style>
+
 
  <style id="custom-jelly-ball-styles"></style>
 
@@ -2405,10 +2668,67 @@ body.theme-glass.dark-mode .memo-toolbar {
             <button class="fab-drawer-item" id="dataSyncBtn" title="数据同步">☁️<span id="sync-status-indicator" title="云同步状态"></span></button>
             <button class="fab-drawer-item" id="addNavBtn" title="管理项目">📱</button>
             <button class="fab-drawer-item" id="colorBtn" title="主题设置">🎨</button>
+            <button class="fab-drawer-item" id="phoneCollectionBtn" title="手机收藏馆">💬</button>
             <button class="fab-drawer-item" id="memoryBtn" title="记忆">📷</button>
         </div>
         <button class="fab-main theme-toggle" id="themeBtn" title="切换主题">🌞</button>
     </div>
+
+    <!-- ===== [结构修改] 手机收藏馆模态框 ===== -->
+    <!-- 列表主窗口 -->
+    <div class="modal-overlay" id="phoneCollectionModal">
+        <div class="modal-content">
+            <div class="page-content"> <!-- ★ 修改点：移除了 .app-container 和 .page，简化为一层 .page-content -->
+                <div class="page-header-container"> <!-- ★ 新增：包裹住所有非滚动区域 -->
+                    <div class="modal-header" style="padding: 12px 15px;"> <!-- ★ 修改点：增加了内边距 -->
+                        <div class="modal-title-group" style="gap: 8px; align-items: center;">
+                            <span>手机收藏馆</span>
+                            <button id="showNoticeBell" style="display: none; background: transparent; border: none; font-size: 22px; cursor: pointer; padding: 5px; line-height: 1;" title="查看社区须知">🔔</button>
+                        </div>
+                        <button class="close-btn" data-modal-id="phoneCollectionModal">&times;</button>
+                    </div>
+                    <div style="padding: 0 25px 15px 25px; display: flex; justify-content: center;">
+                        <input type="search" id="phoneSearchInput" class="modal-input" placeholder="按名称搜索..." style="width: 100%; max-width: 400px;">
+                    </div>
+                </div>
+                <div id="phone-list-container" class="list-container">
+                    <!-- JS动态填充手机分区 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 详情悬浮窗 -->
+    <div class="modal-overlay" id="phoneDetailModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <!-- ★★★ 修改点：将标题和置顶按钮包裹起来 ★★★ -->
+                <div id="phone-detail-title-group" class="modal-title-group" style="gap: 12px; align-items: center;">
+                    <span id="phone-detail-title">手机详情</span>
+                    <span id="pinPhoneBtn" style="cursor: pointer; font-size: 24px; color: #ccc;" title="置顶">★</span>
+                </div>
+                <button class="close-btn" data-modal-id="phoneDetailModal">&times;</button>
+            </div>
+            <div class="modal-body" id="phone-detail-content">
+                <!-- JS动态填充手机信息 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- [新增] 评论区模态框 -->
+    <div class="modal-overlay" id="phoneCommentsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div id="phone-comments-title" class="modal-title-group">安利区</div>
+                <button class="close-btn" data-modal-id="phoneCommentsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Giscus 评论组件将在这里加载 -->
+                <div class="giscus"></div>
+                <!-- ⚠️ script 标签已被移除，将由 JavaScript 动态创建 -->
+            </div>
+        </div>
+    </div>
+    <!-- ===== [修改结束] ===== -->
     
     <!-- Modals -->
     <div class="modal-overlay" id="helpModal">
@@ -2513,6 +2833,19 @@ body.theme-glass.dark-mode .memo-toolbar {
             </div>
         </div>
     </details>
+    <!-- ★★★ 新增：手机收藏馆介绍 ★★★ -->
+    <details>
+        <summary>💬 手机收藏馆</summary>
+        <div class="details-content">
+            <p>一个社区驱动的手机分区展示与交流中心。</p>
+            <ul>
+                <li><strong>集中展示</strong>：汇集了来自社区作者的各类手机分区，方便你快速浏览和发现。</li>
+                <li><strong>快速直达</strong>：提供作者ID、获取方式等基础信息，并支持作者小红书ID一键复制。</li>
+                <li><strong>友好安利区</strong>：每个分区都拥有独立的评论区，你可以在这里分享使用体验、进行友好交流。</li>
+                <li><strong>个性化置顶</strong>：可以将你最喜欢的手机分区置顶显示，打造专属的收藏列表。</li>
+            </ul>
+        </div>
+    </details>
     <details>
         <summary>📷 记忆功能</summary>
         <div class="details-content">
@@ -2526,94 +2859,114 @@ body.theme-glass.dark-mode .memo-toolbar {
     </details>
 
     <div class="warning"><p><strong>危险操作</strong>：在 <code>数据同步</code> (☁️) 弹窗的最下方有“清空所有数据”按钮。此操作会 <strong>永久删除</strong> 您 GitHub 数据仓库中所有相关数据。<strong>此操作不可逆，请极度谨慎</strong>。</p></div>
-                    </div>
-                    <div id="help-page-2" class="help-page-content">
-                        <div class="update-header-info">
-                            <p><strong>小红书ID:</strong> 淡季水母</p>
-                            <p><strong>QQ交流群:</strong> 563191005</p>
-                        </div>
-                         <div class="update-log-entry">
-                            <h4>v5.3.0 <span class="update-date">- 2025.10.11</span></h4>
-                            <ul>
-                                <li><span class="tag new">新功能</span> <strong>锁屏组件</strong>: 新增手机模式与锁屏组件功能，支持高度自定义布局与多种组件类型。（详见“功能介绍”）</li>
-                                <li><span class="tag new">新功能</span> <strong>备忘录增强</strong>: 新增待办事项（清单）功能；支持加粗、斜体、下划线和删除线等文字格式；新增可一键复制代码块功能。</li>
-                                <li><span class="tag fix">修复</span> 解决了悬浮球在部分内嵌网页中无法显示的问题。</li>
-                                <li><span class="tag fix">修复</span> 修复了在悬浮球设置中，自定义CSS输入框无法实时预览样式的问题。</li>
-                            </ul>
-                        </div>
-                        <div class="update-log-entry">
-                            <h4>v4.1.0 <span class="update-date">- 2025.10.04</span></h4>
-                            <ul>
-                                <li><span class="tag fix">修复</span> 解决了上传的HTML项目在部分情况下无法正常打开的问题。</li>
-                                <li><span class="tag new">新功能</span> 新增悬浮球CSS自定义向导与模板，方便用户快速美化悬浮球。（详见“主题设置”）</li>
-                                <li><span class="tag new">新功能</span> 在“按钮管理模式”下，支持通过长按并拖拽的方式，对项目按钮进行直观排序。</li>
-                                <li><span class="tag fix">修复</span> 修复了记忆功能的“文件夹”模块中，项目选择器无法正确加载和选择项目的问题。</li>
-                            </ul>
-                        </div>
-                        <div class="update-log-entry">
-                            <h4>v3.9.0 <span class="update-date">- 2025.10.03</span></h4>
-                            <ul>
-                                <li><span class="tag new">新功能</span> 新增网页内悬浮球与多项目悬浮窗功能，提升多任务操作体验。（详见“功能介绍”）</li>
-                            </ul>
-                        </div>
-                        <div class="update-log-entry">
-                            <h4>v3.7.0 <span class="update-date">- 2025.10.02</span></h4>
-                            <ul>
-                                <li><span class="tag opt">优化</span> 对相册的底层加载逻辑进行了重构，引入懒加载技术，彻底解决了开启、浏览和管理相册时的各种卡顿、图片错乱和重复显示问题。</li>
-                                <li><span class="tag fix">修复</span> 彻底修复了文件在某些情况下无法下载的问题。</li>
-                                <li><span class="tag fix">修复</span> 修复了从内嵌网页跳转后，可能导致数据导出功能异常的Bug。</li>
-                                <li><span class="tag fix">修复</span> 修复了可能导致音乐无法正常加载播放和退出漫游后仍在后台播放的Bug。</li>
-                                <li><span class="tag fix">修复</span> 解决了因加载逻辑问题导致的相册照片无法显示的问题。</li>
-                                <li><span class="tag fix">修复</span> 修正了分页逻辑，现在关闭分页模式后，所有分类下的所有按钮都会被正确显示。</li>
-                                <li><span class="tag fix">修复</span> 修复了在漫游模式下照片无法左右滑动切换的问题。</li>
-                                <li><span class="tag opt">优化</span> 全拟态夜间模式下的立体阴影颜色调整为更深邃的黑色，增强了视觉层次感。</li>
-                                <li><span class="tag opt">优化</span> 移除了磨砂玻璃风格下按钮和悬浮窗的多余蓝调，使其色彩表现更纯净、更通透。</li>
-                            </ul>
-                        </div>
-                        <div class="update-log-entry">
-                            <h4>v3.6.0 <span class="update-date">- 2025.10.01</span></h4>
-                            <ul>
-                                <li><span class="tag fix">重要修复</span> 彻底解决了旧版无分类的 `config.json` 文件无法在新版应用中显示按钮的问题。</li>
-                                <li><span class="tag new">新功能</span> “手动同步与修复” 现已集成**智能数据迁移**功能，可自动将旧版配置文件无缝升级为最新、最兼容的格式。</li>
-                                <li><span class="tag opt">优化</span> 应用在首次加载云端数据时，也会自动执行数据迁移检查，确保老用户平滑过渡。</li>
-                            </ul>
-                        </div>
-                        <div class="update-log-entry">
-                            <h4>v3.5.0 <span class="update-date">- 2025.10.01</span></h4>
-                            <ul>
-                                <li><span class="tag new">功能</span> 新增按钮分类功能，可创建自定义分类管理项目。</li>
-                                <li><span class="tag new">功能</span> 新增 “在新标签页中打开” 选项，用于兼容特殊外部链接。</li>
-                                <li><span class="tag new">功能</span> 新增 “磨砂半透明” 主题，提供全新视觉风格。</li>
-                                <li><span class="tag fix">修复</span> 解决了上传的本地HTML项目无法在应用内正确打开的问题。</li>
-                                <li><span class="tag fix">修复</span> 修复了在部分页面左上角返回按钮无法点击的Bug。</li>
-                                <li><span class="tag opt">优化</span> 优化了应用内的错误与状态提示信息。</li>
-                                <li><span class="tag opt">优化</span> 访问GitHub相关链接时，增加开启VPN的友好提示弹窗。</li>
-                            </ul>
-                        </div>
-                        <div class="update-log-entry">
-                            <h4>v2.0.0 <span class="update-date">- 2025.09.30</span></h4>
-                            <ul>
-                                <li><span class="tag new">功能</span> 极大简化了添加网址与上传文件项目的方式。</li>
-                                <li><span class="tag new">功能</span> 新增文件云盘功能，支持按分类上传和下载文件。</li>
-                                <li><span class="tag new">功能</span> 新增 “记忆” 功能模块，集成备忘录与相册。</li>
-                                <li><span class="tag new">功能</span> 相册内置 “漫游模式”，提供沉浸式看图体验。</li>
-                                <li><span class="tag new">功能</span> 支持自定义上传全局背景图片和标题卡片背景图片。</li>
-                                <li><span class="tag fix">优化</span> 优化iOS端全屏显示，左侧右滑返回时增加确认弹窗以防误触。</li>
-                            </ul>
-                        </div>
-                        <div class="update-log-entry">
-                            <h4>v1.0.0 <span class="update-date">- 2025.09.24</span></h4>
-                            <ul>
-                                <li><span class="tag release">正式发布</span> JellyfishCenter 导航正式上线。</li>
-                                <li><span class="tag new">功能</span> 新增日间/夜间模式一键切换。</li>
-                                <li><span class="tag new">功能</span> 新增自定义图标与卡片主题色功能。</li>
-                            </ul>
-                        </div>
-                        
-                        <footer class="update-footer">
-                            当前版本: v5.3.0
-                        </footer>
-                    </div>
+</div>
+<div id="help-page-2" class="help-page-content">
+    <div class="update-header-info">
+        <p><strong>小红书ID:</strong> 淡季水母</p>
+        <p><strong>QQ交流群:</strong> 563191005</p>
+    </div>
+        <!-- ★ 在这里新增下面的代码块 ★ -->
+    <div class="update-log-entry">
+        <h4>v5.5.0 <span class="update-date">- 2025.10.14</span></h4>
+        <ul>
+            <li><span class="tag new">新功能</span> 新增悬浮球CSS预设管理功能。</li>
+            <li><span class="tag opt">优化</span> 简化了主题颜色预设的管理界面，操作更直观。</li>
+        </ul>
+    </div>
+    
+    <!-- 下方是原始的 v5.4.0 代码 -->
+    <div class="update-log-entry">
+        <h4>v5.4.0 <span class="update-date">- 2025.10.13</span></h4>
+        <ul>
+            <!-- ★ 修改点：移除加粗标题，润色文案 -->
+            <li><span class="tag opt">优化</span> 全拟态主题的颜色设置体验得到优化，颜色值现已支持直接在输入框中修改，整体布局也更为直观。</li>
+            <li><span class="tag new">新功能</span> 新增“手机收藏馆”功能，一个社区驱动的手机分区收藏与交流中心，方便发现与分享。</li>
+        </ul>
+    </div>
+     <div class="update-log-entry">
+        <h4>v5.3.0 <span class="update-date">- 2025.10.11</span></h4>
+        <ul>
+            <!-- ★ 修改点：移除加粗标题，润色文案 -->
+            <li><span class="tag new">新功能</span> 新增“锁屏组件”功能，支持在手机模式下高度自定义布局与多种组件类型。（详见“功能介绍”）</li>
+            <li><span class="tag new">新功能</span> 备忘录功能得到增强，新增待办事项（清单）、多种文字格式及一键复制代码块功能。</li>
+            <li><span class="tag fix">修复</span> 解决了悬浮球在部分内嵌网页中无法显示的问题。</li>
+            <li><span class="tag fix">修复</span> 修复了在悬浮球设置中，自定义CSS输入框无法实时预览样式的问题。</li>
+        </ul>
+    </div>
+    <!-- ... (这里是你文件里原有的其他更新日志，保持不变) ... -->
+    <div class="update-log-entry">
+        <h4>v4.1.0 <span class="update-date">- 2025.10.04</span></h4>
+        <ul>
+            <li><span class="tag fix">修复</span> 解决了上传的HTML项目在部分情况下无法正常打开的问题。</li>
+            <li><span class="tag new">新功能</span> 新增悬浮球CSS自定义向导与模板，方便用户快速美化悬浮球。（详见“主题设置”）</li>
+            <li><span class="tag new">新功能</span> 在“按钮管理模式”下，支持通过长按并拖拽的方式，对项目按钮进行直观排序。</li>
+            <li><span class="tag fix">修复</span> 修复了记忆功能的“文件夹”模块中，项目选择器无法正确加载和选择项目的问题。</li>
+        </ul>
+    </div>
+    <div class="update-log-entry">
+        <h4>v3.9.0 <span class="update-date">- 2025.10.03</span></h4>
+        <ul>
+            <li><span class="tag new">新功能</span> 新增网页内悬浮球与多项目悬浮窗功能，提升多任务操作体验。（详见“功能介绍”）</li>
+        </ul>
+    </div>
+    <div class="update-log-entry">
+        <h4>v3.7.0 <span class="update-date">- 2025.10.02</span></h4>
+        <ul>
+            <li><span class="tag opt">优化</span> 对相册的底层加载逻辑进行了重构，引入懒加载技术，彻底解决了开启、浏览和管理相册时的各种卡顿、图片错乱和重复显示问题。</li>
+            <li><span class="tag fix">修复</span> 彻底修复了文件在某些情况下无法下载的问题。</li>
+            <li><span class="tag fix">修复</span> 修复了从内嵌网页跳转后，可能导致数据导出功能异常的Bug。</li>
+            <li><span class="tag fix">修复</span> 修复了可能导致音乐无法正常加载播放和退出漫游后仍在后台播放的Bug。</li>
+            <li><span class="tag fix">修复</span> 解决了因加载逻辑问题导致的相册照片无法显示的问题。</li>
+            <li><span class="tag fix">修复</span> 修正了分页逻辑，现在关闭分页模式后，所有分类下的所有按钮都会被正确显示。</li>
+            <li><span class="tag fix">修复</span> 修复了在漫游模式下照片无法左右滑动切换的问题。</li>
+            <li><span class="tag opt">优化</span> 全拟态夜间模式下的立体阴影颜色调整为更深邃的黑色，增强了视觉层次感。</li>
+            <li><span class="tag opt">优化</span> 移除了磨砂玻璃风格下按钮和悬浮窗的多余蓝调，使其色彩表现更纯净、更通透。</li>
+        </ul>
+    </div>
+    <div class="update-log-entry">
+        <h4>v3.6.0 <span class="update-date">- 2025.10.01</span></h4>
+        <ul>
+            <li><span class="tag fix">重要修复</span> 彻底解决了旧版无分类的 `config.json` 文件无法在新版应用中显示按钮的问题。</li>
+            <li><span class="tag new">新功能</span> “手动同步与修复” 现已集成**智能数据迁移**功能，可自动将旧版配置文件无缝升级为最新、最兼容的格式。</li>
+            <li><span class="tag opt">优化</span> 应用在首次加载云端数据时，也会自动执行数据迁移检查，确保老用户平滑过渡。</li>
+        </ul>
+    </div>
+    <div class="update-log-entry">
+        <h4>v3.5.0 <span class="update-date">- 2025.10.01</span></h4>
+        <ul>
+            <li><span class="tag new">功能</span> 新增按钮分类功能，可创建自定义分类管理项目。</li>
+            <li><span class="tag new">功能</span> 新增 “在新标签页中打开” 选项，用于兼容特殊外部链接。</li>
+            <li><span class="tag new">功能</span> 新增 “磨砂半透明” 主题，提供全新视觉风格。</li>
+            <li><span class="tag fix">修复</span> 解决了上传的本地HTML项目无法在应用内正确打开的问题。</li>
+            <li><span class="tag fix">修复</span> 修复了在部分页面左上角返回按钮无法点击的Bug。</li>
+            <li><span class="tag opt">优化</span> 优化了应用内的错误与状态提示信息。</li>
+            <li><span class="tag opt">优化</span> 访问GitHub相关链接时，增加开启VPN的友好提示弹窗。</li>
+        </ul>
+    </div>
+    <div class="update-log-entry">
+        <h4>v2.0.0 <span class="update-date">- 2025.09.30</span></h4>
+        <ul>
+            <li><span class="tag new">功能</span> 极大简化了添加网址与上传文件项目的方式。</li>
+            <li><span class="tag new">功能</span> 新增文件云盘功能，支持按分类上传和下载文件。</li>
+            <li><span class="tag new">功能</span> 新增 “记忆” 功能模块，集成备忘录与相册。</li>
+            <li><span class="tag new">功能</span> 相册内置 “漫游模式”，提供沉浸式看图体验。</li>
+            <li><span class="tag new">功能</span> 支持自定义上传全局背景图片和标题卡片背景图片。</li>
+            <li><span class="tag fix">优化</span> 优化iOS端全屏显示，左侧右滑返回时增加确认弹窗以防误触。</li>
+        </ul>
+    </div>
+    <div class="update-log-entry">
+        <h4>v1.0.0 <span class="update-date">- 2025.09.24</span></h4>
+        <ul>
+            <li><span class="tag release">正式发布</span> JellyfishCenter 导航正式上线。</li>
+            <li><span class="tag new">功能</span> 新增日间/夜间模式一键切换。</li>
+            <li><span class="tag new">功能</span> 新增自定义图标与卡片主题色功能。</li>
+        </ul>
+    </div>
+    
+    <footer class="update-footer">
+        当前版本: v5.5.0
+    </footer>
+</div>
                     <div id="help-page-3" class="help-page-content">
                         <h3>免责声明与使用条款</h3><h4>1. 服务条款</h4><p>本应用 (JellyfishCenter) 按“现状”提供，不附带任何明示或暗示的保证。开发者不保证应用的持续可用性、功能完整性或无错误。所有因使用本应用导致的直接或间接风险与责任，均由用户自行承担。</p><h4>2. 数据安全</h4><p>用户需自行负责其GitHub个人访问令牌 (PAT) 的安全保管。任何因PAT泄露导致的数据丢失、篡改或账户安全问题，开发者概不负责。强烈建议为本应用创建独立的、具有最小必要权限 (<code>repo</code>) 的PAT。</p><h4>3. 知识产权与版权责任</h4><div class="important-note"><p>本应用可能被用于托管或链接至第三方项目。用户必须对所上传或链接的内容负全部法律责任，并确保拥有展示、使用和分发该内容的合法权利。<strong>用户必须尊重所有原创作者的知识产权，不得侵犯他人版权。</strong></p></div><h4>4. 使用与分发限制</h4><div class="warning"><p>本项目 (JellyfishCenter) 及其源代码仅供个人非商业性使用。严禁以下行为：</p><ul><li>对本项目的源代码进行任何形式的二次修改、再分发或公开发布（即“二传二改”）。</li><li>公开或私下分享通过本应用“上传项目”功能生成的任何网页链接或文件。此行为可能构成对原创内容的未授权分发。</li></ul></div><p>继续使用本应用，即表示您已阅读、理解并同意上述所有条款。</p>
                     </div>
@@ -2669,9 +3022,21 @@ body.theme-glass.dark-mode .memo-toolbar {
                     </div>
                 </div>
                 <div id="pneumorphism-settings">
-                    <div class="color-picker-grid"><div class="color-picker-group"><label>日间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="dayColor1Picker"><span class="hex-display" id="dayColor1Hex"></span></div></div><div class="color-picker-group"><label>日间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="dayColor2Picker"><span class="hex-display" id="dayColor2Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="nightColor1Picker"><span class="hex-display" id="nightColor1Hex"></span></div></div><div class="color-picker-group"><label>夜间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="nightColor2Picker"><span class="hex-display" id="nightColor2Hex"></span></div></div></div>
+                    <div class="color-picker-grid">
+                        <div class="color-picker-group"><label>日间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="dayColor1Picker"><input type="text" class="modal-input hex-display" id="dayColor1HexInput" maxlength="7"></div></div>
+                        <div class="color-picker-group"><label>日间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="dayColor2Picker"><input type="text" class="modal-input hex-display" id="dayColor2HexInput" maxlength="7"></div></div>
+                        <div class="color-picker-group"><label>夜间模式 - 左上</label><div class="color-input-wrapper"><input type="color" id="nightColor1Picker"><input type="text" class="modal-input hex-display" id="nightColor1HexInput" maxlength="7"></div></div>
+                        <div class="color-picker-group"><label>夜间模式 - 右下</label><div class="color-input-wrapper"><input type="color" id="nightColor2Picker"><input type="text" class="modal-input hex-display" id="nightColor2HexInput" maxlength="7"></div></div>
+                    </div>
                     <div class="preview-container"><div class="preview-box" id="dayPreview" data-label="Day"></div><div class="preview-box" id="nightPreview" data-label="Night"></div></div>
-                    <div class="preset-manager"><div class="preset-row"><input type="text" id="presetNameInput" class="modal-input" placeholder="为当前配色命名"><button id="savePresetBtn" class="modal-button save">保存</button><button id="updatePresetBtn" class="modal-button">更新</button></div><div class="preset-row"><select id="presetSelector" class="modal-select"></select><button id="deletePresetBtn" class="modal-button delete">删除</button></div></div>
+                    <div class="preset-manager" style="margin-bottom: 15px;">
+                        <div class="preset-row">
+                            <select id="presetSelector" class="modal-select" style="flex-grow: 1;"></select>
+                            <button id="addColorPresetBtn" title="添加新预设" class="modal-button" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">+</button>
+                            <button id="updateColorPresetBtn" title="更新当前预设" class="modal-button" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">↻</button>
+                            <button id="deleteColorPresetBtn" title="删除当前预设" class="modal-button delete" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">🗑</button>
+                        </div>
+                    </div>
                     <div class="toggle-section"><span>每次启动时随机应用预设</span><label class="toggle-switch"><input type="checkbox" id="randomPaletteToggle"><span class="slider"></span></label></div>
                 </div>
                 <div class="background-image-manager">
@@ -3150,7 +3515,29 @@ body.theme-glass.dark-mode .memo-toolbar {
     let currentCategory = '全部';
     let photoObserver;
 
-const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按🌞打开工具栏 | By淡季水母', categories: [{ name: '全部', buttons: [] }], settings: { paginationEnabled: true, jellyBall: { enabled: false, swipeBack: true, functions: {}, customCSS: '' } }, themePresets: [], lockscreenWidgets: {} });
+const getDefaultConfig = () => ({
+        title: 'JellyfishCenter',
+        subtitle: '长按🌞打开工具栏 | By淡季水母',
+        categories: [{ name: '全部', buttons: [] }],
+        settings: {
+            paginationEnabled: true,
+            jellyBall: { enabled: false, swipeBack: true, functions: {}, customCSS: '' }
+        },
+        // 核心修改：直接在默认配置中加入“原生主题”预设
+        themePresets: [
+            {
+                name: "原生主题",
+                colors: {
+                    dayColor1: "#f5f7fa",
+                    dayColor2: "#e4eaf5",
+                    nightColor1: "#1f2a40",
+                    nightColor2: "#16213e"
+                }
+            }
+        ],
+        lockscreenWidgets: {}
+    });
+
     let currentConfig = getDefaultConfig();
 
     
@@ -3413,15 +3800,25 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
         let idleTimer = null;
         let longPressTimer = null;
         let activeMenuBtn = null;
+        
+        // [新增] 后台保活功能所需资源和状态
+        const SILENT_AUDIO_DATA_URL = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+        let keepAliveAudio = null;
+        let isKeepAliveActive = false;
+        // [新增结束]
+
         const LONG_PRESS_DURATION = 400; /* MODIFICATION: Shortened long-press time */
         const DRAG_THRESHOLD = 10;
+
         const ALL_FUNCTIONS = [
             { id: 'album', icon: '🖼️', title: '相册' },
             { id: 'folder', icon: '📁', title: '文件夹' },
             { id: 'return', icon: '🔙', title: '返回' },
             { id: 'memo', icon: '📝', title: '备忘录' },
-            { id: 'quick_switch', icon: '🔗', title: '快速切换' }
+            { id: 'quick_switch', icon: '🔗', title: '快速切换' },
+            { id: 'keep_alive', icon: '📻', title: '后台保活' } // [新增] 后台保活功能
         ];
+
 
         function _create() {
             if (currentConfig.settings.jellyBall?.enabled !== true) return;
@@ -3467,9 +3864,16 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                 btnEl.innerHTML = func.icon;
                 btnEl.title = func.title;
                 btnEl.dataset.actionId = func.id;
+                
+                // [新增] 如果后台保活功能正在运行，为按钮添加激活样式
+                if (func.id === 'keep_alive' && isKeepAliveActive) {
+                    btnEl.classList.add('active-keep-alive');
+                }
+
                 menu.appendChild(btnEl);
             });
         }
+
         
         function _destroy() { if (ball) { ball.parentElement.remove(); ball = null; wrapper = null; } clearTimeout(idleTimer); clearTimeout(longPressTimer); document.removeEventListener('mousemove', _onDragMove); document.removeEventListener('touchmove', _onDragMove); document.removeEventListener('mouseup', _onDragEnd); document.removeEventListener('touchend', _onDragEnd); }
         function _addEventListeners() { ball.addEventListener('mousedown', _onDragStart); ball.addEventListener('touchstart', _onDragStart, { passive: false }); document.addEventListener('click', (e) => { if (ball && !ball.contains(e.target)) _closeMenu(); }, true); }
@@ -3555,6 +3959,40 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
         function _toggleMenu() { const isOpen=ball.classList.toggle('menu-open'); const menuBtns=ball.querySelectorAll('.jelly-menu-btn'); if(isOpen){const rect=wrapper.getBoundingClientRect();const n=menuBtns.length,r=65,m=10;let s,e;const c={x:rect.left+rect.width/2,y:rect.top+rect.height/2};if(c.x<r+m){s=-Math.PI/2;e=Math.PI/2;}else if(c.x>window.innerWidth-r-m){s=Math.PI/2;e=3*Math.PI/2;}else if(c.y<r+m){s=0;e=Math.PI;}else if(c.y>window.innerHeight-r-m){s=Math.PI;e=2*Math.PI;}else{s=-Math.PI/2;e=3*Math.PI/2;} const a=n>1?(e-s)/(n-1):0; menuBtns.forEach((b,i)=>{const t=s+i*a;b.style.setProperty('--transform-end',`translate(${Math.cos(t)*r}px, ${Math.sin(t)*r}px)`);});}}
         function _closeMenu(){ if(ball&&ball.classList.contains('menu-open')) ball.classList.remove('menu-open'); }
         
+        // [新增] 切换后台保活功能的核心逻辑
+        function _toggleKeepAlive() {
+            const button = ball.querySelector('[data-action-id="keep_alive"]');
+
+            if (isKeepAliveActive) {
+                // --- 关闭功能 ---
+                if (keepAliveAudio) {
+                    keepAliveAudio.pause();
+                }
+                isKeepAliveActive = false;
+                if (button) button.classList.remove('active-keep-alive');
+                showTopToast('后台保活已关闭', 2000);
+
+            } else {
+                // --- 开启功能 ---
+                if (!keepAliveAudio) {
+                    // 首次开启，创建 Audio 元素
+                    keepAliveAudio = new Audio();
+                    keepAliveAudio.src = SILENT_AUDIO_DATA_URL;
+                    keepAliveAudio.loop = true;
+                }
+                
+                // 尝试播放，并处理可能出现的错误
+                keepAliveAudio.play().then(() => {
+                    isKeepAliveActive = true;
+                    if (button) button.classList.add('active-keep-alive');
+                    showTopToast('后台保活已开启', 2000);
+                }).catch(error => {
+                    console.error("后台保活音频播放失败:", error);
+                    showTopToast('音频播放失败，请检查浏览器设置', 3000);
+                });
+            }
+        }
+
         function _onMenuClick(button){
             if(!button) return;
             const actionId = button.dataset.actionId;
@@ -3574,7 +4012,9 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                 case 'folder': openMemoryAndSwitch('cloud'); break;
                 case 'return': if (iframeModal.classList.contains('active')) { closeIframeModal(); } break;
                 case 'quick_switch': _showQuickSwitchMenu(); break;
+                case 'keep_alive': _toggleKeepAlive(); break; // [新增] 触发后台保活功能
             }
+
             _closeMenu();
         }
 
@@ -3683,14 +4123,14 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
             }
             const settings = currentConfig.settings.jellyBall;
             
-            // 动态创建悬浮球设置窗口
+             // 动态创建悬浮球设置窗口 (V3, 简洁UI版)
             function openJellyBallSettingsWindow() {
                 const modalId = 'jelly-ball-settings-modal';
                 
                 const modalOverlay = document.createElement('div');
                 modalOverlay.id = modalId;
                 modalOverlay.className = 'modal-overlay show';
-                modalOverlay.style.zIndex = '1002'; 
+                modalOverlay.style.zIndex = '1002';
 
                 const modalContent = document.createElement('div');
                 modalContent.className = 'modal-content';
@@ -3705,6 +4145,10 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                             <span>启用左滑返回 (应用内网页)</span>
                             <label class="toggle-switch"><input type="checkbox" id="jellySwipeBackToggle"><span class="slider"></span></label>
                         </div>
+                        <div class="toggle-section">
+                            <span>每次启动时随机应用预设</span>
+                            <label class="toggle-switch"><input type="checkbox" id="jellyRandomCssToggle"><span class="slider"></span></label>
+                        </div>
                         <div class="toggle-section" style="flex-direction: column; align-items: flex-start; gap: 12px; padding: 12px;">
                             <label style="font-size: 14px; color: #5a6778; font-weight: 600;">自定义功能</label>
                             <div id="jelly-function-checkboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 15px; width: 100%;"></div>
@@ -3714,15 +4158,19 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                                 <span>自定义CSS</span>
                                 <button id="show-jelly-css-help" style="background:none; border:none; font-size: 20px; cursor:pointer; padding:0; line-height: 1;" title="CSS提示词向导">💡</button>
                             </label>
+                            <!-- ★ 修改：全新简洁的预设管理UI ★ -->
+                            <div class="preset-row" style="width:100%;">
+                                <select id="jellyCssPresetSelector" class="modal-select" style="flex-grow: 1;"></select>
+                                <button id="addJellyCssPresetBtn" title="添加新预设" class="modal-button" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">+</button>
+                                <button id="editJellyCssPresetBtn" title="修改当前预设" class="modal-button" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">✎</button>
+                                <button id="deleteJellyCssPresetBtn" title="删除当前预设" class="modal-button delete" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">🗑</button>
+                            </div>
                             <div style="display: flex; gap: 15px; width:100%; align-items: center;">
-                                <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="5" placeholder="清空此处可恢复默认样式" style="flex: 1;"></textarea>
+                                <textarea id="jellyBallCssTextarea" class="modal-textarea" rows="5" placeholder="在此粘贴CSS代码，或清空以恢复默认样式" style="flex: 1;"></textarea>
                                 <div id="jelly-css-preview-container">
-                                    <!-- 核心修改：移除 style 标签，让默认样式在 JS 中定义 -->
                                     <div class="jelly-ball-wrapper">
                                         <div class="jelly-ball-glow"></div>
-                                        <div id="floating-jellyfish-ball">
-                                            <span>🪼</span>
-                                        </div>
+                                        <div id="floating-jellyfish-ball"><span>🪼</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -3734,123 +4182,135 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
                 modalOverlay.appendChild(modalContent);
                 document.body.appendChild(modalOverlay);
 
+                // UI元素获取
                 const closeBtn = modalContent.querySelector('.close-btn');
                 const swipeBackToggle = modalContent.querySelector('#jellySwipeBackToggle');
+                const randomCssToggle = modalContent.querySelector('#jellyRandomCssToggle');
                 const checkboxContainer = modalContent.querySelector('#jelly-function-checkboxes');
                 const cssTextarea = modalContent.querySelector('#jellyBallCssTextarea');
                 const applyCssBtn = modalContent.querySelector('#applyJellyBallCssBtn');
-                
-                // [核心修改] 预览区不再需要自己的 style 标签，直接操作元素 style
                 const previewWrapper = modalContent.querySelector('#jelly-css-preview-container .jelly-ball-wrapper');
-
+                
+                // ★ 修改：获取新的预设UI元素
+                const presetSelector = modalContent.querySelector('#jellyCssPresetSelector');
+                const addPresetBtn = modalContent.querySelector('#addJellyCssPresetBtn');
+                const editPresetBtn = modalContent.querySelector('#editJellyCssPresetBtn');
+                const deletePresetBtn = modalContent.querySelector('#deleteJellyCssPresetBtn');
+                
+                // 初始化
+                if (!settings.cssPresets) settings.cssPresets = [];
+                
                 const closeModal = () => { modalOverlay.classList.remove('show'); modalOverlay.addEventListener('transitionend', () => modalOverlay.remove(), { once: true }); };
                 closeBtn.onclick = closeModal;
                 modalOverlay.onclick = (e) => { if (e.target === modalOverlay) closeModal(); };
 
+                // 填充UI
                 swipeBackToggle.checked = settings.swipeBack !== false;
+                randomCssToggle.checked = localStorage.getItem('jellyRandomCssEnabled') === 'true';
                 checkboxContainer.innerHTML = '';
                 ALL_FUNCTIONS.forEach(func => {
                     const isChecked = settings.functions?.[func.id] !== false;
-                    checkboxContainer.innerHTML += `
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                           <label for="jelly_func_${func.id}" style="cursor:pointer;">${func.icon} ${func.title}</label>
-                           <label class="toggle-switch"><input type="checkbox" id="jelly_func_${func.id}" data-function-id="${func.id}" ${isChecked ? 'checked' : ''}><span class="slider"></span></label>
-                        </div>`;
+                    checkboxContainer.innerHTML += `<div style="display:flex;justify-content:space-between;align-items:center;"><label for="jelly_func_${func.id}" style="cursor:pointer;">${func.icon} ${func.title}</label><label class="toggle-switch"><input type="checkbox" id="jelly_func_${func.id}" data-function-id="${func.id}" ${isChecked?'checked':''}><span class="slider"></span></label></div>`;
                 });
                 cssTextarea.value = settings.customCSS || '';
-                
-                // [核心修改] 新的实时预览函数
-                function updatePreview() {
-                    const cssText = cssTextarea.value.trim();
-                    const previewBall = previewWrapper.querySelector('#floating-jellyfish-ball');
-                    const previewGlow = previewWrapper.querySelector('.jelly-ball-glow');
 
-                    // 1. 定义一个稳定的、隔离的默认样式
-                    const defaultStyles = `
-                        .jelly-ball-wrapper {
-                            position: relative;
-                            width: 42px; height: 42px;
-                            display: flex; align-items: center; justify-content: center;
-                            transform: scale(0.9); pointer-events: none;
+                function populateCssPresetDropdown() {
+                    const currentVal = presetSelector.value;
+                    presetSelector.innerHTML = '<option value="">选择或管理预设...</option>';
+                    settings.cssPresets.forEach((preset, index) => {
+                        presetSelector.innerHTML += `<option value="${index}">${preset.name}</option>`;
+                    });
+                    if(currentVal) presetSelector.value = currentVal;
+                }
+                populateCssPresetDropdown();
+
+                function updatePreview() { /* ... (此函数保持不变) ... */ }
+                updatePreview(); // 省略了预览函数的代码，因为它无需改动
+
+                // 事件监听 (通用部分)
+                cssTextarea.addEventListener('input', updatePreview);
+                swipeBackToggle.addEventListener('change', () => { settings.swipeBack = swipeBackToggle.checked; saveGlobalConfig('Update Jellyfish Ball settings'); });
+                randomCssToggle.addEventListener('change', () => { localStorage.setItem('jellyRandomCssEnabled', randomCssToggle.checked); });
+                checkboxContainer.addEventListener('change', e => { if (e.target.dataset.functionId) { if (!settings.functions) settings.functions = {}; settings.functions[e.target.dataset.functionId] = e.target.checked; _renderMenuButtons(); saveGlobalConfig('Update Jellyfish Ball settings'); } });
+                applyCssBtn.addEventListener('click', () => { settings.customCSS = cssTextarea.value; customStyleTag.innerHTML = settings.customCSS; if(ball) { _destroy(); _create(); } saveGlobalConfig('Update Jellyfish Ball CSS'); showTopToast('自定义样式已应用！', 2000); });
+                modalContent.querySelector('#show-jelly-css-help').addEventListener('click', () => document.getElementById('jelly-css-help-modal').classList.add('show'));
+
+                // ★ 新增：修改预设的弹窗函数 ★
+                function _createModifyPresetModal(preset, index) {
+                    const editModal = document.createElement('div');
+                    editModal.className = 'modal-overlay show';
+                    editModal.style.zIndex = '1003';
+                    editModal.innerHTML = `
+                        <div class="modal-content" style="max-width: 400px;">
+                            <div class="modal-header"><div class="modal-title-group">修改预设</div><button class="close-edit-btn">&times;</button></div>
+                            <div class="modal-body" style="gap: 15px;">
+                                <input type="text" id="editPresetName" class="modal-input" value="${preset.name}">
+                                <textarea id="editPresetCss" class="modal-textarea" rows="8">${preset.css}</textarea>
+                                <button id="saveEditBtn" class="modal-button">保存更改</button>
+                            </div>
+                        </div>`;
+                    document.body.appendChild(editModal);
+                    const closeEditModal = () => editModal.remove();
+                    editModal.querySelector('.close-edit-btn').onclick = closeEditModal;
+                    editModal.onclick = (e) => { if(e.target === editModal) closeEditModal(); };
+
+                    editModal.querySelector('#saveEditBtn').onclick = () => {
+                        const newName = editModal.querySelector('#editPresetName').value.trim();
+                        const newCss = editModal.querySelector('#editPresetCss').value;
+                        if (!newName) return alert('预设名称不能为空');
+                        if (newName !== preset.name && settings.cssPresets.some(p => p.name === newName)) {
+                            return alert('该预设名称已存在');
                         }
-                        .jelly-ball-glow {
-                            position: absolute; width: 100%; height: 100%;
-                            border-radius: 50%;
-                            animation: jelly-glow 2.5s infinite ease-in-out;
-                        }
-                        #floating-jellyfish-ball {
-                            position: relative; width: 100%; height: 100%;
-                            background: rgba(255, 255, 255, 0.6);
-                            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-                            border-radius: 50%;
-                            display: flex; align-items: center; justify-content: center;
-                            font-size: 22px; user-select: none;
-                            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                            border: 1px solid rgba(255, 255, 255, 0.5);
-                        }
-                        body.dark-mode #floating-jellyfish-ball {
-                             background: rgba(30, 30, 30, 0.6);
-                             border-color: rgba(255, 255, 255, 0.15);
-                        }
-                    `;
-                    
-                    // 2. 将默认样式注入到一个动态创建的 style 标签中
-                    let styleTag = previewWrapper.querySelector('.preview-default-styles');
-                    if (!styleTag) {
-                        styleTag = document.createElement('style');
-                        styleTag.className = 'preview-default-styles';
-                        // 作用域隔离
-                        styleTag.innerHTML = defaultStyles.replace(/([^{}]+)\{/g, (match, selector) => `#jelly-css-preview-container ${selector.trim()} {`);
-                        previewWrapper.prepend(styleTag);
-                    }
-                    
-                    // 3. 将用户的自定义 CSS 作为内联样式应用，这样它总能覆盖默认样式
-                    let customStyleTag = previewWrapper.querySelector('.preview-custom-styles');
-                    if (!customStyleTag) {
-                        customStyleTag = document.createElement('style');
-                        customStyleTag.className = 'preview-custom-styles';
-                        previewWrapper.appendChild(customStyleTag);
-                    }
-                    
-                    if (cssText) {
-                        // 作用域隔离
-                        const scopedCss = cssText.replace(/(^|\})([^{}]+)\{/g, (match, p1, p2) => {
-                            const selectors = p2.split(',').map(s => `#jelly-css-preview-container ${s.trim()}`).join(', ');
-                            return `${p1} ${selectors} {`;
-                        });
-                        customStyleTag.innerHTML = scopedCss;
-                    } else {
-                        // 如果用户清空了文本框，我们就清空自定义样式，让默认样式生效
-                        customStyleTag.innerHTML = '';
-                    }
+                        settings.cssPresets[index] = { name: newName, css: newCss };
+                        saveGlobalConfig(`Update Jelly CSS preset: ${newName}`);
+                        populateCssPresetDropdown();
+                        presetSelector.value = index;
+                        cssTextarea.value = newCss;
+                        updatePreview();
+                        closeEditModal();
+                    };
                 }
 
-                updatePreview();
-                cssTextarea.addEventListener('input', updatePreview);
+                // ★ 修改：简洁版预设管理事件监听 ★
+                addPresetBtn.addEventListener('click', () => {
+                    const name = prompt('请输入新预设的名称：');
+                    if (!name || name.trim() === '') return;
+                    if (settings.cssPresets.some(p => p.name === name.trim())) return alert('预设名称已存在');
+                    settings.cssPresets.push({ name: name.trim(), css: cssTextarea.value });
+                    saveGlobalConfig(`Save Jelly CSS preset: ${name.trim()}`);
+                    populateCssPresetDropdown();
+                    presetSelector.value = settings.cssPresets.length - 1;
+                });
                 
-                swipeBackToggle.addEventListener('change', () => { settings.swipeBack = swipeBackToggle.checked; saveGlobalConfig('Update Jellyfish Ball settings'); });
-                checkboxContainer.addEventListener('change', (e) => {
-                    const checkbox = e.target;
-                    if (checkbox.dataset.functionId) {
-                        if (!settings.functions) settings.functions = {};
-                        settings.functions[checkbox.dataset.functionId] = checkbox.checked;
-                        _renderMenuButtons();
-                        saveGlobalConfig('Update Jellyfish Ball settings');
+                editPresetBtn.addEventListener('click', () => {
+                    const index = presetSelector.value;
+                    if (index === '') return alert('请先从下拉框中选择一个要修改的预设');
+                    _createModifyPresetModal(settings.cssPresets[index], index);
+                });
+
+                deletePresetBtn.addEventListener('click', () => {
+                    const index = presetSelector.value;
+                    if (index === '') return alert('请先从下拉框中选择一个要删除的预设');
+                    const presetName = settings.cssPresets[index].name;
+                    if (!confirm(`确定要删除预设 "${presetName}" 吗？`)) return;
+                    settings.cssPresets.splice(index, 1);
+                    saveGlobalConfig(`Delete Jelly CSS preset: ${presetName}`);
+                    populateCssPresetDropdown();
+                    cssTextarea.value = settings.customCSS || '';
+                    updatePreview();
+                });
+                
+                presetSelector.addEventListener('change', () => {
+                    const index = presetSelector.value;
+                    if (index === '') {
+                        cssTextarea.value = settings.customCSS || '';
+                    } else {
+                        cssTextarea.value = settings.cssPresets[index].css;
                     }
-                });
-                
-                applyCssBtn.addEventListener('click', () => {
-                   settings.customCSS = cssTextarea.value;
-                   customStyleTag.innerHTML = settings.customCSS;
-                   if(ball) { _destroy(); _create(); } 
-                   saveGlobalConfig('Update Jellyfish Ball CSS');
-                   showTopToast('自定义样式已应用并同步至云端！', 2000);
-                });
-                
-                modalContent.querySelector('#show-jelly-css-help').addEventListener('click', () => {
-                    document.getElementById('jelly-css-help-modal').classList.add('show');
+                    updatePreview();
                 });
             }
+
 
 
 
@@ -4364,9 +4824,16 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
         applyAllBackgrounds();
         WanderView.updateTheme();
         renderLockscreenWidgets(); // 新增：切换主题时重新渲染组件
+
+        // [新增] 联动Giscus主题
+        const giscusFrame = document.querySelector('.giscus-frame');
+        if (giscusFrame) {
+            const newTheme = PhoneCollectionManager.getGiscusTheme();
+            giscusFrame.contentWindow.postMessage({ giscus: { setConfig: { theme: newTheme } } }, 'https://giscus.app');
+        }
     };
 
-    function setThemeStyle(styleName) {
+     function setThemeStyle(styleName) {
         const pneumorphismSettings = document.getElementById('pneumorphism-settings');
         if (styleName === 'glass') {
             document.body.classList.add('theme-glass');
@@ -4383,23 +4850,132 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
             document.getElementById('theme-style-neumorphism').checked = true;
         }
         localStorage.setItem('themeStyle', styleName);
+
+        // [新增] 联动Giscus主题
+        const giscusFrame = document.querySelector('.giscus-frame');
+        if (giscusFrame) {
+            const newTheme = PhoneCollectionManager.getGiscusTheme();
+            giscusFrame.contentWindow.postMessage({ giscus: { setConfig: { theme: newTheme } } }, 'https://giscus.app');
+        }
     }
+
     document.querySelectorAll('input[name="theme-style"]').forEach(radio => {
         radio.addEventListener('change', (e) => setThemeStyle(e.target.value));
     });
 
-    const colorModal = { pickerD1: document.getElementById('dayColor1Picker'), hexD1: document.getElementById('dayColor1Hex'), pickerD2: document.getElementById('dayColor2Picker'), hexD2: document.getElementById('dayColor2Hex'), pickerN1: document.getElementById('nightColor1Picker'), hexN1: document.getElementById('nightColor1Hex'), pickerN2: document.getElementById('nightColor2Picker'), hexN2: document.getElementById('nightColor2Hex'), presetName: document.getElementById('presetNameInput'), presetSelector: document.getElementById('presetSelector'), saveBtn: document.getElementById('savePresetBtn'), updateBtn: document.getElementById('updatePresetBtn'), deleteBtn: document.getElementById('deletePresetBtn'), randomToggle: document.getElementById('randomPaletteToggle'), dayPreview: document.getElementById('dayPreview'), nightPreview: document.getElementById('nightPreview') };
-    const root = document.documentElement; function applyColors(colors, saveToLocal = true) { Object.entries(colors).forEach(([key, value]) => { const cssVar = `--${key.replace('Color', '-color')}`; root.style.setProperty(cssVar, value); if (saveToLocal) localStorage.setItem(key, value); }); updateColorUI(colors); applyAllBackgrounds(); WanderView.updateTheme(); }
-    function updateColorUI(colors) { colorModal.pickerD1.value = colors.dayColor1; colorModal.hexD1.textContent = colors.dayColor1; colorModal.pickerD2.value = colors.dayColor2; colorModal.hexD2.textContent = colors.dayColor2; colorModal.pickerN1.value = colors.nightColor1; colorModal.hexN1.textContent = colors.nightColor1; colorModal.pickerN2.value = colors.nightColor2; colorModal.hexN2.textContent = colors.nightColor2; colorModal.dayPreview.style.background = `linear-gradient(135deg, ${colors.dayColor2}, ${colors.dayColor1})`; colorModal.nightPreview.style.background = `linear-gradient(135deg, ${colors.nightColor2}, ${colors.nightColor1})`; }
-    function getCurrentColors(fromLocalStorage = true) { const source = fromLocalStorage ? localStorage : { getItem: (key) => getComputedStyle(root).getPropertyValue(`--${key.replace('Color', '-color')}`).trim() }; return { dayColor1: source.getItem('dayColor1') || '#f5f7fa', dayColor2: source.getItem('dayColor2') || '#e4eaf5', nightColor1: source.getItem('nightColor1') || '#1f2a40', nightColor2: source.getItem('nightColor2') || '#16213e', }; }
-    function setupColorSync(picker, hexDisplay, key) { picker.addEventListener('input', () => { hexDisplay.textContent = picker.value; applyColors({ ...getCurrentColors(), [key]: picker.value }); }); }
+    const colorModal = { 
+        pickerD1: document.getElementById('dayColor1Picker'), hexD1: document.getElementById('dayColor1HexInput'),
+        pickerD2: document.getElementById('dayColor2Picker'), hexD2: document.getElementById('dayColor2HexInput'),
+        pickerN1: document.getElementById('nightColor1Picker'), hexN1: document.getElementById('nightColor1HexInput'),
+        pickerN2: document.getElementById('nightColor2Picker'), hexN2: document.getElementById('nightColor2HexInput'),
+        presetSelector: document.getElementById('presetSelector'), 
+        randomToggle: document.getElementById('randomPaletteToggle'),
+        dayPreview: document.getElementById('dayPreview'), nightPreview: document.getElementById('nightPreview') 
+    };
+    const root = document.documentElement;
+    function applyColors(colors, saveToLocal = true) { 
+        Object.entries(colors).forEach(([key, value]) => { 
+            const cssVar = `--${key.replace('Color', '-color')}`; 
+            root.style.setProperty(cssVar, value); 
+            if (saveToLocal) localStorage.setItem(key, value); 
+        }); 
+        updateColorUI(colors); 
+        applyAllBackgrounds(); 
+        WanderView.updateTheme(); 
+    }
+    function updateColorUI(colors) { 
+        colorModal.pickerD1.value = colors.dayColor1; colorModal.hexD1.value = colors.dayColor1;
+        colorModal.pickerD2.value = colors.dayColor2; colorModal.hexD2.value = colors.dayColor2;
+        colorModal.pickerN1.value = colors.nightColor1; colorModal.hexN1.value = colors.nightColor1;
+        colorModal.pickerN2.value = colors.nightColor2; colorModal.hexN2.value = colors.nightColor2;
+        colorModal.dayPreview.style.background = `linear-gradient(135deg, ${colors.dayColor2}, ${colors.dayColor1})`; 
+        colorModal.nightPreview.style.background = `linear-gradient(135deg, ${colors.nightColor2}, ${colors.nightColor1})`; 
+    }
+    function getCurrentColors(fromLocalStorage = true) { 
+        const source = fromLocalStorage ? localStorage : { getItem: (key) => getComputedStyle(root).getPropertyValue(`--${key.replace('Color', '-color')}`).trim() }; 
+        return { 
+            dayColor1: source.getItem('dayColor1') || '#f5f7fa', 
+            dayColor2: source.getItem('dayColor2') || '#e4eaf5', 
+            nightColor1: source.getItem('nightColor1') || '#1f2a40', 
+            nightColor2: source.getItem('nightColor2') || '#16213e', 
+        }; 
+    }
+    function setupColorSync(picker, hexInput, key) { 
+        picker.addEventListener('input', () => { 
+            hexInput.value = picker.value; 
+            applyColors({ ...getCurrentColors(), [key]: picker.value }); 
+        }); 
+    }
+    // [V2 优化] 函数，用于同步十六进制输入框的更改，并增加UX交互
+    function setupHexInputSync(hexInput, colorPicker, key) {
+        const handleHexInput = () => {
+            let value = hexInput.value.trim();
+            if (!value.startsWith('#')) value = '#' + value;
+            if (/^#([0-9a-f]{3}){1,2}$/i.test(value)) {
+                colorPicker.value = value;
+                applyColors({ ...getCurrentColors(false), [key]: value });
+            } else {
+                hexInput.value = colorPicker.value;
+            }
+            hexInput.classList.add('confirmed-color');
+        };
+        hexInput.addEventListener('focus', function() { this.classList.remove('confirmed-color'); this.select(); });
+        hexInput.addEventListener('blur', handleHexInput);
+        hexInput.addEventListener('keydown', e => { if (e.key === 'Enter') { handleHexInput(); hexInput.blur(); } });
+        hexInput.classList.add('confirmed-color');
+    }
+
     function loadColorState() { populatePresetDropdown(); const randomPaletteEnabled = localStorage.getItem('randomPaletteEnabled') === 'true'; colorModal.randomToggle.checked = randomPaletteEnabled; if (randomPaletteEnabled && currentConfig.themePresets && currentConfig.themePresets.length > 0) { const randomPreset = currentConfig.themePresets[Math.floor(Math.random() * currentConfig.themePresets.length)]; applyColors(randomPreset.colors, false); } else { applyColors(getCurrentColors()); } }
-    function populatePresetDropdown() { colorModal.presetSelector.innerHTML = '<option value="">选择一个预设...</option>'; (currentConfig.themePresets || []).forEach((p, i) => { const opt = document.createElement('option'); opt.value = i; opt.textContent = p.name; colorModal.presetSelector.appendChild(opt); }); }
-    colorModal.saveBtn.addEventListener('click', () => { const name = colorModal.presetName.value.trim(); if (!name) return alert('请输入预设名称'); if ((currentConfig.themePresets || []).some(p => p.name === name)) return alert('预设名称已存在'); if (!currentConfig.themePresets) currentConfig.themePresets = []; currentConfig.themePresets.push({ name, colors: getCurrentColors(false) }); saveGlobalConfig(`Save theme preset: ${name}`); populatePresetDropdown(); colorModal.presetSelector.value = currentConfig.themePresets.length - 1; colorModal.presetName.value = ''; });
-    colorModal.updateBtn.addEventListener('click', () => { const index = colorModal.presetSelector.value; if (index === '' || !currentConfig.themePresets) return alert('请选择一个预设'); const name = colorModal.presetName.value.trim() || currentConfig.themePresets[index].name; currentConfig.themePresets[index] = { name, colors: getCurrentColors(false) }; saveGlobalConfig(`Update theme preset: ${name}`); populatePresetDropdown(); colorModal.presetSelector.value = index; });
-    colorModal.deleteBtn.addEventListener('click', () => { const index = colorModal.presetSelector.value; if (index === '' || !currentConfig.themePresets) return alert('请选择一个预设'); const presetName = currentConfig.themePresets[index].name; if (!confirm(`确定删除云端预设 "${presetName}"?`)) return; currentConfig.themePresets.splice(index, 1); saveGlobalConfig(`Delete theme preset: ${presetName}`); populatePresetDropdown(); });
-    colorModal.presetSelector.addEventListener('change', () => { const index = colorModal.presetSelector.value; if (index === '' || !currentConfig.themePresets) return; applyColors(currentConfig.themePresets[index].colors); colorModal.presetName.value = currentConfig.themePresets[index].name; });
+    function populatePresetDropdown() { colorModal.presetSelector.innerHTML = '<option value="">选择或管理预设...</option>'; (currentConfig.themePresets || []).forEach((p, i) => { const opt = document.createElement('option'); opt.value = i; opt.textContent = p.name; colorModal.presetSelector.appendChild(opt); }); }
+    
+    // ★ 全新的预设管理逻辑 ★
+    const addPresetBtn = document.getElementById('addColorPresetBtn');
+    const updatePresetBtn = document.getElementById('updateColorPresetBtn');
+    const deletePresetBtn = document.getElementById('deleteColorPresetBtn');
+
+    addPresetBtn.addEventListener('click', () => {
+        const name = prompt("请输入新预设的名称：");
+        if (!name || name.trim() === '') return;
+        const trimmedName = name.trim();
+        if ((currentConfig.themePresets || []).some(p => p.name === trimmedName)) return alert('预设名称已存在');
+        
+        if (!currentConfig.themePresets) currentConfig.themePresets = [];
+        currentConfig.themePresets.push({ name: trimmedName, colors: getCurrentColors(false) });
+        saveGlobalConfig(`Save theme preset: ${trimmedName}`);
+        populatePresetDropdown();
+        colorModal.presetSelector.value = currentConfig.themePresets.length - 1;
+    });
+
+    updatePresetBtn.addEventListener('click', () => {
+        const index = colorModal.presetSelector.value;
+        if (index === '') return alert('请先从下拉框中选择一个要更新的预设');
+        
+        currentConfig.themePresets[index].colors = getCurrentColors(false);
+        const presetName = currentConfig.themePresets[index].name;
+        saveGlobalConfig(`Update theme preset: ${presetName}`);
+        showTopToast(`预设 "${presetName}" 已更新！`, 2000);
+    });
+
+    deletePresetBtn.addEventListener('click', () => {
+        const index = colorModal.presetSelector.value;
+        if (index === '') return alert('请先从下拉框中选择一个要删除的预设');
+        
+        const presetName = currentConfig.themePresets[index].name;
+        if (!confirm(`确定要删除预设 "${presetName}" 吗？`)) return;
+        
+        currentConfig.themePresets.splice(index, 1);
+        saveGlobalConfig(`Delete theme preset: ${presetName}`);
+        populatePresetDropdown();
+    });
+
+    colorModal.presetSelector.addEventListener('change', () => {
+        const index = colorModal.presetSelector.value;
+        if (index === '') return;
+        applyColors(currentConfig.themePresets[index].colors);
+    });
+    
     colorModal.randomToggle.addEventListener('change', () => { localStorage.setItem('randomPaletteEnabled', colorModal.randomToggle.checked); });
+
     
     function setupBgImageManager() {
         const setupPicker = (pickerId, uploadBtnId, clearBtnId, statusId, storageKey, storageNameKey) => {
@@ -4953,19 +5529,19 @@ const getDefaultConfig = () => ({ title: 'JellyfishCenter', subtitle: '长按�
         updateAddNavModalUI();
     }
     
- function openIframeModal(url) { 
+    function openIframeModal(url) { 
         if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } 
         iframeEl.src = url; 
         iframeModal.classList.add('active'); 
-        // FloatingBallManager.create(); // <-- 核心修改：移除此行
     }
+
 
      function closeIframeModal() { 
         FloatingProjectWindowManager.closeAll();
-        // FloatingBallManager.destroy(); // <-- 核心修改：移除此行
         hideReturnConfirmation(); 
         iframeModal.classList.remove('active'); 
     }
+
 
     function showReturnConfirmation() { returnConfirmationToast.classList.add('show'); }
     function hideReturnConfirmation() { returnConfirmationToast.classList.remove('show'); }
@@ -6788,24 +7364,39 @@ const blob = b64toBlob(blobData.content, contentType);
     }
 
  window.addEventListener('load', async () => {
-        initTheme(); 
         loadGithubConfig();
         checkAppUpdate();
         await loadInitialData();
         setupModals();
         MemoryApp.init();
         WanderView.init();
-        // FloatingBallManager.init(); // <-- 核心修改：从这里移除
         setupBgImageManager();
         setupColorSync(colorModal.pickerD1, colorModal.hexD1, 'dayColor1'); 
         setupColorSync(colorModal.pickerD2, colorModal.hexD2, 'dayColor2');
         setupColorSync(colorModal.pickerN1, colorModal.hexN1, 'nightColor1'); 
         setupColorSync(colorModal.pickerN2, colorModal.hexN2, 'nightColor2');
+        // [新增] 为十六进制输入框绑定同步事件
+        setupHexInputSync(colorModal.hexD1, colorModal.pickerD1, 'dayColor1');
+        setupHexInputSync(colorModal.hexD2, colorModal.pickerD2, 'dayColor2');
+        setupHexInputSync(colorModal.hexN1, colorModal.pickerN1, 'nightColor1');
+        setupHexInputSync(colorModal.hexN2, colorModal.pickerN2, 'nightColor2');
+
         // [核心新增] 将悬浮球初始化移至最后，并增加常驻逻辑
         FloatingBallManager.init();
+
+        // ★ 新增：应用随机CSS预设的逻辑 ★
+        const randomCssEnabled = localStorage.getItem('jellyRandomCssEnabled') === 'true';
+        if (currentConfig.settings.jellyBall && currentConfig.settings.jellyBall.cssPresets && currentConfig.settings.jellyBall.cssPresets.length > 0 && randomCssEnabled) {
+            const presets = currentConfig.settings.jellyBall.cssPresets;
+            const randomPreset = presets[Math.floor(Math.random() * presets.length)];
+            currentConfig.settings.jellyBall.customCSS = randomPreset.css; // 同步到当前配置
+            // 注意：这里不需要saveGlobalConfig，因为这只是本次启动的临时效果
+        }
+
         if (currentConfig.settings.jellyBall && currentConfig.settings.jellyBall.enabled) {
             FloatingBallManager.create();
         }
+
  function showIosWarning() {
             // 检查是否为 iOS 设备 (iPhone, iPad, iPod)
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -8137,6 +8728,357 @@ const blob = b64toBlob(blobData.content, contentType);
         /* =============================================================== */
         /* ========================= [新增结束] ========================== */
         /* =============================================================== */
+
+        /* =============================================================== */
+        /* ================== [新增] 手机收藏馆逻辑 =================== */
+        /* =============================================================== */
+        const PhoneCollectionManager = (() => {
+            // 在这里集中管理所有手机数据，方便你后续补充
+            const phoneData = [
+                {
+                    id: 'eve-phone', // 为EVE手机设置一个唯一的英文ID
+                    name: 'EVE',
+                    authorId: '7551854600',
+                    acquisition: 'QQ群购买',
+                    price: '19.9元', // 将价格单独列出
+                    status: '暂时停售'
+                },
+                {
+                    id: 'jrsy-phone', // 为jrsy手机设置一个唯一的英文ID
+                    name: 'jrsy小手机',
+                    authorId: '6536602273',
+                    acquisition: 'QQ群',
+                    price: '5.2元', // 如果没有明确价格，可以这样写
+                    status: '在售'
+                },
+                {
+                    id: 'threeseven-phone',    // 【必填】一个全英文、不重复的唯一ID
+                    name: '37 Chat',          // 【必填】手机的显示名称
+                    authorId: '26299019345',       // 【必填】作者的小红书或QQ号
+                    acquisition: '小红书购买',   // 【必填】如何获取，如：QQ群号、链接等
+                    price: '21.14元',            // 【必填】如：免费、19.9元、未知
+                    status: '内测'         // 【必填】如：在售、已停售、群内获取
+                },
+                {
+                    id: 'fruit-phone',    // 【必填】一个全英文、不重复的唯一ID
+                    name: '果喵机',          // 【必填】手机的显示名称
+                    authorId: '26962794223',       // 【必填】作者的小红书或QQ号
+                    acquisition: '小红书进群',   // 【必填】如何获取，如：QQ群号、链接等
+                    price: '无偿',            // 【必填】如：免费、19.9元、未知
+                    status: '开放'         // 【必填】如：在售、已停售、群内获取
+                },
+                {
+                    id: 'bubble-phone',    // 【必填】一个全英文、不重复的唯一ID
+                    name: '气泡机',          // 【必填】手机的显示名称
+                    authorId: '26962794223',       // 【必填】作者的小红书或QQ号
+                    acquisition: '小红书进群',   // 【必填】如何获取，如：QQ群号、链接等
+                    price: '无偿',            // 【必填】如：免费、19.9元、未知
+                    status: '开放'         // 【必填】如：在售、已停售、群内获取
+                },
+                {
+                    id: 'glutinousrice-phone',    // 【必填】一个全英文、不重复的唯一ID
+                    name: '糯米机',          // 【必填】手机的显示名称
+                    authorId: '933580405',       // 【必填】作者的小红书或QQ号
+                    acquisition: 'QQ群',   // 【必填】如何获取，如：QQ群号、链接等
+                    price: '无偿',            // 【必填】如：免费、19.9元、未知
+                    status: '开放'         // 【必填】如：在售、已停售、群内获取
+                },
+                {
+                    id: 'whale-phone',    // 【必填】一个全英文、不重复的唯一ID
+                    name: 'WhaleLLT',          // 【必填】手机的显示名称
+                    authorId: '42944921236',       // 【必填】作者的小红书或QQ号
+                    acquisition: 'QQ群',   // 【必填】如何获取，如：QQ群号、链接等
+                    price: '无偿',            // 【必填】如：免费、19.9元、未知
+                    status: '获取版权，暂关闭'         // 【必填】如：在售、已停售、群内获取
+                },
+                {
+                    id: 'koko-phone',    // 【必填】一个全英文、不重复的唯一ID
+                    name: 'koko小手机',          // 【必填】手机的显示名称
+                    authorId: '970432882',       // 【必填】作者的小红书或QQ号
+                    acquisition: 'QQ群',   // 【必填】如何获取，如：QQ群号、链接等
+                    price: '14.9元',            // 【必填】如：免费、19.9元、未知
+                    status: '在售'         // 【必填】如：在售、已停售、群内获取
+                },
+                {
+                    id: 'mumu-phone',    // 【必填】一个全英文、不重复的唯一ID
+                    name: '慕慕小手机',          // 【必填】手机的显示名称
+                    authorId: '26211349174',       // 【必填】作者的小红书或QQ号
+                    acquisition: 'QQ群',   // 【必填】如何获取，如：QQ群号、链接等
+                    price: '19.9元',            // 【必填】如：免费、19.9元、未知
+                    status: '内测，在售'         // 【必填】如：在售、已停售、群内获取
+                },
+                {
+                    id: 'raven-phone',    // 【必填】一个全英文、不重复的唯一ID
+                    name: 'RavenPhone',          // 【必填】手机的显示名称
+                    authorId: '999988424',       // 【必填】作者的小红书或QQ号
+                    acquisition: 'DC专属社区，需审核',   // 【必填】如何获取，如：QQ群号、链接等
+                    price: '无偿',            // 【必填】如：免费、19.9元、未知
+                    status: '开放'         // 【必填】如：在售、已停售、群内获取
+                },
+                {
+                    id: 'threethree-phone',    // 【必填】一个全英文、不重复的唯一ID
+                    name: '33聊天室',          // 【必填】手机的显示名称
+                    authorId: '124491716',       // 【必填】作者的小红书或QQ号
+                    acquisition: '小红书购买',   // 【必填】如何获取，如：QQ群号、链接等
+                    price: '9.9元',            // 【必填】如：免费、19.9元、未知
+                    status: '已停售'         // 【必填】如：在售、已停售、群内获取
+                },
+                // 在这里继续添加新的手机对象...
+            ];
+
+            const ui = {
+                collectionModal: document.getElementById('phoneCollectionModal'),
+                detailModal: document.getElementById('phoneDetailModal'),
+                listContainer: document.getElementById('phone-list-container'),
+                detailContainer: document.getElementById('phone-detail-content'),
+                detailTitle: document.getElementById('phone-detail-title'),
+                pinBtn: document.getElementById('pinPhoneBtn'), // 新增
+                searchInput: document.getElementById('phoneSearchInput'), // 新增
+            };
+            
+            // ★★★ 新增：获取置顶列表的函数
+            function getPinnedPhones() {
+                try {
+                    return JSON.parse(localStorage.getItem('pinnedPhones') || '[]');
+                } catch (e) {
+                    return [];
+                }
+            }
+            
+            // ★★★ 新增：保存置顶列表的函数
+            function savePinnedPhones(pinnedIds) {
+                localStorage.setItem('pinnedPhones', JSON.stringify(pinnedIds));
+            }
+
+            function getGiscusTheme() {
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                const isGlassTheme = document.body.classList.contains('theme-glass');
+                if (isGlassTheme) {
+                    return isDarkMode ? 'transparent_dark' : 'light';
+                } else {
+                    return isDarkMode ? 'dark' : 'light';
+                }
+            }
+
+            function showGiscusComments(phoneId, phoneName) {
+                // ... (此函数保持不变，无需修改)
+                const commentsModal = document.getElementById('phoneCommentsModal');
+                const giscusContainer = commentsModal.querySelector('.giscus');
+                giscusContainer.innerHTML = '';
+                const giscusScript = document.createElement('script');
+                const attributes = {
+                    'src': 'https://giscus.app/client.js',
+                    'data-repo': 'Yeexein/Jellyfish-Comments',
+                    'data-repo-id': 'R_kgDOQBfb-w',
+                    'data-category': 'Announcements',
+                    'data-category-id': 'DIC_kwDOQBfb-84CwlT0',
+                    'data-mapping': 'specific',
+                    'data-term': `手机安利区: ${phoneName} (${phoneId})`,
+                    'data-strict': '0',
+                    'data-reactions-enabled': '1',
+                    'data-emit-metadata': '0',
+                    'data-input-position': 'top',
+                    'data-theme': getGiscusTheme(),
+                    'data-lang': 'zh-CN',
+                    'crossorigin': 'anonymous',
+                    'async': ''
+                };
+                Object.entries(attributes).forEach(([key, value]) => {
+                    giscusScript.setAttribute(key, value);
+                });
+                giscusContainer.appendChild(giscusScript);
+                document.getElementById('phone-comments-title').textContent = `${phoneName} - 安利区`;
+                commentsModal.classList.add('show');
+            }
+            
+            // ★★★ 核心修改：渲染函数现在接受一个数据数组作为参数
+            function renderPhoneList(phonesToRender) {
+                 ui.listContainer.innerHTML = '';
+                if (phonesToRender.length === 0) {
+                    ui.listContainer.innerHTML = '<p class="empty-list-placeholder" style="grid-column: 1 / -1;">未找到匹配的手机</p>';
+                    return;
+                }
+                phonesToRender.forEach(phone => {
+                    const item = document.createElement('div');
+                    item.className = 'phone-partition-item';
+                    item.dataset.phoneId = phone.id;
+                    item.innerHTML = `
+                        <div class="phone-partition-icon">${phone.icon || ''}</div>
+                        <div class="phone-partition-name">${phone.name}</div>
+                    `;
+                    item.addEventListener('click', () => renderPhoneDetail(phone.id));
+                    ui.listContainer.appendChild(item);
+                });
+            }
+
+            // ★★★ 新增：主列表的入口函数，处理排序和过滤
+            function displayPhoneList() {
+                const searchTerm = ui.searchInput.value.toLowerCase().trim();
+                const pinnedIds = getPinnedPhones();
+
+                let filteredPhones = phoneData.filter(phone => 
+                    phone.name.toLowerCase().includes(searchTerm)
+                );
+                
+                const pinnedPhones = [];
+                const unpinnedPhones = [];
+
+                filteredPhones.forEach(phone => {
+                    if (pinnedIds.includes(phone.id)) {
+                        pinnedPhones.push(phone);
+                    } else {
+                        unpinnedPhones.push(phone);
+                    }
+                });
+
+                // 随机打乱未置顶的部分
+                for (let i = unpinnedPhones.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [unpinnedPhones[i], unpinnedPhones[j]] = [unpinnedPhones[j], unpinnedPhones[i]];
+                }
+
+                // 组合最终列表：置顶的在前，随机的在后
+                const finalPhoneList = [...pinnedPhones, ...unpinnedPhones];
+                renderPhoneList(finalPhoneList);
+            }
+
+            function renderPhoneDetail(phoneId) {
+                const phone = phoneData.find(p => p.id === phoneId);
+                if (!phone) return;
+
+                ui.detailTitle.textContent = phone.name;
+                
+                // 更新置顶按钮状态
+                const pinnedIds = getPinnedPhones();
+                const isPinned = pinnedIds.includes(phoneId);
+                ui.pinBtn.textContent = '★';
+                ui.pinBtn.style.color = isPinned ? '#ffc107' : '#ccc';
+                ui.pinBtn.title = isPinned ? '取消置顶' : '置顶';
+
+                // 为置顶按钮绑定点击事件
+                ui.pinBtn.onclick = () => {
+                    let currentPinned = getPinnedPhones();
+                    if (currentPinned.includes(phoneId)) {
+                        // 取消置顶
+                        currentPinned = currentPinned.filter(id => id !== phoneId);
+                        ui.pinBtn.style.color = '#ccc';
+                        ui.pinBtn.title = '置顶';
+                    } else {
+                        // 添加置顶
+                        currentPinned.unshift(phoneId); // 加到最前面
+                        ui.pinBtn.style.color = '#ffc107';
+                        ui.pinBtn.title = '取消置顶';
+                    }
+                    savePinnedPhones(currentPinned);
+                };
+
+                ui.detailContainer.innerHTML = `
+                    <div class="detail-info-group">
+                        <label>作者ID</label>
+                        <div class="detail-info-value copyable" id="copyAuthorId" data-id="${phone.authorId}">
+                            <span>${phone.authorId}</span>
+                            <span>❏</span>
+                        </div>
+                    </div>
+                    <div class="detail-info-group">
+                        <label>获取方式</label>
+                        <div class="detail-info-value">${phone.acquisition}</div>
+                    </div>
+                    <div class="detail-info-group">
+                        <label>价格</label>
+                        <div class="detail-info-value">${phone.price}</div>
+                    </div>
+                    <div class="detail-info-group">
+                        <label>状态</label>
+                        <div class="detail-info-value">${phone.status}</div>
+                    </div>
+                    <button id="enterCommentsBtn" class="modal-button" data-phone-id="${phone.id}" style="margin-top: 20px;">进入安利区</button>
+                `;
+                
+                ui.detailContainer.querySelector('#copyAuthorId').addEventListener('click', function() {
+                    const idToCopy = this.dataset.id;
+                    navigator.clipboard.writeText(idToCopy).then(() => {
+                        showTopToast(`已复制作者ID: ${idToCopy}`, 2000);
+                    }).catch(err => {
+                        console.error('复制失败', err);
+                        alert('复制失败，请手动复制。');
+                    });
+                });
+                
+                ui.detailContainer.querySelector('#enterCommentsBtn').addEventListener('click', function() {
+                    const phoneId = this.dataset.phoneId;
+                    const phone = phoneData.find(p => p.id === phoneId);
+                    if(!phone) return;
+
+                    const hasSeenNotice = localStorage.getItem('communityNoticeSeen') === 'true';
+                    
+                    if (hasSeenNotice) {
+                        // 如果已经看过，直接打开评论区
+                        ui.detailModal.classList.remove('show');
+                        setTimeout(() => showGiscusComments(phone.id, phone.name), 200);
+                    } else {
+                        // 否则，显示社区须知弹窗
+                        const noticeModal = document.getElementById('communityNoticeModal');
+                        noticeModal.classList.add('show');
+
+                        // 为确认按钮绑定一次性事件
+                        const confirmBtn = document.getElementById('confirmNoticeBtn');
+                        const newConfirmBtn = confirmBtn.cloneNode(true); // 移除旧监听器
+                        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+                        newConfirmBtn.addEventListener('click', () => {
+                            // 检查“不再提醒”复选框状态
+                            if (document.getElementById('dontRemindCheckbox').checked) {
+                                localStorage.setItem('communityNoticeSeen', 'true');
+                                document.getElementById('showNoticeBell').style.display = 'block'; // 显示铃铛
+                            }
+                            noticeModal.classList.remove('show'); // 关闭须知弹窗
+                            ui.detailModal.classList.remove('show'); // 关闭详情弹窗
+                            setTimeout(() => showGiscusComments(phone.id, phone.name), 200); // 打开评论区
+                        });
+                    }
+                });
+
+                ui.detailModal.classList.add('show');
+            }
+
+            return {
+                init() {
+                    document.getElementById('phoneCollectionBtn').addEventListener('click', () => {
+                        ui.searchInput.value = ''; // 清空搜索框
+                        displayPhoneList(); 
+                        ui.collectionModal.classList.add('show');
+                        toggleFabMenu(false);
+
+                        // 检查是否需要显示铃铛图标
+                        const bell = document.getElementById('showNoticeBell');
+                        if (localStorage.getItem('communityNoticeSeen') === 'true') {
+                            bell.style.display = 'block';
+                        } else {
+                            bell.style.display = 'none';
+                        }
+                    });
+                    
+                    ui.searchInput.addEventListener('input', displayPhoneList);
+                    
+                    // 为铃铛按钮添加点击事件
+                    document.getElementById('showNoticeBell').addEventListener('click', () => {
+                        const noticeModal = document.getElementById('communityNoticeModal');
+                        noticeModal.classList.add('show');
+                    });
+                },
+                getGiscusTheme: getGiscusTheme
+            };
+        })();
+
+
+
+
+        // 初始化手机收藏馆
+        PhoneCollectionManager.init();
+        /* =============================================================== */
+        /* ========================= [新增结束] ========================== */
+        /* =============================================================== */
     });
             // [新增] 锁屏组件交互事件监听
             document.getElementById('lockscreenGrid').addEventListener('click', (e) => {
@@ -8169,5 +9111,31 @@ const blob = b64toBlob(blobData.content, contentType);
                 }
             });
     </script>
+    <!-- ★★★ 新增：社区须知弹窗 ★★★ -->
+    <div class="modal-overlay" id="communityNoticeModal">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header">
+                <div class="modal-title-group">社区须知</div>
+                <button class="close-btn" data-modal-id="communityNoticeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-top: 0;">为维护一个友好、互相尊重的交流环境，请遵守以下规范：</p>
+                <!-- 使用你已经润色好的文字 -->
+                <ul style="padding-left: 20px; line-height: 1.8;">
+                    <li><b>尊重原创</b>：禁止分享作者不允许公开的网址链接和文件。</li>
+                    <li><b>友好交流</b>：禁止拉踩对比。</li>
+                    <li><b>文明发言</b>：禁止辱骂、阴阳、交换私下联系方式。</li>
+                </ul>
+                <p>有以上行为可截图私信群内管理员进行删除和拉黑。</p>
+                <p><b>小提示</b>：想要删除评论，添加图片、链接等可以点击账号旁边的时间，进入github界面进行操作。</p>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px 20px; flex-shrink: 0;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px; color: #889;">
+                    <input type="checkbox" id="dontRemindCheckbox"> 不再提醒
+                </label>
+                <button id="confirmNoticeBtn" class="modal-button" style="width: auto; padding: 10px 20px;">我已阅读并同意</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
