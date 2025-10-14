@@ -28,7 +28,7 @@
       "enabled": true,
       "swipeBack": true,
       "functions": {
-        "keep_alive": true
+        "keep_alive": false
       },
       "customCSS": "",
       "cssPresets": [
