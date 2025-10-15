@@ -2792,36 +2792,86 @@ body.dark-mode .reaction-item {
 .giscus-comments a:hover {
     text-decoration: underline;
 }
-/* =============================================================== */
-/* ============= [新增] 后台保活功能专属样式 ================ */
-/* =============================================================== */
-@keyframes breathing-glow-blue {
-    0% {
-        box-shadow: 0 0 4px 1px rgba(91, 153, 226, 0.6);
-    }
-    50% {
-        box-shadow: 0 0 14px 4px rgba(91, 153, 226, 1);
-    }
-    100% {
-        box-shadow: 0 0 4px 1px rgba(91, 153, 226, 0.6);
-    }
+
+/* [新增] 相册自定义背景样式 */
+#memoryModal .album-item.has-custom-bg {
+    color: white; /* 强制文字颜色为白色以保证可见性 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px; /* 调整内边距，让文字居中 */
 }
 
-.jelly-menu-btn.keep-alive-active {
-    /* 使用 var(--hold-border) 以适应主题颜色变化 */
-    box-shadow: 0 0 8px 2px var(--hold-border); 
-    animation: breathing-glow-blue 2.5s ease-in-out infinite;
-    /* 确保辉光效果在其他按钮之上 */
-    z-index: 1; 
+#memoryModal .album-item.has-custom-bg .folder-name {
+    /* 为文字添加边缘阴影，增强在各种背景下的可读性 */
+    text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8), 0px 0px 8px rgba(0, 0, 0, 0.6);
+    font-size: 1.1em;
+    text-align: center;
 }
-/* =============================================================== */
-/* ========================= [新增结束] ========================== */
-/* =============================================================== */
+
+/* 当有自定义背景时，隐藏图标，并重置信息样式 */
+#memoryModal .album-item.has-custom-bg .folder-icon,
+#memoryModal .album-item.has-custom-bg .manage-checkbox {
+    display: none;
+}
+
+#memoryModal .album-item.has-custom-bg .album-info {
+    position: absolute;
+    bottom: 8px;
+    left: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.7);
+    background-color: rgba(0,0,0,0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* ===== [新增] 相册排序拖拽把手样式 ===== */
+.album-item .sort-handle {
+    display: none; /* 默认隐藏 */
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 24px;   /* 增大图标尺寸 */
+    font-weight: bold;
+    color: #b0b0b0; /* 淡灰色 */
+    cursor: grab;
+    padding: 5px;
+    z-index: 10;
+    transition: color 0.2s, transform 0.2s;
+    -webkit-user-select: none; /* 防止拖拽时选中文字 */
+    user-select: none;
+    line-height: 1; /* 确保垂直居中 */
+}
+
+body.dark-mode .album-item .sort-handle {
+    color: #777; /* 夜间模式下稍亮的灰色 */
+}
+
+/* 管理模式下显示把手 */
+.album-item.manage-mode .sort-handle {
+    display: block;
+}
+
+.album-item .sort-handle:hover {
+    color: var(--hold-border); /* 悬停时高亮 */
+    transform: scale(1.1);
+}
+
+.album-item .sort-handle:active {
+    cursor: grabbing;
+}
+
 
     </style>
 
 
  <style id="custom-jelly-ball-styles"></style>
+
+    <!-- [新增] 用于全局字体的样式标签 -->
+    <style id="global-font-style"></style>
 
 
     <!-- 手机模式滑动容器 -->
@@ -3262,6 +3312,27 @@ body.dark-mode .reaction-item {
                         <button id="clearNightTitleCardBgBtn" class="modal-button delete">清除</button>
                     </div>
                 </div>
+
+                <!-- [新增] 全局字体管理区域 -->
+                <div class="preset-manager font-manager" style="border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; margin-top:20px;">
+                    <label style="font-weight: 600; font-size: 1em; margin-bottom: 10px; display: block; text-align: left;">全局字体设置</label>
+                    
+                    <!-- [优化] 一行式操作布局 -->
+                    <div class="preset-row">
+                        <input type="text" id="fontUrlInput" class="modal-input" placeholder="输入字体文件链接 (.woff2, .ttf)" style="flex-grow: 1;">
+                        <button id="applyFontBtn" class="modal-button" style="width: auto; padding: 12px 15px; flex-shrink: 0; font-size: 14px;">应用</button>
+                        <button id="clearFontBtn" class="modal-button" style="width: auto; padding: 12px 15px; flex-shrink: 0; font-size: 14px; color:#889;">恢复</button>
+                    </div>
+                    
+                    <div class="preset-row" style="margin-top: 15px;">
+                        <select id="fontPresetSelector" class="modal-select" style="flex-grow: 1;"></select>
+                        <button id="addFontPresetBtn" title="添加新预设" class="modal-button" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">+</button>
+                        <button id="updateFontPresetBtn" title="修改预设名" class="modal-button" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">✎</button>
+                        <button id="deleteFontPresetBtn" title="删除当前预设" class="modal-button delete" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">🗑</button>
+                    </div>
+                </div>
+                <!-- [新增结束] -->
+
             </div>
         </div>
     </div>
@@ -3703,13 +3774,7 @@ body.dark-mode .reaction-item {
     // [JS - V12.5.0 "Cascade Select"]
     const CURRENT_APP_VERSION = '3.7.0';
     let GITHUB_CONFIG = {}, configSha = null, isManagementMode = false, isEditingButton = false, editingButtonData = null;
-    
-    // [新增] 后台保活功能的状态变量
-    let isKeepAliveActive = false;
-    let keepAliveAudio = null;
-
     const navContainer = document.getElementById('navContainer'), pageOverlay = document.getElementById('pageOverlay');
-
     const syncStatusIndicator = document.getElementById('sync-status-indicator');
     const syncErrorModal = document.getElementById('syncErrorModal');
     const iframeModal = document.getElementById('iframeModal'), iframeModalContent = iframeModal.querySelector('.iframe-modal-content'), iframeEl = document.getElementById('iframeContent'), swipeHint = document.getElementById('swipeHint'), returnConfirmationToast = document.getElementById('returnConfirmationToast');
@@ -3724,8 +3789,11 @@ const getDefaultConfig = () => ({
         categories: [{ name: '全部', buttons: [] }],
         settings: {
             paginationEnabled: true,
-            themeStyle: 'neumorphism', // [修改] 新增主题风格配置项，默认为拟态
-            jellyBall: { enabled: false, swipeBack: true, functions: {}, customCSS: '' }
+            themeStyle: 'neumorphism', 
+            jellyBall: { enabled: false, swipeBack: true, functions: {}, customCSS: '' },
+            // [新增] 全局字体和预设的默认配置
+            globalFont: { name: '', url: '' }, 
+            fontPresets: []
         },
         // 核心修改：直接在默认配置中加入“原生主题”预设
         themePresets: [
@@ -3741,6 +3809,7 @@ const getDefaultConfig = () => ({
         ],
         lockscreenWidgets: {}
     });
+
 
 
     let currentConfig = getDefaultConfig();
@@ -4012,10 +4081,8 @@ const getDefaultConfig = () => ({
             { id: 'folder', icon: '📁', title: '文件夹' },
             { id: 'return', icon: '🔙', title: '返回' },
             { id: 'memo', icon: '📝', title: '备忘录' },
-            { id: 'quick_switch', icon: '🔗', title: '快速切换' },
-            { id: 'keep_alive', icon: '📻', title: '后台保活' } // [新增] 后台保活功能
+            { id: 'quick_switch', icon: '🔗', title: '快速切换' }
         ];
-
 
         function _create() {
             if (currentConfig.settings.jellyBall?.enabled !== true) return;
@@ -4168,11 +4235,9 @@ const getDefaultConfig = () => ({
                 case 'folder': openMemoryAndSwitch('cloud'); break;
                 case 'return': if (iframeModal.classList.contains('active')) { closeIframeModal(); } break;
                 case 'quick_switch': _showQuickSwitchMenu(); break;
-                case 'keep_alive': toggleKeepAlive(); break; // [新增] 处理后台保活点击事件
             }
             _closeMenu();
         }
-
 
         function _showQuickSwitchMenu() {
             let existingMenu = document.getElementById('quick-switch-menu-overlay');
@@ -4495,72 +4560,7 @@ const getDefaultConfig = () => ({
     })();
     // ===== [END] FLOATING JELLYFISH BALL LOGIC =====
 
-    // ===============================================================
-    // ================ [新增] 后台保活功能核心逻辑 ==================
-    // ===============================================================
-    
-    /**
-     * 创建一个静音、循环播放的音频播放器。
-     * 使用 Data URL 避免网络请求，确保轻量且能立即播放。
-     * 这个函数只会在第一次需要时执行一次。
-     */
-    function createKeepAliveAudio() {
-        if (keepAliveAudio) return;
-
-        keepAliveAudio = new Audio();
-        // 这是一个极小的、有效的静音 WAV 文件内容的 Base64 编码
-        keepAliveAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
-        keepAliveAudio.loop = true;      // 开启循环播放
-        keepAliveAudio.playsInline = true; // 关键属性，防止在iOS上全屏
-        keepAliveAudio.volume = 0;       // 确保静音
-        document.body.appendChild(keepAliveAudio); // 将其添加到DOM中
-    }
-
-    /**
-     * 切换后台保活的状态。
-     * 此函数由悬浮球菜单按钮的点击事件直接触发，
-     * 确保了音频播放在 iOS 上的兼容性（因为它是在用户交互事件循环中调用的）。
-     */
-    function toggleKeepAlive() {
-        const keepAliveBtn = document.querySelector('.jelly-menu-btn[data-action-id="keep_alive"]');
-
-        if (isKeepAliveActive) {
-            // --- 关闭后台保活 ---
-            if (keepAliveAudio) {
-                keepAliveAudio.pause();
-            }
-            if (keepAliveBtn) {
-                keepAliveBtn.classList.remove('keep-alive-active');
-            }
-            isKeepAliveActive = false;
-            showTopToast('后台保活已关闭', 2000);
-        } else {
-            // --- 开启后台保活 ---
-            createKeepAliveAudio(); // 确保音频播放器已创建
-
-            const playPromise = keepAliveAudio.play();
-            if (playPromise !== undefined) {
-                playPromise.then(_ => {
-                    // 播放成功
-                    if (keepAliveBtn) {
-                        keepAliveBtn.classList.add('keep-alive-active');
-                    }
-                    isKeepAliveActive = true;
-                    showTopToast('后台保活已开启');
-                }).catch(error => {
-                    // 播放失败 (例如，在某些极端情况下用户交互被中断)
-                    console.error("后台保活音频播放失败:", error);
-                    alert("无法启动后台保活功能，可能是浏览器限制所致。");
-                });
-            }
-        }
-    }
-    // ===============================================================
-    // ========================= [新增结束] ==========================
-    // ===============================================================
-
     const utf8_to_b64 = (str) => btoa(unescape(encodeURIComponent(str)));
-
     const b64_to_utf8 = (str) => decodeURIComponent(escape(atob(str)));
 
     function b64toBlob(b64Data, contentType = '', sliceSize = 512) {
@@ -5953,6 +5953,7 @@ const getDefaultConfig = () => ({
             viewerContext: { items: [], index: -1 },
             photoUploadQueue: [],
             isSavingPhoto: false,
+            skipAllPhotoDetails: false, // [新增] 用于标记是否跳过后续所有照片详情
         };
 
         function getInitialData() {
@@ -5980,7 +5981,7 @@ const getDefaultConfig = () => ({
                 }
         }
         
-        function scheduleSave() {
+         function scheduleSave() {
             if (isSaving) return;
             clearTimeout(saveTimeout);
             updateStatus('有未保存的更改');
@@ -5988,16 +5989,18 @@ const getDefaultConfig = () => ({
                 isSaving = true;
                 updateStatus('保存中...');
                 const content = utf8_to_b64(JSON.stringify(memoryCache, null, 2));
-                // 注意：这里不再传递 memoryDataSha，让 saveToGithub 自己去获取最新的
                 const result = await saveToGithub(MEMORY_DATA_PATH, content, 'Update memory data'); 
                 
-                // saveToGithub 内部现在会处理 sha 的更新，这里主要是处理UI状态
-                if (!result.sha) { 
+                // [修改] 增加保存成功或失败后的状态更新
+                if (result.sha) {
+                    updateStatus('已同步');
+                } else { 
                     updateStatus('保存失败', true, result.error); 
                 }
                 isSaving = false;
             }, 1500);
         }
+
 
         
         function showPage(pageId) { ui.appContainer.querySelectorAll(':scope > .page').forEach(p => p.classList.remove('active')); ui.appContainer.querySelector(`#${pageId}`).classList.add('active'); }
@@ -6040,11 +6043,22 @@ const getDefaultConfig = () => ({
                 el.className = `album-item ${state.isAlbumManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
                 el.dataset.albumId = folder.id;
                 el.dataset.action = "open-album-folder";
-                el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">🖼️</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${itemCount} 个项目</div>`;
+                el.innerHTML = `<span class="sort-handle" title="按住拖拽排序">☰</span><input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">🖼️</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${itemCount} 个项目</div>`;
+
+                
+                // [新增] 应用自定义背景
+                if (folder.background) {
+                    el.classList.add('has-custom-bg');
+                    el.style.backgroundImage = `url(${folder.background})`;
+                    el.style.backgroundSize = 'cover';
+                    el.style.backgroundPosition = 'center';
+                }
+
                 ui.albumList.appendChild(el);
             });
-                        if (memoryCache.album.folders.length === 0) ui.albumList.innerHTML = `<p class="empty-list-placeholder">没有相册</p>`;
+            if (memoryCache.album.folders.length === 0) ui.albumList.innerHTML = `<p class="empty-list-placeholder">没有相册</p>`;
         }
+
         function renderPhotos() {
             if (photoObserver) photoObserver.disconnect();
             ui.photoList.innerHTML = '';
@@ -6350,8 +6364,22 @@ const getDefaultConfig = () => ({
                 target.textContent = state.isAlbumManageMode ? '取消' : '管理';
                 ui.albumManageControls.classList.toggle('active', state.isAlbumManageMode);
                 if (!state.isAlbumManageMode) state.albumFoldersToDelete = [];
+                
+                // [新增] 替换全局漫游按钮的逻辑
+                const globalWanderBtn = document.querySelector('#album-folder-view [data-action="wander-global"]');
+                if (globalWanderBtn) {
+                     if (state.isAlbumManageMode) {
+                        // 在管理模式下，全局漫游没有意义，可以隐藏或禁用
+                        globalWanderBtn.style.display = 'none';
+                    } else {
+                        // 退出管理模式时恢复
+                        globalWanderBtn.style.display = 'inline-block';
+                    }
+                }
+
                 renderAlbumFolders();
             },
+
             'select-all-album': () => {
                 if (state.albumFoldersToDelete.length === memoryCache.album.folders.length) {
                     state.albumFoldersToDelete = [];
@@ -6377,13 +6405,56 @@ const getDefaultConfig = () => ({
                     scheduleSave();
                 }
             },
-            'toggle-photo-manage': (target) => {
+             'toggle-photo-manage': (target) => {
                 state.isPhotoManageMode = !state.isPhotoManageMode;
                 target.textContent = state.isPhotoManageMode ? '取消' : '管理';
                 ui.photoManageControls.classList.toggle('active', state.isPhotoManageMode);
                 if (!state.isPhotoManageMode) state.photosToDelete = [];
+
+                // [修改] 替换漫游按钮的逻辑
+                const wanderBtn = document.querySelector('#photo-grid-view [data-action="wander-local"], #photo-grid-view [data-action="set-album-bg"]'); // 确保能选中按钮
+                if (wanderBtn) {
+                    if (state.isPhotoManageMode) {
+                        wanderBtn.innerHTML = '🖼️'; // [修改] 使用emoji图标
+                        wanderBtn.dataset.action = 'set-album-bg';
+                        wanderBtn.title = '设置相册背景'; // [新增] 增加提示
+                        wanderBtn.classList.remove('wander-btn');
+                    } else {
+                        wanderBtn.innerHTML = '💫'; // 恢复emoji
+                        wanderBtn.dataset.action = 'wander-local';
+                        wanderBtn.title = '漫游此相册'; // [新增] 恢复提示
+                        wanderBtn.classList.add('wander-btn');
+                    }
+                }
+                
                 renderPhotos();
             },
+
+            // [新增] 设置相册背景的action
+            'set-album-bg': () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const backgroundUrl = event.target.result;
+                        const album = memoryCache.album.folders.find(f => f.id === state.currentAlbumId);
+                        if (album) {
+                            album.background = backgroundUrl;
+                            scheduleSave();
+                            renderAlbumFolders(); // 返回相册列表时会看到更新
+                            showTopToast('相册背景已设置！', 2000);
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                };
+                input.click();
+            },
+
              'select-all-photos': () => {
                 const currentAlbumItems = memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId);
                 if (state.photosToDelete.length === currentAlbumItems.length) {
@@ -6409,7 +6480,16 @@ const getDefaultConfig = () => ({
                 }
             },
             'save-photo-details': () => { state.isSavingPhoto = true; },
-            'skip-photo-details': () => { state.isSavingPhoto = false; document.getElementById('photo-title-input').value = ''; document.getElementById('photo-desc-input').value = ''; },
+            'skip-photo-details': () => {
+                // [修改] 如果当前是多文件上传，点击跳过将跳过后续所有
+                if (state.photoUploadQueue.length > 1) {
+                    state.skipAllPhotoDetails = true;
+                }
+                state.isSavingPhoto = false; 
+                document.getElementById('photo-title-input').value = ''; 
+                document.getElementById('photo-desc-input').value = '';
+            },
+
             'open-item': (target) => {
                 const itemId = parseInt(target.closest('[data-item-id]').dataset.itemId, 10);
                  if (state.isPhotoManageMode) {
@@ -6434,66 +6514,113 @@ const getDefaultConfig = () => ({
 
         async function processPhotoUploadQueue() {
             if (state.photoUploadQueue.length === 0) return;
-            const isSet = state.photoUploadQueue.length > 1;
-            ui.photosetToggleContainer.style.display = isSet ? 'block' : 'none';
-            ui.photosetToggle.checked = isSet;
+            const totalPhotos = state.photoUploadQueue.length;
+            
+            state.skipAllPhotoDetails = false;
+            let isPhotoSetMode = false;
+
+            const isBatch = totalPhotos > 1;
+            ui.photosetToggleContainer.style.display = isBatch ? 'block' : 'none';
+            ui.photosetToggle.checked = isBatch;
 
             let photosetData = { id: Date.now(), albumId: state.currentAlbumId, type: 'photoset', title: '', description: '', timestamp: Date.now(), photos: [] };
-        
-            for (let i = 0; i < state.photoUploadQueue.length; i++) {
-                const file = state.photoUploadQueue[i];
-                ui.photoDetailsModal.querySelector('#upload-thumbnail').src = URL.createObjectURL(file);
-                ui.photoDetailsModal.querySelector('#photo-details-modal-title').textContent = isSet ? `上传照片集 (${i + 1}/${state.photoUploadQueue.length})` : '添加照片信息';
-                ui.photoDetailsModal.classList.add('show');
+            
+            try {
+                for (let i = 0; i < totalPhotos; i++) {
+                    const file = state.photoUploadQueue[i];
+                    let title = '';
+                    let description = '';
+                    
+                    const shouldShowModal = i === 0 || (!isPhotoSetMode && !state.skipAllPhotoDetails);
 
-                let savePromise = new Promise(resolve => {
-                    const saveHandler = () => { ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]').removeEventListener('click', saveHandler); resolve(); };
-                     ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]').addEventListener('click', saveHandler);
-                    const skipHandler = (e) => { e.stopPropagation(); ui.photoDetailsModal.removeEventListener('click', skipDelegation); resolve(); };
-                    const skipDelegation = (e) => { if (e.target.closest('[data-action="skip-photo-details"]')) skipHandler(e); };
-                    ui.photoDetailsModal.addEventListener('click', skipDelegation);
-                });
-                await savePromise;
-
-                const title = document.getElementById('photo-title-input').value.trim();
-                const description = document.getElementById('photo-desc-input').value.trim();
-                const createSet = document.getElementById('create-photoset-toggle').checked;
-                
-                ui.photoDetailsModal.classList.remove('show');
-                const photoData = await uploadPhoto(file, title, description);
-                if (photoData) {
-                    if (isSet && createSet) {
-                         photosetData.photos.push(photoData);
-                         if (!photosetData.title) photosetData.title = title;
-                         if (!photosetData.description) photosetData.description = description;
-                    } else {
-                        memoryCache.album.items.push({
-                            id: Date.now() + i, albumId: state.currentAlbumId, type: 'photo',
-                            title: title, description: description, timestamp: Date.now(),
-                            ...photoData
+                    if (shouldShowModal) {
+                        updateStatus(`等待用户输入... (${i + 1}/${totalPhotos})`);
+                        ui.photoDetailsModal.querySelector('#upload-thumbnail').src = URL.createObjectURL(file);
+                        ui.photoDetailsModal.querySelector('#photo-details-modal-title').textContent = isBatch ? `上传照片 (${i + 1}/${totalPhotos})` : '添加照片信息';
+                        ui.photoDetailsModal.classList.add('show');
+                        
+                        await new Promise(resolve => {
+                            const saveHandler = () => { state.isSavingPhoto = true; cleanupAndResolve(); };
+                            const skipHandler = () => { actions['skip-photo-details'](); state.isSavingPhoto = false; cleanupAndResolve(); };
+                            const cleanupAndResolve = () => {
+                                saveBtn.removeEventListener('click', saveHandler);
+                                skipBtn.removeEventListener('click', skipHandler);
+                                resolve();
+                            };
+                            const saveBtn = ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]');
+                            const skipBtn = ui.photoDetailsModal.querySelector('[data-action="skip-photo-details"]');
+                            saveBtn.addEventListener('click', saveHandler, { once: true });
+                            skipBtn.addEventListener('click', skipHandler, { once: true });
                         });
+                        
+                        if (state.isSavingPhoto) {
+                            title = document.getElementById('photo-title-input').value.trim();
+                            description = document.getElementById('photo-desc-input').value.trim();
+                        }
+                        if (i === 0) isPhotoSetMode = document.getElementById('create-photoset-toggle').checked;
+                        
+                        ui.photoDetailsModal.classList.remove('show');
+                        document.getElementById('photo-title-input').value = '';
+                        document.getElementById('photo-desc-input').value = '';
                     }
-                }
-                document.getElementById('photo-title-input').value = '';
-                document.getElementById('photo-desc-input').value = '';
-            }
-            if (photosetData.photos.length > 0) memoryCache.album.items.push(photosetData);
 
-            state.photoUploadQueue = [];
-            renderPhotos();
-            scheduleSave();
+                    // [修改] 调用新的 uploadPhoto 并传入进度回调
+                    const photoData = await uploadPhoto(file, (percent) => {
+                         let progressText = Math.round(percent) + '%';
+                         updateStatus(`上传中 (${i + 1}/${totalPhotos}): ${progressText}`);
+                    });
+                    
+                    if (photoData) {
+                        if (isPhotoSetMode) {
+                            photosetData.photos.push(photoData);
+                            if (i === 0) {
+                                photosetData.title = title;
+                                photosetData.description = description;
+                            }
+                        } else {
+                            memoryCache.album.items.push({
+                                id: Date.now() + i, albumId: state.currentAlbumId, type: 'photo',
+                                title: title, description: description, timestamp: Date.now(),
+                                ...photoData
+                            });
+                        }
+                    }
+                } // 循环结束
+
+                if (photosetData.photos.length > 0) {
+                    memoryCache.album.items.push(photosetData);
+                }
+
+                updateStatus('上传完成，正在整理...');
+                state.photoUploadQueue = [];
+                renderPhotos();
+                scheduleSave();
+
+            } catch (error) {
+                // [新增] 统一的错误处理
+                updateStatus('上传失败', true, error.message);
+                alert(error.message); // 给用户一个明确的弹窗提示
+                state.photoUploadQueue = []; // 清空队列
+            }
         }
 
-        async function uploadPhoto(file, title, description) {
+
+        async function uploadPhoto(file, onProgressCallback) {
             try {
                 const path = `${MEMORY_PHOTOS_PATH}${Date.now()}_${file.name}`;
-                const result = await uploadFileViaGitData({ file, path, commitMessage: `Upload photo: ${file.name}`, onProgress: () => {} });
+                const result = await uploadFileViaGitData({ 
+                    file, 
+                    path, 
+                    commitMessage: `Upload photo: ${file.name}`, 
+                    onProgress: onProgressCallback // [修改] 传递进度回调
+                });
                 return { path: result.path, sha: result.sha };
             } catch (error) {
-                alert(`上传照片 ${file.name} 失败: ${await handleApiError('上传照片', error)}`);
-                return null;
+                // [修改] 不再弹窗，而是向上抛出错误，由调用者统一处理
+                throw new Error(`上传照片 ${file.name} 失败: ${await handleApiError('上传照片', error)}`);
             }
         }
+
        
               function populateDriveCategorySelector() {
     ui.categorySelector.innerHTML = '<option value="">-- 请选择分类 --</option>';
@@ -7754,7 +7881,7 @@ const blob = b64toBlob(blobData.content, contentType);
                 }
                 
                 // 检查下方元素是否是有效的放置目标
-                const potentialTarget = elementBelow ? elementBelow.closest('.nav-btn, .category-pill') : null;
+                const potentialTarget = elementBelow ? elementBelow.closest('.nav-btn, .category-pill, .album-item') : null;
                 if (potentialTarget && potentialTarget !== draggedEl && draggedEl.classList.contains(potentialTarget.classList[0])) {
                     dropTarget = potentialTarget;
                     dropTarget.classList.add('drag-over');
@@ -7814,29 +7941,46 @@ const blob = b64toBlob(blobData.content, contentType);
 
             // 按下事件（长按的起点）
             function onDragStart(event) {
-                // 只在管理模式下生效
-                if (!document.body.classList.contains('management-active')) return;
+                const isAlbumManageMode = document.querySelector('.album-item.manage-mode');
+
+                // 如果两个管理模式都没开，则退出
+                if (!document.body.classList.contains('management-active') && !isAlbumManageMode) return;
                 
-                const target = event.target.closest('.nav-btn, .category-pill');
-                if (!target || isDragging) return;
+                if (isDragging) return;
 
-                // 排除删除按钮
-                if (event.target.classList.contains('delete-icon')) return;
-
-                draggedEl = target;
                 const a = event.touches ? event.touches[0] : event;
                 startPos.x = a.clientX;
                 startPos.y = a.clientY;
 
-                // 设置长按计时器
+                // 路径1：立即拖拽 (针对相册排序把手)
+                if (event.target.classList.contains('sort-handle')) {
+                    draggedEl = event.target.closest('.album-item');
+                    if (!draggedEl) return;
+                    
+                    // 立即开始拖拽流程，不使用计时器
+                    startDrag(event);
+                    
+                    // 绑定事件
+                    document.addEventListener('mousemove', onDragMove);
+                    document.addEventListener('touchmove', onDragMove, { passive: false });
+                    document.addEventListener('mouseup', onDragEnd, { once: true });
+                    document.addEventListener('touchend', onDragEnd, { once: true });
+                    return; 
+                }
+                
+                // 路径2：长按拖拽 (针对项目和分类)
+                const target = event.target.closest('.nav-btn, .category-pill');
+                if (!target || event.target.classList.contains('delete-icon')) return;
+
+                draggedEl = target;
                 longPressTimer = setTimeout(() => startDrag(event), LONG_PRESS_DELAY);
 
-                // 绑定移动和结束事件
                 document.addEventListener('mousemove', onDragMove);
                 document.addEventListener('touchmove', onDragMove, { passive: false });
                 document.addEventListener('mouseup', onDragEnd, { once: true });
                 document.addEventListener('touchend', onDragEnd, { once: true });
             }
+
 
             // 更新底层数据结构
             function updateDataModel(el1, el2, parent) {
@@ -7852,8 +7996,24 @@ const blob = b64toBlob(blobData.content, contentType);
 
                     category.buttons = newButtonOrder;
                 }
+                // [新增] 情况三：对相册封面排序
+                else if (parent.id === 'album-list-container') {
+                    const allAlbums = Array.from(parent.querySelectorAll('.album-item'));
+                    // 从 DOM 顺序反向更新数据数组
+                    const newAlbumOrder = allAlbums.map(albumEl => {
+                        const albumId = parseInt(albumEl.dataset.albumId, 10);
+                        return memoryCache.album.folders.find(f => f.id === albumId);
+                    }).filter(Boolean); // 过滤掉可能未找到的项
+
+                    memoryCache.album.folders = newAlbumOrder;
+                    
+                    // 调用 MemoryApp 自己的保存机制，而不是全局保存
+                    MemoryApp.scheduleSave();
+                    return; // 结束函数，避免执行下面的全局保存
+                }
                 // 情况二：对分类标签排序
                 else if (parent.id === 'categoryNav') {
+
                     const allPills = Array.from(parent.querySelectorAll('.category-pill'));
                     const newCategoryOrder = allPills.map(pill => {
                         return currentConfig.categories.find(c => c.name === pill.dataset.category);
@@ -7880,11 +8040,17 @@ const blob = b64toBlob(blobData.content, contentType);
                     const categoryContainer = document.getElementById('categoryNav');
 
                     // 使用事件委托来处理动态添加的按钮
+                    const albumContainer = document.getElementById('album-list-container');
+
                     mainContainer.addEventListener('mousedown', onDragStart);
                     mainContainer.addEventListener('touchstart', onDragStart, { passive: true });
                     
                     categoryContainer.addEventListener('mousedown', onDragStart);
                     categoryContainer.addEventListener('touchstart', onDragStart, { passive: true });
+
+                    albumContainer.addEventListener('mousedown', onDragStart);
+                    albumContainer.addEventListener('touchstart', onDragStart, { passive: true });
+
                 }
             };
         })();
@@ -9005,8 +9171,9 @@ const blob = b64toBlob(blobData.content, contentType);
                 console.warn("GitHub config is incomplete. Cannot fetch Giscus stats.");
                 return null;
             }
-            // 从仓库全名中解析出 owner 和 name
-            const [owner, repo] = GITHUB_CONFIG.repo.split('/');
+            // [核心修改] 硬编码为社区评论仓库，而不是使用用户的个人数据仓库
+            const repoOwner = 'Yeexein';
+            const repoName = 'Jellyfish-Comments';
             // Giscus 讨论区的固定 ID，从你的 HTML 配置中获取
             const categoryId = "DIC_kwDOQBfb-84CwlT0";
             // Giscus 用来唯一标识帖子的标题
@@ -9046,8 +9213,8 @@ const blob = b64toBlob(blobData.content, contentType);
                     body: JSON.stringify({
                         query,
                         variables: {
-                            repoOwner: GITHUB_CONFIG.owner,
-                            repoName: repo,
+                            repoOwner: repoOwner, // [核心修改] 使用硬编码的 owner
+                            repoName: repoName,   // [核心修改] 使用硬编码的 repo name
                             categoryId,
                             discussionTitle
                         }
@@ -9381,7 +9548,7 @@ const blob = b64toBlob(blobData.content, contentType);
                     savePinnedPhones(currentPinned);
                 };
 
-                // ★ 修改：在HTML模板中加入反馈数据的占位符 ★
+                // [核心修改] 移除了包含 giscusFeedback 容器的HTML部分
                 ui.detailContainer.innerHTML = `
                     <div class="detail-info-group">
                         <label>作者ID</label>
@@ -9403,12 +9570,7 @@ const blob = b64toBlob(blobData.content, contentType);
                         <div class="detail-info-value">${phone.status}</div>
                     </div>
                     <button id="enterCommentsBtn" class="modal-button" data-phone-id="${phone.id}" style="margin-top: 10px;">进入安利区</button>
-                    
-                    <!-- ★ 新增的反馈数据容器 ★ -->
-                    <div id="giscusFeedback" class="giscus-feedback-container">
-                        正在加载社区反馈...
-                    </div>
-                `;
+                    `;
                 
                 // 绑定常规事件 (逻辑不变)
                 ui.detailContainer.querySelector('#copyAuthorId').addEventListener('click', function() {
@@ -9440,37 +9602,11 @@ const blob = b64toBlob(blobData.content, contentType);
                     }
                 });
 
-                // ★ 新增：异步获取并渲染 Giscus 统计数据 ★
-                const feedbackContainer = document.getElementById('giscusFeedback');
-                fetchGiscusStats(phone.id, phone.name).then(stats => {
-                    if (stats) {
-                        if (stats.reactions.length === 0 && stats.comments === 0) {
-                            feedbackContainer.textContent = '暂无社区反馈，快来第一个安利吧！';
-                        } else {
-                            const reactionsHTML = stats.reactions.map(r => `
-                                <div class="reaction-item">${r.emoji} ${r.count}</div>
-                            `).join('');
-                            
-                            feedbackContainer.innerHTML = `
-                                <div class="giscus-reactions">${reactionsHTML}</div>
-                                <div class="giscus-comments">
-                                    <a href="#" id="commentsLink">💬 ${stats.comments} 条评论</a>
-                                </div>
-                            `;
-                            // 让评论数也成为一个可以点击进入安利区的按钮
-                            feedbackContainer.querySelector('#commentsLink').addEventListener('click', (e) => {
-                                e.preventDefault();
-                                ui.detailContainer.querySelector('#enterCommentsBtn').click();
-                            });
-                            feedbackContainer.classList.add('loaded');
-                        }
-                    } else {
-                        feedbackContainer.textContent = '无法加载社区反馈';
-                    }
-                });
+                // [核心修改] 移除了整个 fetchGiscusStats 的调用和渲染逻辑
 
                 ui.detailModal.classList.add('show');
             }
+
 
             return {
                 init() {
@@ -9509,7 +9645,203 @@ const blob = b64toBlob(blobData.content, contentType);
         /* =============================================================== */
         /* ========================= [新增结束] ========================== */
         /* =============================================================== */
+        
+        /* =============================================================== */
+        /* ================== [新增] 全局字体管理逻辑 (V2) =================== */
+        /* =============================================================== */
+        const FontManager = (() => {
+            const FONT_FAMILY_NAME = 'GlobalCustomFont'; // 使用一个固定的内部字体族名
+
+            const ui = {
+                styleTag: document.getElementById('global-font-style'),
+                urlInput: document.getElementById('fontUrlInput'),
+                applyBtn: document.getElementById('applyFontBtn'),
+                clearBtn: document.getElementById('clearFontBtn'),
+                presetSelector: document.getElementById('fontPresetSelector'),
+                addPresetBtn: document.getElementById('addFontPresetBtn'),
+                updatePresetBtn: document.getElementById('updateFontPresetBtn'),
+                deletePresetBtn: document.getElementById('deleteFontPresetBtn'),
+            };
+
+            function applyFont(fontUrl) {
+                if (fontUrl) {
+                    const fontFaceRule = `@font-face {
+                        font-family: '${FONT_FAMILY_NAME}';
+                        src: url('${fontUrl}');
+                        font-display: swap;
+                    }`;
+                    const globalRule = `* {
+                        font-family: '${FONT_FAMILY_NAME}', Arial, -apple-system, BlinkMacSystemFont, sans-serif !important;
+                    }`;
+                    ui.styleTag.innerHTML = fontFaceRule + '\n' + globalRule;
+                } else {
+                    ui.styleTag.innerHTML = ''; // 清空样式以恢复默认
+                }
+            }
+
+            function populatePresetDropdown() {
+                const currentVal = ui.presetSelector.value;
+                ui.presetSelector.innerHTML = '<option value="">选择或管理预设...</option>';
+                if (!currentConfig.settings.fontPresets) {
+                    currentConfig.settings.fontPresets = [];
+                }
+                currentConfig.settings.fontPresets.forEach((preset, index) => {
+                    ui.presetSelector.innerHTML += `<option value="${index}">${preset.name}</option>`;
+                });
+                if (currentVal) ui.presetSelector.value = currentVal;
+            }
+
+            function loadCurrentSettings() {
+                const fontSettings = currentConfig.settings.globalFont || { url: '' };
+                ui.urlInput.value = fontSettings.url;
+                applyFont(fontSettings.url);
+                populatePresetDropdown();
+            }
+
+            function setupEventListeners() {
+                ui.applyBtn.addEventListener('click', () => {
+                    const fontUrl = ui.urlInput.value.trim();
+                    if (!fontUrl) {
+                        alert('字体链接不能为空！');
+                        return;
+                    }
+                    applyFont(fontUrl);
+                    currentConfig.settings.globalFont = { name: FONT_FAMILY_NAME, url: fontUrl };
+                    saveGlobalConfig('Apply global font');
+                    showTopToast('全局字体已应用！', 2000);
+                });
+
+                ui.clearBtn.addEventListener('click', () => {
+                    ui.urlInput.value = '';
+                    applyFont('');
+                    currentConfig.settings.globalFont = { name: '', url: '' };
+                    saveGlobalConfig('Clear global font');
+                    showTopToast('已恢复默认字体。', 2000);
+                });
+
+                ui.presetSelector.addEventListener('change', () => {
+                    const index = ui.presetSelector.value;
+                    if (index === '') {
+                        // 如果选择 "选择预设"，则恢复到当前非预设状态
+                        const currentFont = currentConfig.settings.globalFont;
+                        ui.urlInput.value = currentFont.url;
+                        applyFont(currentFont.url);
+                        return;
+                    }
+                    const preset = currentConfig.settings.fontPresets[index];
+                    if (preset) {
+                        ui.urlInput.value = preset.url;
+                        applyFont(preset.url);
+                        currentConfig.settings.globalFont = { name: FONT_FAMILY_NAME, url: preset.url };
+                        saveGlobalConfig('Apply font preset');
+                    }
+                });
+
+                ui.addPresetBtn.addEventListener('click', () => {
+                    const presetName = prompt('请输入新预设的名称：');
+                    if (!presetName || presetName.trim() === '') return;
+                    
+                    const fontUrl = ui.urlInput.value.trim();
+                    if (!fontUrl) {
+                        alert('字体链接不能为空，无法保存预设。');
+                        return;
+                    }
+                    if (currentConfig.settings.fontPresets.some(p => p.name === presetName.trim())) {
+                        alert('该预设名称已存在！');
+                        return;
+                    }
+                    
+                    currentConfig.settings.fontPresets.push({
+                        name: presetName.trim(),
+                        url: fontUrl
+                    });
+                    saveGlobalConfig(`Save font preset: ${presetName.trim()}`);
+                    populatePresetDropdown();
+                    ui.presetSelector.value = currentConfig.settings.fontPresets.length - 1;
+                    showTopToast('预设已保存！', 2000);
+                });
+
+                ui.updatePresetBtn.addEventListener('click', () => {
+                    const index = ui.presetSelector.value;
+                    if (index === '') {
+                        alert('请先从下拉框中选择一个要修改的预设。');
+                        return;
+                    }
+
+                    const presetToUpdate = currentConfig.settings.fontPresets[index];
+                    const newName = prompt('请输入新的预设名称：', presetToUpdate.name);
+
+                    if (!newName || newName.trim() === '') {
+                        return; // 用户取消或输入为空
+                    }
+                    
+                    const trimmedNewName = newName.trim();
+                    
+                    // 检查新名称是否与自身相同（大小写不敏感）
+                    if (trimmedNewName.toLowerCase() === presetToUpdate.name.toLowerCase()) {
+                        return; // 名称未改变
+                    }
+
+                    // 检查新名称是否与其他预设冲突（排除自身）
+                    const isDuplicate = currentConfig.settings.fontPresets.some((p, i) => 
+                        i !== parseInt(index) && p.name.toLowerCase() === trimmedNewName.toLowerCase()
+                    );
+
+                    if (isDuplicate) {
+                        alert('该预设名称已存在，请换一个名称。');
+                        return;
+                    }
+
+                    const oldName = presetToUpdate.name;
+                    presetToUpdate.name = trimmedNewName;
+                    
+                    saveGlobalConfig(`Rename font preset from "${oldName}" to "${trimmedNewName}"`);
+                    // 刷新下拉列表以显示新名称，并保持选中状态
+                    populatePresetDropdown();
+                    ui.presetSelector.value = index; 
+                    
+                    showTopToast(`预设已重命名为 "${trimmedNewName}"！`, 2000);
+                });
+
+
+                ui.deletePresetBtn.addEventListener('click', () => {
+                    const index = ui.presetSelector.value;
+                    if (index === '') {
+                        alert('请先从下拉框中选择一个要删除的预设。');
+                        return;
+                    }
+                    
+                    const presetName = currentConfig.settings.fontPresets[index].name;
+                    if (confirm(`确定要删除预设 "${presetName}" 吗？`)) {
+                        currentConfig.settings.fontPresets.splice(index, 1);
+                        saveGlobalConfig(`Delete font preset: ${presetName}`);
+                        populatePresetDropdown();
+                        // 删除后，将输入框和应用状态恢复到当前保存的全局设置
+                        const currentFont = currentConfig.settings.globalFont;
+                        ui.urlInput.value = currentFont.url;
+                        applyFont(currentFont.url);
+                        showTopToast('预设已删除。', 2000);
+                    }
+                });
+            }
+
+            return {
+                init() {
+                    loadCurrentSettings();
+                    setupEventListeners();
+                }
+            };
+        })();
+
+
+        // 初始化字体管理器
+        FontManager.init();
+        
+        /* =============================================================== */
+        /* ========================= [新增结束] ========================== */
+        /* =============================================================== */
     });
+
             // [新增] 锁屏组件交互事件监听
             document.getElementById('lockscreenGrid').addEventListener('click', (e) => {
                 const li = e.target.closest('li[data-note-id]');
