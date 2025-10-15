@@ -59,6 +59,24 @@
         "timestamp": 1760544808811,
         "path": "memory/photos/1760544797206_微信图片_2025-05-14_174038_070.jpg",
         "sha": "cec03660341f2e16baac0dc6b9ab4ee640062583"
+      },
+      {
+        "id": 1760545394441,
+        "albumId": 1760343038321,
+        "type": "photoset",
+        "title": "",
+        "description": "",
+        "timestamp": 1760545394441,
+        "photos": [
+          {
+            "path": "memory/photos/1760545398653_微信图片_2025-05-14_174044_895.jpg",
+            "sha": "933ead3ec8d5803c0274598abc50b59e6a9536f4"
+          },
+          {
+            "path": "memory/photos/1760545408843_微信图片_20251014175350_72_14.jpg",
+            "sha": "8ac0a25554c09d5e2e04219259dabe84caaab542"
+          }
+        ]
       }
     ]
   }
