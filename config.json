@@ -61,7 +61,7 @@
       ]
     },
     "mobileMode": {
-      "enabled": false
+      "enabled": true
     }
   },
   "themePresets": [
