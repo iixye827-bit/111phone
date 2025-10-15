@@ -61,8 +61,8 @@
       ]
     },
     "globalFont": {
-      "name": "",
-      "url": ""
+      "name": "GlobalCustomFont",
+      "url": "https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1756890498643_qdqqd_yz4k5l.TTF"
     },
     "fontPresets": [
       {
