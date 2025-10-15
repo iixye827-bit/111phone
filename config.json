@@ -60,6 +60,11 @@
         }
       ]
     },
+    "globalFont": {
+      "name": "",
+      "url": ""
+    },
+    "fontPresets": [],
     "fontSettings": {
       "currentFontUrl": "",
       "presets": []
