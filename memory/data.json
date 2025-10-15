@@ -31,36 +31,6 @@
     ],
     "items": [
       {
-        "id": 1760544668833,
-        "albumId": 1760343038321,
-        "type": "photoset",
-        "title": "",
-        "description": "",
-        "timestamp": 1760544668833,
-        "photos": [
-          {
-            "path": "memory/photos/1760544690396_微信图片_2025-05-14_174031_019.jpg",
-            "sha": "81bc0c0a063a6b1d1248934016f5fed3ca67bc4e"
-          },
-          {
-            "path": "memory/photos/1760544708727_微信图片_2025-05-14_174038_070.jpg",
-            "sha": "cec03660341f2e16baac0dc6b9ab4ee640062583"
-          },
-          {
-            "path": "memory/photos/1760544716975_微信图片_2025-05-14_174041_577.jpg",
-            "sha": "237f1b6e1768944357c1c4a0e1b6d0e6e2ab7ab2"
-          },
-          {
-            "path": "memory/photos/1760544729408_微信图片_2025-05-14_174044_895.jpg",
-            "sha": "933ead3ec8d5803c0274598abc50b59e6a9536f4"
-          },
-          {
-            "path": "memory/photos/1760544733462_微信图片_20251014175350_72_14.jpg",
-            "sha": "8ac0a25554c09d5e2e04219259dabe84caaab542"
-          }
-        ]
-      },
-      {
         "id": 1760544783107,
         "albumId": 1760343038321,
         "type": "photo",
