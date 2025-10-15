@@ -197,7 +197,25 @@
         #nightPreview { border: 2px solid var(--bg-night-element); color: var(--text-night); } body.dark-mode #nightPreview { border-color: rgba(255,255,255,0.2); }
         .preset-manager, .background-image-manager { border-top: 1px solid rgba(0,0,0,0.1); padding-top: 20px; display: flex; flex-direction: column; gap: 15px; }
         body.dark-mode .preset-manager, body.dark-mode .background-image-manager { border-color: rgba(255,255,255,0.1); } 
-        .preset-row, .background-image-row { display: flex; align-items: center; gap: 10px; }
+        .preset-row, .background-image-row { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            /* [新增] 核心修复：确保容器不会因为内容溢出而被撑开 */
+            min-width: 0; 
+        }
+        
+        /* [新增] 针对 preset-row 内部输入框的特殊处理 */
+        .preset-row .modal-input {
+            /* [新增] 确保输入框本身不会被内容无限撑大 */
+            min-width: 0;
+            /* [新增] 当文本溢出时，用省略号显示 */
+            text-overflow: ellipsis;
+            /* [新增] 防止文本换行，与 ellipsis 配合使用 */
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
         .preset-row .modal-input, .preset-row .modal-select { flex-grow: 1; }
         .preset-row .modal-button, .background-image-row .modal-button { width: auto; padding: 12px 15px; flex-shrink: 0; font-size: 14px; }
         .preset-row .modal-button.save { color: #28a745; } .preset-row .modal-button.delete, .background-image-row .modal-button.delete { color: #dc3545; }
