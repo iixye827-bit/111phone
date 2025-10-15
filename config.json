@@ -64,7 +64,12 @@
       "name": "GlobalCustomFont",
       "url": "https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1755930860831_qdqqd_4hgn3n.woff2"
     },
-    "fontPresets": [],
+    "fontPresets": [
+      {
+        "name": "花园B2",
+        "url": "https://s3plus.meituan.net/opapisdk/op_ticket_885190757_1755930860831_qdqqd_4hgn3n.woff2"
+      }
+    ],
     "fontSettings": {
       "currentFontUrl": "",
       "presets": []
