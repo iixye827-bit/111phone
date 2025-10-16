@@ -102,5 +102,16 @@
       }
     }
   ],
-  "lockscreenWidgets": {}
+  "lockscreenWidgets": {
+    "29": [
+      {
+        "id": 1760594195452,
+        "size": "1x1",
+        "type": "shortcut",
+        "shape": "circle",
+        "content": "33453",
+        "text": "122"
+      }
+    ]
+  }
 }
