@@ -273,6 +273,28 @@
             "sha": "947fddcaf41762bf171e3c6b20547e87964bbd2e"
           }
         ]
+      },
+      {
+        "id": 1760602975166,
+        "albumId": 1760546447393,
+        "type": "photoset",
+        "title": "",
+        "description": "",
+        "timestamp": 1760602975166,
+        "photos": [
+          {
+            "path": "memory/photos/1760602976846_yde4wori.jpg",
+            "sha": "f0b2f1e3e3083629eeb0cffc5fad4483b9f00636"
+          },
+          {
+            "path": "memory/photos/1760602980478_2xk28zon.jpg",
+            "sha": "81bc0c0a063a6b1d1248934016f5fed3ca67bc4e"
+          },
+          {
+            "path": "memory/photos/1760602983898_pqxx7ffv.jpg",
+            "sha": "cec03660341f2e16baac0dc6b9ab4ee640062583"
+          }
+        ]
       }
     ]
   }
