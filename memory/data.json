@@ -187,6 +187,28 @@
         "timestamp": 1760601584251,
         "path": "memory/photos/1760601581381_yf6kkuew.jpg",
         "sha": "81bc0c0a063a6b1d1248934016f5fed3ca67bc4e"
+      },
+      {
+        "id": 1760601823141,
+        "albumId": 1760546437538,
+        "type": "photoset",
+        "title": "",
+        "description": "",
+        "timestamp": 1760601823141,
+        "photos": [
+          {
+            "path": "memory/photos/1760601827019_ylqa7kmf.jpg",
+            "sha": "f0b2f1e3e3083629eeb0cffc5fad4483b9f00636"
+          },
+          {
+            "path": "memory/photos/1760601829695_380xu8tj.jpg",
+            "sha": "81bc0c0a063a6b1d1248934016f5fed3ca67bc4e"
+          },
+          {
+            "path": "memory/photos/1760601832839_qz35xvpk.jpg",
+            "sha": "cec03660341f2e16baac0dc6b9ab4ee640062583"
+          }
+        ]
       }
     ]
   }
