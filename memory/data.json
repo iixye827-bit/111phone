@@ -155,6 +155,24 @@
         "timestamp": 1760603521192,
         "path": "memory/photos/1760603518242_f5v7f9bo.jpg",
         "sha": "f0b2f1e3e3083629eeb0cffc5fad4483b9f00636"
+      },
+      {
+        "id": 1760604022764,
+        "albumId": 1760546437538,
+        "type": "photoset",
+        "title": "",
+        "description": "",
+        "timestamp": 1760604022764,
+        "photos": [
+          {
+            "path": "memory/photos/1760604024932_n6szlgfr.jpeg",
+            "sha": "cca238a06740a71a1551c8a24de4d0396fff1c24"
+          },
+          {
+            "path": "memory/photos/1760604028044_csfclnp7.jpeg",
+            "sha": "9d7cdf3479c4fbd34e4243cce2a81bb448619fd3"
+          }
+        ]
       }
     ]
   }
