@@ -3882,15 +3882,18 @@ body.dark-mode .album-item .sort-handle {
     const syncErrorModal = document.getElementById('syncErrorModal');
     const iframeModal = document.getElementById('iframeModal'), iframeModalContent = iframeModal.querySelector('.iframe-modal-content'), iframeEl = document.getElementById('iframeContent'), swipeHint = document.getElementById('swipeHint'), returnConfirmationToast = document.getElementById('returnConfirmationToast');
     let activeUploadXHR = null;
-let isPhotoUploading = false; // [新增] 用于标记相册照片是否正在上传
+let activePhotoUploadXHRs = []; // [新增] 跟踪所有活跃的照片上传请求
+
 
 window.addEventListener('beforeunload', (event) => {
-    // [新增] 当相册照片或文件夹文件正在上传时，提示用户
-    if (isPhotoUploading || activeUploadXHR) {
-        event.preventDefault(); // 阻止默认行为
-        event.returnValue = '有文件正在上传，确定要离开吗？'; // 显示提示信息
+    // [最终修正] 只检查真正跟踪后台网络请求的变量
+    if (activeUploadXHR || activePhotoUploadXHRs.length > 0) {
+        event.preventDefault();
+        event.returnValue = '有文件正在上传，确定要离开吗？';
     }
 });
+
+
 
     const secureFileCache = new Map();
     let currentCategory = '全部';
@@ -6651,14 +6654,10 @@ const getDefaultConfig = () => ({
         async function processPhotoUploadQueue() {
             if (state.photoUploadQueue.length === 0) return;
             
-            // [新增] 开始上传，设置标志位
-            isPhotoUploading = true;
-
             const totalPhotos = state.photoUploadQueue.length;
             
             state.skipAllPhotoDetails = false;
             let isPhotoSetMode = false;
-
             const isBatch = totalPhotos > 1;
             ui.photosetToggleContainer.style.display = isBatch ? 'block' : 'none';
             ui.photosetToggle.checked = isBatch;
@@ -6671,24 +6670,23 @@ const getDefaultConfig = () => ({
                     let title = '';
                     let description = '';
                     
+                    let statusText = `上传中 (${i + 1}/${totalPhotos})`;
+                    updateStatus(statusText);
+
                     const shouldShowModal = i === 0 || (!isPhotoSetMode && !state.skipAllPhotoDetails);
 
                     if (shouldShowModal) {
-                        updateStatus(`等待用户输入... (${i + 1}/${totalPhotos})`);
+                        ui.photoDetailsModal.querySelector('#photo-details-modal-title').textContent = '添加照片信息';
                         ui.photoDetailsModal.querySelector('#upload-thumbnail').src = URL.createObjectURL(file);
-                        ui.photoDetailsModal.querySelector('#photo-details-modal-title').textContent = isBatch ? `上传照片 (${i + 1}/${totalPhotos})` : '添加照片信息';
                         ui.photoDetailsModal.classList.add('show');
                         
                         await new Promise(resolve => {
-                            const saveHandler = () => { state.isSavingPhoto = true; cleanupAndResolve(); };
-                            const skipHandler = () => { actions['skip-photo-details'](); state.isSavingPhoto = false; cleanupAndResolve(); };
-                            const cleanupAndResolve = () => {
-                                saveBtn.removeEventListener('click', saveHandler);
-                                skipBtn.removeEventListener('click', skipHandler);
-                                resolve();
-                            };
+                            const saveHandler = () => { state.isSavingPhoto = true; resolve(); };
+                            const skipHandler = () => { actions['skip-photo-details'](); state.isSavingPhoto = false; resolve(); };
+                            
                             const saveBtn = ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]');
                             const skipBtn = ui.photoDetailsModal.querySelector('[data-action="skip-photo-details"]');
+
                             saveBtn.addEventListener('click', saveHandler, { once: true });
                             skipBtn.addEventListener('click', skipHandler, { once: true });
                         });
@@ -6703,11 +6701,9 @@ const getDefaultConfig = () => ({
                         document.getElementById('photo-title-input').value = '';
                         document.getElementById('photo-desc-input').value = '';
                     }
-
-                    // [修改] 调用新的 uploadPhoto 并传入进度回调
+                    
                     const photoData = await uploadPhoto(file, (percent) => {
-                         let progressText = Math.round(percent) + '%';
-                         updateStatus(`上传中 (${i + 1}/${totalPhotos}): ${progressText}`);
+                         // 此回调为空，我们不再使用它来更新UI
                     });
                     
                     if (photoData) {
@@ -6731,46 +6727,82 @@ const getDefaultConfig = () => ({
                     memoryCache.album.items.push(photosetData);
                 }
 
-                updateStatus('上传完成，正在整理...');
+                updateStatus('上传完成!');
                 state.photoUploadQueue = [];
                 renderPhotos();
                 scheduleSave();
 
             } catch (error) {
-                // [新增] 统一的错误处理
                 updateStatus('上传失败', true, error.message);
-                alert(error.message); // 给用户一个明确的弹窗提示
-                state.photoUploadQueue = []; // 清空队列
-            } finally {
-                // [新增] 无论成功或失败，上传结束，重置标志位
-                isPhotoUploading = false;
+                alert(error.message); 
+                state.photoUploadQueue = []; 
             }
+            // [最终修正] 我们不再需要 finally 块来管理状态
         }
 
-        async function uploadPhoto(file, onProgressCallback) {
-            try {
-                // [核心修改] 创建一个安全的新文件名，不再依赖 file.name
-                // 1. 安全地获取文件后缀
+
+
+        function uploadPhoto(file, onProgressCallback) {
+            return new Promise((resolve, reject) => {
                 const extension = (file.name.split('.').pop() || 'jpg').toLowerCase();
-                // 2. 构造新文件名：时间戳 + 8位随机字符串 + 后缀
                 const newSafeFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${extension}`;
-                // 3. 使用新文件名构造存储路径
                 const path = `${MEMORY_PHOTOS_PATH}${newSafeFileName}`;
+                const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
 
-                const result = await uploadFileViaGitData({ 
-                    file, 
-                    path, 
-                    // [核心修改] Commit message 也使用安全的新文件名
-                    commitMessage: `Upload photo: ${newSafeFileName}`, 
-                    onProgress: onProgressCallback
-                });
-                return { path: result.path, sha: result.sha };
-            } catch (error) {
-                // [核心修改] 错误提示中也使用原始文件名（如果可用），以便追溯
-                const originalName = file.name || '未知文件';
-                throw new Error(`上传照片 ${originalName} 失败: ${await handleApiError('上传照片', error)}`);
-            }
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = async () => {
+                    const contentB64 = reader.result.split(',')[1];
+                    const body = { message: `Upload photo: ${newSafeFileName}`, content: contentB64, branch: 'main' };
+
+                    const xhr = new XMLHttpRequest();
+                    activePhotoUploadXHRs.push(xhr); // [核心] 将请求添加到跟踪列表
+
+                    xhr.open('PUT', url, true);
+                    xhr.setRequestHeader('Authorization', `token ${GITHUB_CONFIG.token}`);
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+
+                    xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable && onProgressCallback) {
+                            const percent = (e.loaded / e.total) * 100;
+                            onProgressCallback(percent);
+                        }
+                    };
+
+                    xhr.onload = function() {
+                        const index = activePhotoUploadXHRs.indexOf(xhr);
+                        if (index > -1) activePhotoUploadXHRs.splice(index, 1);
+
+                        if (this.status >= 200 && this.status < 300) {
+                            const response = JSON.parse(this.responseText);
+                            resolve({ path: response.content.path, sha: response.content.sha });
+                        } else {
+                            const errorResponse = JSON.parse(this.responseText);
+                            const errorMessage = errorResponse.message || `HTTP ${this.status}`;
+                            reject(new Error(`上传照片 ${file.name || '未知文件'} 失败: ${errorMessage}`));
+                        }
+                    };
+
+                    xhr.onerror = () => {
+                        const index = activePhotoUploadXHRs.indexOf(xhr);
+                        if (index > -1) activePhotoUploadXHRs.splice(index, 1);
+                        reject(new Error("网络错误，上传失败。"));
+                    };
+                    
+                    xhr.onabort = () => {
+                        const index = activePhotoUploadXHRs.indexOf(xhr);
+                        if (index > -1) activePhotoUploadXHRs.splice(index, 1);
+                        reject(new Error("上传已取消。"));
+                    };
+
+                    xhr.send(JSON.stringify(body));
+                };
+                reader.onerror = () => {
+                   reject(new Error("读取文件失败！"));
+                };
+            });
         }
+
 
        
               function populateDriveCategorySelector() {
