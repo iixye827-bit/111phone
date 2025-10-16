@@ -167,6 +167,16 @@
         "timestamp": 1760601538350,
         "path": "memory/photos/1760601535356_e5ie6cpe.jpg",
         "sha": "237f1b6e1768944357c1c4a0e1b6d0e6e2ab7ab2"
+      },
+      {
+        "id": 1760601573319,
+        "albumId": 1760546437538,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1760601573319,
+        "path": "memory/photos/1760601570710_prbiskxn.jpg",
+        "sha": "f0b2f1e3e3083629eeb0cffc5fad4483b9f00636"
       }
     ]
   }
