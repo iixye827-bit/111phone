@@ -1,0 +1,37 @@
+{
+  "title": "JellyfishCenter",
+  "subtitle": "长按🌞打开工具栏 | By淡季水母",
+  "categories": [
+    {
+      "name": "全部",
+      "buttons": []
+    }
+  ],
+  "settings": {
+    "paginationEnabled": true,
+    "themeStyle": "neumorphism",
+    "jellyBall": {
+      "enabled": false,
+      "swipeBack": true,
+      "functions": {},
+      "customCSS": ""
+    },
+    "globalFont": {
+      "name": "",
+      "url": ""
+    },
+    "fontPresets": []
+  },
+  "themePresets": [
+    {
+      "name": "原生主题",
+      "colors": {
+        "dayColor1": "#f5f7fa",
+        "dayColor2": "#e4eaf5",
+        "nightColor1": "#1f2a40",
+        "nightColor2": "#16213e"
+      }
+    }
+  ],
+  "lockscreenWidgets": {}
+}
