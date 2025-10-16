@@ -209,6 +209,32 @@
             "sha": "cec03660341f2e16baac0dc6b9ab4ee640062583"
           }
         ]
+      },
+      {
+        "id": 1760601902810,
+        "albumId": 1760546437538,
+        "type": "photoset",
+        "title": "",
+        "description": "",
+        "timestamp": 1760601902810,
+        "photos": [
+          {
+            "path": "memory/photos/1760601904929_mncc42u4.png",
+            "sha": "5df39db5d3952ce66fc6bf13f4d5aa6f60e16a3e"
+          },
+          {
+            "path": "memory/photos/1760601910246_keksefv3.jpeg",
+            "sha": "cca238a06740a71a1551c8a24de4d0396fff1c24"
+          },
+          {
+            "path": "memory/photos/1760601913612_l0x1yfd8.jpeg",
+            "sha": "9d7cdf3479c4fbd34e4243cce2a81bb448619fd3"
+          },
+          {
+            "path": "memory/photos/1760601917286_bk4cqpkx.jpeg",
+            "sha": "5a117f20f7ef50ce9d1b23de95e78b9c4e91c594"
+          }
+        ]
       }
     ]
   }
