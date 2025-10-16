@@ -6653,9 +6653,15 @@ const getDefaultConfig = () => ({
 
         async function processPhotoUploadQueue() {
             if (state.photoUploadQueue.length === 0) return;
-            
+
+            // [解决方案 1] 同步添加一个标记，确保在文件读取期间关闭页面也能触发提示。
+            activePhotoUploadXHRs.push("photo_upload_session");
+
             const totalPhotos = state.photoUploadQueue.length;
-            
+
+            // [解决方案 2] 弹出一个长时存在的顶部提示框作为视觉反馈。
+            showTopToast(`正在上传 ${totalPhotos} 张照片...`, 600000); // 持续10分钟或直到任务结束
+
             state.skipAllPhotoDetails = false;
             let isPhotoSetMode = false;
             const isBatch = totalPhotos > 1;
@@ -6703,7 +6709,7 @@ const getDefaultConfig = () => ({
                     }
                     
                     const photoData = await uploadPhoto(file, (percent) => {
-                         // 此回调为空，我们不再使用它来更新UI
+                         // 此回调为空，因为用户不需要进度条
                     });
                     
                     if (photoData) {
@@ -6727,17 +6733,24 @@ const getDefaultConfig = () => ({
                     memoryCache.album.items.push(photosetData);
                 }
 
+                showTopToast('所有照片上传完成!', 3000); // 显示最终成功状态
                 updateStatus('上传完成!');
                 state.photoUploadQueue = [];
                 renderPhotos();
                 scheduleSave();
 
             } catch (error) {
+                showTopToast('照片上传失败，请检查网络或配置', 4000); // 显示最终失败状态
                 updateStatus('上传失败', true, error.message);
                 alert(error.message); 
                 state.photoUploadQueue = []; 
+            } finally {
+                // [解决方案 1 清理] 无论成功或失败，都在任务结束后移除标记。
+                const index = activePhotoUploadXHRs.indexOf("photo_upload_session");
+                if (index > -1) {
+                    activePhotoUploadXHRs.splice(index, 1);
+                }
             }
-            // [最终修正] 我们不再需要 finally 块来管理状态
         }
 
 
