@@ -105,6 +105,28 @@
         "timestamp": 1760600542984,
         "path": "memory/photos/1760600539992_oAFBBI3a8IAwZA7eTdhiReAvfAIZzEGCRED7AL~tplv-dy-vqe2-sr-v2_1440_2560_q80.webp",
         "sha": "d0dd89afbbbb1c3cc1e98888ebb58bcef672f90c"
+      },
+      {
+        "id": 1760600639372,
+        "albumId": 1760544398425,
+        "type": "photoset",
+        "title": "",
+        "description": "",
+        "timestamp": 1760600639372,
+        "photos": [
+          {
+            "path": "memory/photos/1760600640643_IMG_6425.jpeg",
+            "sha": "843948f728ca72300785e1b68f6c08f000888ec8"
+          },
+          {
+            "path": "memory/photos/1760600643792_IMG_6427.jpeg",
+            "sha": "3ed0c4a3134b7b9dfee109bca0abf5956cd11e2a"
+          },
+          {
+            "path": "memory/photos/1760600647154_IMG_6426.jpeg",
+            "sha": "9166e5b6272badf789913041ef9c5d7c7966745c"
+          }
+        ]
       }
     ]
   }
