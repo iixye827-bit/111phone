@@ -145,6 +145,40 @@
             "sha": "cec03660341f2e16baac0dc6b9ab4ee640062583"
           }
         ]
+      },
+      {
+        "id": 1760603485724,
+        "albumId": 1760546437538,
+        "type": "photoset",
+        "title": "",
+        "description": "",
+        "timestamp": 1760603485724,
+        "photos": [
+          {
+            "path": "memory/photos/1760603488812_w6patf4q.png",
+            "sha": "5df39db5d3952ce66fc6bf13f4d5aa6f60e16a3e"
+          },
+          {
+            "path": "memory/photos/1760603492381_gqe4em6d.jpeg",
+            "sha": "cca238a06740a71a1551c8a24de4d0396fff1c24"
+          },
+          {
+            "path": "memory/photos/1760603495330_0rt5d43n.jpeg",
+            "sha": "9d7cdf3479c4fbd34e4243cce2a81bb448619fd3"
+          },
+          {
+            "path": "memory/photos/1760603497675_y6k6i3la.jpeg",
+            "sha": "5a117f20f7ef50ce9d1b23de95e78b9c4e91c594"
+          },
+          {
+            "path": "memory/photos/1760603501013_5qu7x5qw.jpeg",
+            "sha": "35c854aee2c9ae69defbc1df691893067a51a9f6"
+          },
+          {
+            "path": "memory/photos/1760603503579_zz5fu5jb.jpeg",
+            "sha": "08fe7ecdaecb2decf48f0736ce249c4e3161fceb"
+          }
+        ]
       }
     ]
   }
