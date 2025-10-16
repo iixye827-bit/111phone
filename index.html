@@ -244,8 +244,45 @@
         .file-select-wrapper { display: flex; align-items: center; gap: 10px; width: 100%; } .file-select-wrapper .modal-button { flex-shrink: 0; width: auto; padding: 10px 15px; font-size: 14px; }
         .file-select-wrapper .status-text { flex-grow: 1; font-size: 14px; color: #889; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .file-upload-section { display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; } input[type="file"] { display: none; }
-        .progress-container { display: none; height: 12px; background:var(--bg-day-element); border-radius: 6px; box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day); padding: 2px; } body.dark-mode .progress-container { box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night); }
-        .progress-bar { width: 0%; height: 100%; border-radius: 4px; background-color: #707899; transition: width 0.2s linear; }
+.progress-container { 
+    display: none; /* 初始隐藏 */
+    align-items: center; 
+    gap: 10px; /* 进度条和按钮的间距 */
+    height: 36px; /* 增加容器高度以容纳按钮 */
+} 
+.progress-bar-wrapper {
+    flex-grow: 1; /* 让进度条容器占据大部分空间 */
+    height: 12px; 
+    background: var(--bg-day-element); 
+    border-radius: 6px; 
+    box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day); 
+    padding: 2px;
+}
+body.dark-mode .progress-bar-wrapper { 
+    box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night); 
+}
+.progress-bar { 
+    width: 0%; 
+    height: 100%; 
+    border-radius: 4px; 
+    background-color: var(--hold-border); /* 使用主题高亮色 */ 
+    transition: width 0.2s linear; 
+}
+#upload-cancel-btn {
+    flex-shrink: 0; /* 防止按钮被压缩 */
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: #aaa;
+    cursor: pointer;
+    padding: 5px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+#upload-cancel-btn:hover {
+    color: #e53e3e;
+}
+
         #helpModal .modal-body { gap: 0; padding-top: 15px; } #helpModal .modal-body > input[name="help-tab"] { display: none; } 
       .help-page-content { display: none; padding: 15px 5px 40px 5px; overflow-x: hidden; } /* 修改点：底部内边距调整为 40px */
 
@@ -1049,10 +1086,10 @@ body.dragging-active {
     left: 50%;
     transform: translate(-50%, -150%); /* 初始位置在屏幕外 */
     padding: 12px 20px;
-    background-color: var(--bg-night-element, #1f2a40);
-    color: var(--text-night, #e0e6f0);
+    background: var(--bg-day-element); /* 适配主题背景 */
+    color: #6c757d; /* 设置为清晰的灰色字体 */
     border-radius: 0 0 12px 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 -1px 0 rgba(0,0,0,0.05); /* 适配主题的阴影 */
     z-index: 9999;
     font-size: 15px;
     font-weight: 600;
@@ -1062,6 +1099,27 @@ body.dragging-active {
     text-align: center;
     max-width: 90%;
 }
+/* 新增：夜间模式适配 */
+body.dark-mode .top-toast {
+    background: var(--bg-night-element);
+    color: #a0aec0; /* 夜间模式使用更亮的灰色 */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+/* 新增：磨砂玻璃主题适配 */
+body.theme-glass .top-toast {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: none;
+    color: #343a40;
+}
+body.theme-glass.dark-mode .top-toast {
+    background: rgba(30, 30, 30, 0.4);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #e9ecef;
+}
+
 .top-toast.show {
     transform: translate(-50%, 0); /* 移动到屏幕内 */
     opacity: 1;
@@ -1785,8 +1843,8 @@ body.dark-mode .roller-btn:active {
     border-color: transparent;
 }
 .widget-preview-item {
-    padding: 12px 20px;
-    border-radius: 10px;
+    padding: 10px; /* 统一内边距 */
+    border-radius: 16px; /* 增加圆角弧度，使其更像组件本身 */
     text-align: center;
     cursor: grab;
     font-size: 14px;
@@ -1794,7 +1852,17 @@ body.dark-mode .roller-btn:active {
     background: var(--bg-day-element);
     box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day);
     transition: all 0.2s ease;
+    /* 核心修改：让其成为 flex 子项以便居中和控制尺寸 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 核心修改：设定固定的正方形尺寸 */
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0; /* 防止被 flex 容器压缩 */
+    word-break: break-word; /* 防止文字溢出 */
 }
+
 body.dark-mode .widget-preview-item {
     background: var(--bg-night-element);
     box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night);
@@ -2889,7 +2957,98 @@ body.dark-mode .album-item .sort-handle {
  <style id="custom-jelly-ball-styles"></style>
 
     <!-- [新增] 用于全局字体的样式标签 -->
-    <style id="global-font-style"></style>
+    <style id="global-font-style">
+/* =============================================================== */
+/* ============= [修改] 左下角上传进度弹窗样式 V2 ============ */
+/* =============================================================== */
+.upload-progress-popup {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 220px; /* 减小宽度以适应简洁内容 */
+    background: rgba(255, 255, 255, 0.2); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #4a5568; /* 深灰色字体 */
+    border-radius: 14px; /* 增加圆角 */
+    padding: 12px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    z-index: 10000;
+    font-size: 13px; /* 字体比系统默认小 */
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none; /* 默认不可交互 */
+}
+
+/* 夜间模式适配 */
+body.dark-mode .upload-progress-popup {
+    background: rgba(30, 30, 30, 0.4);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.8); /* 夜间模式使用半透明亮色 */
+}
+
+.upload-progress-popup.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto; /* 显示时可交互 */
+}
+
+/* 状态文本和取消按钮容器 */
+.popup-status-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.popup-status-text {
+    flex-grow: 1;
+}
+
+/* 取消上传按钮 */
+.popup-cancel-btn {
+    background: transparent;
+    border: none;
+    color: #999;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 5px;
+    transition: color 0.2s;
+    flex-shrink: 0;
+}
+.popup-cancel-btn:hover { color: #e53e3e; }
+body.dark-mode .popup-cancel-btn { color: #777; }
+body.dark-mode .popup-cancel-btn:hover { color: #fc8181; }
+
+/* 进度条容器 */
+.popup-progress-container {
+    height: 5px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 2.5px;
+    overflow: hidden;
+}
+body.dark-mode .popup-progress-container {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 进度条本体 */
+.popup-progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: var(--hold-border, #5B99E2); /* 使用主题高亮色 */
+    border-radius: 2.5px;
+    transition: width 0.2s linear;
+}
+
+
+</style>
 
 
     <!-- 手机模式滑动容器 -->
@@ -3132,6 +3291,21 @@ body.dark-mode .album-item .sort-handle {
     </div>
         <!-- ★ 在这里新增下面的代码块 ★ -->
     <div class="update-log-entry">
+        <h4>v5.7.6 <span class="update-date">- 2025.10.16</span></h4>
+        <ul>
+            <li><span class="tag new">新功能</span> 新增全局字体更换功能，支持在主题设置中应用在线字体及管理预设。</li>
+            <li><span class="tag new">新功能</span> 新增为相册设置自定义背景（封面）的功能。</li>
+            <li><span class="tag new">新功能</span> 新增相册排序功能，在管理模式下可以拖拽调整相册顺序。</li>
+            <li><span class="tag opt">优化</span> 优化了项目编辑逻辑，修改项目后其按钮将保持在原位，不再移动到末尾。</li>
+            <li><span class="tag opt">优化</span> 美化了“手机收藏馆”的界面，采用更具动感的泡泡布局以提升视觉体验。</li>
+            <li><span class="tag opt">优化</span> 优化了相册的上传流程，批量上传照片和编辑信息的交互更为简洁。</li>
+            <li><span class="tag fix">修复</span> 修复了备忘录内容无法垂直滚动以及代码块内长文本溢出的问题。</li>
+            <li><span class="tag fix">修复</span> 修复了在主题设置中，所选的主题风格（如“磨砂玻璃”）无法被正确保存的问题。</li>
+            <li><span class="tag fix">修复</span> 修复了在管理模式下长按拖拽排序时，项目按钮位置可能无法正确互换的问题。</li>
+        </ul>
+    </div>
+
+    <div class="update-log-entry">
         <h4>v5.5.0 <span class="update-date">- 2025.10.14</span></h4>
         <ul>
             <li><span class="tag new">新功能</span> 新增悬浮球CSS预设管理功能。</li>
@@ -3229,7 +3403,7 @@ body.dark-mode .album-item .sort-handle {
     </div>
     
     <footer class="update-footer">
-        当前版本: v5.5.0
+        当前版本: v5.7.6
     </footer>
 </div>
                     <div id="help-page-3" class="help-page-content">
@@ -3584,10 +3758,13 @@ body.dark-mode .album-item .sort-handle {
                                 <span id="selectedFileName" class="status-text">未选择任何文件</span>
                             </div>
                             <input type="text" id="fileNameInput" class="modal-input" placeholder="可修改文件名（可选）"/>
-                            <button id="uploadBtn" class="modal-button">上传文件</button>
-                            <div id="progressContainer" class="progress-container">
-                                <div id="uploadProgressBar" class="progress-bar"></div>
-                            </div>
+<button id="uploadBtn" class="modal-button">上传文件</button>
+<div id="progressContainer" class="progress-container">
+    <div class="progress-bar-wrapper">
+        <div id="uploadProgressBar" class="progress-bar"></div>
+    </div>
+    <button id="upload-cancel-btn" title="终止上传">✖</button>
+</div>
                         </div>
                         <div id="file-list-container">
                             <ul id="fileList"></ul>
@@ -4706,7 +4883,7 @@ const getDefaultConfig = () => ({
     }
 
 
-    async function saveToGithub(path, content, commitMessage, sha = null) { // sha is now effectively a fallback
+    async function saveToGithub(path, content, commitMessage, sha = null, signal = null) {
         if (!checkConfig(true)) {
             updateSyncStatus('error', '配置不完整，无法同步。');
             return { sha: null, error: "配置不完整" };
@@ -4715,37 +4892,35 @@ const getDefaultConfig = () => ({
         const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
         const body = { message: commitMessage, content: content, branch: 'main' };
 
-        // ============ [核心修复逻辑 V2] ============
-        // 在每次写入前，都主动获取最新的 sha，从根本上解决冲突问题
         try {
-            const { data: remoteFileData, response: fetchResponse } = await fetchFromGithub(path);
-            // 如果文件存在(响应不是404)，就使用它的 sha
+            const { data: remoteFileData, response: fetchResponse } = await fetchFromGithub(path, 'GET', null, signal);
+            
+            if (signal?.aborted) {
+                console.log('Save cancelled during SHA fetch.');
+                return { sha: null, error: '用户取消了操作' };
+            }
+
             if (fetchResponse && fetchResponse.status !== 404 && remoteFileData && remoteFileData.sha) {
-                console.log(`Fetched latest sha for "${path}" before saving.`);
                 body.sha = remoteFileData.sha;
-            } else {
-                // 如果文件不存在 (404)，则不提供 sha，这是创建新文件的正确行为
-                console.log(`File "${path}" not found on remote. Proceeding with creation.`);
             }
         } catch (e) {
-            // 如果在获取 sha 的过程中出错，则中止保存操作
+            if (e.name === 'AbortError') return { sha: null, error: "用户取消了操作" };
             const userMessage = await handleApiError(`准备写入 ${path} 时`, e);
             updateSyncStatus('error', userMessage);
             return { sha: null, error: userMessage };
         }
-        // =========================================
 
         try {
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` },
                 body: JSON.stringify(body),
-                cache: 'no-cache'
+                cache: 'no-cache',
+                signal: signal // Pass signal to the final PUT request
             });
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                // 专门处理仍然可能发生的、极小概率的竞争条件
                 if (response.status === 409 || response.status === 422 || (errorData.message && errorData.message.includes("sha "))) {
                     const conflictMessage = `同步冲突：在您保存的瞬间，云端数据被另一处修改。请稍后重试。`;
                     updateSyncStatus('error', conflictMessage);
@@ -4757,14 +4932,17 @@ const getDefaultConfig = () => ({
             const data = await response.json();
             updateSyncStatus('synced', '同步成功！');
             
-            // [重要] 返回新的 sha，以便全局变量可以更新
             const newSha = data.content.sha;
             if (path === 'config.json') configSha = newSha;
-            if (path === 'memory/data.json') MemoryApp.updateSha(newSha); // 需要在MemoryApp中添加一个更新sha的函数
+            if (path === 'memory/data.json') MemoryApp.updateSha(newSha);
             
             return { sha: newSha, error: null };
             
         } catch (error) {
+            if (error.name === 'AbortError') {
+                console.log('Save cancelled during PUT request.');
+                return { sha: null, error: '用户取消了操作' };
+            }
             const userMessage = await handleApiError(`写入 ${path}`, error);
             updateSyncStatus('error', userMessage);
             return { sha: null, error: userMessage };
@@ -4772,54 +4950,38 @@ const getDefaultConfig = () => ({
     }
 
     
-    async function uploadFileViaGitData({ file, path, commitMessage, onProgress }) {
+    async function uploadFileViaGitData({ file, path, commitMessage, onProgress, signal }) {
         if (!checkConfig(true)) throw new Error("GitHub未配置");
-        const { owner, repo, token, branch = 'main' } = GITHUB_CONFIG;
-
-        const content = await new Promise((resolve, reject) => {
+        
+        const contentB64 = await new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onload = () => resolve(reader.result.split(',')[1]); 
             reader.onerror = reject;
+            if (signal) {
+                signal.addEventListener('abort', () => reject(new DOMException('Aborted by user', 'AbortError')));
+            }
             reader.readAsDataURL(file);
         });
 
-        const blobUrl = `https://api.github.com/repos/${owner}/${repo}/git/blobs`;
-        const blobResponse = await new Promise((resolve, reject) => {
-            activeUploadXHR = new XMLHttpRequest();
-            activeUploadXHR.open("POST", blobUrl, true);
-            activeUploadXHR.setRequestHeader("Authorization", `token ${token}`);
-            activeUploadXHR.setRequestHeader("Content-Type", "application/json");
-            activeUploadXHR.upload.onprogress = (event) => { if (event.lengthComputable) onProgress((event.loaded / event.total) * 90); };
-            activeUploadXHR.onload = () => {
-                if (activeUploadXHR.status === 201) resolve(JSON.parse(activeUploadXHR.responseText));
-                else reject(new Error(`${activeUploadXHR.status}: ${activeUploadXHR.responseText}`));
-            };
-            activeUploadXHR.onerror = () => reject(new Error("网络错误，Blob创建失败。"));
-            activeUploadXHR.onabort = () => reject(new Error("上传已取消。"));
-            activeUploadXHR.send(JSON.stringify({ content, encoding: "base64" }));
-        });
-        const blobSha = blobResponse.sha;
-        activeUploadXHR = null;
-        onProgress(95);
+        if (signal?.aborted) throw new DOMException('Aborted by user', 'AbortError');
 
-        const refUrl = `https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`;
-        const refData = await (await fetch(refUrl, { headers: { 'Authorization': `token ${token}` } })).json();
-        const parentCommitSha = refData.object.sha;
+        if (onProgress) onProgress(50);
+        
+        // Pass the signal to saveToGithub
+        const result = await saveToGithub(path, contentB64, commitMessage, null, signal);
 
-        const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees`;
-        const treeBody = { base_tree: parentCommitSha, tree: [{ path, mode: "100644", type: "blob", sha: blobSha }] };
-        const treeData = await (await fetch(treeUrl, { method: 'POST', headers: { 'Authorization': `token ${token}` }, body: JSON.stringify(treeBody) })).json();
-        const newTreeSha = treeData.sha;
+        if (signal?.aborted) throw new DOMException('Aborted by user', 'AbortError');
 
-        const commitUrl = `https://api.github.com/repos/${owner}/${repo}/git/commits`;
-        const commitBody = { message: commitMessage, tree: newTreeSha, parents: [parentCommitSha] };
-        const commitData = await (await fetch(commitUrl, { method: 'POST', headers: { 'Authorization': `token ${token}` }, body: JSON.stringify(commitBody) })).json();
-        const newCommitSha = commitData.sha;
+        if (onProgress) onProgress(100);
 
-        await fetch(refUrl, { method: 'PATCH', headers: { 'Authorization': `token ${token}` }, body: JSON.stringify({ sha: newCommitSha }) });
-        onProgress(100);
-        return { sha: blobSha, path };
+        if (result.sha) {
+            return { sha: result.sha, path: path };
+        } else {
+            // Propagate the error message from saveToGithub
+            throw new Error(result.error || "未知上传错误");
+        }
     }
+
 
     async function deleteFromGithub(path, commitMessage, sha, ignoreNotFound = false) {
         if (!checkConfig(true)) return false;
@@ -6054,7 +6216,10 @@ const getDefaultConfig = () => ({
         }
         function renderAlbumFolders() {
             ui.albumList.innerHTML = '';
-            memoryCache.album.folders.forEach(folder => {
+            // [修改] 如果存在排序，则使用排序后的数组，否则使用原数组
+            const foldersToRender = memoryCache.album.folders;
+
+            foldersToRender.forEach(folder => {
                 const itemCount = memoryCache.album.items.filter(p => p.albumId === folder.id).length;
                 const isSelected = state.albumFoldersToDelete.includes(folder.id);
                 const el = document.createElement('div');
@@ -6064,17 +6229,29 @@ const getDefaultConfig = () => ({
                 el.innerHTML = `<span class="sort-handle" title="按住拖拽排序">☰</span><input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">🖼️</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${itemCount} 个项目</div>`;
 
                 
-                // [新增] 应用自定义背景
+                // [核心修正] 处理自定义背景逻辑
                 if (folder.background) {
                     el.classList.add('has-custom-bg');
-                    el.style.backgroundImage = `url(${folder.background})`;
                     el.style.backgroundSize = 'cover';
                     el.style.backgroundPosition = 'center';
+                    
+                    // 判断 background 是 Base64 还是路径
+                    if (folder.background.startsWith('data:image')) {
+                        // 兼容可能存在的旧数据
+                        el.style.backgroundImage = `url(${folder.background})`;
+                    } else {
+                        // 新的路径方案，需要异步获取安全URL
+                        getSecureFileUrl(folder.background).then(secureUrl => {
+                            if (secureUrl) {
+                                el.style.backgroundImage = `url(${secureUrl})`;
+                            }
+                        });
+                    }
                 }
 
                 ui.albumList.appendChild(el);
             });
-            if (memoryCache.album.folders.length === 0) ui.albumList.innerHTML = `<p class="empty-list-placeholder">没有相册</p>`;
+            if (foldersToRender.length === 0) ui.albumList.innerHTML = `<p class="empty-list-placeholder">没有相册</p>`;
         }
 
         function renderPhotos() {
@@ -6448,28 +6625,52 @@ const getDefaultConfig = () => ({
                 renderPhotos();
             },
 
-            // [新增] 设置相册背景的action
+            // [V2 修正] 使用文件上传机制设置相册背景
             'set-album-bg': () => {
+                // 1. 创建一个文件选择器
                 const input = document.createElement('input');
                 input.type = 'file';
                 input.accept = 'image/*';
-                input.onchange = e => {
+
+                // 2. 监听文件选择事件
+                input.onchange = async e => {
                     const file = e.target.files[0];
                     if (!file) return;
 
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const backgroundUrl = event.target.result;
+                    // 3. 立即显示加载状态，提升用户体验
+                    showTopToast('正在上传背景图...', 60000); // 长时间提示以防上传慢
+
+                    try {
+                        // 4. 定义上传路径和唯一文件名
+                        const ALBUM_BG_PATH = 'memory/album_backgrounds/';
+                        const path = `${ALBUM_BG_PATH}bg-${state.currentAlbumId}-${Date.now()}.${file.name.split('.').pop()}`;
+                        
+                        // 5. 调用文件上传函数（复用已有逻辑）
+                        const result = await uploadFileViaGitData({
+                            file,
+                            path,
+                            commitMessage: `Update album background for ID ${state.currentAlbumId}`,
+                            onProgress: (p) => { /* 可以在这里更新提示，暂时省略 */ }
+                        });
+
+                        // 6. 核心：只保存返回的路径
                         const album = memoryCache.album.folders.find(f => f.id === state.currentAlbumId);
                         if (album) {
-                            album.background = backgroundUrl;
+                            album.background = result.path; // 只保存路径！
                             scheduleSave();
-                            renderAlbumFolders(); // 返回相册列表时会看到更新
-                            showTopToast('相册背景已设置！', 2000);
+                            renderAlbumFolders(); // 重新渲染当前相册列表，即时看到效果
+                            renderPhotos(); // 刷新照片视图，背景图可能也需要在这里更新
+                            showTopToast('相册背景已成功设置！', 2000);
                         }
-                    };
-                    reader.readAsDataURL(file);
+                    } catch (error) {
+                        console.error("Failed to upload album background:", error);
+                        const userMessage = await handleApiError("上传背景图", error);
+                        alert(`上传失败: ${userMessage}`);
+                        showTopToast('上传背景图失败', 3000);
+                    }
                 };
+                
+                // 7. 触发文件选择
                 input.click();
             },
 
@@ -6533,26 +6734,81 @@ const getDefaultConfig = () => ({
         async function processPhotoUploadQueue() {
             if (state.photoUploadQueue.length === 0) return;
             const totalPhotos = state.photoUploadQueue.length;
-            
+
+            // --- 新增：弹窗及取消逻辑 V2 ---
+            let popupEl = null; 
+            window.photoUploadAbortController = new AbortController();
+            const signal = window.photoUploadAbortController.signal;
+
+            function createOrUpdatePopup(status, progress) {
+                if (signal.aborted) return;
+                if (!popupEl) {
+                    popupEl = document.createElement('div');
+                    popupEl.className = 'upload-progress-popup';
+                    popupEl.innerHTML = `
+                        <div class="popup-status-container">
+                            <span class="popup-status-text"></span>
+                            <button class="popup-cancel-btn" title="取消上传">✖</button>
+                        </div>
+                        <div class="popup-progress-container"><div class="popup-progress-bar"></div></div>`;
+                    document.body.appendChild(popupEl);
+                    popupEl.querySelector('.popup-cancel-btn').addEventListener('click', () => {
+                        if (window.photoUploadAbortController) window.photoUploadAbortController.abort();
+                    });
+                    setTimeout(() => popupEl.classList.add('show'), 50);
+                }
+
+                const statusTextEl = popupEl.querySelector('.popup-status-text');
+                const progressBarEl = popupEl.querySelector('.popup-progress-bar');
+                const cancelBtnEl = popupEl.querySelector('.popup-cancel-btn');
+
+                statusTextEl.textContent = status;
+                progressBarEl.style.width = `${progress}%`;
+
+                if (status.includes('成功') || status.includes('失败') || status.includes('取消') || status.includes('完成')) {
+                    cancelBtnEl.style.display = 'none';
+                    setTimeout(() => {
+                        if (popupEl) {
+                            popupEl.classList.remove('show');
+                            popupEl.addEventListener('transitionend', () => popupEl.remove(), { once: true });
+                            popupEl = null;
+                        }
+                    }, 3000);
+                } else {
+                    cancelBtnEl.style.display = 'block';
+                }
+            }
+
+            const modalObserver = new MutationObserver(mutations => {
+                for (const mutation of mutations) {
+                    if (mutation.attributeName === 'class' && !mutation.target.classList.contains('show') && state.photoUploadQueue.length > 0) {
+                        createOrUpdatePopup(`后台上传中 (0/${totalPhotos})`, 0);
+                        modalObserver.disconnect();
+                        return;
+                    }
+                }
+            });
+            modalObserver.observe(document.getElementById('memoryModal'), { attributes: true });
+
+            // --- 原有逻辑 ---
             state.skipAllPhotoDetails = false;
             let isPhotoSetMode = false;
-
             const isBatch = totalPhotos > 1;
             ui.photosetToggleContainer.style.display = isBatch ? 'block' : 'none';
             ui.photosetToggle.checked = isBatch;
-
             let photosetData = { id: Date.now(), albumId: state.currentAlbumId, type: 'photoset', title: '', description: '', timestamp: Date.now(), photos: [] };
             
             try {
                 for (let i = 0; i < totalPhotos; i++) {
-                    const file = state.photoUploadQueue[i];
-                    let title = '';
-                    let description = '';
-                    
-                    const shouldShowModal = i === 0 || (!isPhotoSetMode && !state.skipAllPhotoDetails);
+                    if (signal.aborted) throw new Error("上传已取消");
 
-                    if (shouldShowModal) {
+                    const file = state.photoUploadQueue[i];
+                    let title = '', description = '';
+                    const shouldShowModal = i === 0 || (!isPhotoSetMode && !state.skipAllPhotoDetails);
+                    
+                    if (shouldShowModal && !popupEl) { // 仅当弹窗不存在时才显示模态框
                         updateStatus(`等待用户输入... (${i + 1}/${totalPhotos})`);
+                        // 以下是原有的等待用户输入的 Promise 逻辑
                         ui.photoDetailsModal.querySelector('#upload-thumbnail').src = URL.createObjectURL(file);
                         ui.photoDetailsModal.querySelector('#photo-details-modal-title').textContent = isBatch ? `上传照片 (${i + 1}/${totalPhotos})` : '添加照片信息';
                         ui.photoDetailsModal.classList.add('show');
@@ -6560,11 +6816,7 @@ const getDefaultConfig = () => ({
                         await new Promise(resolve => {
                             const saveHandler = () => { state.isSavingPhoto = true; cleanupAndResolve(); };
                             const skipHandler = () => { actions['skip-photo-details'](); state.isSavingPhoto = false; cleanupAndResolve(); };
-                            const cleanupAndResolve = () => {
-                                saveBtn.removeEventListener('click', saveHandler);
-                                skipBtn.removeEventListener('click', skipHandler);
-                                resolve();
-                            };
+                            const cleanupAndResolve = () => { saveBtn.removeEventListener('click', saveHandler); skipBtn.removeEventListener('click', skipHandler); resolve(); };
                             const saveBtn = ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]');
                             const skipBtn = ui.photoDetailsModal.querySelector('[data-action="skip-photo-details"]');
                             saveBtn.addEventListener('click', saveHandler, { once: true });
@@ -6576,31 +6828,29 @@ const getDefaultConfig = () => ({
                             description = document.getElementById('photo-desc-input').value.trim();
                         }
                         if (i === 0) isPhotoSetMode = document.getElementById('create-photoset-toggle').checked;
-                        
                         ui.photoDetailsModal.classList.remove('show');
                         document.getElementById('photo-title-input').value = '';
                         document.getElementById('photo-desc-input').value = '';
                     }
 
-                    // [修改] 调用新的 uploadPhoto 并传入进度回调
                     const photoData = await uploadPhoto(file, (percent) => {
-                         let progressText = Math.round(percent) + '%';
-                         updateStatus(`上传中 (${i + 1}/${totalPhotos}): ${progressText}`);
-                    });
+                        const fileProgress = percent / 100;
+                        const currentOverallProgress = ((i + fileProgress) / totalPhotos) * 100;
+                        // 注意：相册上传没有精确的字节进度，所以这里只显示文件计数
+                        const statusMessage = `上传中 (${i + 1}/${totalPhotos})`; 
+                        if (popupEl) {
+                            createOrUpdatePopup(statusMessage, currentOverallProgress);
+                        } else {
+                            updateStatus(statusMessage);
+                        }
+                    }, signal);
                     
                     if (photoData) {
                         if (isPhotoSetMode) {
                             photosetData.photos.push(photoData);
-                            if (i === 0) {
-                                photosetData.title = title;
-                                photosetData.description = description;
-                            }
+                            if (i === 0) { photosetData.title = title; photosetData.description = description; }
                         } else {
-                            memoryCache.album.items.push({
-                                id: Date.now() + i, albumId: state.currentAlbumId, type: 'photo',
-                                title: title, description: description, timestamp: Date.now(),
-                                ...photoData
-                            });
+                            memoryCache.album.items.push({ id: Date.now() + i, albumId: state.currentAlbumId, type: 'photo', title, description, timestamp: Date.now(), ...photoData });
                         }
                     }
                 } // 循环结束
@@ -6609,35 +6859,47 @@ const getDefaultConfig = () => ({
                     memoryCache.album.items.push(photosetData);
                 }
 
-                updateStatus('上传完成，正在整理...');
+                if (popupEl) createOrUpdatePopup('上传完成！', 100);
+                else updateStatus('上传完成，正在整理...');
+                
                 state.photoUploadQueue = [];
                 renderPhotos();
                 scheduleSave();
 
             } catch (error) {
-                // [新增] 统一的错误处理
-                updateStatus('上传失败', true, error.message);
-                alert(error.message); // 给用户一个明确的弹窗提示
-                state.photoUploadQueue = []; // 清空队列
+                const userMessage = error.message === "上传已取消" ? '已取消' : '上传失败';
+                if (popupEl) createOrUpdatePopup(userMessage, userMessage === '已取消' ? 0 : 100);
+                else if (userMessage === '已取消') showTopToast('上传已取消', 2000);
+                else updateStatus('上传失败', true, error.message);
+                
+                if (userMessage === '上传失败') alert(error.message);
+                state.photoUploadQueue = [];
+
+            } finally {
+                modalObserver.disconnect();
+                window.photoUploadAbortController = null; // 清理
             }
         }
 
-
-        async function uploadPhoto(file, onProgressCallback) {
+        async function uploadPhoto(file, onProgressCallback, signal) {
             try {
                 const path = `${MEMORY_PHOTOS_PATH}${Date.now()}_${file.name}`;
                 const result = await uploadFileViaGitData({ 
                     file, 
                     path, 
                     commitMessage: `Upload photo: ${file.name}`, 
-                    onProgress: onProgressCallback // [修改] 传递进度回调
+                    onProgress: onProgressCallback,
+                    signal: signal // Pass signal down
                 });
                 return { path: result.path, sha: result.sha };
             } catch (error) {
-                // [修改] 不再弹窗，而是向上抛出错误，由调用者统一处理
+                if (error.name === 'AbortError') {
+                    throw new Error("上传已取消"); // Pass a user-friendly message up
+                }
                 throw new Error(`上传照片 ${file.name} 失败: ${await handleApiError('上传照片', error)}`);
             }
         }
+
 
        
               function populateDriveCategorySelector() {
@@ -6888,84 +7150,142 @@ const getDefaultConfig = () => ({
                 el.style.pointerEvents = "auto";
             }
         }
-                async function uploadFile() {
-    if (activeUploadXHR) { activeUploadXHR.abort(); return; }
-    if (!checkConfig()) return;
+        async function uploadFile() {
+    if (activeUploadXHR) {
+        if(confirm("当前有文件正在上传，要终止它吗？")) {
+             activeUploadXHR.abort();
+        }
+        return;
+    }
+    if (!checkConfig(true)) return;
 
     const selectedProjectHref = ui.projectSelector.value;
     const file = ui.fileUploader.files[0];
     let fileName = ui.fileNameInput.value.trim() || (file && file.name);
 
-    if (!selectedProjectHref || !file || !fileName) {
-        return alert("请选择要上传到的项目、文件，并确保文件名不为空。");
-    }
-
+    if (!selectedProjectHref || !file || !fileName) { return alert("请选择要上传到的项目、文件，并确保文件名不为空。"); }
     const projectConfig = findButtonConfigByHref(selectedProjectHref);
-    if (!projectConfig) {
-        return alert("此项目配置无效。");
+    if (!projectConfig) { return alert("此项目配置无效。"); }
+
+    const projectName = projectConfig.text;
+    const folderName = projectName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-");
+    const path = `jellyfish_drive/${folderName}/${fileName}`;
+    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
+
+    // --- UI 准备 (V2 弹窗) ---
+    let popupEl = null;
+
+    function createOrUpdatePopup(status, progress) {
+        if (!popupEl) {
+            popupEl = document.createElement('div');
+            popupEl.className = 'upload-progress-popup';
+            popupEl.innerHTML = `
+                <div class="popup-status-container">
+                    <span class="popup-status-text"></span>
+                    <button class="popup-cancel-btn" title="取消上传">✖</button>
+                </div>
+                <div class="popup-progress-container"><div class="popup-progress-bar"></div></div>`;
+            document.body.appendChild(popupEl);
+            popupEl.querySelector('.popup-cancel-btn').addEventListener('click', () => { if (activeUploadXHR) activeUploadXHR.abort(); });
+            setTimeout(() => popupEl.classList.add('show'), 50);
+        }
+
+        const statusTextEl = popupEl.querySelector('.popup-status-text');
+        const progressBarEl = popupEl.querySelector('.popup-progress-bar');
+        const cancelBtnEl = popupEl.querySelector('.popup-cancel-btn');
+
+        statusTextEl.textContent = status;
+        progressBarEl.style.width = `${progress}%`;
+
+        // 如果上传完成（成功/失败/取消），隐藏取消按钮并准备自动关闭
+        if (status.includes('成功') || status.includes('失败') || status.includes('取消')) {
+            cancelBtnEl.style.display = 'none';
+            setTimeout(() => {
+                if (popupEl) {
+                    popupEl.classList.remove('show');
+                    popupEl.addEventListener('transitionend', () => popupEl.remove(), { once: true });
+                    popupEl = null; // 重置
+                }
+            }, 3000);
+        } else {
+            cancelBtnEl.style.display = 'block';
+        }
     }
     
-    const projectName = projectConfig.text;
-    const folderName = projectName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-") || `project-${Date.now()}`;
-    const basePath = `jellyfish_drive/${folderName}`;
-    const path = `${basePath}/${fileName}`;
+    // --- 监听主上传模态框的关闭 ---
+    const modalObserver = new MutationObserver(mutations => {
+        for (const mutation of mutations) {
+            if (mutation.attributeName === 'class' && !mutation.target.classList.contains('show') && activeUploadXHR) {
+                // 当模态框关闭时，创建或更新左下角的弹窗
+                const percent = parseInt(ui.progressBar.style.width, 10) || 0;
+                createOrUpdatePopup(`后台上传中... ${percent}%`, percent);
+                modalObserver.disconnect();
+                return;
+            }
+        }
+    });
+    modalObserver.observe(document.getElementById('memoryModal'), { attributes: true });
 
-    ui.uploadBtn.disabled = true;
-    ui.uploadBtn.textContent = "上传中 (0%)...";
-    ui.progressContainer.style.display = 'block';
-    ui.progressBar.style.width = '0%';
+    // --- 核心上传逻辑 ---
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+        const contentB64 = reader.result.split(',')[1];
+        const { data: existingFile } = await fetchFromGithub(path);
+        
+        const body = { message: `Upload ${fileName} to Drive`, content: contentB64, branch: 'main', sha: existingFile?.sha };
+        
+        activeUploadXHR = new XMLHttpRequest();
+        activeUploadXHR.open('PUT', url, true);
+        activeUploadXHR.setRequestHeader('Authorization', `token ${GITHUB_CONFIG.token}`);
+        activeUploadXHR.setRequestHeader('Content-Type', 'application/json');
+        
+        const uploadCancelBtn = document.getElementById('upload-cancel-btn');
+        const uploadCancelHandler = () => { if (activeUploadXHR) activeUploadXHR.abort(); };
+        uploadCancelBtn.addEventListener('click', uploadCancelHandler);
 
-    try {
-        const result = await uploadFileViaGitData({ 
-            file, 
-            path, 
-            commitMessage: `Upload ${fileName} to Drive/${projectName}`, 
-            onProgress: (percent) => { 
-                ui.progressBar.style.width = `${percent}%`; 
-                if (percent < 100) { 
-                    ui.uploadBtn.textContent = `上传中 (${Math.round(percent)}%)...`; 
-                } else { 
-                    ui.uploadBtn.textContent = '正在处理...'; 
-                } 
-            } 
-        });
+        activeUploadXHR.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+                const percent = (e.loaded / e.total) * 100;
+                // 如果弹窗已存在（即模态框已关闭），则更新弹窗；否则更新模态框内的进度条
+                if(popupEl) {
+                    createOrUpdatePopup(`后台上传中... ${Math.round(percent)}%`, percent);
+                } else {
+                    ui.progressBar.style.width = `${percent}%`;
+                }
+            }
+        };
+        activeUploadXHR.onload = function() {
+            if (this.status >= 200 && this.status < 300) {
+                showTopToast("上传成功！", 2000);
+                if(popupEl) createOrUpdatePopup("上传成功！", 100);
+                fetchFilesForSelectedProject();
+                ui.fileUploader.value = "";
+                ui.fileNameInput.value = "";
+                ui.selectedFileName.textContent = '未选择任何文件';
+            } else {
+                const errorMsg = JSON.parse(this.responseText).message || `HTTP ${this.status}`;
+                if(popupEl) createOrUpdatePopup(`上传失败`, 100);
+                alert(`上传失败: ${errorMsg}`);
+            }
+            cleanup();
+        };
+        activeUploadXHR.onerror = () => { if(popupEl) createOrUpdatePopup("网络错误", 100); alert("上传失败，请检查网络连接。"); cleanup(); };
+        activeUploadXHR.onabort = () => { showTopToast("上传已取消", 2000); if(popupEl) createOrUpdatePopup("已取消", 100); cleanup(); };
 
-        // --- [核心修复] ---
-        // 直接在本地构建新文件对象，并添加到UI，而不是重新从服务器获取整个列表
-        ui.fileListStatus.style.display = "none";
-        const newFile = {
-            name: fileName,
-            path: path,
-            sha: result.sha, // 使用上传后返回的精确sha
-            size: file.size
+        const cleanup = () => {
+            uploadCancelBtn.removeEventListener('click', uploadCancelHandler);
+            ui.progressContainer.style.display = 'none';
+            activeUploadXHR = null;
+            modalObserver.disconnect();
         };
 
-        const li = document.createElement("li");
-        const sizeText = `${(newFile.size / 1024).toFixed(1)} KB`;
-        li.innerHTML = `<div class="file-info"><span class="file-name">${newFile.name}</span><span class="file-meta" data-path="${newFile.path}">${sizeText}</span></div><button class="delete-btn">&times;</button>`;
-        ui.fileList.appendChild(li);
-
-        li.querySelector(".file-info").addEventListener("click", () => forceDownload(newFile.path, newFile.name, li));
-        li.querySelector(".delete-btn").addEventListener("click", () => deleteFile(newFile.path, newFile.sha, li));
-        // --- [修复结束] ---
-
-        alert("上传成功！");
-        ui.fileUploader.value = "";
-        ui.fileNameInput.value = "";
-        ui.selectedFileName.textContent = '未选择任何文件';
-
-    } catch (error) {
-        if (error.message !== "上传已取消。") {
-            alert(await handleApiError(`上传文件 ${fileName}`, error));
-        }
-    } finally {
-        ui.uploadBtn.disabled = false;
-        ui.uploadBtn.textContent = "上传文件";
-        ui.progressContainer.style.display = 'none';
-    }
+        ui.progressContainer.style.display = 'flex';
+        ui.progressBar.style.width = '0%';
+        activeUploadXHR.send(JSON.stringify(body));
+    };
+    reader.onerror = () => { alert("读取文件失败！"); };
 }
-
-
 
         return {
             open: () => {
@@ -8396,7 +8716,11 @@ const blob = b64toBlob(blobData.content, contentType);
                 if (typeof onCompleteCallback === 'function') {
                     onCompleteCallback();
                 }
+                
+                // === 新增：显示成功提示 ===
+                showTopToast("小组件已添加", 2000);
             }
+
 
             async function deleteWidgetFromCell(cellIndex) {
                 delete currentConfig.lockscreenWidgets[cellIndex];
@@ -8410,6 +8734,9 @@ const blob = b64toBlob(blobData.content, contentType);
                 if (settingsModal?.classList.contains('show')) {
                     renderSettingsGrid(settingsModal.querySelector('.settings-grid'));
                 }
+                
+                // === 新增：显示成功提示 ===
+                showTopToast("小组件已删除", 2000);
             }
 
 
@@ -8480,12 +8807,24 @@ const blob = b64toBlob(blobData.content, contentType);
             }
 
             
-            async function ensureMemoryDataIsLoaded(signal) {
-                if (memoryCache && memoryCache.album) {
+             async function ensureMemoryDataIsLoaded(signal) {
+                // 如果内存中已有缓存，直接返回成功
+                if (memoryCache && memoryCache.album && memoryCache.memo) {
                     return { success: true };
                 }
 
                 const MEMORY_DATA_PATH = 'memory/data.json';
+
+                const getInitialData = () => ({ 
+                    memo: { 
+                        folders: [{ id: Date.now(), name: "默认文件夹" }], 
+                        notes: [] 
+                    }, 
+                    album: { 
+                        folders: [{ id: Date.now() + 1, name: "我的照片" }],
+                        items: [] 
+                    } 
+                });
                 
                 try {
                     const { data, error, response } = await fetchFromGithub(MEMORY_DATA_PATH, 'GET', null, signal);
@@ -8496,31 +8835,43 @@ const blob = b64toBlob(blobData.content, contentType);
                     }
 
                     if (error) {
-                        alert(`加载相册数据失败: ${error}\n\n请检查您的网络连接和GitHub配置。`);
+                        alert(`加载记忆数据失败: ${error}\n\n请检查您的网络连接和GitHub配置。`);
                         return { success: false, reason: 'error' };
                     }
                     
-                    if (response && response.status === 404) {
-                         console.log('memory/data.json not found on remote. Creating new initial data.');
-                         const getInitialData = () => ({ memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] }, album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] } });
-                         memoryCache = getInitialData();
-                    } else if (data) {
-                        memoryCache = JSON.parse(b64_to_utf8(data.content));
+                    let loadedData = null;
+                    if ((response && response.status === 404) || !data || !data.content) {
+                         console.log('memory/data.json not found or is empty on remote. Using initial data.');
+                         loadedData = getInitialData();
                     } else {
-                        throw new Error("从云端获取的数据为空，但没有明确错误。");
+                        // 只有在确定内容非空时才尝试解析
+                        loadedData = JSON.parse(b64_to_utf8(data.content));
                     }
-                    if (!memoryCache.memo) memoryCache.memo = { folders: [], notes: [] };
-                    if (!memoryCache.album) memoryCache.album = { folders: [], items: [] };
+
+                    // [核心最终修复] 使用正确的 mergeDeep 顺序
+                    // 1. 创建一个全新的空对象 {} 作为安全的目标。
+                    // 2. 将 defaultConfig (最新的数据结构) 合并进去作为基础。
+                    // 3. 将 loadedData (你的数据) 合并进去，你的数据会覆盖掉默认值，从而被完整保留。
+                    const defaultConfig = getInitialData();
+                    memoryCache = mergeDeep({}, defaultConfig, loadedData);
+
+                    // 兼容旧版 `photos` 字段到 `items` 的迁移
+                    if (memoryCache.album && memoryCache.album.photos && (!memoryCache.album.items || memoryCache.album.items.length === 0)) {
+                        console.log("Migrating legacy 'photos' array to 'items'.");
+                        memoryCache.album.items = memoryCache.album.photos.map(p => ({...p, type: 'photo'}));
+                        delete memoryCache.album.photos;
+                    }
 
                     return { success: true };
 
                 } catch (e) {
+                    // 捕获所有致命错误，包括JSON解析失败
                     console.error('Critical error in ensureMemoryDataIsLoaded:', e);
-                    alert(`处理相册数据时发生严重错误: ${e.message}\n\n这可能是因为云端文件已损坏。您可以尝试进入“记忆”功能，它会自动尝试修复或重建数据。`);
+                    alert(`处理记忆数据时发生严重错误: ${e.message}\n\n这可能是因为云端文件格式已损坏。您可以尝试进入“记忆”功能，它会自动尝试修复或重建数据。`);
                     return { success: false, reason: 'critical' };
                 }
             }
-            
+
             function openLockscreenSettingsWindow() {
                 const modalId = 'lockscreen-settings-modal';
                 // [修复] 移除防止重复创建的判断，因为关闭时元素会被彻底销毁，需要能够重新创建
@@ -9414,6 +9765,14 @@ const blob = b64toBlob(blobData.content, contentType);
                     price: '无偿',            // 【必填】如：免费、19.9元、未知
                     status: '开放'         // 【必填】如：在售、已停售、群内获取
                 },
+ {
+                    id: 'youzi-phone',    // 【必填】一个全英文、不重复的唯一ID
+                    name: '柚子机',          // 【必填】手机的显示名称
+                    authorId: '5007799940',       // 【必填】作者的小红书或QQ号
+                    acquisition: 'QQ群',   // 【必填】如何获取，如：QQ群号、链接等
+                    price: '无偿',            // 【必填】如：免费、19.9元、未知
+                    status: '开放测试'         // 【必填】如：在售、已停售、群内获取
+                },
                 // 在这里继续添加新的手机对象...
             ];
 
@@ -9481,6 +9840,8 @@ const blob = b64toBlob(blobData.content, contentType);
                 document.getElementById('phone-comments-title').textContent = `${phoneName} - 安利区`;
                 commentsModal.classList.add('show');
             }
+
+
             
             // ★★★ 核心修改：渲染函数现在接受一个数据数组作为参数
             function renderPhoneList(phonesToRender) {
