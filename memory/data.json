@@ -95,6 +95,16 @@
         "timestamp": 1760597168265,
         "path": "memory/photos/1760597162109_微信图片_20250924225920_43_14.jpg",
         "sha": "34a5240d698f4ebddd95d8fba3ef4f8afe90689e"
+      },
+      {
+        "id": 1760600334617,
+        "albumId": 1760546437538,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1760600334617,
+        "path": "memory/photos/1760600330194_icon.png",
+        "sha": "56234c97b6159089ef88d46bc1103ff3ee0580d3"
       }
     ]
   }
