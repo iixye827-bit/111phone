@@ -295,6 +295,26 @@
             "sha": "cec03660341f2e16baac0dc6b9ab4ee640062583"
           }
         ]
+      },
+      {
+        "id": 1760603009283,
+        "albumId": 1760546437538,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1760603009283,
+        "path": "memory/photos/1760603007432_rk27lkyu.jpg",
+        "sha": "933ead3ec8d5803c0274598abc50b59e6a9536f4"
+      },
+      {
+        "id": 1760603011668,
+        "albumId": 1760546437538,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1760603011667,
+        "path": "memory/photos/1760603009283_95ohy1dm.jpg",
+        "sha": "8ac0a25554c09d5e2e04219259dabe84caaab542"
       }
     ]
   }
