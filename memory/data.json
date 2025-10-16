@@ -235,6 +235,44 @@
             "sha": "5a117f20f7ef50ce9d1b23de95e78b9c4e91c594"
           }
         ]
+      },
+      {
+        "id": 1760602043341,
+        "albumId": 1760546447393,
+        "type": "photoset",
+        "title": "",
+        "description": "",
+        "timestamp": 1760602043341,
+        "photos": [
+          {
+            "path": "memory/photos/1760602044432_ikvjgl2r.png",
+            "sha": "5df39db5d3952ce66fc6bf13f4d5aa6f60e16a3e"
+          },
+          {
+            "path": "memory/photos/1760602048416_qs2nc25g.jpeg",
+            "sha": "cca238a06740a71a1551c8a24de4d0396fff1c24"
+          },
+          {
+            "path": "memory/photos/1760602051300_oadadyco.jpeg",
+            "sha": "9d7cdf3479c4fbd34e4243cce2a81bb448619fd3"
+          },
+          {
+            "path": "memory/photos/1760602053980_1r02wqgy.jpeg",
+            "sha": "5a117f20f7ef50ce9d1b23de95e78b9c4e91c594"
+          },
+          {
+            "path": "memory/photos/1760602056282_vp1492mn.jpeg",
+            "sha": "35c854aee2c9ae69defbc1df691893067a51a9f6"
+          },
+          {
+            "path": "memory/photos/1760602059087_dumbd57m.jpeg",
+            "sha": "08fe7ecdaecb2decf48f0736ce249c4e3161fceb"
+          },
+          {
+            "path": "memory/photos/1760602062144_rs1h9e6b.jpeg",
+            "sha": "947fddcaf41762bf171e3c6b20547e87964bbd2e"
+          }
+        ]
       }
     ]
   }
