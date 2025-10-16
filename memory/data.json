@@ -359,6 +359,16 @@
             "sha": "cec03660341f2e16baac0dc6b9ab4ee640062583"
           }
         ]
+      },
+      {
+        "id": 1760603139958,
+        "albumId": 1760544398425,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1760603139958,
+        "path": "memory/photos/1760603137161_6d5dcopd.jpg",
+        "sha": "81bc0c0a063a6b1d1248934016f5fed3ca67bc4e"
       }
     ]
   }
