@@ -2957,98 +2957,6 @@ body.dark-mode .album-item .sort-handle {
  <style id="custom-jelly-ball-styles"></style>
 
     <!-- [新增] 用于全局字体的样式标签 -->
-    <style id="global-font-style">
-/* =============================================================== */
-/* ============= [修改] 左下角上传进度弹窗样式 V2 ============ */
-/* =============================================================== */
-.upload-progress-popup {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    width: 220px; /* 减小宽度以适应简洁内容 */
-    background: rgba(255, 255, 255, 0.2); 
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    color: #4a5568; /* 深灰色字体 */
-    border-radius: 14px; /* 增加圆角 */
-    padding: 12px 15px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    z-index: 10000;
-    font-size: 13px; /* 字体比系统默认小 */
-    font-weight: 500;
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none; /* 默认不可交互 */
-}
-
-/* 夜间模式适配 */
-body.dark-mode .upload-progress-popup {
-    background: rgba(30, 30, 30, 0.4);
-    border-color: rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.8); /* 夜间模式使用半透明亮色 */
-}
-
-.upload-progress-popup.show {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    pointer-events: auto; /* 显示时可交互 */
-}
-
-/* 状态文本和取消按钮容器 */
-.popup-status-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.popup-status-text {
-    flex-grow: 1;
-}
-
-/* 取消上传按钮 */
-.popup-cancel-btn {
-    background: transparent;
-    border: none;
-    color: #999;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    line-height: 1;
-    padding: 0 5px;
-    transition: color 0.2s;
-    flex-shrink: 0;
-}
-.popup-cancel-btn:hover { color: #e53e3e; }
-body.dark-mode .popup-cancel-btn { color: #777; }
-body.dark-mode .popup-cancel-btn:hover { color: #fc8181; }
-
-/* 进度条容器 */
-.popup-progress-container {
-    height: 5px;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 2.5px;
-    overflow: hidden;
-}
-body.dark-mode .popup-progress-container {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* 进度条本体 */
-.popup-progress-bar {
-    width: 0%;
-    height: 100%;
-    background-color: var(--hold-border, #5B99E2); /* 使用主题高亮色 */
-    border-radius: 2.5px;
-    transition: width 0.2s linear;
-}
-
-
-</style>
 
 
     <!-- 手机模式滑动容器 -->
@@ -3974,6 +3882,16 @@ body.dark-mode .popup-progress-container {
     const syncErrorModal = document.getElementById('syncErrorModal');
     const iframeModal = document.getElementById('iframeModal'), iframeModalContent = iframeModal.querySelector('.iframe-modal-content'), iframeEl = document.getElementById('iframeContent'), swipeHint = document.getElementById('swipeHint'), returnConfirmationToast = document.getElementById('returnConfirmationToast');
     let activeUploadXHR = null;
+let isPhotoUploading = false; // [新增] 用于标记相册照片是否正在上传
+
+window.addEventListener('beforeunload', (event) => {
+    // [新增] 当相册照片或文件夹文件正在上传时，提示用户
+    if (isPhotoUploading || activeUploadXHR) {
+        event.preventDefault(); // 阻止默认行为
+        event.returnValue = '有文件正在上传，确定要离开吗？'; // 显示提示信息
+    }
+});
+
     const secureFileCache = new Map();
     let currentCategory = '全部';
     let photoObserver;
@@ -4883,7 +4801,7 @@ const getDefaultConfig = () => ({
     }
 
 
-    async function saveToGithub(path, content, commitMessage, sha = null, signal = null) {
+    async function saveToGithub(path, content, commitMessage, sha = null) { // sha is now effectively a fallback
         if (!checkConfig(true)) {
             updateSyncStatus('error', '配置不完整，无法同步。');
             return { sha: null, error: "配置不完整" };
@@ -4892,35 +4810,37 @@ const getDefaultConfig = () => ({
         const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
         const body = { message: commitMessage, content: content, branch: 'main' };
 
+        // ============ [核心修复逻辑 V2] ============
+        // 在每次写入前，都主动获取最新的 sha，从根本上解决冲突问题
         try {
-            const { data: remoteFileData, response: fetchResponse } = await fetchFromGithub(path, 'GET', null, signal);
-            
-            if (signal?.aborted) {
-                console.log('Save cancelled during SHA fetch.');
-                return { sha: null, error: '用户取消了操作' };
-            }
-
+            const { data: remoteFileData, response: fetchResponse } = await fetchFromGithub(path);
+            // 如果文件存在(响应不是404)，就使用它的 sha
             if (fetchResponse && fetchResponse.status !== 404 && remoteFileData && remoteFileData.sha) {
+                console.log(`Fetched latest sha for "${path}" before saving.`);
                 body.sha = remoteFileData.sha;
+            } else {
+                // 如果文件不存在 (404)，则不提供 sha，这是创建新文件的正确行为
+                console.log(`File "${path}" not found on remote. Proceeding with creation.`);
             }
         } catch (e) {
-            if (e.name === 'AbortError') return { sha: null, error: "用户取消了操作" };
+            // 如果在获取 sha 的过程中出错，则中止保存操作
             const userMessage = await handleApiError(`准备写入 ${path} 时`, e);
             updateSyncStatus('error', userMessage);
             return { sha: null, error: userMessage };
         }
+        // =========================================
 
         try {
             const response = await fetch(url, {
                 method: 'PUT',
                 headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` },
                 body: JSON.stringify(body),
-                cache: 'no-cache',
-                signal: signal // Pass signal to the final PUT request
+                cache: 'no-cache'
             });
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
+                // 专门处理仍然可能发生的、极小概率的竞争条件
                 if (response.status === 409 || response.status === 422 || (errorData.message && errorData.message.includes("sha "))) {
                     const conflictMessage = `同步冲突：在您保存的瞬间，云端数据被另一处修改。请稍后重试。`;
                     updateSyncStatus('error', conflictMessage);
@@ -4932,17 +4852,14 @@ const getDefaultConfig = () => ({
             const data = await response.json();
             updateSyncStatus('synced', '同步成功！');
             
+            // [重要] 返回新的 sha，以便全局变量可以更新
             const newSha = data.content.sha;
             if (path === 'config.json') configSha = newSha;
-            if (path === 'memory/data.json') MemoryApp.updateSha(newSha);
+            if (path === 'memory/data.json') MemoryApp.updateSha(newSha); // 需要在MemoryApp中添加一个更新sha的函数
             
             return { sha: newSha, error: null };
             
         } catch (error) {
-            if (error.name === 'AbortError') {
-                console.log('Save cancelled during PUT request.');
-                return { sha: null, error: '用户取消了操作' };
-            }
             const userMessage = await handleApiError(`写入 ${path}`, error);
             updateSyncStatus('error', userMessage);
             return { sha: null, error: userMessage };
@@ -4950,38 +4867,38 @@ const getDefaultConfig = () => ({
     }
 
     
-    async function uploadFileViaGitData({ file, path, commitMessage, onProgress, signal }) {
+    async function uploadFileViaGitData({ file, path, commitMessage, onProgress }) {
         if (!checkConfig(true)) throw new Error("GitHub未配置");
         
+        // 1. 将文件读取为 Base64 编码的 Data URL
         const contentB64 = await new Promise((resolve, reject) => {
             const reader = new FileReader();
+            //  reader.onload 的结果是 'data:image/jpeg;base64,....'，我们需要去掉头部
             reader.onload = () => resolve(reader.result.split(',')[1]); 
             reader.onerror = reject;
-            if (signal) {
-                signal.addEventListener('abort', () => reject(new DOMException('Aborted by user', 'AbortError')));
-            }
             reader.readAsDataURL(file);
         });
 
-        if (signal?.aborted) throw new DOMException('Aborted by user', 'AbortError');
-
-        if (onProgress) onProgress(50);
+        // 2. 调用我们已经非常稳定的 saveToGithub 函数
+        // 这个函数内部使用了 Contents API (PUT /.../contents/:path)，是原子操作，更可靠。
+        // 它还会自动处理文件已存在时的 SHA 更新，避免冲突。
         
-        // Pass the signal to saveToGithub
-        const result = await saveToGithub(path, contentB64, commitMessage, null, signal);
+        // 尽管 onProgress 不再被精确调用，我们仍然可以在关键步骤调用它来更新UI
+        if (onProgress) onProgress(50); // 表示文件已读取，准备上传
 
-        if (signal?.aborted) throw new DOMException('Aborted by user', 'AbortError');
+        const result = await saveToGithub(path, contentB64, commitMessage);
 
         if (onProgress) onProgress(100);
 
+        // 3. 检查结果并返回
         if (result.sha) {
+            // 上传成功，返回与旧函数兼容的格式
             return { sha: result.sha, path: path };
         } else {
-            // Propagate the error message from saveToGithub
+            // 如果 saveToGithub 失败，它内部已经处理了错误提示，这里我们抛出错误以便上层捕获
             throw new Error(result.error || "未知上传错误");
         }
     }
-
 
     async function deleteFromGithub(path, commitMessage, sha, ignoreNotFound = false) {
         if (!checkConfig(true)) return false;
@@ -6733,82 +6650,31 @@ const getDefaultConfig = () => ({
 
         async function processPhotoUploadQueue() {
             if (state.photoUploadQueue.length === 0) return;
+            
+            // [新增] 开始上传，设置标志位
+            isPhotoUploading = true;
+
             const totalPhotos = state.photoUploadQueue.length;
-
-            // --- 新增：弹窗及取消逻辑 V2 ---
-            let popupEl = null; 
-            window.photoUploadAbortController = new AbortController();
-            const signal = window.photoUploadAbortController.signal;
-
-            function createOrUpdatePopup(status, progress) {
-                if (signal.aborted) return;
-                if (!popupEl) {
-                    popupEl = document.createElement('div');
-                    popupEl.className = 'upload-progress-popup';
-                    popupEl.innerHTML = `
-                        <div class="popup-status-container">
-                            <span class="popup-status-text"></span>
-                            <button class="popup-cancel-btn" title="取消上传">✖</button>
-                        </div>
-                        <div class="popup-progress-container"><div class="popup-progress-bar"></div></div>`;
-                    document.body.appendChild(popupEl);
-                    popupEl.querySelector('.popup-cancel-btn').addEventListener('click', () => {
-                        if (window.photoUploadAbortController) window.photoUploadAbortController.abort();
-                    });
-                    setTimeout(() => popupEl.classList.add('show'), 50);
-                }
-
-                const statusTextEl = popupEl.querySelector('.popup-status-text');
-                const progressBarEl = popupEl.querySelector('.popup-progress-bar');
-                const cancelBtnEl = popupEl.querySelector('.popup-cancel-btn');
-
-                statusTextEl.textContent = status;
-                progressBarEl.style.width = `${progress}%`;
-
-                if (status.includes('成功') || status.includes('失败') || status.includes('取消') || status.includes('完成')) {
-                    cancelBtnEl.style.display = 'none';
-                    setTimeout(() => {
-                        if (popupEl) {
-                            popupEl.classList.remove('show');
-                            popupEl.addEventListener('transitionend', () => popupEl.remove(), { once: true });
-                            popupEl = null;
-                        }
-                    }, 3000);
-                } else {
-                    cancelBtnEl.style.display = 'block';
-                }
-            }
-
-            const modalObserver = new MutationObserver(mutations => {
-                for (const mutation of mutations) {
-                    if (mutation.attributeName === 'class' && !mutation.target.classList.contains('show') && state.photoUploadQueue.length > 0) {
-                        createOrUpdatePopup(`后台上传中 (0/${totalPhotos})`, 0);
-                        modalObserver.disconnect();
-                        return;
-                    }
-                }
-            });
-            modalObserver.observe(document.getElementById('memoryModal'), { attributes: true });
-
-            // --- 原有逻辑 ---
+            
             state.skipAllPhotoDetails = false;
             let isPhotoSetMode = false;
+
             const isBatch = totalPhotos > 1;
             ui.photosetToggleContainer.style.display = isBatch ? 'block' : 'none';
             ui.photosetToggle.checked = isBatch;
+
             let photosetData = { id: Date.now(), albumId: state.currentAlbumId, type: 'photoset', title: '', description: '', timestamp: Date.now(), photos: [] };
             
             try {
                 for (let i = 0; i < totalPhotos; i++) {
-                    if (signal.aborted) throw new Error("上传已取消");
-
                     const file = state.photoUploadQueue[i];
-                    let title = '', description = '';
-                    const shouldShowModal = i === 0 || (!isPhotoSetMode && !state.skipAllPhotoDetails);
+                    let title = '';
+                    let description = '';
                     
-                    if (shouldShowModal && !popupEl) { // 仅当弹窗不存在时才显示模态框
+                    const shouldShowModal = i === 0 || (!isPhotoSetMode && !state.skipAllPhotoDetails);
+
+                    if (shouldShowModal) {
                         updateStatus(`等待用户输入... (${i + 1}/${totalPhotos})`);
-                        // 以下是原有的等待用户输入的 Promise 逻辑
                         ui.photoDetailsModal.querySelector('#upload-thumbnail').src = URL.createObjectURL(file);
                         ui.photoDetailsModal.querySelector('#photo-details-modal-title').textContent = isBatch ? `上传照片 (${i + 1}/${totalPhotos})` : '添加照片信息';
                         ui.photoDetailsModal.classList.add('show');
@@ -6816,7 +6682,11 @@ const getDefaultConfig = () => ({
                         await new Promise(resolve => {
                             const saveHandler = () => { state.isSavingPhoto = true; cleanupAndResolve(); };
                             const skipHandler = () => { actions['skip-photo-details'](); state.isSavingPhoto = false; cleanupAndResolve(); };
-                            const cleanupAndResolve = () => { saveBtn.removeEventListener('click', saveHandler); skipBtn.removeEventListener('click', skipHandler); resolve(); };
+                            const cleanupAndResolve = () => {
+                                saveBtn.removeEventListener('click', saveHandler);
+                                skipBtn.removeEventListener('click', skipHandler);
+                                resolve();
+                            };
                             const saveBtn = ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]');
                             const skipBtn = ui.photoDetailsModal.querySelector('[data-action="skip-photo-details"]');
                             saveBtn.addEventListener('click', saveHandler, { once: true });
@@ -6828,29 +6698,31 @@ const getDefaultConfig = () => ({
                             description = document.getElementById('photo-desc-input').value.trim();
                         }
                         if (i === 0) isPhotoSetMode = document.getElementById('create-photoset-toggle').checked;
+                        
                         ui.photoDetailsModal.classList.remove('show');
                         document.getElementById('photo-title-input').value = '';
                         document.getElementById('photo-desc-input').value = '';
                     }
 
+                    // [修改] 调用新的 uploadPhoto 并传入进度回调
                     const photoData = await uploadPhoto(file, (percent) => {
-                        const fileProgress = percent / 100;
-                        const currentOverallProgress = ((i + fileProgress) / totalPhotos) * 100;
-                        // 注意：相册上传没有精确的字节进度，所以这里只显示文件计数
-                        const statusMessage = `上传中 (${i + 1}/${totalPhotos})`; 
-                        if (popupEl) {
-                            createOrUpdatePopup(statusMessage, currentOverallProgress);
-                        } else {
-                            updateStatus(statusMessage);
-                        }
-                    }, signal);
+                         let progressText = Math.round(percent) + '%';
+                         updateStatus(`上传中 (${i + 1}/${totalPhotos}): ${progressText}`);
+                    });
                     
                     if (photoData) {
                         if (isPhotoSetMode) {
                             photosetData.photos.push(photoData);
-                            if (i === 0) { photosetData.title = title; photosetData.description = description; }
+                            if (i === 0) {
+                                photosetData.title = title;
+                                photosetData.description = description;
+                            }
                         } else {
-                            memoryCache.album.items.push({ id: Date.now() + i, albumId: state.currentAlbumId, type: 'photo', title, description, timestamp: Date.now(), ...photoData });
+                            memoryCache.album.items.push({
+                                id: Date.now() + i, albumId: state.currentAlbumId, type: 'photo',
+                                title: title, description: description, timestamp: Date.now(),
+                                ...photoData
+                            });
                         }
                     }
                 } // 循环结束
@@ -6859,47 +6731,37 @@ const getDefaultConfig = () => ({
                     memoryCache.album.items.push(photosetData);
                 }
 
-                if (popupEl) createOrUpdatePopup('上传完成！', 100);
-                else updateStatus('上传完成，正在整理...');
-                
+                updateStatus('上传完成，正在整理...');
                 state.photoUploadQueue = [];
                 renderPhotos();
                 scheduleSave();
 
             } catch (error) {
-                const userMessage = error.message === "上传已取消" ? '已取消' : '上传失败';
-                if (popupEl) createOrUpdatePopup(userMessage, userMessage === '已取消' ? 0 : 100);
-                else if (userMessage === '已取消') showTopToast('上传已取消', 2000);
-                else updateStatus('上传失败', true, error.message);
-                
-                if (userMessage === '上传失败') alert(error.message);
-                state.photoUploadQueue = [];
-
+                // [新增] 统一的错误处理
+                updateStatus('上传失败', true, error.message);
+                alert(error.message); // 给用户一个明确的弹窗提示
+                state.photoUploadQueue = []; // 清空队列
             } finally {
-                modalObserver.disconnect();
-                window.photoUploadAbortController = null; // 清理
+                // [新增] 无论成功或失败，上传结束，重置标志位
+                isPhotoUploading = false;
             }
         }
 
-        async function uploadPhoto(file, onProgressCallback, signal) {
+        async function uploadPhoto(file, onProgressCallback) {
             try {
                 const path = `${MEMORY_PHOTOS_PATH}${Date.now()}_${file.name}`;
                 const result = await uploadFileViaGitData({ 
                     file, 
                     path, 
                     commitMessage: `Upload photo: ${file.name}`, 
-                    onProgress: onProgressCallback,
-                    signal: signal // Pass signal down
+                    onProgress: onProgressCallback // [修改] 传递进度回调
                 });
                 return { path: result.path, sha: result.sha };
             } catch (error) {
-                if (error.name === 'AbortError') {
-                    throw new Error("上传已取消"); // Pass a user-friendly message up
-                }
+                // [修改] 不再弹窗，而是向上抛出错误，由调用者统一处理
                 throw new Error(`上传照片 ${file.name} 失败: ${await handleApiError('上传照片', error)}`);
             }
         }
-
 
        
               function populateDriveCategorySelector() {
@@ -7150,142 +7012,156 @@ const getDefaultConfig = () => ({
                 el.style.pointerEvents = "auto";
             }
         }
-        async function uploadFile() {
-    if (activeUploadXHR) {
-        if(confirm("当前有文件正在上传，要终止它吗？")) {
-             activeUploadXHR.abort();
-        }
-        return;
-    }
-    if (!checkConfig(true)) return;
+                async function uploadFile() {
+                    if (activeUploadXHR) {
+                        if(confirm("当前有文件正在上传，要终止它吗？")) {
+                            activeUploadXHR.abort();
+                        }
+                        return;
+                    }
+                    if (!checkConfig(true)) return;
 
-    const selectedProjectHref = ui.projectSelector.value;
-    const file = ui.fileUploader.files[0];
-    let fileName = ui.fileNameInput.value.trim() || (file && file.name);
+                    const selectedProjectHref = ui.projectSelector.value;
+                    const file = ui.fileUploader.files[0];
+                    let fileName = ui.fileNameInput.value.trim() || (file && file.name);
 
-    if (!selectedProjectHref || !file || !fileName) { return alert("请选择要上传到的项目、文件，并确保文件名不为空。"); }
-    const projectConfig = findButtonConfigByHref(selectedProjectHref);
-    if (!projectConfig) { return alert("此项目配置无效。"); }
+                    if (!selectedProjectHref || !file || !fileName) { return alert("请选择要上传到的项目、文件，并确保文件名不为空。"); }
+                    const projectConfig = findButtonConfigByHref(selectedProjectHref);
+                    if (!projectConfig) { return alert("此项目配置无效。"); }
 
-    const projectName = projectConfig.text;
-    const folderName = projectName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-");
-    const path = `jellyfish_drive/${folderName}/${fileName}`;
-    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
+                    const projectName = projectConfig.text;
+                    const folderName = projectName.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-");
+                    const path = `jellyfish_drive/${folderName}/${fileName}`;
+                    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
 
-    // --- UI 准备 (V2 弹窗) ---
-    let popupEl = null;
+                    // --- [修改] UI 准备 ---
+                    let progressToast = null; // 用于管理顶部持久化进度提示框
 
-    function createOrUpdatePopup(status, progress) {
-        if (!popupEl) {
-            popupEl = document.createElement('div');
-            popupEl.className = 'upload-progress-popup';
-            popupEl.innerHTML = `
-                <div class="popup-status-container">
-                    <span class="popup-status-text"></span>
-                    <button class="popup-cancel-btn" title="取消上传">✖</button>
-                </div>
-                <div class="popup-progress-container"><div class="popup-progress-bar"></div></div>`;
-            document.body.appendChild(popupEl);
-            popupEl.querySelector('.popup-cancel-btn').addEventListener('click', () => { if (activeUploadXHR) activeUploadXHR.abort(); });
-            setTimeout(() => popupEl.classList.add('show'), 50);
-        }
+                    // --- [新增] 创建/更新/销毁 顶部提示框的函数 ---
+                    const manageProgressToast = (status, isFinal = false, duration = 3000) => {
+                        // 如果是最终状态（成功/失败），但提示框从未被创建（即用户未关闭弹窗），则直接使用标准的 showTopToast
+                        if (isFinal && !progressToast) {
+                            showTopToast(status, duration);
+                            return;
+                        }
 
-        const statusTextEl = popupEl.querySelector('.popup-status-text');
-        const progressBarEl = popupEl.querySelector('.popup-progress-bar');
-        const cancelBtnEl = popupEl.querySelector('.popup-cancel-btn');
+                        // 如果提示框不存在，则创建它 (仅在非最终状态或模态框关闭后调用)
+                        if (!progressToast) {
+                            progressToast = document.createElement('div');
+                            progressToast.className = 'top-toast';
+                            document.body.appendChild(progressToast);
+                            // 触发显示动画
+                            setTimeout(() => {
+                                if (progressToast) progressToast.classList.add('show');
+                            }, 50);
+                        }
 
-        statusTextEl.textContent = status;
-        progressBarEl.style.width = `${progress}%`;
+                        // 更新内容
+                        progressToast.textContent = status;
 
-        // 如果上传完成（成功/失败/取消），隐藏取消按钮并准备自动关闭
-        if (status.includes('成功') || status.includes('失败') || status.includes('取消')) {
-            cancelBtnEl.style.display = 'none';
-            setTimeout(() => {
-                if (popupEl) {
-                    popupEl.classList.remove('show');
-                    popupEl.addEventListener('transitionend', () => popupEl.remove(), { once: true });
-                    popupEl = null; // 重置
+                        // 如果是最终状态，安排移除
+                        if (isFinal) {
+                            setTimeout(() => {
+                                if (progressToast) {
+                                    progressToast.classList.remove('show');
+                                    progressToast.addEventListener('transitionend', () => {
+                                        if (progressToast) progressToast.remove();
+                                        progressToast = null; // 清理引用
+                                    }, { once: true });
+                                }
+                            }, duration);
+                        }
+                    };
+                    
+                    // --- [修改] 监听主上传模态框的关闭 ---
+                    const modalObserver = new MutationObserver(mutations => {
+                        for (const mutation of mutations) {
+                            if (mutation.attributeName === 'class' && !mutation.target.classList.contains('show') && activeUploadXHR) {
+                                // 当模态框关闭时，创建顶部持久提示框
+                                const currentProgress = parseInt(ui.progressBar.style.width, 10) || 0;
+                                manageProgressToast(`上传中... ${currentProgress}%`);
+                                modalObserver.disconnect();
+                                return;
+                            }
+                        }
+                    });
+                    modalObserver.observe(document.getElementById('memoryModal'), { attributes: true });
+
+                    // --- 核心上传逻辑 ---
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = async () => {
+                        const contentB64 = reader.result.split(',')[1];
+                        const { data: existingFile } = await fetchFromGithub(path);
+                        
+                        const body = { message: `Upload ${fileName} to Drive`, content: contentB64, branch: 'main', sha: existingFile?.sha };
+                        
+                        activeUploadXHR = new XMLHttpRequest();
+                        activeUploadXHR.open('PUT', url, true);
+                        activeUploadXHR.setRequestHeader('Authorization', `token ${GITHUB_CONFIG.token}`);
+                        activeUploadXHR.setRequestHeader('Content-Type', 'application/json');
+                        
+                        const uploadCancelBtn = document.getElementById('upload-cancel-btn');
+                        const uploadCancelHandler = () => { if (activeUploadXHR) activeUploadXHR.abort(); };
+                        uploadCancelBtn.addEventListener('click', uploadCancelHandler);
+
+                        activeUploadXHR.upload.onprogress = (e) => {
+                            if (e.lengthComputable) {
+                                const percent = (e.loaded / e.total) * 100;
+                                ui.progressBar.style.width = `${percent}%`;
+                                // 如果顶部提示框已存在，同步更新进度
+                                if(progressToast) {
+                                    manageProgressToast(`上传中... ${Math.round(percent)}%`);
+                                }
+                            }
+                        };
+
+                        activeUploadXHR.onload = function() {
+                            if (this.status >= 200 && this.status < 300) {
+                                manageProgressToast("上传成功！", true, 2000);
+                                fetchFilesForSelectedProject();
+                                ui.fileUploader.value = "";
+                                ui.fileNameInput.value = "";
+                                ui.selectedFileName.textContent = '未选择任何文件';
+                            } else {
+                                const errorMsg = JSON.parse(this.responseText).message || `HTTP ${this.status}`;
+                                manageProgressToast(`上传失败`, true, 4000);
+                                alert(`上传失败: ${errorMsg}`);
+                            }
+                            cleanup();
+                        };
+
+                        activeUploadXHR.onerror = () => { 
+                            manageProgressToast("网络错误", true, 4000);
+                            alert("上传失败，请检查网络连接。"); 
+                            cleanup(); 
+                        };
+
+                        activeUploadXHR.onabort = () => { 
+                            manageProgressToast("已取消", true, 2000);
+                            cleanup(); 
+                        };
+
+                        const cleanup = () => {
+                            uploadCancelBtn.removeEventListener('click', uploadCancelHandler);
+                            ui.progressContainer.style.display = 'none';
+                            activeUploadXHR = null;
+                            modalObserver.disconnect();
+                            // 如果清理时，toast 仍在且不处于最终状态，则立即移除
+                            if (progressToast && !progressToast.textContent.includes('成功') && !progressToast.textContent.includes('失败') && !progressToast.textContent.includes('取消')) {
+                                progressToast.classList.remove('show');
+                                progressToast.addEventListener('transitionend', () => progressToast.remove(), { once: true });
+                                progressToast = null;
+                            }
+                        };
+
+                        ui.progressContainer.style.display = 'flex';
+                        ui.progressBar.style.width = '0%';
+                        activeUploadXHR.send(JSON.stringify(body));
+                    };
+                    reader.onerror = () => { alert("读取文件失败！"); };
                 }
-            }, 3000);
-        } else {
-            cancelBtnEl.style.display = 'block';
-        }
-    }
-    
-    // --- 监听主上传模态框的关闭 ---
-    const modalObserver = new MutationObserver(mutations => {
-        for (const mutation of mutations) {
-            if (mutation.attributeName === 'class' && !mutation.target.classList.contains('show') && activeUploadXHR) {
-                // 当模态框关闭时，创建或更新左下角的弹窗
-                const percent = parseInt(ui.progressBar.style.width, 10) || 0;
-                createOrUpdatePopup(`后台上传中... ${percent}%`, percent);
-                modalObserver.disconnect();
-                return;
-            }
-        }
-    });
-    modalObserver.observe(document.getElementById('memoryModal'), { attributes: true });
 
-    // --- 核心上传逻辑 ---
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = async () => {
-        const contentB64 = reader.result.split(',')[1];
-        const { data: existingFile } = await fetchFromGithub(path);
-        
-        const body = { message: `Upload ${fileName} to Drive`, content: contentB64, branch: 'main', sha: existingFile?.sha };
-        
-        activeUploadXHR = new XMLHttpRequest();
-        activeUploadXHR.open('PUT', url, true);
-        activeUploadXHR.setRequestHeader('Authorization', `token ${GITHUB_CONFIG.token}`);
-        activeUploadXHR.setRequestHeader('Content-Type', 'application/json');
-        
-        const uploadCancelBtn = document.getElementById('upload-cancel-btn');
-        const uploadCancelHandler = () => { if (activeUploadXHR) activeUploadXHR.abort(); };
-        uploadCancelBtn.addEventListener('click', uploadCancelHandler);
-
-        activeUploadXHR.upload.onprogress = (e) => {
-            if (e.lengthComputable) {
-                const percent = (e.loaded / e.total) * 100;
-                // 如果弹窗已存在（即模态框已关闭），则更新弹窗；否则更新模态框内的进度条
-                if(popupEl) {
-                    createOrUpdatePopup(`后台上传中... ${Math.round(percent)}%`, percent);
-                } else {
-                    ui.progressBar.style.width = `${percent}%`;
-                }
-            }
-        };
-        activeUploadXHR.onload = function() {
-            if (this.status >= 200 && this.status < 300) {
-                showTopToast("上传成功！", 2000);
-                if(popupEl) createOrUpdatePopup("上传成功！", 100);
-                fetchFilesForSelectedProject();
-                ui.fileUploader.value = "";
-                ui.fileNameInput.value = "";
-                ui.selectedFileName.textContent = '未选择任何文件';
-            } else {
-                const errorMsg = JSON.parse(this.responseText).message || `HTTP ${this.status}`;
-                if(popupEl) createOrUpdatePopup(`上传失败`, 100);
-                alert(`上传失败: ${errorMsg}`);
-            }
-            cleanup();
-        };
-        activeUploadXHR.onerror = () => { if(popupEl) createOrUpdatePopup("网络错误", 100); alert("上传失败，请检查网络连接。"); cleanup(); };
-        activeUploadXHR.onabort = () => { showTopToast("上传已取消", 2000); if(popupEl) createOrUpdatePopup("已取消", 100); cleanup(); };
-
-        const cleanup = () => {
-            uploadCancelBtn.removeEventListener('click', uploadCancelHandler);
-            ui.progressContainer.style.display = 'none';
-            activeUploadXHR = null;
-            modalObserver.disconnect();
-        };
-
-        ui.progressContainer.style.display = 'flex';
-        ui.progressBar.style.width = '0%';
-        activeUploadXHR.send(JSON.stringify(body));
-    };
-    reader.onerror = () => { alert("读取文件失败！"); };
-}
 
         return {
             open: () => {
