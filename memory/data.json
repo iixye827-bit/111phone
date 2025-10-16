@@ -85,6 +85,16 @@
             "sha": "8ac0a25554c09d5e2e04219259dabe84caaab542"
           }
         ]
+      },
+      {
+        "id": 1760597168265,
+        "albumId": 1760546437538,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1760597168265,
+        "path": "memory/photos/1760597162109_微信图片_20250924225920_43_14.jpg",
+        "sha": "34a5240d698f4ebddd95d8fba3ef4f8afe90689e"
       }
     ]
   }
