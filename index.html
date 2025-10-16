@@ -6749,17 +6749,26 @@ const getDefaultConfig = () => ({
 
         async function uploadPhoto(file, onProgressCallback) {
             try {
-                const path = `${MEMORY_PHOTOS_PATH}${Date.now()}_${file.name}`;
+                // [核心修改] 创建一个安全的新文件名，不再依赖 file.name
+                // 1. 安全地获取文件后缀
+                const extension = (file.name.split('.').pop() || 'jpg').toLowerCase();
+                // 2. 构造新文件名：时间戳 + 8位随机字符串 + 后缀
+                const newSafeFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 10)}.${extension}`;
+                // 3. 使用新文件名构造存储路径
+                const path = `${MEMORY_PHOTOS_PATH}${newSafeFileName}`;
+
                 const result = await uploadFileViaGitData({ 
                     file, 
                     path, 
-                    commitMessage: `Upload photo: ${file.name}`, 
-                    onProgress: onProgressCallback // [修改] 传递进度回调
+                    // [核心修改] Commit message 也使用安全的新文件名
+                    commitMessage: `Upload photo: ${newSafeFileName}`, 
+                    onProgress: onProgressCallback
                 });
                 return { path: result.path, sha: result.sha };
             } catch (error) {
-                // [修改] 不再弹窗，而是向上抛出错误，由调用者统一处理
-                throw new Error(`上传照片 ${file.name} 失败: ${await handleApiError('上传照片', error)}`);
+                // [核心修改] 错误提示中也使用原始文件名（如果可用），以便追溯
+                const originalName = file.name || '未知文件';
+                throw new Error(`上传照片 ${originalName} 失败: ${await handleApiError('上传照片', error)}`);
             }
         }
 
