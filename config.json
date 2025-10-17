@@ -22,7 +22,7 @@
     },
     "fontPresets": [],
     "backupReminder": {
-      "enabled": false,
+      "enabled": true,
       "times": [],
       "message": "是时候备份啦！",
       "onExit": false,
