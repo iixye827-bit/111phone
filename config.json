@@ -44,6 +44,7 @@
     "fontPresets": [],
     "backupReminder": {
       "enabled": true,
+      "timeBasedEnabled": false,
       "times": [],
       "message": "是时候备份啦！",
       "onExit": true,
