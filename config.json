@@ -46,8 +46,12 @@
       "enabled": true,
       "times": [],
       "message": "是时候备份啦！",
-      "onExit": false,
-      "projects": []
+      "onExit": true,
+      "projects": [
+        "1",
+        "2",
+        "3"
+      ]
     }
   },
   "themePresets": [
