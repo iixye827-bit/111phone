@@ -2950,6 +2950,34 @@ body.dark-mode .album-item .sort-handle {
     cursor: grabbing;
 }
 
+        /* =============================================================== */
+        /* ============= [新增] 更新公告标签页红点提示样式 ============= */
+        /* =============================================================== */
+        label[for="help-tab-2"].has-update {
+            position: relative;
+        }
+
+        label[for="help-tab-2"].has-update::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 12px; /* 调整红点与文字的距离 */
+            transform: translateY(-50%);
+            width: 7px;
+            height: 7px;
+            background-color: #e53e3e;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #e53e3e;
+        }
+
+        @media (max-width: 480px) {
+            label[for="help-tab-2"].has-update::after {
+                right: 5px; /* 手机端距离小一点 */
+            }
+        }
+        /* =============================================================== */
+        /* ========================= [新增结束] ========================== */
+        /* =============================================================== */
 
     </style>
 
@@ -2957,6 +2985,7 @@ body.dark-mode .album-item .sort-handle {
  <style id="custom-jelly-ball-styles"></style>
 
     <!-- [新增] 用于全局字体的样式标签 -->
+    <style id="global-font-style"></style>
 
 
     <!-- 手机模式滑动容器 -->
@@ -3199,6 +3228,18 @@ body.dark-mode .album-item .sort-handle {
     </div>
         <!-- ★ 在这里新增下面的代码块 ★ -->
     <div class="update-log-entry">
+        <h4>v5.8.0 <span class="update-date">- 2025.10.16</span></h4>
+        <ul>
+            <li><span class="tag new">新功能</span> 【数据保险箱】当云端数据意外清空时，进入“数据同步”弹窗点击“手动同步与修复”，系统会自动检测并引导您从上一个历史版本一键恢复所有数据。</li>
+            <li><span class="tag new">新功能</span> 新增上传中断保护，在上传文件或照片时关闭页面会触发挽留提示。</li>
+            <li><span class="tag new">新功能</span> 在“记忆-文件夹”中上传文件时，增加了“✖”按钮以随时终止上传任务。</li>
+            <li><span class="tag fix">修复</span> 修复了在特定情况下，“记忆-相册”批量上传照片时可能中断或失败的问题。</li>
+            <li><span class="tag opt">优化</span> 优化了项目内所有弹窗的字体渲染，增强了可读性。</li>
+            <li><span class="tag opt">优化</span> 提升了文件上传进度条的计算精度。</li>
+        </ul>
+    </div>
+        <!-- ★ 在这里新增下面的代码块 ★ -->
+    <div class="update-log-entry">
         <h4>v5.7.6 <span class="update-date">- 2025.10.16</span></h4>
         <ul>
             <li><span class="tag new">新功能</span> 新增全局字体更换功能，支持在主题设置中应用在线字体及管理预设。</li>
@@ -3311,7 +3352,7 @@ body.dark-mode .album-item .sort-handle {
     </div>
     
     <footer class="update-footer">
-        当前版本: v5.7.6
+        当前版本: v5.8.0
     </footer>
 </div>
                     <div id="help-page-3" class="help-page-content">
@@ -5352,7 +5393,17 @@ const getDefaultConfig = () => ({
     // 立即移除红点，提供即时反馈
     document.getElementById('helpBtn').classList.remove('has-update');
 })
-,document.getElementById("dataSyncBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(settingsModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),settingsModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("addNavBtn").addEventListener("click",()=>{openAddModal(); toggleFabMenu(false);}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); }), document.getElementById('jelly-css-help-modal').querySelectorAll('.copy-btn').forEach(btn => { btn.addEventListener('click', async (e) => { const textBlock = e.target.parentElement; const textToCopy = textBlock.innerText.replace(e.target.innerText, '').trim(); try { await navigator.clipboard.writeText(textToCopy); const originalText = e.target.textContent; e.target.textContent = '已复制!'; setTimeout(() => { e.target.textContent = originalText; }, 1500); } catch (err) { alert('复制失败，请手动复制。'); } }); });}
+,document.getElementById("dataSyncBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(settingsModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),settingsModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("addNavBtn").addEventListener("click",()=>{openAddModal(); toggleFabMenu(false);}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); }), document.getElementById('jelly-css-help-modal').querySelectorAll('.copy-btn').forEach(btn => { btn.addEventListener('click', async (e) => { const textBlock = e.target.parentElement; const textToCopy = textBlock.innerText.replace(e.target.innerText, '').trim(); try { await navigator.clipboard.writeText(textToCopy); const originalText = e.target.textContent; e.target.textContent = '已复制!'; setTimeout(() => { e.target.textContent = originalText; }, 1500); } catch (err) { alert('复制失败，请手动复制。'); } }); });
+
+    // [核心新增] 为“更新公告”标签添加点击事件，用于消除红点
+    const updateTabLabel = document.querySelector('label[for="help-tab-2"]');
+    if (updateTabLabel) {
+        updateTabLabel.addEventListener('click', () => {
+            updateTabLabel.classList.remove('has-update');
+        });
+    }
+}
+
     function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){const e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e=!0){return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据同步)"),!1):!0}
     
     function isObject(item) { return (item && typeof item === 'object' && !Array.isArray(item)); }
@@ -5416,93 +5467,195 @@ const getDefaultConfig = () => ({
     }
 
 
+    // [V2 修改] 增加几个新的辅助函数
+    /**
+     * 获取指定文件的提交历史
+     * @param {string} path - 文件路径, e.g., 'config.json'
+     * @returns {Promise<Array|null>} - 包含提交对象的数组或null
+     */
+    async function getHistoryForFile(path) {
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${path}&per_page=5`;
+        try {
+            const response = await fetch(url, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` } });
+            if (!response.ok) throw new Error(`API error: ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            console.error(`Failed to get history for ${path}:`, error);
+            return null;
+        }
+    }
+
+    /**
+     * 获取文件在某次特定提交时的内容
+     * @param {string} path - 文件路径
+     * @param {string} commitSha - 提交的SHA值
+     * @returns {Promise<string|null>} - 文件的UTF-8字符串内容或null
+     */
+    async function getContentAtCommit(path, commitSha) {
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}?ref=${commitSha}`;
+        try {
+            const response = await fetch(url, { headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` } });
+            if (response.status === 404) return null; // 该版本不存在此文件
+            if (!response.ok) throw new Error(`API error: ${response.status}`);
+            const data = await response.json();
+            return data.content ? b64_to_utf8(data.content) : null;
+        } catch (error) {
+            console.error(`Failed to get content for ${path} at commit ${commitSha}:`, error);
+            return null;
+        }
+    }
+
     settingsModalElements.manualSyncBtn.addEventListener("click", async () => {
         if (!checkConfig(true)) return;
+        
         const btn = settingsModalElements.manualSyncBtn;
         const originalText = btn.textContent;
+        const recoveryModal = document.getElementById('dataRecoveryModal');
+        const summaryList = document.getElementById('recovery-summary-list');
+        const confirmRecoveryBtn = document.getElementById('confirmRecoveryBtn');
+        const cancelRecoveryBtn = document.getElementById('cancelRecoveryBtn');
+
         btn.disabled = true;
+        btn.textContent = '正在检查云端数据...';
 
         try {
-            btn.textContent = '正在验证连接...';
+            // 1. 获取当前云端配置
+            const currentConfigData = await fetchConfigFromGithub();
+            const isDataEmpty = !currentConfigData || !currentConfigData.categories || currentConfigData.categories.length === 0 || 
+                                (currentConfigData.categories.length === 1 && currentConfigData.categories[0].buttons.length === 0);
 
-            // 1. 新增的验证性请求 (Pre-flight Check)
-            const validationUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`;
-            let validationResponse;
-            try {
-                validationResponse = await fetch(validationUrl, {
-                    headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` },
-                    cache: 'no-cache'
+            // 2. 如果数据为空，则启动恢复流程
+            if (isDataEmpty) {
+                btn.textContent = '检测到数据为空，正在查找历史版本...';
+                
+                const history = await getHistoryForFile('config.json');
+                if (!history || history.length < 2) {
+                    throw new Error('未找到足够的历史记录来进行恢复。');
+                }
+
+                // 选择倒数第二个版本作为恢复点
+                const recoveryCommit = history[1];
+                const recoveryCommitSha = recoveryCommit.sha;
+                const commitMessage = recoveryCommit.commit.message;
+                const commitDate = new Date(recoveryCommit.commit.author.date).toLocaleString('zh-CN');
+
+                btn.textContent = '正在解析历史数据...';
+
+                // 获取历史版本的 config.json 和 memory.json
+                const [historicalConfigContent, historicalMemoryContent] = await Promise.all([
+                    getContentAtCommit('config.json', recoveryCommitSha),
+                    getContentAtCommit('memory/data.json', recoveryCommitSha)
+                ]);
+
+                if (!historicalConfigContent) {
+                    throw new Error('无法获取历史版本的主配置文件，恢复失败。');
+                }
+
+                // 解析和统计
+                let summary = { buttons: 0, categories: 0, photos: 0, albums: 0, memos: 0, memoFolders: 0 };
+                try {
+                    const parsedConfig = JSON.parse(historicalConfigContent);
+                    summary.categories = parsedConfig.categories?.length || 0;
+                    summary.buttons = parsedConfig.categories?.reduce((acc, cat) => acc + (cat.buttons?.length || 0), 0) || 0;
+                } catch(e) { console.error("Error parsing historical config.json"); }
+
+                if (historicalMemoryContent) {
+                    try {
+                        const parsedMemory = JSON.parse(historicalMemoryContent);
+                        summary.albums = parsedMemory.album?.folders?.length || 0;
+                        summary.photos = parsedMemory.album?.items?.reduce((acc, item) => acc + (item.type === 'photoset' ? item.photos.length : 1), 0) || 0;
+                        summary.memoFolders = parsedMemory.memo?.folders?.length || 0;
+                        summary.memos = parsedMemory.memo?.notes?.length || 0;
+                    } catch (e) { console.error("Error parsing historical memory/data.json"); }
+                }
+
+                // 填充并显示恢复确认模态框
+                summaryList.innerHTML = `
+                    <li><strong>版本信息:</strong> ${commitMessage}</li>
+                    <li><strong>修改于:</strong> ${commitDate}</li>
+                    <hr style="margin: 8px 0; border: 0; border-top: 1px solid rgba(128,128,128,0.2);">
+                    <li><strong>按钮项目:</strong> ${summary.buttons} 个</li>
+                    <li><strong>项目分类:</strong> ${summary.categories} 个</li>
+                    <li><strong>备忘录:</strong> ${summary.memos} 篇 (在 ${summary.memoFolders} 个文件夹中)</li>
+                    <li><strong>照片:</strong> ${summary.photos} 张 (在 ${summary.albums} 个相册中)</li>
+                `;
+                
+                settingsModalElements.modal.classList.remove('show');
+                recoveryModal.classList.add('show');
+                btn.textContent = '请确认恢复操作...';
+
+                // 返回一个Promise，等待用户操作
+                return new Promise(resolve => {
+                    const handleConfirm = async () => {
+                        recoveryModal.classList.remove('show');
+                        btn.textContent = '正在恢复数据...';
+
+                        // 同时恢复两个文件
+                        const configPromise = saveToGithub('config.json', utf8_to_b64(historicalConfigContent), `Recover data from commit ${recoveryCommitSha.substring(0, 7)}`);
+                        const memoryPromise = historicalMemoryContent 
+                            ? saveToGithub('memory/data.json', utf8_to_b64(historicalMemoryContent), `Recover data from commit ${recoveryCommitSha.substring(0, 7)}`)
+                            : Promise.resolve();
+
+                        await Promise.all([configPromise, memoryPromise]);
+
+                        alert('数据恢复成功！页面将刷新以应用新数据。');
+                        location.reload();
+                        resolve();
+                    };
+
+                    const handleCancel = () => {
+                        recoveryModal.classList.remove('show');
+                        btn.disabled = false;
+                        btn.textContent = originalText;
+                        resolve();
+                    };
+                    
+                    // 清理旧监听器并添加新监听器
+                    const newConfirmBtn = confirmRecoveryBtn.cloneNode(true);
+                    confirmRecoveryBtn.parentNode.replaceChild(newConfirmBtn, confirmRecoveryBtn);
+                    newConfirmBtn.addEventListener('click', handleConfirm, { once: true });
+                    
+                    const newCancelBtn = cancelRecoveryBtn.cloneNode(true);
+                    cancelRecoveryBtn.parentNode.replaceChild(newCancelBtn, cancelRecoveryBtn);
+                    newCancelBtn.addEventListener('click', handleCancel, { once: true });
                 });
-            } catch (networkError) {
-                // 捕获 fetch 本身的网络错误
-                throw new Error('NetworkError');
-            }
 
-            // 2. 分析响应，提供精准错误信息
-            if (!validationResponse.ok) {
-                // 根据状态码抛出特定错误
-                if (validationResponse.status === 401) throw new Error('401 Unauthorized');
-                if (validationResponse.status === 403) throw new Error('403 Forbidden');
-                if (validationResponse.status === 404) throw new Error('404 Not Found');
-                throw new Error(`HTTP Error ${validationResponse.status}`);
-            }
-
-            // --- 如果验证通过，才继续执行原有的同步逻辑 ---
-            btn.textContent = '验证成功，正在同步...';
-            let fetchedConfig = await fetchConfigFromGithub();
-            
-            const defaultConfig = getDefaultConfig();
-            let needsSave = false;
-            let wasMigrated = false;
-            
-            if (fetchedConfig) {
-                 btn.textContent = '解析与合并...';
-                 const migrationResult = migrateLegacyConfig(fetchedConfig);
-                 fetchedConfig = migrationResult.migratedConfig;
-                 wasMigrated = migrationResult.wasMigrated;
-                 if (wasMigrated) btn.textContent = '迁移旧版配置...';
-
-                 const mergedConfig = mergeDeep({}, defaultConfig, fetchedConfig);
-                 // 核心逻辑不变
-                 if (JSON.stringify(mergedConfig) !== JSON.stringify(fetchedConfig) || wasMigrated) {
-                     currentConfig = mergedConfig;
-                     needsSave = true;
-                 }
             } else {
-                 btn.textContent = '云端无配置，正在创建...';
-                 currentConfig = defaultConfig;
-                 configSha = null; // 确保是创建新文件
-                 needsSave = true;
-            }
-            
-            if (needsSave) {
-                 btn.textContent = '正在保存至云端...';
-                 await saveGlobalConfig(wasMigrated ? 'Manual sync: Migrated legacy config' : 'Manual sync and repair');
-                 btn.textContent = '同步完成，即将刷新';
-                 alert("同步与修复完成！页面将刷新以应用最新配置。");
-                 location.reload();
-            } else {
-                 btn.textContent = '配置已是最新';
-                 alert("配置已是最新，无需修复。");
+                // 3. 如果数据正常，执行原有的同步和修复逻辑
+                btn.textContent = '数据完整，执行常规同步...';
+                
+                let fetchedConfig = currentConfigData;
+                const defaultConfig = getDefaultConfig();
+                let needsSave = false;
+                let wasMigrated = false;
+
+                const migrationResult = migrateLegacyConfig(fetchedConfig);
+                fetchedConfig = migrationResult.migratedConfig;
+                wasMigrated = migrationResult.wasMigrated;
+                if (wasMigrated) btn.textContent = '迁移旧版配置...';
+
+                const mergedConfig = mergeDeep({}, defaultConfig, fetchedConfig);
+                if (JSON.stringify(mergedConfig) !== JSON.stringify(fetchedConfig) || wasMigrated) {
+                    currentConfig = mergedConfig;
+                    needsSave = true;
+                }
+                
+                if (needsSave) {
+                    btn.textContent = '正在保存至云端...';
+                    await saveGlobalConfig(wasMigrated ? 'Manual sync: Migrated legacy config' : 'Manual sync and repair');
+                    btn.textContent = '同步完成，即将刷新';
+                    alert("同步与修复完成！页面将刷新以应用最新配置。");
+                    location.reload();
+                } else {
+                    btn.textContent = '配置已是最新';
+                    alert("配置已是最新，无需修复。");
+                }
             }
         } catch (e) {
-            // 3. 捕获上面抛出的特定错误，并显示给用户
-            let userMessage = `手动同步失败: ${e.message}`;
-            if (e.message.includes('401 Unauthorized')) {
-                userMessage = "认证失败 (401): 您的Personal Access Token无效、已过期或被撤销。请重新生成并更新。";
-            } else if (e.message.includes('403 Forbidden')) {
-                userMessage = "权限不足 (403): 您的Token有效，但缺少对仓库的访问权限。请确保已勾选 `repo` 作用域。";
-            } else if (e.message.includes('404 Not Found')) {
-                userMessage = "仓库未找到 (404): 请检查您的仓库地址 '用户名/仓库名' 是否填写正确。";
-            } else if (e.message.includes('NetworkError')) {
-                userMessage = "网络连接失败: 无法连接到GitHub API。请检查您的网络设置、代理或VPN。";
-            }
-            
-            btn.textContent = '同步失败';
-            alert(userMessage);
-
+            btn.textContent = '发生错误';
+            alert(`操作失败: ${e.message}`);
         } finally {
-            // 无论成功失败，3秒后恢复按钮状态
+            // 使用一个延时确保在页面刷新前按钮状态不会闪烁
             setTimeout(() => {
                 btn.disabled = false;
                 btn.textContent = originalText;
@@ -5511,9 +5664,38 @@ const getDefaultConfig = () => ({
     });
 
 
+
+
     async function loadInitialData() { 
         navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>'; 
+
+        // [核心修改] 检查是否为新用户
+        if (!GITHUB_CONFIG.owner || !GITHUB_CONFIG.repo || !GITHUB_CONFIG.token) {
+            console.log("New user detected. Showing first-time guide.");
+            navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">欢迎！请先完成配置。</p>';
+            
+            // 显示引导模态框
+            const guideModal = document.getElementById('first-time-guide-modal');
+            guideModal.classList.add('show');
+            
+            // 为引导按钮绑定事件
+            document.getElementById('goToSetupBtn').addEventListener('click', () => {
+                guideModal.classList.remove('show');
+                
+                // 打开常规的帮助文档
+                const helpModal = document.getElementById('helpModal');
+                helpModal.classList.add('show');
+                
+                // 自动切换到“首次配置”标签页
+                const setupTabRadio = document.getElementById('help-tab-0');
+                if (setupTabRadio) setupTabRadio.checked = true;
+            }, { once: true });
+
+            return; // [核心修改] 中断后续加载流程
+        }
+
         let fetchedConfig = await fetchConfigFromGithub(); 
+
         
         let needsSave = false;
         let wasMigrated = false;
@@ -8012,8 +8194,15 @@ const blob = b64toBlob(blobData.content, contentType);
         // 3. 比较哈希值，如果不一致则显示红点
         if (String(currentUpdateHash) !== lastSeenUpdateHash) {
             document.getElementById('helpBtn').classList.add('has-update');
+            
+            // [核心新增] 同时给“更新公告”标签页也加上红点
+            const updateTabLabel = document.querySelector('label[for="help-tab-2"]');
+            if (updateTabLabel) {
+                updateTabLabel.classList.add('has-update');
+            }
         }
     }
+
 
  window.addEventListener('load', async () => {
         loadGithubConfig();
@@ -10205,6 +10394,51 @@ const blob = b64toBlob(blobData.content, contentType);
                     <input type="checkbox" id="dontRemindCheckbox"> 不再提醒
                 </label>
                 <button id="confirmNoticeBtn" class="modal-button" style="width: auto; padding: 10px 20px;">我已阅读并同意</button>
+            </div>
+        </div>
+    </div>
+    <!-- [新增] 数据恢复确认模态框 -->
+    <div class="modal-overlay" id="dataRecoveryModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <span>🛡️ 数据恢复</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <p>检测到当前云端数据可能已损坏或为空！</p>
+                <p>我们在您的历史记录中找到了一个可用的版本，其包含以下内容：</p>
+                <div class="detail-info-group" style="padding: 12px;">
+                    <ul id="recovery-summary-list" style="list-style: none; padding-left: 5px; line-height: 1.8;">
+                        <!-- JS 动态填充摘要信息 -->
+                    </ul>
+                </div>
+                <p style="margin-top: 15px;"><strong>您是否希望使用此历史版本覆盖当前数据？</strong></p>
+                <div class="important-note" style="font-size: 13px; padding: 8px 12px; margin-top: 5px;">
+                    <p>此操作将恢复您的主配置和“记忆”功能的数据。操作不可撤销。</p>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button id="cancelRecoveryBtn" class="modal-button">取消</button>
+                <button id="confirmRecoveryBtn" class="modal-button primary">确认恢复</button>
+            </div>
+        </div>
+    </div>
+    <!-- ... 其他模态框代码 ... -->
+
+    <!-- [新增] 首次使用引导模态框 -->
+    <div class="modal-overlay" id="first-time-guide-modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <div class="modal-title-group">欢迎使用 Jellyfish Island</div>
+            </div>
+            <div class="modal-body">
+                <p>看起来这是您第一次使用本应用！</p>
+                <p>为了同步和备份您的所有个性化数据，您需要先完成一个简单的云端配置。</p>
+                <div class="important-note" style="padding: 10px 15px; margin: 15px 0;">
+                    <p style="margin:0;">请点击下方按钮，我们将引导您前往“使用指南”中的“首次配置”章节，按照步骤操作即可。</p>
+                </div>
+                <button id="goToSetupBtn" class="modal-button primary">前往配置</button>
             </div>
         </div>
     </div>
