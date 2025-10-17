@@ -2950,44 +2950,56 @@ body.dark-mode .album-item .sort-handle {
     cursor: grabbing;
 }
 
-        /* =============================================================== */
-        /* ============= [新增] 更新公告标签页红点提示样式 ============= */
-        /* =============================================================== */
-        label[for="help-tab-2"].has-update {
-            position: relative;
-        }
+/* =============================================================== */
+/* =================== [新增] 功能优化专属样式 =================== */
+/* =============================================================== */
 
-        label[for="help-tab-2"].has-update::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            right: 12px; /* 调整红点与文字的距离 */
-            transform: translateY(-50%);
-            width: 7px;
-            height: 7px;
-            background-color: #e53e3e;
-            border-radius: 50%;
-            box-shadow: 0 0 5px #e53e3e;
-        }
+/* 1. 更新公告标签的红点 */
+.segmented-control label[for="help-tab-2"] {
+    position: relative; /* 为红点的绝对定位提供基准 */
+}
+#update-log-indicator {
+    display: none; /* 默认隐藏 */
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background-color: #e53e3e;
+    border-radius: 50%;
+    border: 1px solid white;
+    box-shadow: 0 0 5px #e53e3e;
+}
+#update-log-indicator.show {
+    display: block; /* 用于JS控制显示 */
+}
 
-        @media (max-width: 480px) {
-            label[for="help-tab-2"].has-update::after {
-                right: 5px; /* 手机端距离小一点 */
-            }
-        }
-        /* =============================================================== */
-        /* ========================= [新增结束] ========================== */
-        /* =============================================================== */
+/* 2. 美化新用户引导弹窗的内容 */
+#welcome-modal-content p {
+    line-height: 1.7;
+    margin-bottom: 12px;
+}
+#welcome-modal-content ul {
+    list-style: none;
+    padding-left: 10px;
+    margin-bottom: 15px;
+}
+#welcome-modal-content li {
+    margin-bottom: 8px;
+    color: #4a5568;
+}
+body.dark-mode #welcome-modal-content li {
+    color: #a0aec0;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
 
     </style>
-
-
  <style id="custom-jelly-ball-styles"></style>
 
     <!-- [新增] 用于全局字体的样式标签 -->
     <style id="global-font-style"></style>
-
-
     <!-- 手机模式滑动容器 -->
     <div class="main-wrapper" id="mainWrapper">
         <div class="page-slider" id="pageSlider">
@@ -3107,7 +3119,7 @@ body.dark-mode .album-item .sort-handle {
                 <div class="segmented-control four-segments">
                     <label for="help-tab-0">首次配置</label>
                     <label for="help-tab-1">功能介绍</label>
-                    <label for="help-tab-2">更新公告</label>
+                    <label for="help-tab-2">更新公告<span id="update-log-indicator"></span></label>
                     <label for="help-tab-3">免责声明</label>
                     <div class="slider-indicator"></div>
                 </div>
@@ -4785,10 +4797,15 @@ const getDefaultConfig = () => ({
             }, 3000);
             syncErrorModal.classList.remove('show');
         } else if (status === 'error') {
-            document.getElementById('sync-error-message').textContent = message;
-            syncErrorModal.classList.add('show');
+            // [核心修改] 只有在已配置的情况下才弹出错误框
+            const isConfigured = GITHUB_CONFIG.owner && GITHUB_CONFIG.repo && GITHUB_CONFIG.token;
+            if (isConfigured) {
+                document.getElementById('sync-error-message').textContent = message;
+                syncErrorModal.classList.add('show');
+            }
         }
     }
+
     
     async function fetchFromGithub(path, method = 'GET', body = null, signal = null) {
         if (!checkConfig(false)) return { data: null, error: "GitHub未配置" };
@@ -5382,28 +5399,9 @@ const getDefaultConfig = () => ({
     // 切换弹窗和菜单的显示
     document.getElementById("helpModal").classList.add("show");
     toggleFabMenu(false);
-    
-    // [核心修改] 更新“已读”状态
-    const helpPage = document.getElementById('help-page-2');
-    if (helpPage) {
-        const currentUpdateHash = simpleHash(helpPage.innerHTML.trim());
-        localStorage.setItem('lastSeenUpdateHash', String(currentUpdateHash));
-    }
-    
-    // 立即移除红点，提供即时反馈
-    document.getElementById('helpBtn').classList.remove('has-update');
 })
-,document.getElementById("dataSyncBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(settingsModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),settingsModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("addNavBtn").addEventListener("click",()=>{openAddModal(); toggleFabMenu(false);}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); }), document.getElementById('jelly-css-help-modal').querySelectorAll('.copy-btn').forEach(btn => { btn.addEventListener('click', async (e) => { const textBlock = e.target.parentElement; const textToCopy = textBlock.innerText.replace(e.target.innerText, '').trim(); try { await navigator.clipboard.writeText(textToCopy); const originalText = e.target.textContent; e.target.textContent = '已复制!'; setTimeout(() => { e.target.textContent = originalText; }, 1500); } catch (err) { alert('复制失败，请手动复制。'); } }); });
 
-    // [核心新增] 为“更新公告”标签添加点击事件，用于消除红点
-    const updateTabLabel = document.querySelector('label[for="help-tab-2"]');
-    if (updateTabLabel) {
-        updateTabLabel.addEventListener('click', () => {
-            updateTabLabel.classList.remove('has-update');
-        });
-    }
-}
-
+,document.getElementById("dataSyncBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(settingsModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),settingsModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("addNavBtn").addEventListener("click",()=>{openAddModal(); toggleFabMenu(false);}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); }), document.getElementById('jelly-css-help-modal').querySelectorAll('.copy-btn').forEach(btn => { btn.addEventListener('click', async (e) => { const textBlock = e.target.parentElement; const textToCopy = textBlock.innerText.replace(e.target.innerText, '').trim(); try { await navigator.clipboard.writeText(textToCopy); const originalText = e.target.textContent; e.target.textContent = '已复制!'; setTimeout(() => { e.target.textContent = originalText; }, 1500); } catch (err) { alert('复制失败，请手动复制。'); } }); });}
     function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){const e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e=!0){return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据同步)"),!1):!0}
     
     function isObject(item) { return (item && typeof item === 'object' && !Array.isArray(item)); }
@@ -5668,34 +5666,7 @@ const getDefaultConfig = () => ({
 
     async function loadInitialData() { 
         navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>'; 
-
-        // [核心修改] 检查是否为新用户
-        if (!GITHUB_CONFIG.owner || !GITHUB_CONFIG.repo || !GITHUB_CONFIG.token) {
-            console.log("New user detected. Showing first-time guide.");
-            navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">欢迎！请先完成配置。</p>';
-            
-            // 显示引导模态框
-            const guideModal = document.getElementById('first-time-guide-modal');
-            guideModal.classList.add('show');
-            
-            // 为引导按钮绑定事件
-            document.getElementById('goToSetupBtn').addEventListener('click', () => {
-                guideModal.classList.remove('show');
-                
-                // 打开常规的帮助文档
-                const helpModal = document.getElementById('helpModal');
-                helpModal.classList.add('show');
-                
-                // 自动切换到“首次配置”标签页
-                const setupTabRadio = document.getElementById('help-tab-0');
-                if (setupTabRadio) setupTabRadio.checked = true;
-            }, { once: true });
-
-            return; // [核心修改] 中断后续加载流程
-        }
-
         let fetchedConfig = await fetchConfigFromGithub(); 
-
         
         let needsSave = false;
         let wasMigrated = false;
@@ -8182,26 +8153,20 @@ const blob = b64toBlob(blobData.content, contentType);
 
 
         function checkAppUpdate() {
-        const helpPage = document.getElementById('help-page-2');
-        if (!helpPage) return;
+            const helpPage = document.getElementById('help-page-2');
+            if (!helpPage) return;
 
-        // 1. 计算当前更新公告内容的哈希值
-        const currentUpdateHash = simpleHash(helpPage.innerHTML.trim());
+            const currentUpdateHash = simpleHash(helpPage.innerHTML.trim());
+            const lastSeenUpdateHash = localStorage.getItem('lastSeenUpdateHash');
+            const updateLogIndicator = document.getElementById('update-log-indicator');
 
-        // 2. 获取用户上次看到的哈希值
-        const lastSeenUpdateHash = localStorage.getItem('lastSeenUpdateHash');
-
-        // 3. 比较哈希值，如果不一致则显示红点
-        if (String(currentUpdateHash) !== lastSeenUpdateHash) {
-            document.getElementById('helpBtn').classList.add('has-update');
-            
-            // [核心新增] 同时给“更新公告”标签页也加上红点
-            const updateTabLabel = document.querySelector('label[for="help-tab-2"]');
-            if (updateTabLabel) {
-                updateTabLabel.classList.add('has-update');
+            if (String(currentUpdateHash) !== lastSeenUpdateHash) {
+                document.getElementById('helpBtn').classList.add('has-update');
+                if (updateLogIndicator) updateLogIndicator.classList.add('show');
+            } else {
+                if (updateLogIndicator) updateLogIndicator.classList.remove('show');
             }
         }
-    }
 
 
  window.addEventListener('load', async () => {
@@ -8238,26 +8203,66 @@ const blob = b64toBlob(blobData.content, contentType);
             FloatingBallManager.create();
         }
 
- function showIosWarning() {
-            // 检查是否为 iOS 设备 (iPhone, iPad, iPod)
+        function showIosWarning() {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            // 检查 localStorage 中是否已有标记
             const hasBeenShown = localStorage.getItem('iosWarningShown') === 'true';
             if (isIOS && !hasBeenShown) {
                 const modal = document.getElementById('iosWarningModal');
                 const confirmBtn = document.getElementById('iosWarningConfirmBtn');
-                // 显示模态框
                 modal.classList.add('show');
-                // 为确认按钮绑定点击事件
                 confirmBtn.addEventListener('click', () => {
-                    // 隐藏模态框
                     modal.classList.remove('show');
-                    // 在 localStorage 中设置标记，确保不再显示
                     localStorage.setItem('iosWarningShown', 'true');
-                }, { once: true }); // 使用 once: true 确保事件只触发一次
+                    // [核心修改] 用户确认iOS提示后，再检查是否需要显示首次引导
+                    checkAndShowFirstTimeGuide();
+                }, { once: true });
+            } else {
+                // [核心修改] 如果不是iOS或已经提示过，直接检查首次引导
+                checkAndShowFirstTimeGuide();
             }
         }
+        function checkAndShowFirstTimeGuide() {
+            const isConfigured = GITHUB_CONFIG.owner && GITHUB_CONFIG.repo && GITHUB_CONFIG.token;
+            const guideShown = localStorage.getItem('firstTimeGuideShown') === 'true';
+
+            if (!isConfigured && !guideShown) {
+                const guideModal = document.getElementById('firstTimeGuideModal');
+                const startBtn = document.getElementById('startConfigGuideBtn');
+
+                guideModal.classList.add('show');
+
+                startBtn.addEventListener('click', () => {
+                    guideModal.classList.remove('show');
+                    document.getElementById('helpModal').classList.add('show');
+                    document.getElementById('help-tab-0').click(); // 直接跳转到首次配置标签页
+                    localStorage.setItem('firstTimeGuideShown', 'true');
+                }, { once: true });
+            }
+        }
+
+        // [修改] 调用 showIosWarning，它现在内部会处理后续的 checkAndShowFirstTimeGuide 调用
         showIosWarning();
+
+
+        // [新增] 监听更新公告标签页的点击
+        const updateLogTab = document.querySelector('label[for="help-tab-2"]');
+        if (updateLogTab) {
+            updateLogTab.addEventListener('click', () => {
+                const helpPage = document.getElementById('help-page-2');
+                const updateLogIndicator = document.getElementById('update-log-indicator');
+
+                if (helpPage && updateLogIndicator.classList.contains('show')) {
+                    // 隐藏标签上的红点
+                    if (updateLogIndicator) updateLogIndicator.classList.remove('show');
+                    // 隐藏主按钮上的红点
+                    document.getElementById('helpBtn').classList.remove('has-update');
+                    // 更新“已读”状态到localStorage
+                    const currentUpdateHash = simpleHash(helpPage.innerHTML.trim());
+                    localStorage.setItem('lastSeenUpdateHash', String(currentUpdateHash));
+                }
+            });
+        }
+
         /* =============================================================== */
         /* ============== [新增] 拖拽排序功能核心逻辑 V1.0 ============= */
         /* =============================================================== */
@@ -10424,21 +10429,22 @@ const blob = b64toBlob(blobData.content, contentType);
             </div>
         </div>
     </div>
-    <!-- ... 其他模态框代码 ... -->
-
     <!-- [新增] 首次使用引导模态框 -->
-    <div class="modal-overlay" id="first-time-guide-modal">
-        <div class="modal-content" style="max-width: 450px;">
+    <div class="modal-overlay" id="firstTimeGuideModal">
+        <div class="modal-content" style="max-width: 480px;">
             <div class="modal-header">
                 <div class="modal-title-group">欢迎使用 Jellyfish Island</div>
             </div>
-            <div class="modal-body">
-                <p>看起来这是您第一次使用本应用！</p>
+            <div class="modal-body" id="welcome-modal-content">
                 <p>为了同步和备份您的所有个性化数据，您需要先完成一个简单的云端配置。</p>
-                <div class="important-note" style="padding: 10px 15px; margin: 15px 0;">
-                    <p style="margin:0;">请点击下方按钮，我们将引导您前往“使用指南”中的“首次配置”章节，按照步骤操作即可。</p>
-                </div>
-                <button id="goToSetupBtn" class="modal-button primary">前往配置</button>
+                <p>配置步骤：</p>
+                <ul>
+                    <li>✔ 创建一个安全的GitHub“钥匙”</li>
+                    <li>✔ 创建一个私密的云端“仓库”</li>
+                    <li>✔ 在本应用中填入信息</li>
+                </ul>
+                <p>我们将引导您完成每一步。</p>
+                <button id="startConfigGuideBtn" class="modal-button" style="margin-top: 15px;">开始配置</button>
             </div>
         </div>
     </div>
