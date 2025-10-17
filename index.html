@@ -4842,6 +4842,192 @@ const getDefaultConfig = () => ({
         return { init: initSettings, create: _create, destroy: _destroy };
     })();
     // ===== [END] FLOATING JELLYFISH BALL LOGIC =====
+        /* =============================================================== */
+        /* ============== [最终修正] 备份提醒功能管理器 V3.0 =============== */
+        /* =============================================================== */
+        const BackupReminderManager = (() => {
+            // [核心修改1] 将 ui 对象声明为空，延迟初始化
+            let ui = {}; 
+            let activeTimers = [];
+
+            // [核心修改2] 新增一个专门用于获取DOM元素的函数
+            function initUI() {
+                ui = {
+                    // 入口
+                    toggle: document.getElementById('backupReminderToggle'),
+                    settingsEntry: document.getElementById('backupSettingsEntry'),
+                    openSettingsBtn: document.getElementById('openBackupSettingsBtn'),
+                    // 设置弹窗 V2
+                    modal: document.getElementById('backupReminderSettingsModal'),
+                    timeBasedToggle: document.getElementById('backupTimeBasedToggle'),
+                    timeContainer: document.getElementById('backupTimeContainer'),
+                    timeListContainer: document.getElementById('backupTimeListContainer'),
+                    messageTextarea: document.getElementById('backupMessageTextarea'),
+                    onExitToggle: document.getElementById('backupOnExitToggle'),
+                    projectsSection: document.getElementById('backupProjectsSection'),
+                    projectList: document.getElementById('backupProjectList'),
+                    saveBtn: document.getElementById('saveBackupSettingsBtn'),
+                };
+            }
+
+            function getSettings() {
+                if (!currentConfig.settings.backupReminder) {
+                    currentConfig.settings.backupReminder = getDefaultConfig().settings.backupReminder;
+                }
+                return currentConfig.settings.backupReminder;
+            }
+            
+            function renderTimeRows(times = []) {
+                ui.timeListContainer.innerHTML = '';
+                if (times.length > 0) {
+                    times.forEach(time => addTimeRow(time));
+                } else {
+                    addTimeRow();
+                }
+            }
+
+            function addTimeRow(timeValue = '') {
+                const row = document.createElement('div');
+                row.className = 'time-input-row';
+                row.innerHTML = `
+                    <input type="time" class="modal-input" value="${timeValue}">
+                    <button class="time-action-btn add" title="添加新一行">+</button>
+                    <button class="time-action-btn remove" title="删除此行">-</button>
+                `;
+                row.querySelector('.add').addEventListener('click', () => addTimeRow());
+                row.querySelector('.remove').addEventListener('click', (e) => {
+                    if (ui.timeListContainer.childElementCount <= 1) {
+                         e.currentTarget.parentElement.querySelector('input[type="time"]').value = '';
+                    } else {
+                         e.currentTarget.parentElement.remove();
+                    }
+                });
+                ui.timeListContainer.appendChild(row);
+            }
+
+            function renderProjectList() {
+                ui.projectList.innerHTML = '';
+                const reminderSettings = getSettings();
+                const allButtons = currentConfig.categories.flatMap(c => c.buttons);
+                const uniqueButtons = Array.from(new Map(allButtons.map(item => [item.href, item])).values());
+                if (uniqueButtons.length === 0) {
+                    ui.projectList.innerHTML = '<p style="color: #889; text-align: center;">暂无项目</p>';
+                    return;
+                }
+                uniqueButtons.forEach(btn => {
+                    const isChecked = reminderSettings.projects.includes(btn.href);
+                    const itemHtml = `<label class="project-checkbox-item"><input type="checkbox" data-href="${btn.href}" ${isChecked ? 'checked' : ''}><span>${btn.text}</span></label>`;
+                    ui.projectList.innerHTML += itemHtml;
+                });
+            }
+
+            function populateSettingsModal() {
+                const settings = getSettings();
+                ui.messageTextarea.value = settings.message;
+                ui.timeBasedToggle.checked = settings.timeBasedEnabled;
+                ui.timeContainer.style.display = settings.timeBasedEnabled ? 'flex' : 'none';
+                renderTimeRows(settings.times);
+                ui.onExitToggle.checked = settings.onExit;
+                ui.projectsSection.style.display = settings.onExit ? 'block' : 'none';
+                renderProjectList();
+            }
+
+            function openSettingsModal() {
+                populateSettingsModal();
+                ui.modal.classList.add('show');
+            }
+
+            function saveSettings() {
+                const times = Array.from(ui.timeListContainer.querySelectorAll('.time-input-row input[type="time"]'))
+                                .map(input => input.value)
+                                .filter(Boolean);
+
+                const newSettings = {
+                    enabled: getSettings().enabled,
+                    timeBasedEnabled: ui.timeBasedToggle.checked,
+                    times: [...new Set(times)],
+                    message: ui.messageTextarea.value.trim() || '是时候该备份你的项目啦！',
+                    onExit: ui.onExitToggle.checked,
+                    projects: Array.from(ui.projectList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.dataset.href)
+                };
+
+                currentConfig.settings.backupReminder = newSettings;
+                saveGlobalConfig('Update backup reminder settings');
+                startTimers();
+                ui.modal.classList.remove('show');
+                showTopToast('备份提醒设置已保存！', 2000);
+            }
+            
+            function clearTimers() {
+                activeTimers.forEach(timerId => clearTimeout(timerId));
+                activeTimers = [];
+            }
+
+            function startTimers() {
+                clearTimers();
+                const settings = getSettings();
+                if (!settings.enabled || !settings.timeBasedEnabled || settings.times.length === 0) return;
+                const now = new Date();
+                settings.times.forEach(timeStr => {
+                    const [hours, minutes] = timeStr.split(':').map(Number);
+                    let reminderTime = new Date();
+                    reminderTime.setHours(hours, minutes, 0, 0);
+                    if (reminderTime < now) reminderTime.setDate(reminderTime.getDate() + 1);
+                    const delay = reminderTime.getTime() - now.getTime();
+                    const createReminder = () => {
+                        showTopToast(settings.message);
+                        activeTimers.push(setTimeout(createReminder, 24 * 60 * 60 * 1000));
+                    };
+                    activeTimers.push(setTimeout(createReminder, delay));
+                });
+            }
+
+            function triggerOnExitReminder() {
+                const settings = getSettings();
+                if (!settings.enabled || !settings.onExit) return;
+                const originalUrl = iframeModal.dataset.originalUrl;
+                if (!originalUrl) return;
+                const targetProjects = settings.projects;
+                if (targetProjects.length === 0 || targetProjects.includes(originalUrl)) {
+                    showTopToast(settings.message);
+                }
+            }
+
+            // [核心修改3] init 函数现在只负责绑定事件监听器
+            function init() {
+                const initialSettings = getSettings();
+                ui.toggle.checked = initialSettings.enabled;
+                ui.settingsEntry.style.display = initialSettings.enabled ? 'block' : 'none';
+
+                ui.toggle.addEventListener('change', () => {
+                    const settings = getSettings();
+                    settings.enabled = ui.toggle.checked;
+                    ui.settingsEntry.style.display = settings.enabled ? 'block' : 'none';
+                    saveGlobalConfig('Toggle backup reminder');
+                    if (settings.enabled) startTimers(); else clearTimers();
+                });
+
+                ui.openSettingsBtn.addEventListener('click', openSettingsModal);
+                ui.timeBasedToggle.addEventListener('change', () => {
+                    ui.timeContainer.style.display = ui.timeBasedToggle.checked ? 'flex' : 'none';
+                });
+                ui.onExitToggle.addEventListener('change', () => {
+                    ui.projectsSection.style.display = ui.onExitToggle.checked ? 'block' : 'none';
+                });
+                ui.saveBtn.addEventListener('click', saveSettings);
+
+                startTimers();
+            }
+
+            // [核心修改4] 导出 initUI 和 init
+            return {
+                init,
+                initUI,
+                triggerOnExitReminder
+            };
+
+        })();
+
 
     const utf8_to_b64 = (str) => btoa(unescape(encodeURIComponent(str)));
     const b64_to_utf8 = (str) => decodeURIComponent(escape(atob(str)));
@@ -8642,215 +8828,6 @@ const blob = b64toBlob(blobData.content, contentType);
         /* ========================= [新增结束] ========================== */
         /* =============================================================== */
         
-        /* =============================================================== */
-        /* ============== [新增] 备份提醒功能管理器 V2.0 =============== */
-        /* =============================================================== */
-        const BackupReminderManager = (() => {
-            let activeTimers = [];
-
-            const ui = {
-                // 入口
-                toggle: document.getElementById('backupReminderToggle'),
-                settingsEntry: document.getElementById('backupSettingsEntry'),
-                openSettingsBtn: document.getElementById('openBackupSettingsBtn'),
-                // 设置弹窗 V2
-                modal: document.getElementById('backupReminderSettingsModal'),
-                timeBasedToggle: document.getElementById('backupTimeBasedToggle'),
-                timeContainer: document.getElementById('backupTimeContainer'),
-                timeListContainer: document.getElementById('backupTimeListContainer'),
-                messageTextarea: document.getElementById('backupMessageTextarea'),
-                onExitToggle: document.getElementById('backupOnExitToggle'),
-                projectsSection: document.getElementById('backupProjectsSection'),
-                projectList: document.getElementById('backupProjectList'),
-                saveBtn: document.getElementById('saveBackupSettingsBtn'),
-            };
-
-            function getSettings() {
-                if (!currentConfig.settings.backupReminder) {
-                    currentConfig.settings.backupReminder = getDefaultConfig().settings.backupReminder;
-                }
-                return currentConfig.settings.backupReminder;
-            }
-
-            // [MODIFIED] 从数据动态创建时间输入行
-            function renderTimeRows(times = []) {
-                ui.timeListContainer.innerHTML = '';
-                if (times.length > 0) {
-                    times.forEach(time => addTimeRow(time));
-                } else {
-                    addTimeRow(); // 默认至少显示一个
-                }
-            }
-
-            // [MODIFIED V2] 添加一个新的时间输入行，包含加减号
-            function addTimeRow(timeValue = '') {
-                const row = document.createElement('div');
-                row.className = 'time-input-row';
-                row.innerHTML = `
-                    <input type="time" class="modal-input" value="${timeValue}">
-                    <button class="time-action-btn add" title="添加新一行">+</button>
-                    <button class="time-action-btn remove" title="删除此行">-</button>
-                `;
-                
-                // 绑定加号事件
-                row.querySelector('.add').addEventListener('click', () => {
-                    addTimeRow();
-                });
-
-                // 绑定减号事件
-                row.querySelector('.remove').addEventListener('click', (e) => {
-                    // 如果只剩最后一个，则不删除，仅清空
-                    if (ui.timeListContainer.childElementCount <= 1) {
-                         e.currentTarget.parentElement.querySelector('input[type="time"]').value = '';
-                    } else {
-                         e.currentTarget.parentElement.remove();
-                    }
-                });
-
-                ui.timeListContainer.appendChild(row);
-            }
-
-
-            // [UNCHANGED] 渲染项目列表
-            function renderProjectList() {
-                ui.projectList.innerHTML = '';
-                const reminderSettings = getSettings();
-                const allButtons = currentConfig.categories.flatMap(c => c.buttons);
-                const uniqueButtons = Array.from(new Map(allButtons.map(item => [item.href, item])).values());
-                if (uniqueButtons.length === 0) {
-                    ui.projectList.innerHTML = '<p style="color: #889; text-align: center;">暂无项目</p>';
-                    return;
-                }
-                uniqueButtons.forEach(btn => {
-                    const isChecked = reminderSettings.projects.includes(btn.href);
-                    const itemHtml = `<label class="project-checkbox-item"><input type="checkbox" data-href="${btn.href}" ${isChecked ? 'checked' : ''}><span>${btn.text}</span></label>`;
-                    ui.projectList.innerHTML += itemHtml;
-                });
-            }
-
-            // [MODIFIED] 填充 V2 版本的弹窗
-            function populateSettingsModal() {
-                const settings = getSettings();
-                ui.messageTextarea.value = settings.message;
-                ui.timeBasedToggle.checked = settings.timeBasedEnabled;
-                ui.timeContainer.style.display = settings.timeBasedEnabled ? 'flex' : 'none';
-                renderTimeRows(settings.times);
-                ui.onExitToggle.checked = settings.onExit;
-                ui.projectsSection.style.display = settings.onExit ? 'block' : 'none';
-                renderProjectList();
-            }
-
-
-            function openSettingsModal() {
-                populateSettingsModal();
-                ui.modal.classList.add('show');
-            }
-
-            // [MODIFIED] 保存 V2 版本的设置
-            function saveSettings() {
-                const times = Array.from(ui.timeListContainer.querySelectorAll('.time-input-row input[type="time"]'))
-                                .map(input => input.value)
-                                .filter(Boolean); // 过滤掉空值
-
-                const newSettings = {
-                    enabled: getSettings().enabled,
-                    timeBasedEnabled: ui.timeBasedToggle.checked, // 新增
-                    times: [...new Set(times)], // 去重
-                    message: ui.messageTextarea.value.trim() || '是时候该备份你的项目啦！',
-                    onExit: ui.onExitToggle.checked,
-                    projects: Array.from(ui.projectList.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.dataset.href)
-                };
-
-                currentConfig.settings.backupReminder = newSettings;
-                saveGlobalConfig('Update backup reminder settings');
-                startTimers();
-                ui.modal.classList.remove('show');
-                showTopToast('备份提醒设置已保存！', 2000);
-            }
-            
-            function clearTimers() {
-                activeTimers.forEach(timerId => clearTimeout(timerId));
-                activeTimers = [];
-            }
-
-            // [MODIFIED] 启动计时器时检查新的开关
-            function startTimers() {
-                clearTimers();
-                const settings = getSettings();
-                if (!settings.enabled || !settings.timeBasedEnabled || settings.times.length === 0) {
-                    return;
-                }
-                const now = new Date();
-                settings.times.forEach(timeStr => {
-                    const [hours, minutes] = timeStr.split(':').map(Number);
-                    let reminderTime = new Date();
-                    reminderTime.setHours(hours, minutes, 0, 0);
-                    if (reminderTime < now) {
-                        reminderTime.setDate(reminderTime.getDate() + 1);
-                    }
-                    const delay = reminderTime.getTime() - now.getTime();
-                    const createReminder = () => {
-                        showTopToast(settings.message);
-                        const nextTimerId = setTimeout(createReminder, 24 * 60 * 60 * 1000);
-                        activeTimers.push(nextTimerId);
-                    };
-                    const timerId = setTimeout(createReminder, delay);
-                    activeTimers.push(timerId);
-                });
-            }
-
-            function triggerOnExitReminder() {
-                const settings = getSettings();
-                if (!settings.enabled || !settings.onExit) return;
-                const originalUrl = iframeModal.dataset.originalUrl;
-                if (!originalUrl) return;
-                const targetProjects = settings.projects;
-                if (targetProjects.length === 0 || targetProjects.includes(originalUrl)) {
-                    showTopToast(settings.message);
-                }
-            }
-
-            // [MODIFIED] 初始化 V2 版本的事件监听
-            function init() {
-                const initialSettings = getSettings();
-                ui.toggle.checked = initialSettings.enabled;
-                ui.settingsEntry.style.display = initialSettings.enabled ? 'block' : 'none';
-
-                ui.toggle.addEventListener('change', () => {
-                    const settings = getSettings();
-                    settings.enabled = ui.toggle.checked;
-                    ui.settingsEntry.style.display = settings.enabled ? 'block' : 'none';
-                    saveGlobalConfig('Toggle backup reminder');
-                    if (settings.enabled) startTimers();
-                    else clearTimers();
-                });
-
-                ui.openSettingsBtn.addEventListener('click', openSettingsModal);
-                
-                // 设置弹窗内的事件监听
-                ui.timeBasedToggle.addEventListener('change', () => {
-                    ui.timeContainer.style.display = ui.timeBasedToggle.checked ? 'flex' : 'none';
-                });
-
-                ui.onExitToggle.addEventListener('change', () => {
-                    ui.projectsSection.style.display = ui.onExitToggle.checked ? 'block' : 'none';
-                });
-
-                ui.saveBtn.addEventListener('click', saveSettings);
-
-                startTimers();
-            }
-
-            return {
-                init,
-                triggerOnExitReminder
-            };
-
-        })();
-
-        /* =============================================================== */
-        /* ========================= [新增结束] ========================== */
-        /* =============================================================== */
 
 
          /* =============================================================== */
@@ -10669,13 +10646,17 @@ const blob = b64toBlob(blobData.content, contentType);
         // 初始化字体管理器
         FontManager.init();
         
-        // [新增] 初始化备份提醒管理器
+        // [核心修正] 初始化备份提醒管理器
+        // 1. 先调用 initUI() 找到所有HTML元素
+        BackupReminderManager.initUI();
+        // 2. 再调用 init() 为这些元素绑定事件
         BackupReminderManager.init();
 
         /* =============================================================== */
         /* ========================= [新增结束] ========================== */
         /* =============================================================== */
     });
+
 
 
             // [新增] 锁屏组件交互事件监听
@@ -10786,7 +10767,7 @@ const blob = b64toBlob(blobData.content, contentType);
     <div class="modal-overlay" id="backupReminderSettingsModal">
         <div class="modal-content" style="max-width: 420px;">
             <div class="modal-header">
-                <div class="modal-title-group"><span>自定义备份提醒</span></div>
+                <div class="modal-title-group"><span>备份提醒设置</span></div>
                 <button class="close-btn" data-modal-id="backupReminderSettingsModal">&times;</button>
             </div>
             <div class="modal-body">
