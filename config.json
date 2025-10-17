@@ -16,18 +16,18 @@
       "functions": {},
       "customCSS": ""
     },
-    "backupReminder": {
-      "enabled": false,
-      "onExit": false,
-      "times": [],
-      "message": "是时候备份啦！",
-      "projects": []
-    },
     "globalFont": {
       "name": "",
       "url": ""
     },
-    "fontPresets": []
+    "fontPresets": [],
+    "backupReminder": {
+      "enabled": false,
+      "times": [],
+      "message": "是时候备份啦！",
+      "onExit": false,
+      "projects": []
+    }
   },
   "themePresets": [
     {
