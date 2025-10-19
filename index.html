@@ -2564,7 +2564,7 @@ body.theme-glass.dark-mode .memo-toolbar {
 
 /* 核心修改：列表容器改为 Flex 布局以实现泡泡效果 */
 #phoneCollectionModal .list-container {
-    padding: 50px 20px; /* ★★★ 修正：增加顶部内边距，为上移的泡泡提供空间，防止被裁切 ★★★ */
+    padding: 35px 20px; /* ★★★ 修正：增加顶部内边距，为上移的泡泡提供空间，防止被裁切 ★★★ */
     display: flex; 
     flex-wrap: wrap; 
     justify-content: center; 
@@ -2601,13 +2601,6 @@ body.theme-glass.dark-mode .memo-toolbar {
     animation: float-bubble 6s ease-in-out infinite;
 }
 
-/* ★ 新增：错落有致的布局效果 ★ */
-.phone-partition-item:nth-child(odd) {
-    transform: translateY(-20px); /* 奇数泡泡向上移动 */
-}
-.phone-partition-item:nth-child(even) {
-    transform: translateY(20px); /* 偶数泡泡向下移动 */
-}
 
 
 .phone-partition-item:active {
@@ -2723,13 +2716,11 @@ body.dark-mode #showNoticeBell {
     .phone-partition-item .phone-partition-name {
         font-size: 0.8rem; /* 略微减小字体 */
     }
-    /* 减小错落效果的幅度 */
-    .phone-partition-item:nth-child(odd) {
-        transform: translateY(-15px);
-    }
-    .phone-partition-item:nth-child(even) {
-        transform: translateY(15px);
-    }
+
+}
+/* ★★★ 最终方案：使用 margin 实现错落效果，并从根本上解决安卓裁切问题 ★★★ */
+.phone-partition-item:nth-child(even) {
+    margin-top: -30px; 
 }
 
 /* =============================================================== */
