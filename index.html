@@ -3199,6 +3199,13 @@ body.dark-mode .status-option-btn:hover {
     outline: 2.5px solid var(--status-color);
     outline-offset: 2px; /* 让边框与泡泡之间有一点空隙，更好看 */
 }
+/* ★★★ 新增：修复磨砂玻璃主题下“已拥有”状态的背景色问题 ★★★ */
+body.theme-glass .phone-partition-item.status-owned,
+body.theme-glass.dark-mode .phone-partition-item.status-owned {
+    background: var(--status-color);
+    /* 移除磨砂玻璃主题添加的透明边框，避免颜色冲突 */
+    border: none;
+}
 
 
     </style>
@@ -3503,6 +3510,15 @@ body.dark-mode .status-option-btn:hover {
     </div>
         <!-- ★ 在这里新增下面的代码块 ★ -->
 <div class="update-log-entry">
+    <h4>v5.9.5 <span class="update-date">- 2025.10.19</span></h4>
+    <ul>
+        <li><span class="tag new">新功能</span> 新增备份提醒功能，支持定时或在关闭项目时弹出提醒，有效防止数据丢失。</li>
+        <li><span class="tag new">新功能</span> 手机收藏馆新增“我的状态”功能，可将手机标记为“已拥有”或“愿望单”，并附有专属动态效果。</li>
+        <li><span class="tag new">新功能</span> 手机收藏馆新增高级筛选功能，支持按手机状态、售价和“我的状态”进行多条件组合筛选。</li>
+        <li><span class="tag new">新功能</span> 在相册的全屏看图模式下，现已支持直接下载当前照片。</li>
+    </ul>
+</div>
+<div class="update-log-entry">
     <h4>v5.9.0 <span class="update-date">- 2025.10.17</span></h4>
     <ul>
         <li><span class="tag release">里程碑</span> 应用正式更名为“水母岛 (Jellyfish Island)”。</li>
@@ -3636,7 +3652,7 @@ body.dark-mode .status-option-btn:hover {
     </div>
     
     <footer class="update-footer">
-        当前版本: v5.9.0
+        当前版本: v5.9.5
     </footer>
 </div>
                     <div id="help-page-3" class="help-page-content">
