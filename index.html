@@ -2563,17 +2563,15 @@ body.theme-glass.dark-mode .memo-toolbar {
     flex-shrink: 0; 
 }
 
-/* 核心修改：列表容器改为 Flex 布局以实现泡泡效果 */
 #phoneCollectionModal .list-container {
     padding: 35px 20px;
-    display: grid; /* 修改: 使用更稳定、更适合二维布局的Grid */
-    grid-template-columns: repeat(auto-fill, 100px); /* 新增: 定义自适应列，每列宽度为泡泡的宽度(100px) */
-    justify-content: center; /* 保留: 这个属性在Grid中同样有效，用于水平居中所有列 */
-    gap: 25px; 
-    align-content: flex-start; /* 保留: 确保内容从顶部开始排列 */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 100px);
+    justify-content: space-evenly; /* ★ 核心修改：将 center 改为 space-evenly ★ */
+    gap: 15px; 
+    align-content: flex-start; 
     overflow-y: auto;
     min-height: 0;
-    /* 移除了不再需要的Flexbox专属属性: flex-wrap, align-items, flex-grow */
 }
 
 
