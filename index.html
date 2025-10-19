@@ -2566,15 +2566,14 @@ body.theme-glass.dark-mode .memo-toolbar {
 #phoneCollectionModal .list-container {
     padding: 35px 20px;
     display: grid;
-    /* ★ 最终修复：将最小宽度设置为动画缩放后的最大值，并居中项目 ★ */
-    grid-template-columns: repeat(auto-fit, minmax(102px, 1fr));
-    justify-items: center; /* [新增] 确保泡泡在网格单元格内水平居中 */
-    gap: 20px;
+    /* ★ 核心修改：使用minmax实现真正的自适应列 ★ */
+grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* <--- 修改为100px */
+    gap: 20px; /* ★ 优化：稍微减小间距以容纳更多内容 ★ */
     align-content: flex-start;
     overflow-y: auto;
     min-height: 0;
+    /* 移除了不再需要的 justify-content 属性 */
 }
-
 
 /* 核心修改：将分区项目改为圆形泡泡 */
 .phone-partition-item {
