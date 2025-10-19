@@ -2565,17 +2565,17 @@ body.theme-glass.dark-mode .memo-toolbar {
 
 /* 核心修改：列表容器改为 Flex 布局以实现泡泡效果 */
 #phoneCollectionModal .list-container {
-    padding: 35px 20px; /* 进一步增加上下内边距，为错落效果留出空间 */
-    display: flex; 
-    flex-wrap: wrap; 
-    justify-content: center; 
-    align-items: center; 
+    padding: 35px 20px;
+    display: grid; /* 修改: 使用更稳定、更适合二维布局的Grid */
+    grid-template-columns: repeat(auto-fill, 100px); /* 新增: 定义自适应列，每列宽度为泡泡的宽度(100px) */
+    justify-content: center; /* 保留: 这个属性在Grid中同样有效，用于水平居中所有列 */
     gap: 25px; 
-    align-content: flex-start; /* ★ 核心修改：确保内容从上到下排列，解决遮挡问题 ★ */
-    flex-grow: 1; 
-    overflow-y: auto; 
+    align-content: flex-start; /* 保留: 确保内容从顶部开始排列 */
+    overflow-y: auto;
     min-height: 0;
+    /* 移除了不再需要的Flexbox专属属性: flex-wrap, align-items, flex-grow */
 }
+
 
 
 /* 核心修改：将分区项目改为圆形泡泡 */
@@ -3208,6 +3208,84 @@ body.theme-glass.dark-mode .phone-partition-item.status-owned {
     /* 移除磨砂玻璃主题添加的透明边框，避免颜色冲突 */
     border: none;
 }
+/* =============================================================== */
+/* ============= [新增] 多版本恢复选择器样式 ================ */
+/* =============================================================== */
+#recovery-versions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 45vh;
+    overflow-y: auto;
+    padding: 5px;
+    margin: 10px 0;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15px, black 90%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 15px, black 90%, transparent 100%);
+}
+
+.recovery-version-item {
+    border: 1px solid rgba(128,128,128,0.2);
+    border-radius: 10px;
+    transition: background-color 0.2s, border-color 0.2s;
+    position: relative;
+}
+
+.recovery-version-item:has(input:checked) {
+    background-color: rgba(91, 153, 226, 0.1);
+    border-color: var(--hold-border);
+    box-shadow: 0 0 8px rgba(91, 153, 226, 0.3);
+}
+
+.recovery-version-item label {
+    display: block;
+    padding: 12px 18px;
+    cursor: pointer;
+    line-height: 1.6;
+}
+
+.recovery-version-item input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.version-meta {
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+.version-meta span {
+    font-size: 12px;
+    font-weight: normal;
+    color: #889;
+    margin-left: 8px;
+}
+body.dark-mode .version-meta span {
+    color: #a0aec0;
+}
+
+.version-summary {
+    font-size: 13px;
+    color: #5a6778;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 15px; /* 行间距 和 列间距 */
+}
+body.dark-mode .version-summary {
+    color: #c0c6cc;
+}
+
+#confirmRecoveryBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: #9db2c2 !important;
+    box-shadow: none !important;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
 
 
     </style>
@@ -6020,7 +6098,7 @@ const getDefaultConfig = () => ({
         const btn = settingsModalElements.manualSyncBtn;
         const originalText = btn.textContent;
         const recoveryModal = document.getElementById('dataRecoveryModal');
-        const summaryList = document.getElementById('recovery-summary-list');
+        const versionsListContainer = document.getElementById('recovery-versions-list');
         const confirmRecoveryBtn = document.getElementById('confirmRecoveryBtn');
         const cancelRecoveryBtn = document.getElementById('cancelRecoveryBtn');
 
@@ -6028,85 +6106,98 @@ const getDefaultConfig = () => ({
         btn.textContent = '正在检查云端数据...';
 
         try {
-            // 1. 获取当前云端配置
             const currentConfigData = await fetchConfigFromGithub();
             const isDataEmpty = !currentConfigData || !currentConfigData.categories || currentConfigData.categories.length === 0 || 
                                 (currentConfigData.categories.length === 1 && currentConfigData.categories[0].buttons.length === 0);
 
-            // 2. 如果数据为空，则启动恢复流程
             if (isDataEmpty) {
                 btn.textContent = '检测到数据为空，正在查找历史版本...';
                 
                 const history = await getHistoryForFile('config.json');
-                if (!history || history.length < 2) {
+                const historyToConsider = history ? history.slice(1, 5) : []; // 跳过最新的错误提交，取最多4个历史版本
+
+                if (!historyToConsider || historyToConsider.length === 0) {
                     throw new Error('未找到足够的历史记录来进行恢复。');
                 }
 
-                // 选择倒数第二个版本作为恢复点
-                const recoveryCommit = history[1];
-                const recoveryCommitSha = recoveryCommit.sha;
-                const commitMessage = recoveryCommit.commit.message;
-                const commitDate = new Date(recoveryCommit.commit.author.date).toLocaleString('zh-CN');
-
                 btn.textContent = '正在解析历史数据...';
 
-                // 获取历史版本的 config.json 和 memory.json
-                const [historicalConfigContent, historicalMemoryContent] = await Promise.all([
-                    getContentAtCommit('config.json', recoveryCommitSha),
-                    getContentAtCommit('memory/data.json', recoveryCommitSha)
-                ]);
+                const versions = [];
+                await Promise.all(historyToConsider.map(async (commit) => {
+                    const commitSha = commit.sha;
+                    const [configContent, memoryContent] = await Promise.all([
+                        getContentAtCommit('config.json', commitSha),
+                        getContentAtCommit('memory/data.json', commitSha)
+                    ]);
+                    if (!configContent) return;
 
-                if (!historicalConfigContent) {
-                    throw new Error('无法获取历史版本的主配置文件，恢复失败。');
-                }
-
-                // 解析和统计
-                let summary = { buttons: 0, categories: 0, photos: 0, albums: 0, memos: 0, memoFolders: 0 };
-                try {
-                    const parsedConfig = JSON.parse(historicalConfigContent);
-                    summary.categories = parsedConfig.categories?.length || 0;
-                    summary.buttons = parsedConfig.categories?.reduce((acc, cat) => acc + (cat.buttons?.length || 0), 0) || 0;
-                } catch(e) { console.error("Error parsing historical config.json"); }
-
-                if (historicalMemoryContent) {
+                    let summary = { buttons: 0, categories: 0, photos: 0, albums: 0, memos: 0, memoFolders: 0 };
                     try {
-                        const parsedMemory = JSON.parse(historicalMemoryContent);
-                        summary.albums = parsedMemory.album?.folders?.length || 0;
-                        summary.photos = parsedMemory.album?.items?.reduce((acc, item) => acc + (item.type === 'photoset' ? item.photos.length : 1), 0) || 0;
-                        summary.memoFolders = parsedMemory.memo?.folders?.length || 0;
-                        summary.memos = parsedMemory.memo?.notes?.length || 0;
-                    } catch (e) { console.error("Error parsing historical memory/data.json"); }
+                        const parsedConfig = JSON.parse(configContent);
+                        summary.categories = parsedConfig.categories?.length || 0;
+                        summary.buttons = parsedConfig.categories?.reduce((acc, cat) => acc + (cat.buttons?.length || 0), 0) || 0;
+                    } catch (e) { /* ignore */ }
+                    if (memoryContent) {
+                        try {
+                            const parsedMemory = JSON.parse(memoryContent);
+                            summary.albums = parsedMemory.album?.folders?.length || 0;
+                            summary.photos = parsedMemory.album?.items?.reduce((acc, item) => acc + (item.type === 'photoset' ? item.photos.length : 1), 0) || 0;
+                            summary.memoFolders = parsedMemory.memo?.folders?.length || 0;
+                            summary.memos = parsedMemory.memo?.notes?.length || 0;
+                        } catch (e) { /* ignore */ }
+                    }
+                    versions.push({sha:commitSha,message:commit.commit.message,date:new Date(commit.commit.author.date).toLocaleString('zh-CN'),summary,configContent,memoryContent});
+                }));
+
+                if (versions.length === 0) {
+                    throw new Error('无法解析任何有效的历史版本。');
                 }
-
-                // 填充并显示恢复确认模态框
-                summaryList.innerHTML = `
-                    <li><strong>版本信息:</strong> ${commitMessage}</li>
-                    <li><strong>修改于:</strong> ${commitDate}</li>
-                    <hr style="margin: 8px 0; border: 0; border-top: 1px solid rgba(128,128,128,0.2);">
-                    <li><strong>按钮项目:</strong> ${summary.buttons} 个</li>
-                    <li><strong>项目分类:</strong> ${summary.categories} 个</li>
-                    <li><strong>备忘录:</strong> ${summary.memos} 篇 (在 ${summary.memoFolders} 个文件夹中)</li>
-                    <li><strong>照片:</strong> ${summary.photos} 张 (在 ${summary.albums} 个相册中)</li>
-                `;
                 
-                settingsModalElements.modal.classList.remove('show');
+                // 渲染版本列表
+                versionsListContainer.innerHTML = '';
+                versions.forEach((version, index) => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'recovery-version-item';
+                    itemEl.innerHTML = `
+                        <input type="radio" name="recovery-version" id="version-${index}" value="${version.sha}">
+                        <label for="version-${index}">
+                            <div class="version-meta">${version.message} <span>(${version.date})</span></div>
+                            <div class="version-summary">
+                                <span><pre>按钮: ${version.summary.buttons}</pre></span>
+                                <span><pre>分类: ${version.summary.categories}</pre></span>
+                                <span><pre>备忘录: ${version.summary.memos}</pre></span>
+                                <span><pre>相册: ${version.summary.albums}</pre></span>
+                                <span><pre>照片: ${version.summary.photos}</pre></span>
+                            </div>
+                        </label>
+                    `;
+                    versionsListContainer.appendChild(itemEl);
+                });
+                
+                document.getElementById('settingsModal').classList.remove('show');
                 recoveryModal.classList.add('show');
-                btn.textContent = '请确认恢复操作...';
+                btn.textContent = '请选择恢复版本...';
+                confirmRecoveryBtn.disabled = true;
 
-                // 返回一个Promise，等待用户操作
                 return new Promise(resolve => {
+                    const handleSelectionChange = () => confirmRecoveryBtn.disabled = false;
+                    versionsListContainer.addEventListener('change', handleSelectionChange);
+
                     const handleConfirm = async () => {
+                        const selectedSha = versionsListContainer.querySelector('input[name="recovery-version"]:checked')?.value;
+                        if (!selectedSha) return;
+
+                        const selectedVersion = versions.find(v => v.sha === selectedSha);
+                        if (!selectedVersion) return alert('无法找到所选版本的数据。');
+
                         recoveryModal.classList.remove('show');
                         btn.textContent = '正在恢复数据...';
 
-                        // 同时恢复两个文件
-                        const configPromise = saveToGithub('config.json', utf8_to_b64(historicalConfigContent), `Recover data from commit ${recoveryCommitSha.substring(0, 7)}`);
-                        const memoryPromise = historicalMemoryContent 
-                            ? saveToGithub('memory/data.json', utf8_to_b64(historicalMemoryContent), `Recover data from commit ${recoveryCommitSha.substring(0, 7)}`)
-                            : Promise.resolve();
-
+                        const commitMsg = `Recover data from commit ${selectedVersion.sha.substring(0, 7)}`;
+                        const configPromise = saveToGithub('config.json', utf8_to_b64(selectedVersion.configContent), commitMsg);
+                        const memoryPromise = selectedVersion.memoryContent ? saveToGithub('memory/data.json', utf8_to_b64(selectedVersion.memoryContent), commitMsg) : Promise.resolve();
+                        
                         await Promise.all([configPromise, memoryPromise]);
-
                         alert('数据恢复成功！页面将刷新以应用新数据。');
                         location.reload();
                         resolve();
@@ -6119,20 +6210,12 @@ const getDefaultConfig = () => ({
                         resolve();
                     };
                     
-                    // 清理旧监听器并添加新监听器
-                    const newConfirmBtn = confirmRecoveryBtn.cloneNode(true);
-                    confirmRecoveryBtn.parentNode.replaceChild(newConfirmBtn, confirmRecoveryBtn);
-                    newConfirmBtn.addEventListener('click', handleConfirm, { once: true });
-                    
-                    const newCancelBtn = cancelRecoveryBtn.cloneNode(true);
-                    cancelRecoveryBtn.parentNode.replaceChild(newCancelBtn, cancelRecoveryBtn);
-                    newCancelBtn.addEventListener('click', handleCancel, { once: true });
+                    confirmRecoveryBtn.onclick = handleConfirm;
+                    cancelRecoveryBtn.onclick = handleCancel;
                 });
 
             } else {
-                // 3. 如果数据正常，执行原有的同步和修复逻辑
                 btn.textContent = '数据完整，执行常规同步...';
-                
                 let fetchedConfig = currentConfigData;
                 const defaultConfig = getDefaultConfig();
                 let needsSave = false;
@@ -6164,54 +6247,52 @@ const getDefaultConfig = () => ({
             btn.textContent = '发生错误';
             alert(`操作失败: ${e.message}`);
         } finally {
-            // 使用一个延时确保在页面刷新前按钮状态不会闪烁
             setTimeout(() => {
-                btn.disabled = false;
-                btn.textContent = originalText;
+                if(btn.textContent.includes('...')) { // 只在未完成最终操作时恢复按钮
+                   btn.disabled = false;
+                   btn.textContent = originalText;
+                }
             }, 3000);
         }
     });
 
-
-
-
     async function loadInitialData() { 
         navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>'; 
         let fetchedConfig = await fetchConfigFromGithub(); 
-        
         let needsSave = false;
         let wasMigrated = false;
 
+        // [核心修复逻辑]
         if (fetchedConfig) {
+            // 云端存在配置，以此为基础进行合并和迁移
             const migrationResult = migrateLegacyConfig(fetchedConfig);
-            fetchedConfig = migrationResult.migratedConfig;
-            if (migrationResult.wasMigrated) {
-                needsSave = true;
-                wasMigrated = true;
-                console.log("Config was migrated, scheduling an auto-save.");
-            }
-        }
+            const migratedConfig = migrationResult.migratedConfig;
+            wasMigrated = migrationResult.wasMigrated;
 
-        let mergedConfig = getDefaultConfig();
-        if (fetchedConfig) {
-            currentConfig = mergeDeep({}, mergedConfig, fetchedConfig);
-            if (JSON.stringify(currentConfig) !== JSON.stringify(fetchedConfig)) {
+            const defaultConfig = getDefaultConfig();
+            // 正确的合并顺序：以用户数据 (migratedConfig) 为主，用默认配置 (defaultConfig) 补充缺失的字段
+            const mergedConfig = mergeDeep({}, defaultConfig, migratedConfig); 
+            
+            currentConfig = mergedConfig;
+            
+            // 检查合并或迁移后是否有变化，有则需要保存
+            if (JSON.stringify(currentConfig) !== JSON.stringify(fetchedConfig) || wasMigrated) {
                 needsSave = true;
-                console.log("Config updated with new fields from default template.");
+                console.log("Config updated with new fields or migrated. Scheduling an auto-save.");
             }
         } else {
-            console.log('Config.json not found or invalid. Using default and attempting to create.');
-            currentConfig = mergedConfig;
-            configSha = null;
-            needsSave = true;
+            // 只有当云端确实没有 config.json 文件时，才使用全新的默认配置并创建
+            console.log('Config.json not found on remote. Creating a new one with default settings.');
+            currentConfig = getDefaultConfig();
+            configSha = null; // 确保是创建新文件
+            needsSave = true; 
         }
 
         if (needsSave) {
             await saveGlobalConfig(wasMigrated ? 'Auto-migrate legacy config format' : 'Auto-create or repair config.json');
         }
 
-        // --- [核心修改] ---
-        // 1. 将主题初始化逻辑移到这里，确保 currentConfig 已加载
+        // --- [UI 初始化逻辑保持不变] ---
         const t = localStorage.getItem('theme');
         if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.body.classList.add('dark-mode');
@@ -6221,11 +6302,10 @@ const getDefaultConfig = () => ({
         }
 
         const savedThemeStyle = currentConfig.settings.themeStyle || 'neumorphism';
-        setThemeStyle(savedThemeStyle); // setThemeStyle 内部已经有保存逻辑了，这里调用即可
+        setThemeStyle(savedThemeStyle);
 
         applyAllBackgrounds();
-        // --- [修改结束] ---
-
+        
         document.getElementById('title').textContent = currentConfig.title; 
         document.getElementById('subtitle').textContent = currentConfig.subtitle; 
         document.querySelector('.editable-title').style.opacity = 1; 
@@ -6239,7 +6319,6 @@ const getDefaultConfig = () => ({
         renderCategories();
         loadColorState(); 
     }
-
 
     
     function renderCategories() {
@@ -10934,30 +11013,29 @@ const blob = b64toBlob(blobData.content, contentType);
             </div>
         </div>
     </div>
-    <!-- [新增] 数据恢复确认模态框 -->
+    <!-- [新增] 数据恢复确认模态框 V2 -->
     <div class="modal-overlay" id="dataRecoveryModal">
-        <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">
                 <div class="modal-title-group">
-                    <span>🛡️ 数据恢复</span>
+                    <span>🛡️ 选择要恢复的版本</span>
                 </div>
             </div>
             <div class="modal-body">
-                <p>检测到当前云端数据可能已损坏或为空！</p>
-                <p>我们在您的历史记录中找到了一个可用的版本，其包含以下内容：</p>
-                <div class="detail-info-group" style="padding: 12px;">
-                    <ul id="recovery-summary-list" style="list-style: none; padding-left: 5px; line-height: 1.8;">
-                        <!-- JS 动态填充摘要信息 -->
-                    </ul>
+                <p>检测到云端数据为空！我们在您的历史记录中找到了以下几个最近的有效版本：</p>
+                
+                <div id="recovery-versions-list">
+                    <!-- JS 动态填充版本列表 -->
                 </div>
-                <p style="margin-top: 15px;"><strong>您是否希望使用此历史版本覆盖当前数据？</strong></p>
+                
+                <p style="margin-top: 15px;"><strong>请选择一个版本进行恢复。</strong></p>
                 <div class="important-note" style="font-size: 13px; padding: 8px 12px; margin-top: 5px;">
-                    <p>此操作将恢复您的主配置和“记忆”功能的数据。操作不可撤销。</p>
+                    <p>此操作将恢复您的主配置和“记忆”功能的数据，并覆盖云端的空数据。操作不可撤销。</p>
                 </div>
             </div>
             <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
                 <button id="cancelRecoveryBtn" class="modal-button">取消</button>
-                <button id="confirmRecoveryBtn" class="modal-button primary">确认恢复</button>
+                <button id="confirmRecoveryBtn" class="modal-button primary" disabled>恢复选中版本</button>
             </div>
         </div>
     </div>
