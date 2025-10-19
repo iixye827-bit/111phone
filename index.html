@@ -2566,15 +2566,14 @@ body.theme-glass.dark-mode .memo-toolbar {
 #phoneCollectionModal .list-container {
     padding: 35px 20px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, 100px);
-    justify-content: space-evenly; /* ★ 核心修改：将 center 改为 space-evenly ★ */
-    gap: 15px; 
-    align-content: flex-start; 
+    /* ★ 核心修改：使用minmax实现真正的自适应列 ★ */
+    grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+    gap: 20px; /* ★ 优化：稍微减小间距以容纳更多内容 ★ */
+    align-content: flex-start;
     overflow-y: auto;
     min-height: 0;
+    /* 移除了不再需要的 justify-content 属性 */
 }
-
-
 
 /* 核心修改：将分区项目改为圆形泡泡 */
 .phone-partition-item {
