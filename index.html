@@ -2563,21 +2563,22 @@ body.theme-glass.dark-mode .memo-toolbar {
     flex-shrink: 0; 
 }
 
-/* 核心修改：列表容器改为 Flex 布局以实现泡泡效果 */
 #phoneCollectionModal .list-container {
     padding: 35px 20px;
-    display: flex; 
-    flex-wrap: wrap; 
-    justify-content: center; 
-    align-items: center; 
-    gap: 25px; 
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
     align-content: center;
-    flex-grow: 1; 
-    overflow-y: auto; 
+    flex-grow: 1;
+    overflow-y: auto;
     min-height: 0;
-    /* 新增：允许内容在容器顶部溢出30px而不被裁剪 */
-    overflow-clip-margin: 30px;
+    /* 核心修复：创建新的层叠上下文并提升图层 */
+    position: relative;
+    z-index: 1;
 }
+
 
 
 /* 核心修改：将分区项目改为圆形泡泡 */
