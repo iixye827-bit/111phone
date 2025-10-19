@@ -4,40 +4,14 @@
   "categories": [
     {
       "name": "全部",
-      "buttons": [
-        {
-          "text": "1",
-          "href": "1",
-          "openExternally": false
-        },
-        {
-          "text": "2",
-          "href": "2",
-          "openExternally": false
-        },
-        {
-          "text": "3",
-          "href": "3",
-          "openExternally": false
-        },
-        {
-          "text": "4",
-          "href": "4",
-          "openExternally": false
-        },
-        {
-          "text": "RAVEN",
-          "href": "https://raven7-7.github.io/Crow/",
-          "openExternally": false
-        }
-      ]
+      "buttons": []
     }
   ],
   "settings": {
     "paginationEnabled": true,
-    "themeStyle": "glass",
+    "themeStyle": "neumorphism",
     "jellyBall": {
-      "enabled": true,
+      "enabled": false,
       "swipeBack": true,
       "functions": {},
       "customCSS": ""
@@ -48,18 +22,12 @@
     },
     "fontPresets": [],
     "backupReminder": {
-      "enabled": true,
+      "enabled": false,
       "timeBasedEnabled": false,
       "times": [],
-      "message": "是时候备份啦！",
-      "onExit": true,
-      "projects": [
-        "1",
-        "2",
-        "3",
-        "4",
-        "https://raven7-7.github.io/Crow/"
-      ]
+      "message": "是时候该备份你的项目啦！",
+      "onExit": false,
+      "projects": []
     }
   },
   "themePresets": [
