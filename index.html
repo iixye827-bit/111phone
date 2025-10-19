@@ -2564,15 +2564,15 @@ body.theme-glass.dark-mode .memo-toolbar {
 }
 
 #phoneCollectionModal .list-container {
-    padding: 35px 20px;
-    display: grid;
-    /* ★ 核心修改：使用minmax实现真正的自适应列 ★ */
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 20px; /* ★ 优化：稍微减小间距以容纳更多内容 ★ */
+    /* 垂直内边距保持，水平内边距交由布局自动处理 */
+    padding: 35px 0;
+    display: flex; /* ★ 核心修改：使用 Flexbox 布局 */
+    flex-wrap: wrap; /* ★ 核心修改：允许泡泡换行 */
+    justify-content: space-evenly; /* ★ 核心修改：实现所有水平间距（包括两端）相等 */
+    row-gap: 40px; /* ★ 核心修改：设置一个充足的行间距，以适应泡泡的错落效果 */
     align-content: flex-start;
     overflow-y: auto;
     min-height: 0;
-    /* 移除了不再需要的 justify-content 属性 */
 }
 
 /* 核心修改：将分区项目改为圆形泡泡 */
