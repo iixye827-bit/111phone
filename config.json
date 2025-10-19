@@ -40,7 +40,7 @@
       "projects": []
     },
     "mobileMode": {
-      "enabled": true
+      "enabled": false
     }
   },
   "themePresets": [
