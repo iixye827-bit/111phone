@@ -2564,7 +2564,7 @@ body.theme-glass.dark-mode .memo-toolbar {
 
 /* 核心修改：列表容器改为 Flex 布局以实现泡泡效果 */
 #phoneCollectionModal .list-container {
-    padding: 55px 20px 35px 20px; /* ★★★ 核心修复：大幅增加上边距，为向上漂浮的气泡留出空间 ★★★ */
+    padding: 50px 20px; /* ★★★ 修正：增加顶部内边距，为上移的泡泡提供空间，防止被裁切 ★★★ */
     display: flex; 
     flex-wrap: wrap; 
     justify-content: center; 
@@ -2575,7 +2575,6 @@ body.theme-glass.dark-mode .memo-toolbar {
     overflow-y: auto; 
     min-height: 0;
 }
-
 
 /* 核心修改：将分区项目改为圆形泡泡 */
 .phone-partition-item {
