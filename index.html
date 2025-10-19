@@ -3069,6 +3069,30 @@ body.dark-mode #backupProjectList .project-checkbox-item:hover {
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
+        /* ===== [修改] 相册照片下载按钮样式 V2 ===== */
+        #download-photo-btn {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            z-index: 20;
+            background: transparent; /* 移除背景 */
+            border: none;
+            color: white;
+            font-size: 22px; /* 稍微增大图标尺寸 */
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.7; /* 初始透明度 */
+            display: none; /* 默认隐藏，由JS控制显示 */
+            padding: 10px; /* 增加点击热区 */
+            text-decoration: none;
+            -webkit-tap-highlight-color: transparent;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5); /* 为图标增加轻微阴影，增强可读性 */
+        }
+        #download-photo-btn:hover {
+            opacity: 1; /* 悬停时完全显示 */
+            transform: scale(1.15); /* 悬停时放大效果更明显 */
+        }
+        /* ===== [修改结束] ===== */
 
 
     </style>
@@ -3893,9 +3917,10 @@ body.dark-mode #backupProjectList .project-checkbox-item:hover {
             <h3 id="viewer-title"></h3>
             <p id="viewer-description"></p>
             <p id="viewer-timestamp"></p>
+            <!-- [修改] 将下载按钮移动到页脚内部 -->
+            <a id="download-photo-btn" title="下载图片">❣</a>
         </div>
     </div>
-
     <!-- Wander View -->
     <div id="wanderViewOverlay">
         <div class="wander-header">
@@ -4516,11 +4541,18 @@ const getDefaultConfig = () => ({
                 case 'album': openMemoryAndSwitch('album'); break;
                 case 'memo': openMemoryAndSwitch('memo'); break;
                 case 'folder': openMemoryAndSwitch('cloud'); break;
-                case 'return': if (iframeModal.classList.contains('active')) { closeIframeModal(); } break;
+                case 'return':
+                    if (iframeModal.classList.contains('active')) {
+                        // ★ 新增：在这里同样触发退出提醒
+                        BackupReminderManager.triggerOnExitReminder();
+                        closeIframeModal();
+                    }
+                    break;
                 case 'quick_switch': _showQuickSwitchMenu(); break;
             }
             _closeMenu();
         }
+
 
         function _showQuickSwitchMenu() {
             let existingMenu = document.getElementById('quick-switch-menu-overlay');
@@ -6721,6 +6753,18 @@ const getDefaultConfig = () => ({
             ui.photoViewer.querySelector('#viewer-description').textContent = description || '';
             ui.photoViewer.querySelector('#viewer-timestamp').textContent = new Date(timestamp).toLocaleString('zh-CN');
             
+            // [新增] 更新下载按钮逻辑
+            const downloadBtn = document.getElementById('download-photo-btn');
+            if (downloadBtn) {
+                downloadBtn.href = photoUrl;
+                // 从路径中提取文件名，如果标题存在则优先使用标题作为文件名
+                const originalFilename = photo.path.split('/').pop();
+                const extension = originalFilename.includes('.') ? '.' + originalFilename.split('.').pop() : '.jpg';
+                const smartTitle = title ? title.replace(/[/\\?%*:|"<>]/g, '-') : ''; // 清理标题中的非法字符
+                downloadBtn.download = smartTitle ? `${smartTitle}${extension}` : originalFilename;
+                downloadBtn.style.display = 'flex';
+            }
+
             const prevBtn = document.getElementById('prev-photo-btn');
             const nextBtn = document.getElementById('next-photo-btn');
             const counter = document.getElementById('viewer-counter');
@@ -6738,10 +6782,17 @@ const getDefaultConfig = () => ({
                 counter.style.display = 'none';
             }
         }
+
         function closePhotoViewer() { 
             state.viewerContext.items.forEach(item => { if(item.type === 'photoset') delete item.internalIndex; });
             ui.photoViewer.classList.remove('active'); 
+            // [新增] 隐藏下载按钮
+            const downloadBtn = document.getElementById('download-photo-btn');
+            if (downloadBtn) {
+                downloadBtn.style.display = 'none';
+            }
         }
+
         async function changePhotoInViewer(direction) {
             const { items, index } = state.viewerContext;
             const currentItem = items[index];
