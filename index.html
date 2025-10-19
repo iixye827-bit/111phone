@@ -3094,6 +3094,92 @@ body.dark-mode #backupProjectList .project-checkbox-item:hover {
         }
         /* ===== [修改结束] ===== */
 
+/* =============================================================== */
+/* =============== [新增] 手机收藏馆状态功能样式 =============== */
+/* =============================================================== */
+
+/* 状态按钮的弹出菜单容器 */
+#phoneStatusMenu {
+    position: absolute;
+    top: 100%; /* 定位在状态按钮的正下方 */
+    left: 50%;
+    transform: translateX(-50%) translateY(10px) scale(0.9); /* 初始状态，轻微下移和缩小 */
+    display: flex;
+    gap: 15px; /* 按钮之间的间距 */
+    padding: 8px 12px;
+    background: var(--bg-day-element);
+    border-radius: 20px; /* 胶囊形状 */
+    box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day);
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+body.dark-mode #phoneStatusMenu {
+    background: var(--bg-night-element);
+    box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night);
+}
+
+/* 弹出菜单显示时的样式 */
+#phoneStatusMenu.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(5px) scale(1);
+}
+
+/* 弹出菜单中的小按钮 */
+.status-option-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: transform 0.2s, background-color 0.2s;
+}
+.status-option-btn:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+body.dark-mode .status-option-btn:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+.status-option-btn:active {
+    transform: scale(0.9);
+}
+
+/* 按钮图标颜色 */
+.status-option-btn .owned-icon {
+    color: #ffc107; /* 黄色 */
+}
+.status-option-btn .wishlist-icon {
+    color: #ff85a2; /* 粉色 */
+}
+
+/* "已拥有" 状态的呼吸辉光效果 */
+@keyframes breathing-glow {
+    0% { box-shadow: 0 0 5px 0px var(--status-color), inset 0 0 3px 0px var(--status-color); }
+    50% { box-shadow: 0 0 15px 3px var(--status-color), inset 0 0 5px 1px var(--status-color); }
+    100% { box-shadow: 0 0 5px 0px var(--status-color), inset 0 0 3px 0px var(--status-color); }
+}
+
+.phone-partition-item.status-owned {
+    background: var(--status-color); /* 将背景设为状态颜色 */
+    color: black; /* 将文字颜色设为黑色 */
+    text-shadow: 0 1px 3px rgba(255,255,255,0.3); /* 为文字添加轻微阴影以增强可读性 */
+    animation: float-bubble 6s ease-in-out infinite, breathing-glow 2.5s ease-in-out infinite;
+}
+
+
+/* "愿望单" 状态的实线边框效果 (修正版) */
+.phone-partition-item.status-wishlist {
+    outline: 2.5px solid var(--status-color);
+    outline-offset: 2px; /* 让边框与泡泡之间有一点空隙，更好看 */
+}
+
 
     </style>
 
@@ -3175,10 +3261,22 @@ body.dark-mode #backupProjectList .project-checkbox-item:hover {
     <div class="modal-overlay" id="phoneDetailModal">
         <div class="modal-content" style="max-width: 450px;">
             <div class="modal-header">
-                <!-- ★★★ 修改点：将标题和置顶按钮包裹起来 ★★★ -->
-                <div id="phone-detail-title-group" class="modal-title-group" style="gap: 12px; align-items: center;">
+                <!-- ★★★ 修改点：将标题和状态按钮包裹起来，并新增弹出菜单 ★★★ -->
+                <div id="phone-detail-title-group" class="modal-title-group" style="gap: 12px; align-items: center; position: relative;">
                     <span id="phone-detail-title">手机详情</span>
-                    <span id="pinPhoneBtn" style="cursor: pointer; font-size: 24px; color: #ccc;" title="置顶">★</span>
+                    <span id="phoneStatusBtn" style="cursor: pointer; font-size: 24px;" title="设置状态">◌</span>
+                    <!-- [新增] 状态选择弹出菜单 -->
+                    <div id="phoneStatusMenu">
+                        <button class="status-option-btn" data-status="owned" title="已拥有">
+                            <span class="status-icon owned-icon">★</span>
+                        </button>
+                        <button class="status-option-btn" data-status="wishlist" title="加入愿望单">
+                            <span class="status-icon wishlist-icon">♥</span>
+                        </button>
+                         <button class="status-option-btn" data-status="none" title="未拥有">
+                            <span class="status-icon" style="font-size: 20px;">∅</span>
+                        </button>
+                    </div>
                 </div>
                 <button class="close-btn" data-modal-id="phoneDetailModal">&times;</button>
             </div>
@@ -10254,8 +10352,60 @@ const blob = b64toBlob(blobData.content, contentType);
                     price: '无偿',            // 【必填】如：免费、19.9元、未知
                     status: '开放测试'         // 【必填】如：在售、已停售、群内获取
                 },
+ {
+                    id: 'jing-phone',    // 【必填】一个全英文、不重复的唯一ID
+                    name: '镜',          // 【必填】手机的显示名称
+                    authorId: 'il_057',       // 【必填】作者的小红书或QQ号
+                    acquisition: 'QQ群',   // 【必填】如何获取，如：QQ群号、链接等
+                    price: '无偿',            // 【必填】如：免费、19.9元、未知
+                    status: '开放'         // 【必填】如：在售、已停售、群内获取
+                },
                 // 在这里继续添加新的手机对象...
             ];
+            // [新增] 状态管理辅助函数
+            function getCollectionStatus() {
+                try {
+                    return JSON.parse(localStorage.getItem('phoneCollectionStatus') || '{}');
+                } catch (e) {
+                    return {};
+                }
+            }
+
+            function saveCollectionStatus(statusData) {
+                localStorage.setItem('phoneCollectionStatus', JSON.stringify(statusData));
+            }
+
+            function getRandomMacaronColor() {
+                // 使用您提供的全新颜色列表 (并修正了 #D6FOE6 -> #D6F0E6)
+                const macaronPalette = [
+                    '#FFD1DC', '#C5E0F2', '#D9C7F5', '#D5ECD9', 
+                    '#FFEDCC', '#FBBEAD', '#FFF4F4', '#D6F0E6', 
+                    '#F0D6E8', '#E5F2BC', '#A5E1D4', '#F8F5F0', 
+                    '#F7E0B3'
+                ];
+                
+                // 1. 获取所有已分配的颜色
+                const allStatuses = getCollectionStatus();
+                const usedColors = new Set();
+                for (const phoneId in allStatuses) {
+                    if (allStatuses[phoneId] && allStatuses[phoneId].color) {
+                        usedColors.add(allStatuses[phoneId].color);
+                    }
+                }
+
+                // 2. 找出当前未被使用的颜色
+                const availableColors = macaronPalette.filter(color => !usedColors.has(color));
+
+                // 3. 如果所有颜色都用过了（或者列表为空），就从完整列表中随机选一个
+                if (availableColors.length === 0) {
+                    return macaronPalette[Math.floor(Math.random() * macaronPalette.length)];
+                }
+
+                // 4. 否则，从可用的颜色中随机选一个，以确保不重复
+                return availableColors[Math.floor(Math.random() * availableColors.length)];
+            }
+
+
 
             const ui = {
                 collectionModal: document.getElementById('phoneCollectionModal'),
@@ -10263,7 +10413,6 @@ const blob = b64toBlob(blobData.content, contentType);
                 listContainer: document.getElementById('phone-list-container'),
                 detailContainer: document.getElementById('phone-detail-content'),
                 detailTitle: document.getElementById('phone-detail-title'),
-                pinBtn: document.getElementById('pinPhoneBtn'), // 新增
                 searchInput: document.getElementById('phoneSearchInput'), // 新增
             };
             
@@ -10326,11 +10475,14 @@ const blob = b64toBlob(blobData.content, contentType);
             
             // ★★★ 核心修改：渲染函数现在接受一个数据数组作为参数
             function renderPhoneList(phonesToRender) {
-                 ui.listContainer.innerHTML = '';
+                ui.listContainer.innerHTML = '';
                 if (phonesToRender.length === 0) {
                     ui.listContainer.innerHTML = '<p class="empty-list-placeholder" style="grid-column: 1 / -1;">未找到匹配的手机</p>';
                     return;
                 }
+                
+                const allStatuses = getCollectionStatus();
+
                 phonesToRender.forEach(phone => {
                     const item = document.createElement('div');
                     item.className = 'phone-partition-item';
@@ -10340,9 +10492,14 @@ const blob = b64toBlob(blobData.content, contentType);
                         <div class="phone-partition-name">${phone.name}</div>
                     `;
 
-                    // ★ 新增：为每个泡泡设置一个随机的动画延迟时间
-                    // 负延迟会让动画从周期中的一个随机点立即开始，看起来更自然
                     item.style.animationDelay = `${Math.random() * -6}s`;
+
+                    // [新增] 应用状态效果
+                    const statusData = allStatuses[phone.id];
+                    if (statusData) {
+                        item.classList.add(`status-${statusData.status}`);
+                        item.style.setProperty('--status-color', statusData.color);
+                    }
 
                     item.addEventListener('click', () => renderPhoneDetail(phone.id));
                     ui.listContainer.appendChild(item);
@@ -10385,34 +10542,88 @@ const blob = b64toBlob(blobData.content, contentType);
                 const phone = phoneData.find(p => p.id === phoneId);
                 if (!phone) return;
 
-                ui.detailTitle.textContent = phone.name;
-                
-                // 更新置顶按钮状态 (逻辑不变)
-                const pinnedIds = getPinnedPhones();
-                const isPinned = pinnedIds.includes(phoneId);
-                ui.pinBtn.textContent = '★';
-                ui.pinBtn.style.color = isPinned ? '#ffc107' : '#ccc';
-                ui.pinBtn.title = isPinned ? '取消置顶' : '置顶';
+                const statusBtn = document.getElementById('phoneStatusBtn');
+                const statusMenu = document.getElementById('phoneStatusMenu');
 
-                ui.pinBtn.onclick = () => {
-                    let currentPinned = getPinnedPhones();
-                    if (currentPinned.includes(phoneId)) {
-                        currentPinned = currentPinned.filter(id => id !== phoneId);
-                        ui.pinBtn.style.color = '#ccc';
-                        ui.pinBtn.title = '置顶';
-                    } else {
-                        currentPinned.unshift(phoneId);
-                        ui.pinBtn.style.color = '#ffc107';
-                        ui.pinBtn.title = '取消置顶';
+                // [修复 Bug 1 & 3] 创建一个独立的函数来更新主状态按钮的UI
+                function updateStatusButtonUI() {
+                    const currentStatus = getCollectionStatus()[phoneId];
+                    if (!currentStatus) {
+                        statusBtn.innerHTML = '◌';
+                        statusBtn.style.color = 'inherit';
+                    } else if (currentStatus.status === 'owned') {
+                        statusBtn.innerHTML = '★';
+                        statusBtn.style.color = '#ffc107'; // 黄色
+                    } else if (currentStatus.status === 'wishlist') {
+                        statusBtn.innerHTML = '♥';
+                        statusBtn.style.color = '#ff85a2'; // 粉色
                     }
-                    savePinnedPhones(currentPinned);
-                };
+                }
+                
+                // 1. 初始化时，就根据当前状态更新UI
+                ui.detailTitle.textContent = phone.name;
+                updateStatusButtonUI();
 
-                // [核心修改] 移除了包含 giscusFeedback 容器的HTML部分
+                // [修复 Bug 1] 移除旧的事件处理器，确保每次只绑定一次
+                if (statusMenu.handler) {
+                    statusMenu.removeEventListener('click', statusMenu.handler);
+                }
+                if (statusBtn.handler) {
+                    statusBtn.removeEventListener('click', statusBtn.handler);
+                }
+                if (window.currentHideMenuHandler) {
+                    document.body.removeEventListener('click', window.currentHideMenuHandler);
+                }
+
+                // 2. 为状态按钮绑定新的点击事件
+                statusBtn.handler = (e) => {
+                    e.stopPropagation();
+                    statusMenu.classList.toggle('show');
+                };
+                statusBtn.addEventListener('click', statusBtn.handler);
+
+                // 3. 为菜单选项绑定新的点击事件
+                statusMenu.handler = (e) => {
+                    const button = e.target.closest('.status-option-btn');
+                    if (button) {
+                        const newStatus = button.dataset.status;
+                        const allStatuses = getCollectionStatus();
+
+                        if (newStatus === 'none') {
+                            delete allStatuses[phoneId];
+                            showTopToast(`已将 "${phone.name}" 恢复为未拥有`, 2000);
+                        } else {
+                            const currentColor = allStatuses[phoneId]?.color || getRandomMacaronColor();
+                            allStatuses[phoneId] = { status: newStatus, color: currentColor };
+                            const statusText = newStatus === 'owned' ? '已拥有' : '已加入愿望单';
+                            showTopToast(`已将 "${phone.name}" 标记为 ${statusText}`, 2000);
+                        }
+                        
+                        saveCollectionStatus(allStatuses);
+                        statusMenu.classList.remove('show');
+                        
+                        // [修复 Bug 3] 选择后立即更新状态按钮
+                        updateStatusButtonUI(); 
+                        
+                        displayPhoneList(); 
+                    }
+                };
+                statusMenu.addEventListener('click', statusMenu.handler);
+
+                // 4. 为body绑定新的隐藏菜单事件
+                window.currentHideMenuHandler = (e) => {
+                    if (!statusBtn.contains(e.target) && !statusMenu.contains(e.target)) {
+                        statusMenu.classList.remove('show');
+                    }
+                };
+                document.body.addEventListener('click', window.currentHideMenuHandler);
+                
+                
+                // 5. 渲染详情页内容 (这部分代码保持不变)
                 ui.detailContainer.innerHTML = `
                     <div class="detail-info-group">
                         <label>作者ID</label>
-                        <div class="detail-info-value copyable" id="copyAuthorId" data-id="${phone.authorId}">
+                        <div class="detail-info-value copyable" data-id="${phone.authorId}">
                             <span>${phone.authorId}</span>
                             <span>❏</span>
                         </div>
@@ -10432,8 +10643,7 @@ const blob = b64toBlob(blobData.content, contentType);
                     <button id="enterCommentsBtn" class="modal-button" data-phone-id="${phone.id}" style="margin-top: 10px;">进入安利区</button>
                     `;
                 
-                // 绑定常规事件 (逻辑不变)
-                ui.detailContainer.querySelector('#copyAuthorId').addEventListener('click', function() {
+                ui.detailContainer.querySelector('.copyable').addEventListener('click', function() {
                     navigator.clipboard.writeText(this.dataset.id).then(() => showTopToast(`已复制作者ID: ${this.dataset.id}`, 2000));
                 });
                 
@@ -10461,8 +10671,6 @@ const blob = b64toBlob(blobData.content, contentType);
                         });
                     }
                 });
-
-                // [核心修改] 移除了整个 fetchGiscusStats 的调用和渲染逻辑
 
                 ui.detailModal.classList.add('show');
             }
