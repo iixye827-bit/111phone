@@ -1,0 +1,31 @@
+{
+  "memo": {
+    "folders": [
+      {
+        "id": 1760872799857,
+        "name": "默认文件夹"
+      }
+    ],
+    "notes": []
+  },
+  "album": {
+    "folders": [
+      {
+        "id": 1760872799858,
+        "name": "我的照片"
+      }
+    ],
+    "items": [
+      {
+        "id": 1760872813038,
+        "albumId": 1760872799858,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1760872813038,
+        "path": "memory/photos/1760872808345_kq1kirho.jpg",
+        "sha": "f0b2f1e3e3083629eeb0cffc5fad4483b9f00636"
+      }
+    ]
+  }
+}
