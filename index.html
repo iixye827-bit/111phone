@@ -2565,17 +2565,20 @@ body.theme-glass.dark-mode .memo-toolbar {
 
 /* 核心修改：列表容器改为 Flex 布局以实现泡泡效果 */
 #phoneCollectionModal .list-container {
-    padding: 35px 20px; /* 进一步增加上下内边距，为错落效果留出空间 */
+    padding: 35px 20px;
     display: flex; 
     flex-wrap: wrap; 
     justify-content: center; 
     align-items: center; 
     gap: 25px; 
-    align-content: center; /* 让多行内容在容器里整体居中 */
+    align-content: center;
     flex-grow: 1; 
     overflow-y: auto; 
     min-height: 0;
+    /* 新增：允许内容在容器顶部溢出30px而不被裁剪 */
+    overflow-clip-margin: 30px;
 }
+
 
 /* 核心修改：将分区项目改为圆形泡泡 */
 .phone-partition-item {
