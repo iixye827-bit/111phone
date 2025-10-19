@@ -2547,38 +2547,35 @@ body.theme-glass.dark-mode .memo-toolbar {
     max-width: 800px;
     height: calc(100vh - 40px);
     padding: 0;
-    /* overflow: hidden; */
+    overflow: hidden;
     display: flex;
     flex-direction: column;
 }
-
 #phoneCollectionModal .page-content {
     flex-grow: 1; 
-    display: flex;
-    flex-direction: column;
+    display: grid; /* [核心修改] 使用 Grid 布局替代 Flex */
+    grid-template-rows: auto 1fr; /* [核心修改] 定义一个高度自适应的头部行，和一个占满剩余空间的滚动内容行 */
     min-height: 0; 
+    overflow: hidden; /* 保持不变，确保整个页面内容不溢出 */
 }
 
 #phoneCollectionModal .page-header-container {
     flex-shrink: 0; 
 }
 
+/* 核心修改：列表容器改为 Flex 布局以实现泡泡效果 */
 #phoneCollectionModal .list-container {
-    padding: 35px 20px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 25px;
-    align-content: center;
-    flex-grow: 1;
-    overflow-y: auto;
+    padding: 35px 20px; /* 进一步增加上下内边距，为错落效果留出空间 */
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 25px; 
+    align-content: flex-start; /* ★ 核心修改：确保内容从上到下排列，解决遮挡问题 ★ */
+    flex-grow: 1; 
+    overflow-y: auto; 
     min-height: 0;
-    /* 核心修复：创建新的层叠上下文并提升图层 */
-    position: relative;
-    z-index: 1;
 }
-
 
 
 /* 核心修改：将分区项目改为圆形泡泡 */
