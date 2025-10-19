@@ -21,7 +21,7 @@
     "paginationEnabled": true,
     "themeStyle": "glass",
     "jellyBall": {
-      "enabled": true,
+      "enabled": false,
       "swipeBack": true,
       "functions": {},
       "customCSS": ""
