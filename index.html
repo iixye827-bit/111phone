@@ -3453,6 +3453,8 @@ body.dark-mode .folder-item .sort-handle.memo-sort-handle {
                 <div class="lockscreen-grid" id="lockscreenGrid">
                     <!-- JS 动态填充 -->
                 </div>
+                <!-- [新增] 锁屏空白提示 -->
+                <div id="lockscreen-swipe-hint" style="display: none; position: absolute; color: inherit; opacity: 0.5; font-size: 16px; font-weight: 600; text-align: center; pointer-events: none;">向右滑动进入主屏幕 →</div>
             </div>
             <!-- 主屏幕页面 (JS会将下面的内容移入此div) -->
             <div class="home-screen-page" id="homeScreenPage">
@@ -6944,6 +6946,73 @@ const getDefaultConfig = () => ({
     
     // ===== [START] MEMORY APP LOGIC =====
     let memoryCache = null; // [修复] 将 memoryCache 提升到模块共享作用域
+    // [新增] 基于 IndexedDB 的图片持久化缓存
+    const ImageCacheDB = (() => {
+        let db;
+        const DB_NAME = 'JellyfishImageCache';
+        const STORE_NAME = 'photo_blobs';
+        const DB_VERSION = 1;
+
+        // 初始化/打开数据库
+        async function init() {
+            return new Promise((resolve, reject) => {
+                if (db) {
+                    resolve(db);
+                    return;
+                }
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onerror = (event) => {
+                    console.error("IndexedDB error:", event.target.error);
+                    reject("IndexedDB 初始化失败。");
+                };
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    console.log("IndexedDB 图片缓存库已准备就绪。");
+                    resolve(db);
+                };
+                request.onupgradeneeded = (event) => {
+                    // 当数据库首次创建或版本升级时调用
+                    const store = event.target.result.createObjectStore(STORE_NAME, { keyPath: 'path' });
+                    console.log("IndexedDB 对象存储空间已创建。");
+                };
+            });
+        }
+
+        // 存储图片 Blob
+        async function set(path, blob) {
+            if (!db) await init();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.put({ path, blob });
+                request.onsuccess = () => resolve();
+                request.onerror = (event) => {
+                    console.error('无法将图片存入 IndexedDB:', event.target.error);
+                    reject(event.target.error);
+                };
+            });
+        }
+
+        // 获取图片 Blob
+        async function get(path) {
+            if (!db) await init();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.get(path);
+                request.onsuccess = () => {
+                    resolve(request.result ? request.result.blob : null);
+                };
+                request.onerror = (event) => {
+                    console.error('无法从 IndexedDB 读取图片:', event.target.error);
+                    reject(event.target.error);
+                };
+            });
+        }
+
+        return { init, set, get };
+    })();
+
     const MemoryApp = (() => {
         const MEMORY_DATA_PATH = 'memory/data.json';
         const MEMORY_PHOTOS_PATH = 'memory/photos/';
@@ -6995,8 +7064,8 @@ const getDefaultConfig = () => ({
         photoUploadQueue: [],
         isSavingPhoto: false,
         skipAllPhotoDetails: false, // [新增] 用于标记是否跳过后续所有照片详情
+        cloudDriveRequestToken: null, // [新增] 为文件夹加载请求创建一个唯一令牌
     };
-
 
         function getInitialData() {
             return {
@@ -8055,6 +8124,13 @@ const getDefaultConfig = () => ({
                 }
 
                 async function fetchFilesFromGithubProject(projectHref) {
+                    // [新增] 为本次请求创建一个唯一的令牌
+                    const requestToken = Symbol();
+                    state.cloudDriveRequestToken = requestToken;
+
+                    ui.fileList.innerHTML = '';
+                    ui.fileListStatus.style.display = 'block';
+
                     const projectConfig = findButtonConfigByHref(projectHref);
 
                     if (!projectConfig) {
@@ -8068,6 +8144,13 @@ const getDefaultConfig = () => ({
                     ui.fileListStatus.textContent = "加载中...";
                     
                     const { data: files, error } = await fetchFromGithub(projectPath);
+                    
+                    // [新增] 在处理返回数据前，检查令牌是否仍然有效
+                    if(state.cloudDriveRequestToken !== requestToken) {
+                        console.log("文件夹请求已过期，结果被丢弃。");
+                        return; // 如果令牌不匹配（意味着用户已切换项目），则中止函数
+                    }
+
                     if (error) { 
                         ui.fileListStatus.textContent = `加载失败: ${error}`; 
                         return; 
@@ -8080,17 +8163,18 @@ const getDefaultConfig = () => ({
 
                     ui.fileListStatus.style.display = "none";
                     
-                    // [核心修改] 使用 for...of 循环来正确处理异步操作
                     for (const file of files) {
+                        // [新增] 在每次异步操作（如获取日期）后都检查令牌
+                        if(state.cloudDriveRequestToken !== requestToken) { return; }
+
                         const li = document.createElement("li");
                         
-                        // 1. 格式化文件大小
                         const sizeText = formatFileSize(file.size); 
-                        
-                        // 2. 异步获取日期
                         const dateText = await getFileCommitDate(file.path);
 
-                        // 3. 构建新的元信息字符串
+                        // [新增] 这是最后一个检查点，在渲染到DOM之前再次确认
+                        if(state.cloudDriveRequestToken !== requestToken) { return; }
+
                         const metaText = `${sizeText} • ${dateText}`;
 
                         li.innerHTML = `<div class="file-info"><span class="file-name">${file.name}</span><span class="file-meta" data-path="${file.path}">${metaText}</span></div><button class="delete-btn" data-sha="${file.sha}">&times;</button>`;
@@ -8100,7 +8184,6 @@ const getDefaultConfig = () => ({
                         li.querySelector(".delete-btn").addEventListener("click", () => deleteFile(file.path, file.sha, li));
                     }
                 }
-
 
         async function getLatestCommitDate(e){const t=`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/commits?path=${encodeURIComponent(e)}&page=1&per_page=1`;try{const n=await fetch(t,{headers:{"Authorization":`token ${GITHUB_CONFIG.token}`},cache:"no-cache"});if(!n.ok)return(new Date(0)).toISOString().split('T')[0];const o=await n.json();return o[0]?.commit.committer.date.split('T')[0]||(new Date(0)).toISOString().split('T')[0]}catch(n){return console.error(`Error fetching commit date for ${e}:`,n),(new Date(0)).toISOString().split('T')[0]}}async function deleteFile(e,t,n){
     const originalFileName = n.querySelector(".file-name").textContent;
@@ -9122,15 +9205,31 @@ const getDefaultConfig = () => ({
     
     async function getSecureFileUrl(path) {
         if (!path) return '';
+
+        // 1. 优先从本次会话的内存缓存中读取 (最快)
         if (secureFileCache.has(path)) {
             const cached = secureFileCache.get(path);
+            // 如果缓存的是一个Promise，等待它完成
             if (typeof cached.then === 'function') {
                 return await cached;
             }
             return cached;
         }
+        
+        // 2. 如果内存中没有，则尝试从 IndexedDB 持久化缓存中读取
+        try {
+            const cachedBlob = await ImageCacheDB.get(path);
+            if (cachedBlob) {
+                const blobUrl = URL.createObjectURL(cachedBlob);
+                secureFileCache.set(path, blobUrl); // 存入内存缓存，方便本次会话后续快速访问
+                return blobUrl;
+            }
+        } catch (e) {
+            console.warn(`从 IndexedDB 读取缓存失败:`, e);
+        }
 
-        const fetchPromise = new Promise(async (resolve, reject) => {
+        // 3. 如果 IndexedDB 中也没有，则发起网络请求
+        const fetchPromise = new Promise(async (resolve) => {
             try {
                 if (!path.startsWith('projects/') && !path.startsWith('memory/')) {
                     resolve(path);
@@ -9143,30 +9242,31 @@ const getDefaultConfig = () => ({
                 }
 
                 const { data: blobData, error: blobError } = await fetchFromGithub(`blobs/${metaData.sha}`, 'git');
-
                 if (blobError || !blobData || !blobData.content) {
                     throw new Error(`Could not get blob content for ${path}. ${blobError || 'No content returned.'}`);
                 }
                 
-                const contentType = path.toLowerCase().endsWith('.html') || path.toLowerCase().endsWith('.htm') ? 'text/html' : metaData.type;
-const blob = b64toBlob(blobData.content, contentType);
+                const contentType = path.toLowerCase().endsWith('.html') || path.toLowerCase().endsWith('.htm') ? 'text/html' : (metaData.type || 'application/octet-stream');
+                const blob = b64toBlob(blobData.content, contentType);
+
+                // 4. [核心] 将获取到的数据存入 IndexedDB
+                ImageCacheDB.set(path, blob).catch(e => console.warn('存入IndexedDB失败:', e));
 
                 const blobUrl = URL.createObjectURL(blob);
-                
-                secureFileCache.set(path, blobUrl);
+                secureFileCache.set(path, blobUrl); // 确保内存缓存也被更新
                 resolve(blobUrl);
 
             } catch (error) {
-                console.error(`Failed to retrieve file: ${path}`, error);
-                secureFileCache.delete(path);
-                resolve('');
+                console.error(`获取安全文件URL失败: ${path}`, error);
+                secureFileCache.delete(path); // 从内存缓存中移除失败的条目
+                resolve(''); // 返回空字符串，防止界面出错
             }
         });
 
+        // 将Promise存入内存缓存，防止对同一资源发起重复网络请求
         secureFileCache.set(path, fetchPromise);
         return await fetchPromise;
     }
-
 
         function checkAppUpdate() {
             const helpPage = document.getElementById('help-page-2');
@@ -9186,6 +9286,12 @@ const blob = b64toBlob(blobData.content, contentType);
 
 
  window.addEventListener('load', async () => {
+        try {
+            await ImageCacheDB.init();
+        } catch (e) {
+            console.error(e);
+            alert("本地图片缓存功能启动失败，图片加载速度可能会变慢。");
+        }
         loadGithubConfig();
         checkAppUpdate();
         await loadInitialData();
@@ -10666,8 +10772,13 @@ const blob = b64toBlob(blobData.content, contentType);
                 componentContainer.appendChild(widgetEl);
                 grid.appendChild(componentContainer);
             });
+            
+            // [新增] 检查网格中是否有小组件，并据此显示/隐藏提示
+            const hint = document.getElementById('lockscreen-swipe-hint');
+            if (hint) {
+                hint.style.display = grid.childElementCount === 0 ? 'block' : 'none';
+            }
         }
-
 
         // 初始化手机模式管理器
         MobileModeManager.init();
