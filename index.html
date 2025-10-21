@@ -350,6 +350,13 @@ body.dark-mode .progress-bar-wrapper {
         #memoryModal #photo-list-container { grid-template-columns: repeat(3, 1fr); gap: 15px; }
         #memoryModal .photo-item, .photo-item-set { position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; overflow: hidden; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,0.7); cursor: pointer; transition: transform 0.2s ease; background-color: rgba(128,128,128,0.1); }
         #memoryModal .photo-item img, .photo-item-set img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+        .photo-item-set .photo-stack-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s ease; border: 2px solid var(--bg-day-element); }
+        body.dark-mode .photo-item-set .photo-stack-img { border-color: var(--bg-night-element); }
+        .photo-item-set .photo-stack-img:nth-child(1) { transform: translate(6px, 6px); z-index: 1; }
+        .photo-item-set .photo-stack-img:nth-child(2) { transform: translate(3px, 3px); z-index: 2; }
+        .photo-item-set .photo-stack-img:nth-child(3) { transform: translate(0, 0); z-index: 3; }
+        .photo-item-set:hover .photo-stack-img:nth-child(1) { transform: translate(10px, 10px); }
+        .photo-item-set:hover .photo-stack-img:nth-child(2) { transform: translate(5px, 5px); }
         #memoryModal .photo-title-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); color: white; font-size: 12px; padding: 12px 8px 4px 8px; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; z-index: 5; }
         .photo-item-set .count-overlay { position: absolute; bottom: 5px; right: 8px; background: rgba(0,0,0,0.5); color: white; padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 4px; z-index: 5; }
         #memoryPhotoViewerOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 5000; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
@@ -7003,34 +7010,28 @@ const getDefaultConfig = () => ({
                 const el = document.createElement('div');
                 el.dataset.itemId = item.id;
                 
-                const imgSrc = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Placeholder
-                let coverPath = '';
-                let title = '';
-                const isSet = item.type === 'photoset' && item.photos && item.photos.length > 0;
-
-                if (isSet) {
-                    coverPath = item.photos[item.photos.length - 1].path;
-                    title = item.title || '照片集';
-                    // 保持 photo-item-set 类名以兼容选择器，但其内部结构已简化
+                let imgSrc = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Placeholder
+                let firstPhotoPath = '';
+                
+                if (item.type === 'photoset') {
                     el.className = `photo-item-set ${state.isPhotoManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
-                } else { // Single photo
-                    coverPath = item.path;
-                    title = item.title || '';
+                    el.dataset.action = "open-item";
+                    let stackHtml = '';
+                    const photosToDisplay = item.photos.slice(0, 3);
+                    firstPhotoPath = photosToDisplay.length > 0 ? photosToDisplay[photosToDisplay.length - 1].path : '';
+                     
+                    for (let i = photosToDisplay.length - 1; i >= 0; i--) {
+                        stackHtml += `<img data-src="${photosToDisplay[i].path}" class="photo-stack-img lazyload" loading="lazy" src="${imgSrc}">`;
+                    }
+                    const title = (item.title || '照片集');
+                    el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}>${stackHtml}<div class="photo-title-overlay">${title}</div><div class="count-overlay">${item.photos.length} 张</div>`;
+                } else {
                     el.className = `photo-item ${state.isPhotoManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
+                    el.dataset.action = "open-item";
+                    firstPhotoPath = item.path;
+                    const title = (item.title || '');
+                    el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><img data-src="${firstPhotoPath}" class="lazyload" alt="${title}" loading="lazy" src="${imgSrc}"><div class="photo-title-overlay">${title}</div>`;
                 }
-                
-                el.dataset.action = "open-item";
-
-                let innerHTML = `
-                    <input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}>
-                    <img data-src="${coverPath}" class="lazyload" alt="${title}" loading="lazy" src="${imgSrc}">
-                    <div class="photo-title-overlay">${title}</div>`;
-
-                if (isSet) {
-                    innerHTML += `<div class="count-overlay">${item.photos.length} 张</div>`;
-                }
-                
-                el.innerHTML = innerHTML;
                 fragment.appendChild(el);
             });
 
@@ -7039,7 +7040,6 @@ const getDefaultConfig = () => ({
             const lazyImages = ui.photoList.querySelectorAll('.lazyload');
             lazyImages.forEach(img => photoObserver.observe(img));
         }
-
         
         async function openPhotoViewer(items, initialIndex) {
             if (!items || items.length === 0) return;
@@ -8145,11 +8145,12 @@ const getDefaultConfig = () => ({
                     }
                 });
 
-                // [新增] 长图双击缩放逻辑
+                // [新增] 长图双击/双指缩放逻辑 (V2: 兼容移动端)
                 const viewerImg = ui.photoViewer.querySelector('#viewer-img');
                 const viewerImgContainer = ui.photoViewer.querySelector('#viewer-img-container');
-                
-                viewerImgContainer.addEventListener('dblclick', () => {
+                let lastTapTime = 0;
+
+                const handleZoom = () => {
                     const isCurrentlyZoomed = viewerImgContainer.classList.contains('zoomed-long');
                     
                     if (isCurrentlyZoomed) {
@@ -8157,6 +8158,9 @@ const getDefaultConfig = () => ({
                         viewerImgContainer.scrollTop = 0; 
                         return;
                     }
+
+                    // 检查图片是否加载完成
+                    if (!viewerImg.naturalWidth || viewerImg.naturalWidth === 0) return;
 
                     const isLongImage = viewerImg.naturalHeight > viewerImg.naturalWidth;
                     const isTallerThanContainer = viewerImg.naturalHeight > viewerImgContainer.clientHeight;
@@ -8166,7 +8170,22 @@ const getDefaultConfig = () => ({
                     } else {
                         showTopToast('此图片无需放大', 2000);
                     }
+                };
+
+                // 监听原生双击事件（PC端）
+                viewerImgContainer.addEventListener('dblclick', handleZoom);
+
+                // 监听触摸结束事件，模拟双击（移动端）
+                viewerImgContainer.addEventListener('touchend', (e) => {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTapTime;
+                    if (tapLength < 300 && tapLength > 0) {
+                        e.preventDefault(); // 防止缩放等默认行为
+                        handleZoom();
+                    }
+                    lastTapTime = currentTime;
                 });
+
 
                 // [新增] 备忘录富文本编辑器逻辑 v2
                 const editor = document.getElementById('note-content-editor');
