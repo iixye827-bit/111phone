@@ -37,6 +37,16 @@
         "timestamp": 1760872813038,
         "path": "memory/photos/1760872808345_kq1kirho.jpg",
         "sha": "f0b2f1e3e3083629eeb0cffc5fad4483b9f00636"
+      },
+      {
+        "id": 1761069049779,
+        "albumId": 1761067920611,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1761069049779,
+        "path": "memory/photos/1761069044633_ullnpaf8.jpg",
+        "sha": "e0c6d25209f1796737b2e1b1dd5e2b8de9c7ec4e"
       }
     ]
   }
