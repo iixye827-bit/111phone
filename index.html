@@ -426,19 +426,18 @@ body.dark-mode .progress-bar-wrapper {
         #memoryPhotoDetailsModal #photoset-toggle-container { display: none; padding: 10px; border-bottom: 1px solid rgba(128,128,128,0.2); }
         #memoryPhotoDetailsModal .modal-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
         #memoryPhotoDetailsModal .modal-button.primary { color: var(--hold-border); }
-        #memoryModal .pin-btn { position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 20px; cursor: pointer; opacity: 0.3; transition: opacity 0.2s, transform 0.2s; z-index: 5; }
+        #memoryModal .pin-btn { position: absolute; top: 10px; right: 10px; background: transparent; border: none; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 0.3; transition: opacity 0.2s, transform 0.2s; z-index: 5; border-radius: 4px; padding: 2px 5px; }
         #memoryModal .note-item.pinned .pin-btn { opacity: 1; color: var(--hold-border); }
         #memoryModal .pin-btn:hover { transform: scale(1.2); }
         .management-controls { display: none; position: absolute; bottom: 0; left: 0; right: 0; padding: 15px; background: var(--bg-day-element); box-shadow: 0 -4px 12px rgba(0,0,0,0.1); z-index: 101; flex-direction: row; justify-content: space-between; gap: 10px; border-radius: 16px 16px 0 0;}
         body.dark-mode .management-controls { background: var(--bg-night-element); }
         .management-controls.active { display: flex; }
         .management-controls .modal-button { flex-grow: 1; margin: 0; padding: 12px; }
-        .folder-item.manage-mode, .album-item.manage-mode, .photo-item.manage-mode, .photo-item-set.manage-mode { cursor: pointer; }
-        .folder-item .manage-checkbox, .album-item .manage-checkbox, .photo-item .manage-checkbox, .photo-item-set .manage-checkbox { display: none; position: absolute; top: 10px; left: 10px; width: 22px; height: 22px; z-index: 5; }
-        .folder-item.manage-mode .manage-checkbox, .album-item.manage-mode .manage-checkbox, .photo-item.manage-mode .manage-checkbox, .photo-item-set.manage-mode .manage-checkbox { display: block; }
-        .folder-item.manage-selected, .album-item.manage-selected, .photo-item.manage-selected, .photo-item-set.manage-selected { border: 2px solid var(--hold-border); box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day) !important; }
-        body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-selected, body.dark-mode .photo-item.manage-selected, body.dark-mode .photo-item-set.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
-        
+.folder-item.manage-mode, .album-item.manage-mode, .photo-item.manage-mode, .photo-item-set.manage-mode, .note-item.manage-mode { cursor: pointer; }
+.folder-item .manage-checkbox, .album-item .manage-checkbox, .photo-item .manage-checkbox, .photo-item-set .manage-checkbox, .note-item .manage-checkbox { display: none; position: absolute; top: 10px; left: 10px; width: 22px; height: 22px; z-index: 5; }
+.folder-item.manage-mode .manage-checkbox, .album-item.manage-mode .manage-checkbox, .photo-item.manage-mode .manage-checkbox, .photo-item-set.manage-mode .manage-checkbox, .note-item.manage-mode .manage-checkbox { display: block; }
+.folder-item.manage-selected, .album-item.manage-selected, .photo-item.manage-selected, .photo-item-set.manage-selected, .note-item.manage-selected { border: 2px solid var(--hold-border); box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day) !important; }
+body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-selected, body.dark-mode .photo-item.manage-selected, body.dark-mode .photo-item-set.manage-selected, body.dark-mode .note-item.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
         #cloud-drive-section .list-container { display: flex; flex-direction: column; gap: 15px; padding: 15px; overflow-y: hidden; min-height: 0; }
         #file-list-container { flex-shrink: 1; flex-grow: 1; min-height: 100px; overflow-y: auto; border-radius: 10px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); display: flex; flex-direction: column; }
         body.dark-mode #file-list-container { background:var(--bg-night-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
@@ -3368,6 +3367,77 @@ body.dark-mode #memoryModal .album-item .rename-icon {
     width: 100%;             /* 宽度占满容器 */
     cursor: zoom-out;        /* 图片上显示缩小光标 */
 }
+/* =============================================================== */
+/* ============= [新增] 备忘录文件夹管理图标样式 =============== */
+/* =============================================================== */
+
+/* 1. 重命名图标样式 (复用相册样式) */
+#memoryModal .folder-item .rename-icon {
+    display: none; /* 默认隐藏 */
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 20px;
+    font-weight: normal;
+    color: #a0aec0;
+    cursor: pointer;
+    padding: 5px;
+    z-index: 10;
+    transition: color 0.2s, transform 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+    line-height: 1;
+}
+
+body.dark-mode #memoryModal .folder-item .rename-icon {
+    color: #718096;
+}
+
+/* 管理模式下显示重命名图标 */
+#memoryModal .folder-item.manage-mode .rename-icon {
+    display: block;
+}
+
+#memoryModal .folder-item .rename-icon:hover {
+    color: var(--hold-border);
+    transform: scale(1.2);
+}
+
+/* 2. 排序拖拽把手样式 (复用相册样式) */
+.folder-item .sort-handle.memo-sort-handle {
+    display: none; /* 默认隐藏 */
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #b0b0b0;
+    cursor: grab;
+    padding: 5px;
+    z-index: 10;
+    transition: color 0.2s, transform 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+    line-height: 1;
+}
+
+body.dark-mode .folder-item .sort-handle.memo-sort-handle {
+    color: #777;
+}
+
+/* 管理模式下显示排序把手 */
+.folder-item.manage-mode .sort-handle.memo-sort-handle {
+    display: block;
+}
+
+.folder-item .sort-handle.memo-sort-handle:hover {
+    color: var(--hold-border);
+    transform: scale(1.1);
+}
+
+.folder-item .sort-handle.memo-sort-handle:active {
+    cursor: grabbing;
+}
 
     </style>
 
@@ -4110,9 +4180,17 @@ body.dark-mode #memoryModal .album-item .rename-icon {
                         <div class="page-header">
                             <button data-action="back-to-memo-folders" class="header-btn back-btn">&#10094;</button>
                             <h1 id="notes-view-title" class="title">文件夹</h1>
+                            <div class="header-controls">
+                                <button data-action="toggle-note-manage" class="header-btn manage-btn">管理</button>
+                            </div>
                         </div>
                         <div id="notes-list-container" class="list-container"></div>
                         <button data-action="add-note" class="fab">+</button>
+                        <div id="note-management-controls" class="management-controls">
+                             <button data-action="select-all-notes" class="modal-button">全选</button>
+                             <button data-action="move-selected-notes" class="modal-button">移动选中</button>
+                             <button data-action="delete-selected-notes" class="modal-button" style="color:#f56565;">删除选中</button>
+                        </div>
                     </div>
                     <div id="note-editor-view" class="page">
                         <div class="editor-header">
@@ -4252,6 +4330,21 @@ body.dark-mode #memoryModal .album-item .rename-icon {
             <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
                 <button data-action="close-move-modal" class="modal-button">取消</button>
                 <button data-action="confirm-move-photos" class="modal-button" style="color:var(--hold-border)">确认移动</button>
+            </div>
+        </div>
+    </div>
+    <!-- [新增] 移动备忘录模态框 -->
+    <div id="moveNotesModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <div class="modal-title-group">移动到...</div>
+            </div>
+            <div class="modal-body">
+                <select id="memo-destination-selector" class="modal-select"></select>
+            </div>
+            <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button data-action="close-move-notes-modal" class="modal-button">取消</button>
+                <button data-action="confirm-move-notes" class="modal-button" style="color:var(--hold-border)">确认移动</button>
             </div>
         </div>
     </div>
@@ -6868,9 +6961,10 @@ const getDefaultConfig = () => ({
             albumList: document.getElementById('album-list-container'),
             photoList: document.getElementById('photo-list-container'),
             photoUploader: document.getElementById('photo-uploader'),
-            memoManageControls: document.getElementById('memo-management-controls'),
-            albumManageControls: document.getElementById('album-management-controls'),
-            photoManageControls: document.getElementById('photo-management-controls'),
+        memoManageControls: document.getElementById('memo-management-controls'),
+        albumManageControls: document.getElementById('album-management-controls'),
+        photoManageControls: document.getElementById('photo-management-controls'),
+        noteManageControls: document.getElementById('note-management-controls'),
             folderModal: document.getElementById('memoryFolderModal'),
             photoDetailsModal: document.getElementById('memoryPhotoDetailsModal'),
             photoViewer: document.getElementById('memoryPhotoViewerOverlay'),
@@ -6889,18 +6983,20 @@ const getDefaultConfig = () => ({
             progressBar: document.getElementById("uploadProgressBar")
         };
 
-        const state = {
-            currentSection: null,
-            isMemoManageMode: false, memoFoldersToDelete: [],
-            isAlbumManageMode: false, albumFoldersToDelete: [],
-            isPhotoManageMode: false, photosToDelete: [],
-            currentMemoFolderId: null, currentNoteId: null, currentAlbumId: null,
-            folderModalContext: null,
-            viewerContext: { items: [], index: -1 },
-            photoUploadQueue: [],
-            isSavingPhoto: false,
-            skipAllPhotoDetails: false, // [新增] 用于标记是否跳过后续所有照片详情
-        };
+    const state = {
+        currentSection: null,
+        isMemoManageMode: false, memoFoldersToDelete: [],
+        isAlbumManageMode: false, albumFoldersToDelete: [],
+        isPhotoManageMode: false, photosToDelete: [],
+        isNoteManageMode: false, notesToDelete: [],
+        currentMemoFolderId: null, currentNoteId: null, currentAlbumId: null,
+        folderModalContext: null,
+        viewerContext: { items: [], index: -1 },
+        photoUploadQueue: [],
+        isSavingPhoto: false,
+        skipAllPhotoDetails: false, // [新增] 用于标记是否跳过后续所有照片详情
+    };
+
 
         function getInitialData() {
             return {
@@ -6960,26 +7056,32 @@ const getDefaultConfig = () => ({
                 el.className = `folder-item ${state.isMemoManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
                 el.dataset.folderId = folder.id;
                 el.dataset.action = "open-memo-folder";
-                el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div class="folder-icon">📁</div><div class="folder-name">${folder.name}</div>`;
+                // 新增了 sort-handle 和 rename-icon
+                el.innerHTML = `<span class="sort-handle memo-sort-handle" title="按住拖拽排序">☰</span><input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div class="folder-icon">📁</div><div class="folder-name">${folder.name}</div><span class="rename-icon" data-action="rename-memo-folder" title="重命名">&#9998;</span>`;
                 ui.folderList.appendChild(el);
             });
             if (memoryCache.memo.folders.length === 0) ui.folderList.innerHTML = `<p class="empty-list-placeholder">没有文件夹</p>`;
         }
+
         function renderNotes() {
             ui.notesList.innerHTML = '';
             const notesInFolder = memoryCache.memo.notes.filter(n => n.folderId === state.currentMemoFolderId).sort((a, b) => (b.isPinned ? 1 : 0) - (a.isPinned ? 1 : 0) || b.timestamp - a.timestamp);
             notesInFolder.forEach(note => {
+                const isSelected = state.notesToDelete.includes(note.id); // 检查是否被选中
                 const el = document.createElement('div');
-                el.className = `note-item ${note.isPinned ? 'pinned' : ''}`; 
+                // 添加管理模式相关的 class
+                el.className = `note-item ${note.isPinned ? 'pinned' : ''} ${state.isNoteManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`; 
                 el.dataset.noteId = note.id;
                 el.dataset.action = "open-note";
                 const preview = (note.content || '').substring(0, 100).replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 const date = new Date(note.timestamp).toLocaleDateString('zh-CN');
-                el.innerHTML = `<div class="note-content-area"><div class="note-title">${note.title || '无标题'}</div><div class="note-preview">${preview || '没有内容'}</div><div class="note-timestamp">${date}</div></div><button class="pin-btn" data-action="pin-note" data-note-id="${note.id}" title="置顶">📌</button>`;
+                // 添加复选框，并将图标从 📌 替换为 "置顶"
+                el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div class="note-content-area"><div class="note-title">${note.title || '无标题'}</div><div class="note-preview">${preview || '没有内容'}</div><div class="note-timestamp">${date}</div></div><button class="pin-btn" data-action="pin-note" data-note-id="${note.id}" title="置顶">置顶</button>`;
                 ui.notesList.appendChild(el);
             });
             if (notesInFolder.length === 0) ui.notesList.innerHTML = `<p class="empty-list-placeholder">没有笔记</p>`;
         }
+
         function renderAlbumFolders() {
             ui.albumList.innerHTML = '';
             // [修改] 如果存在排序，则使用排序后的数组，否则使用原数组
@@ -7211,6 +7313,20 @@ const getDefaultConfig = () => ({
                 if (type === 'memo') renderMemoFolders(); else renderAlbumFolders();
                 scheduleSave();
             },
+            // --- 在此下方新增 ---
+            'rename-memo-folder': (target) => {
+                const folderId = parseInt(target.closest('[data-folder-id]').dataset.folderId, 10);
+                const folder = memoryCache.memo.folders.find(f => f.id === folderId);
+                if (folder) {
+                    const newName = prompt('请输入新的文件夹名称：', folder.name);
+                    if (newName && newName.trim() && newName.trim() !== folder.name) {
+                        folder.name = newName.trim();
+                        renderMemoFolders();
+                        scheduleSave();
+                    }
+                }
+            },
+            // --- 新增结束 ---
             'open-memo-folder': (target) => {
                 const folderId = parseInt(target.closest('[data-folder-id]').dataset.folderId, 10);
                 if (state.isMemoManageMode) {
@@ -7257,19 +7373,25 @@ const getDefaultConfig = () => ({
                 showView('note-editor-view', 'memo-section');
             },
 
+         'open-note': (target) => {
+            const noteId = parseInt(target.closest('[data-note-id]').dataset.noteId, 10);
+            if (state.isNoteManageMode) {
+                const index = state.notesToDelete.indexOf(noteId);
+                if (index > -1) state.notesToDelete.splice(index, 1);
+                else state.notesToDelete.push(noteId);
+                renderNotes();
+                return;
+            }
+            const note = memoryCache.memo.notes.find(n => n.id === noteId);
+            if (note) {
+                state.currentNoteId = note.id;
+                document.getElementById('note-title-input').value = note.title;
+                document.getElementById('note-content-editor').innerHTML = note.content; 
+                document.querySelector('[data-action="delete-note"]').style.display = 'inline-block';
+                showView('note-editor-view', 'memo-section');
+            }
+        },
 
-             'open-note': (target) => {
-                const noteId = parseInt(target.closest('[data-note-id]').dataset.noteId, 10);
-                const note = memoryCache.memo.notes.find(n => n.id === noteId);
-                if (note) {
-                    state.currentNoteId = note.id;
-                    document.getElementById('note-title-input').value = note.title;
-                    // 使用 innerHTML 设置内容
-                    document.getElementById('note-content-editor').innerHTML = note.content; 
-                    document.querySelector('[data-action="delete-note"]').style.display = 'inline-block';
-                    showView('note-editor-view', 'memo-section');
-                }
-            },
             'save-note': () => {
                 const title = document.getElementById('note-title-input').value.trim();
                 // 从 contenteditable div 获取 innerHTML
@@ -7386,6 +7508,76 @@ const getDefaultConfig = () => ({
                     scheduleSave();
                 }
             },
+        'toggle-note-manage': (target) => {
+            state.isNoteManageMode = !state.isNoteManageMode;
+            target.textContent = state.isNoteManageMode ? '取消' : '管理';
+            ui.noteManageControls.classList.toggle('active', state.isNoteManageMode);
+            if (!state.isNoteManageMode) state.notesToDelete = [];
+            renderNotes();
+        },
+        'select-all-notes': () => {
+            const currentFolderNotes = memoryCache.memo.notes.filter(n => n.folderId === state.currentMemoFolderId);
+            if (state.notesToDelete.length === currentFolderNotes.length) {
+                state.notesToDelete = [];
+            } else {
+                state.notesToDelete = currentFolderNotes.map(n => n.id);
+            }
+            renderNotes();
+        },
+        'delete-selected-notes': () => {
+            if (state.notesToDelete.length === 0) return;
+            if (confirm(`确定要删除选中的 ${state.notesToDelete.length} 篇笔记吗？`)) {
+                memoryCache.memo.notes = memoryCache.memo.notes.filter(n => !state.notesToDelete.includes(n.id));
+                state.notesToDelete = [];
+                renderNotes();
+                scheduleSave();
+            }
+        },
+        'move-selected-notes': () => {
+            if (state.notesToDelete.length === 0) {
+                alert('请先选择要移动的笔记。');
+                return;
+            }
+            const destSelector = document.getElementById('memo-destination-selector');
+            destSelector.innerHTML = '';
+            memoryCache.memo.folders.forEach(folder => {
+                if (folder.id !== state.currentMemoFolderId) {
+                    const option = document.createElement('option');
+                    option.value = folder.id;
+                    option.textContent = folder.name;
+                    destSelector.appendChild(option);
+                }
+            });
+
+            if (destSelector.options.length === 0) {
+                alert('没有其他文件夹可以移动。');
+                return;
+            }
+            document.getElementById('moveNotesModal').classList.add('show');
+        },
+        'close-move-notes-modal': () => {
+            document.getElementById('moveNotesModal').classList.remove('show');
+        },
+        'confirm-move-notes': () => {
+            const destFolderId = parseInt(document.getElementById('memo-destination-selector').value, 10);
+            if (!destFolderId) {
+                alert('无效的目标文件夹。');
+                return;
+            }
+
+            memoryCache.memo.notes.forEach(note => {
+                if (state.notesToDelete.includes(note.id)) {
+                    note.folderId = destFolderId;
+                }
+            });
+
+            state.notesToDelete = [];
+            renderNotes();
+            scheduleSave();
+            document.getElementById('moveNotesModal').classList.remove('show');
+            showTopToast('笔记移动成功！', 2000);
+        },
+
              'toggle-photo-manage': (target) => {
                 state.isPhotoManageMode = !state.isPhotoManageMode;
                 target.textContent = state.isPhotoManageMode ? '取消' : '管理';
@@ -7761,20 +7953,42 @@ const getDefaultConfig = () => ({
             const selectedCategory = ui.categorySelector.value;
             ui.projectSelector.innerHTML = ''; // 首先清空旧的项目
 
+            // 如果没有选择分类，则隐藏项目选择器
             if (!selectedCategory || selectedCategory === '') {
                 ui.projectSelector.classList.add('hidden');
+                ui.fileList.innerHTML = ''; // 同时清空文件列表
+                ui.fileListStatus.textContent = '请选择一个分类';
+                ui.fileListStatus.style.display = 'block';
                 return;
             }
 
             ui.projectSelector.classList.remove('hidden');
 
-            const category = currentConfig.categories.find(c => c.name === selectedCategory);
-            // 修改核心：不再过滤，获取该分类下的【所有】按钮/项目
-            const allProjects = (category && category.buttons) ? category.buttons : [];
+            let projectsToShow = [];
+            // 如果选择的是"全部"，则合并所有分类下的项目
+            if (selectedCategory === '全部') {
+                 const allButtons = new Map();
+                currentConfig.categories.forEach(cat => {
+                    if (cat.buttons) {
+                        cat.buttons.forEach(btn => {
+                             // 使用 href 作为 key 来去重
+                            if (!allButtons.has(btn.href)) {
+                                allButtons.set(btn.href, btn);
+                            }
+                        });
+                    }
+                });
+                projectsToShow = Array.from(allButtons.values());
+            } else {
+                const category = currentConfig.categories.find(c => c.name === selectedCategory);
+                projectsToShow = (category && category.buttons) ? category.buttons : [];
+            }
 
-            if (allProjects.length > 0) {
+
+            if (projectsToShow.length > 0) {
+                 ui.projectSelector.innerHTML = '<option value="">-- 请选择项目 --</option>'; // 添加一个默认提示选项
                 // 遍历所有项目并添加到选择框
-                allProjects.forEach(btn => {
+                projectsToShow.forEach(btn => {
                     const option = document.createElement('option');
                     // 使用项目的 href 作为唯一标识
                     option.value = btn.href; 
@@ -7789,8 +8003,10 @@ const getDefaultConfig = () => ({
                 option.disabled = true;
                 ui.projectSelector.appendChild(option);
             }
+            
+            // 切换分类后，主动清空文件列表并更新状态提示
+            fetchFilesForSelectedProject();
         }
-
 
         function fetchFilesForSelectedProject() {
             const categoryName = ui.categorySelector.value;
@@ -8334,6 +8550,7 @@ const getDefaultConfig = () => ({
                 ui.photoDetailsModal.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target) actions[target.dataset.action]?.(); });
                 ui.photoViewer.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target) actions[target.dataset.action]?.(); });
                 document.getElementById('movePhotosModal').addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target && actions[target.dataset.action]) actions[target.dataset.action](target); });
+            document.getElementById('moveNotesModal').addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target && actions[target.dataset.action]) actions[target.dataset.action](target); });
 
                 ui.photoUploader.addEventListener('change', e => {
                     if (!e.target.files.length) return;
