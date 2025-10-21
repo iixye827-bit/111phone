@@ -348,16 +348,23 @@ body.dark-mode .progress-bar-wrapper {
         #memoryModal .album-item .folder-icon { font-size: 32px; }
         #memoryModal .album-info { font-size: 12px; color: #889; }
 #memoryModal #photo-list-container {
-    display: block; /* 1. 切换为最基本的块级布局 */
-    text-align: center; /* 2. 使用这个属性来让内部的元素实现居中对齐 */
-    min-height: 0; /* (保留) 这是一个好习惯，防止父级flex布局出错 */
-    /* 删除了所有 grid 和 gap 相关属性 */
+    display: flex;          /* 1. 声明为 Flexbox 弹性布局 */
+    flex-wrap: wrap;        /* 2. 允许项目自动换行 */
+    justify-content: flex-start; /* 3. 核心：实现从左到右排列 */
+    min-height: 0;
+    gap: 10px;              /* 4. 使用 gap 属性创建统一的 10px 间隙 */
 }
+
         #memoryModal .photo-item, .photo-item-set {
-    display: inline-block;   /* 1. 让项目像文字一样可以并排排列 */
-    vertical-align: top;    /* 2. 确保项目顶部对齐 */
-    width: 120px;           /* 3. 给予一个固定的宽度 */
-    margin: 8px;            /* 4. 这是最关键的：用外边距创造绝对可靠的16px间隙！*/
+    /* 核心：计算项目宽度，减去 gap 的空间，实现每行完美的3列 */
+    width: calc(33.333% - 6.7px); 
+    
+    /* 你可以调整这里的百分比和减去的值来改变列数，例如 4 列：
+       width: calc(25% - 7.5px);
+       5 列：
+       width: calc(20% - 8px);
+    */
+    
     aspect-ratio: 1 / 1;
     position: relative;
     overflow: hidden;
@@ -366,7 +373,10 @@ body.dark-mode .progress-bar-wrapper {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     cursor: pointer;
     transition: all 0.3s ease;
+    
+    /* 删除了所有旧的 display, vertical-align, width, margin 属性 */
 }
+
 
         #memoryModal .photo-item img, .photo-item-set img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
         .photo-item-set .photo-stack-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: transform 0.3s ease; border: 2px solid var(--bg-day-element); }
@@ -3303,6 +3313,61 @@ body.dark-mode .version-summary {
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
 
+/* ===== [新增] 相册重命名图标样式 ===== */
+#memoryModal .album-item .rename-icon {
+    display: none; /* 默认隐藏 */
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 20px;
+    font-weight: normal;
+    color: #a0aec0; /* 一个柔和的颜色 */
+    cursor: pointer;
+    padding: 5px;
+    z-index: 10;
+    transition: color 0.2s, transform 0.2s;
+    -webkit-user-select: none;
+    user-select: none;
+    line-height: 1;
+}
+
+body.dark-mode #memoryModal .album-item .rename-icon {
+    color: #718096;
+}
+
+/* 管理模式下显示 */
+#memoryModal .album-item.manage-mode .rename-icon {
+    display: block;
+}
+
+#memoryModal .album-item .rename-icon:hover {
+    color: var(--hold-border);
+    transform: scale(1.2);
+}
+
+/* 当有自定义背景时，使图标更清晰 */
+#memoryModal .album-item.has-custom-bg .rename-icon {
+    color: white;
+    opacity: 0.7;
+    text-shadow: 0 0 3px rgba(0,0,0,0.7);
+}
+#memoryModal .album-item.has-custom-bg .rename-icon:hover {
+    opacity: 1;
+}
+/* ===== [新增] 长图查看器缩放样式 ===== */
+#memoryPhotoViewerOverlay #viewer-img-container {
+    cursor: zoom-in; /* 默认显示放大光标 */
+}
+#viewer-img-container.zoomed-long {
+    align-items: flex-start; /* 切换为顶部对齐 */
+    overflow-y: auto;        /* 允许垂直滚动 */
+    cursor: default;         /* 容器本身恢复默认光标 */
+}
+#viewer-img-container.zoomed-long #viewer-img {
+    max-height: none;        /* 移除最大高度限制 */
+    width: 100%;             /* 宽度占满容器 */
+    cursor: zoom-out;        /* 图片上显示缩小光标 */
+}
 
     </style>
 
@@ -4104,6 +4169,7 @@ body.dark-mode .version-summary {
                         <input type="file" id="photo-uploader" multiple accept="image/*" style="display: none;">
                         <div id="photo-management-controls" class="management-controls">
                              <button data-action="select-all-photos" class="modal-button">全选</button>
+                             <button data-action="move-selected-photos" class="modal-button">移动选中</button>
                              <button data-action="delete-selected-photos" class="modal-button" style="color:#f56565;">删除选中</button>
                         </div>
                     </div>
@@ -4170,6 +4236,22 @@ body.dark-mode .version-summary {
             <div class="modal-footer">
                 <button data-action="skip-photo-details" class="modal-button">跳过</button>
                 <button data-action="save-photo-details" class="modal-button primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- [新增] 移动照片模态框 -->
+    <div id="movePhotosModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <div class="modal-title-group">移动到...</div>
+            </div>
+            <div class="modal-body">
+                <select id="album-destination-selector" class="modal-select"></select>
+            </div>
+            <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button data-action="close-move-modal" class="modal-button">取消</button>
+                <button data-action="confirm-move-photos" class="modal-button" style="color:var(--hold-border)">确认移动</button>
             </div>
         </div>
     </div>
@@ -6910,7 +6992,8 @@ const getDefaultConfig = () => ({
                 el.className = `album-item ${state.isAlbumManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
                 el.dataset.albumId = folder.id;
                 el.dataset.action = "open-album-folder";
-                el.innerHTML = `<span class="sort-handle" title="按住拖拽排序">☰</span><input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">🖼️</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${itemCount} 个项目</div>`;
+                el.innerHTML = `<span class="sort-handle" title="按住拖拽排序">☰</span><input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">🖼️</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${itemCount} 个项目</div><span class="rename-icon" data-action="rename-album" title="重命名">&#9998;</span>`;
+
 
                 
                 // [核心修正] 处理自定义背景逻辑
@@ -7058,6 +7141,7 @@ const getDefaultConfig = () => ({
         }
 
         function closePhotoViewer() { 
+            document.getElementById('viewer-img-container').classList.remove('zoomed-long'); // 重置缩放状态
             state.viewerContext.items.forEach(item => { if(item.type === 'photoset') delete item.internalIndex; });
             ui.photoViewer.classList.remove('active'); 
             // [新增] 隐藏下载按钮
@@ -7066,7 +7150,6 @@ const getDefaultConfig = () => ({
                 downloadBtn.style.display = 'none';
             }
         }
-
         async function changePhotoInViewer(direction) {
             const { items, index } = state.viewerContext;
             const currentItem = items[index];
@@ -7428,6 +7511,66 @@ const getDefaultConfig = () => ({
             'close-viewer': () => closePhotoViewer(),
             'prev-photo': () => changePhotoInViewer(-1),
             'next-photo': () => changePhotoInViewer(1),
+
+            'move-selected-photos': () => {
+                if (state.photosToDelete.length === 0) {
+                    alert('请先选择要移动的照片。');
+                    return;
+                }
+                const destSelector = document.getElementById('album-destination-selector');
+                destSelector.innerHTML = '';
+                memoryCache.album.folders.forEach(folder => {
+                    if (folder.id !== state.currentAlbumId) {
+                        const option = document.createElement('option');
+                        option.value = folder.id;
+                        option.textContent = folder.name;
+                        destSelector.appendChild(option);
+                    }
+                });
+
+                if (destSelector.options.length === 0) {
+                    alert('没有其他相册可以移动。');
+                    return;
+                }
+                document.getElementById('movePhotosModal').classList.add('show');
+            },
+            'close-move-modal': () => {
+                document.getElementById('movePhotosModal').classList.remove('show');
+            },
+            'confirm-move-photos': () => {
+                const destAlbumId = parseInt(document.getElementById('album-destination-selector').value, 10);
+                if (!destAlbumId) {
+                    alert('无效的目标相册。');
+                    return;
+                }
+
+                memoryCache.album.items.forEach(item => {
+                    if (state.photosToDelete.includes(item.id)) {
+                        item.albumId = destAlbumId;
+                    }
+                });
+
+                state.photosToDelete = [];
+                renderPhotos();
+                scheduleSave();
+                document.getElementById('movePhotosModal').classList.remove('show');
+                showTopToast('照片移动成功！', 2000);
+            },
+
+            'rename-album': (target) => {
+                const albumId = parseInt(target.closest('[data-album-id]').dataset.albumId, 10);
+                const album = memoryCache.album.folders.find(f => f.id === albumId);
+
+                if (album) {
+                    const newName = prompt('请输入新的相册名称：', album.name);
+                    if (newName && newName.trim() !== '' && newName.trim() !== album.name) {
+                        album.name = newName.trim();
+                        renderAlbumFolders(); // 重新渲染以显示新名称
+                        scheduleSave();
+                    }
+                }
+            },
+
             'wander-global': () => WanderView.start(memoryCache.album.items),
             'wander-local': () => WanderView.start(memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId)),
             'close-wander-view': () => WanderView.close(),
@@ -8029,6 +8172,30 @@ const getDefaultConfig = () => ({
                         actions[target.dataset.action](target);
                     }
                 });
+
+                // [新增] 长图双击缩放逻辑
+                const viewerImg = ui.photoViewer.querySelector('#viewer-img');
+                const viewerImgContainer = ui.photoViewer.querySelector('#viewer-img-container');
+                
+                viewerImgContainer.addEventListener('dblclick', () => {
+                    const isCurrentlyZoomed = viewerImgContainer.classList.contains('zoomed-long');
+                    
+                    if (isCurrentlyZoomed) {
+                        viewerImgContainer.classList.remove('zoomed-long');
+                        viewerImgContainer.scrollTop = 0; 
+                        return;
+                    }
+
+                    const isLongImage = viewerImg.naturalHeight > viewerImg.naturalWidth;
+                    const isTallerThanContainer = viewerImg.naturalHeight > viewerImgContainer.clientHeight;
+
+                    if (isLongImage && isTallerThanContainer) {
+                        viewerImgContainer.classList.add('zoomed-long');
+                    } else {
+                        showTopToast('此图片无需放大', 2000);
+                    }
+                });
+
                 // [新增] 备忘录富文本编辑器逻辑 v2
                 const editor = document.getElementById('note-content-editor');
                 const toolbar = document.querySelector('.memo-toolbar');
@@ -8166,6 +8333,8 @@ const getDefaultConfig = () => ({
                 ui.folderModal.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target) actions[target.dataset.action]?.(); });
                 ui.photoDetailsModal.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target) actions[target.dataset.action]?.(); });
                 ui.photoViewer.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target) actions[target.dataset.action]?.(); });
+                document.getElementById('movePhotosModal').addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target && actions[target.dataset.action]) actions[target.dataset.action](target); });
+
                 ui.photoUploader.addEventListener('change', e => {
                     if (!e.target.files.length) return;
                     state.photoUploadQueue = Array.from(e.target.files);
