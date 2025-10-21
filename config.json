@@ -59,5 +59,16 @@
       }
     }
   ],
-  "lockscreenWidgets": {}
+  "lockscreenWidgets": {
+    "24": [
+      {
+        "id": 1761083497311,
+        "size": "1x1",
+        "type": "shortcut",
+        "shape": "circle",
+        "content": "https://raven7-7.github.io/Crow/",
+        "text": "Raven"
+      }
+    ]
+  }
 }
