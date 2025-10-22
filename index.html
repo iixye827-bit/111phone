@@ -8746,10 +8746,11 @@ const getDefaultConfig = () => ({
                                         body: JSON.stringify({ name: cbRepoName, "private": true })
                                   });
                                
-                                 // 如果仓库已存在(422)或创建成功(201)，都算成功
-                                 if (!repoCreateRes.ok && repoCreateRes.status !== 422) {
+                                 // 如果仓库已存在(409或422)或创建成功(201)，都算成功
+                                 if (!repoCreateRes.ok && repoCreateRes.status !== 422 && repoCreateRes.status !== 409) {
                                      throw new Error(`创建Codeberg仓库失败: ${repoCreateRes.statusText}`);
                                  }
+
                             } catch(e) {
                                 alert(e.message);
                                 return; // 创建失败则中断上传
