@@ -8520,7 +8520,10 @@ const getDefaultConfig = () => ({
                         if (activeCbAccount) {
                             const codebergRepoName = projectConfig.text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-") || `drive-${Date.now()}`;
                             const cbUrl = `https://codeberg.org/api/v1/repos/${activeCbAccount.username}/${codebergRepoName}/contents/`;
-                            const res = await fetch(cbUrl, { headers: { 'Authorization': `token ${activeCbAccount.accessToken}` } });
+                            const res = await fetch(cbUrl, { 
+                                headers: { 'Authorization': `token ${activeCbAccount.accessToken}` },
+                                cache: 'no-cache' // <-- 核心修改：禁止缓存
+                            });
                             if (res.ok) {
                                 codebergFiles = await res.json();
                             }
@@ -8528,6 +8531,7 @@ const getDefaultConfig = () => ({
                     } catch (e) {
                         console.warn("加载 Codeberg 文件列表失败 (这可能是正常的，比如仓库还未创建):", e);
                     }
+
                     if (state.cloudDriveRequestToken !== requestToken) { return; }
                     
                     // --- 3. 合并和渲染 ---
@@ -8666,7 +8670,8 @@ const getDefaultConfig = () => ({
                     try {
                         const response = await fetch(url, {
                             method: 'GET',
-                            headers: { 'Authorization': authToken }
+                            headers: { 'Authorization': authToken },
+                            cache: 'no-cache' // <-- 核心修改：禁止缓存
                         });
                         return response.ok; // 如果仓库存在，API会返回200 OK
                     } catch (error) {
@@ -8674,7 +8679,7 @@ const getDefaultConfig = () => ({
                         return false;
                     }
                 }
-                
+
                 async function uploadToCodeberg(file, fileName, projectHref) {
                     const activeAccount = CodebergManager.getActiveAccount();
                     if (!activeAccount) {
@@ -8776,12 +8781,17 @@ const getDefaultConfig = () => ({
                         
                         let existingFileSha = null;
                         try {
-                            const shaRes = await fetch(url, { method: 'GET', headers: { 'Authorization': authToken } });
+                            const shaRes = await fetch(url, { 
+                                method: 'GET', 
+                                headers: { 'Authorization': authToken },
+                                cache: 'no-cache' // <-- 核心修改：禁止缓存
+                            });
                             if (shaRes.ok) {
                                 const fileData = await shaRes.json();
                                 existingFileSha = fileData.sha;
                             }
                         } catch(e) { console.warn("Could not fetch existing file sha, proceeding with create.", e); }
+
 
                         // [核心修改] 根据文件是否存在，准备不同的请求体和方法
                         let body;
