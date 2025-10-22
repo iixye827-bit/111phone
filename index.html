@@ -8757,10 +8757,30 @@ const getDefaultConfig = () => ({
                             }
                         }
 
-                        const body = { message: `Upload file: ${file.name}`, content: contentB64, sha: existingFileSha };
+                        let body;
+                        let method;
+                        
+                        if (existingFileSha) {
+                            // 文件已存在，执行更新操作
+                            method = 'PUT';
+                            body = {
+                                message: `Update file: ${file.name}`,
+                                content: contentB64,
+                                sha: existingFileSha
+                            };
+                        } else {
+                            // 文件不存在，执行创建操作
+                            method = 'POST';
+                            body = {
+                                message: `Create file: ${file.name}`,
+                                content: contentB64
+                                // 注意：创建文件时，请求体中不包含 sha 字段
+                            };
+                        }
                         
                         activeUploadXHR = new XMLHttpRequest();
-                        activeUploadXHR.open('PUT', url, true);
+                        activeUploadXHR.open(method, url, true);
+
                         activeUploadXHR.setRequestHeader('Authorization', authToken);
                         activeUploadXHR.setRequestHeader('Content-Type', 'application/json');
                         
