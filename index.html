@@ -3453,8 +3453,6 @@ body.dark-mode .folder-item .sort-handle.memo-sort-handle {
                 <div class="lockscreen-grid" id="lockscreenGrid">
                     <!-- JS 动态填充 -->
                 </div>
-                <!-- [新增] 锁屏空白提示 -->
-                <div id="lockscreen-swipe-hint" style="display: none; position: absolute; color: inherit; opacity: 0.5; font-size: 16px; font-weight: 600; text-align: center; pointer-events: none;">向右滑动进入主屏幕 →</div>
             </div>
             <!-- 主屏幕页面 (JS会将下面的内容移入此div) -->
             <div class="home-screen-page" id="homeScreenPage">
@@ -7502,7 +7500,7 @@ const getDefaultConfig = () => ({
 
             'toggle-memo-manage': (target) => {
                 state.isMemoManageMode = !state.isMemoManageMode;
-                target.textContent = state.isMemoManageMode ? '取消' : '管理';
+                target.textContent = state.isMemoManageMode ? '完成' : '管理';
                 ui.memoManageControls.classList.toggle('active', state.isMemoManageMode);
                 if (!state.isMemoManageMode) state.memoFoldersToDelete = [];
                 renderMemoFolders();
@@ -7533,7 +7531,7 @@ const getDefaultConfig = () => ({
             },
             'toggle-album-manage': (target) => {
                 state.isAlbumManageMode = !state.isAlbumManageMode;
-                target.textContent = state.isAlbumManageMode ? '取消' : '管理';
+                target.textContent = state.isAlbumManageMode ? '完成' : '管理';
                 ui.albumManageControls.classList.toggle('active', state.isAlbumManageMode);
                 if (!state.isAlbumManageMode) state.albumFoldersToDelete = [];
                 
@@ -7579,7 +7577,7 @@ const getDefaultConfig = () => ({
             },
         'toggle-note-manage': (target) => {
             state.isNoteManageMode = !state.isNoteManageMode;
-            target.textContent = state.isNoteManageMode ? '取消' : '管理';
+            target.textContent = state.isNoteManageMode ? '完成' : '管理';
             ui.noteManageControls.classList.toggle('active', state.isNoteManageMode);
             if (!state.isNoteManageMode) state.notesToDelete = [];
             renderNotes();
@@ -7649,7 +7647,7 @@ const getDefaultConfig = () => ({
 
              'toggle-photo-manage': (target) => {
                 state.isPhotoManageMode = !state.isPhotoManageMode;
-                target.textContent = state.isPhotoManageMode ? '取消' : '管理';
+                target.textContent = state.isPhotoManageMode ? '完成' : '管理';
                 ui.photoManageControls.classList.toggle('active', state.isPhotoManageMode);
                 if (!state.isPhotoManageMode) state.photosToDelete = [];
 
@@ -9465,8 +9463,8 @@ const getDefaultConfig = () => ({
                 }
                 
                 // 检查下方元素是否是有效的放置目标
-                const potentialTarget = elementBelow ? elementBelow.closest('.nav-btn, .category-pill, .album-item') : null;
-                if (potentialTarget && potentialTarget !== draggedEl && draggedEl.classList.contains(potentialTarget.classList[0])) {
+                const potentialTarget = elementBelow ? elementBelow.closest('.nav-btn, .category-pill, .album-item, .folder-item') : null;
+                if (potentialTarget && potentialTarget !== draggedEl && draggedEl.classList[0] === potentialTarget.classList[0]) {
                     dropTarget = potentialTarget;
                     dropTarget.classList.add('drag-over');
                 }
@@ -9525,10 +9523,12 @@ const getDefaultConfig = () => ({
 
             // 按下事件（长按的起点）
             function onDragStart(event) {
+                // [修改] 同时检查相册和备忘录文件夹的管理模式是否开启
                 const isAlbumManageMode = document.querySelector('.album-item.manage-mode');
+                const isMemoManageMode = document.querySelector('.folder-item.manage-mode');
 
-                // 如果两个管理模式都没开，则退出
-                if (!document.body.classList.contains('management-active') && !isAlbumManageMode) return;
+                // 如果所有管理模式都没开，则退出
+                if (!document.body.classList.contains('management-active') && !isAlbumManageMode && !isMemoManageMode) return;
                 
                 if (isDragging) return;
 
@@ -9536,15 +9536,14 @@ const getDefaultConfig = () => ({
                 startPos.x = a.clientX;
                 startPos.y = a.clientY;
 
-                // 路径1：立即拖拽 (针对相册排序把手)
+                // 路径1：立即拖拽 (针对相册或备忘录文件夹的排序把手)
                 if (event.target.classList.contains('sort-handle')) {
-                    draggedEl = event.target.closest('.album-item');
+                    // [修改] 让其能找到 .album-item 或 .folder-item
+                    draggedEl = event.target.closest('.album-item, .folder-item'); 
                     if (!draggedEl) return;
                     
-                    // 立即开始拖拽流程，不使用计时器
                     startDrag(event);
                     
-                    // 绑定事件
                     document.addEventListener('mousemove', onDragMove);
                     document.addEventListener('touchmove', onDragMove, { passive: false });
                     document.addEventListener('mouseup', onDragEnd, { once: true });
@@ -9552,7 +9551,7 @@ const getDefaultConfig = () => ({
                     return; 
                 }
                 
-                // 路径2：长按拖拽 (针对项目和分类)
+                // 路径2：长按拖拽 (针对主页项目和分类)
                 const target = event.target.closest('.nav-btn, .category-pill');
                 if (!target || event.target.classList.contains('delete-icon')) return;
 
@@ -9565,7 +9564,6 @@ const getDefaultConfig = () => ({
                 document.addEventListener('touchend', onDragEnd, { once: true });
             }
 
-
             // 更新底层数据结构
             function updateDataModel(el1, el2, parent) {
                 // 情况一：对项目按钮排序
@@ -9576,26 +9574,37 @@ const getDefaultConfig = () => ({
                     const allButtons = Array.from(parent.querySelectorAll('.nav-btn'));
                     const newButtonOrder = allButtons.map(btn => {
                         return category.buttons.find(b => b.href === btn.dataset.href);
-                    }).filter(Boolean); // 过滤掉可能找不到的按钮
+                    }).filter(Boolean);
 
                     category.buttons = newButtonOrder;
                 }
-                // [新增] 情况三：对相册封面排序
+                // 情况二：对相册封面排序
                 else if (parent.id === 'album-list-container') {
                     const allAlbums = Array.from(parent.querySelectorAll('.album-item'));
-                    // 从 DOM 顺序反向更新数据数组
                     const newAlbumOrder = allAlbums.map(albumEl => {
                         const albumId = parseInt(albumEl.dataset.albumId, 10);
                         return memoryCache.album.folders.find(f => f.id === albumId);
-                    }).filter(Boolean); // 过滤掉可能未找到的项
+                    }).filter(Boolean);
 
                     memoryCache.album.folders = newAlbumOrder;
                     
-                    // 调用 MemoryApp 自己的保存机制，而不是全局保存
                     MemoryApp.scheduleSave();
-                    return; // 结束函数，避免执行下面的全局保存
+                    return; 
                 }
-                // 情况二：对分类标签排序
+                // [新增] 情况三：对备忘录文件夹排序
+                else if (parent.id === 'folder-list-container') {
+                    const allFolders = Array.from(parent.querySelectorAll('.folder-item'));
+                    const newFolderOrder = allFolders.map(folderEl => {
+                        const folderId = parseInt(folderEl.dataset.folderId, 10);
+                        return memoryCache.memo.folders.find(f => f.id === folderId);
+                    }).filter(Boolean);
+
+                    memoryCache.memo.folders = newFolderOrder;
+
+                    MemoryApp.scheduleSave();
+                    return;
+                }
+                // 情况四：对分类标签排序
                 else if (parent.id === 'categoryNav') {
 
                     const allPills = Array.from(parent.querySelectorAll('.category-pill'));
@@ -9603,7 +9612,6 @@ const getDefaultConfig = () => ({
                         return currentConfig.categories.find(c => c.name === pill.dataset.category);
                     }).filter(Boolean);
 
-                    // 确保“全部”分类始终在第一位
                     const allCategory = newCategoryOrder.find(c => c.name === '全部');
                     const otherCategories = newCategoryOrder.filter(c => c.name !== '全部');
                     if (allCategory) {
@@ -9622,9 +9630,9 @@ const getDefaultConfig = () => ({
                     console.log("Drag and Sort functionality initialized.");
                     const mainContainer = document.getElementById('navContainer');
                     const categoryContainer = document.getElementById('categoryNav');
-
-                    // 使用事件委托来处理动态添加的按钮
                     const albumContainer = document.getElementById('album-list-container');
+                    // [新增] 获取备忘录文件夹的容器
+                    const memoFolderContainer = document.getElementById('folder-list-container');
 
                     mainContainer.addEventListener('mousedown', onDragStart);
                     mainContainer.addEventListener('touchstart', onDragStart, { passive: true });
@@ -9635,6 +9643,9 @@ const getDefaultConfig = () => ({
                     albumContainer.addEventListener('mousedown', onDragStart);
                     albumContainer.addEventListener('touchstart', onDragStart, { passive: true });
 
+                    // [新增] 为备忘录文件夹容器也绑定事件
+                    memoFolderContainer.addEventListener('mousedown', onDragStart);
+                    memoFolderContainer.addEventListener('touchstart', onDragStart, { passive: true });
                 }
             };
         })();
@@ -10772,13 +10783,8 @@ const getDefaultConfig = () => ({
                 componentContainer.appendChild(widgetEl);
                 grid.appendChild(componentContainer);
             });
-            
-            // [新增] 检查网格中是否有小组件，并据此显示/隐藏提示
-            const hint = document.getElementById('lockscreen-swipe-hint');
-            if (hint) {
-                hint.style.display = grid.childElementCount === 0 ? 'block' : 'none';
-            }
         }
+
 
         // 初始化手机模式管理器
         MobileModeManager.init();
