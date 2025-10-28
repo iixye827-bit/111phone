@@ -5,13 +5,33 @@
     {
       "name": "全部",
       "buttons": []
+    },
+    {
+      "name": "小手机",
+      "buttons": [
+        {
+          "text": "1",
+          "href": "1",
+          "openExternally": false
+        },
+        {
+          "text": "Raven",
+          "href": "https://raven7-7.github.io/Crow/",
+          "openExternally": false
+        },
+        {
+          "text": "2",
+          "href": "3",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
     "paginationEnabled": true,
-    "themeStyle": "neumorphism",
+    "themeStyle": "glass",
     "jellyBall": {
-      "enabled": false,
+      "enabled": true,
       "swipeBack": true,
       "functions": {},
       "customCSS": ""
@@ -28,6 +48,9 @@
       "message": "是时候该备份你的项目啦！",
       "onExit": false,
       "projects": []
+    },
+    "mobileMode": {
+      "enabled": false
     }
   },
   "themePresets": [
