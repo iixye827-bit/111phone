@@ -5659,34 +5659,39 @@ const getDefaultConfig = () => ({
 
         })();
     /* =============================================================== */
-    /* ================== [新增] Mega 管理器 V1.0 ==================== */
+    /* ================== [修改] Mega 管理器 V2.0 ==================== */
     /* =============================================================== */
     const MegaManager = (() => {
-        // ⚠️ 重要: 这是Jellyfish Island应用的公用客户端ID，请勿修改。
+        // ... 常量定义保持不变 ...
         const CLIENT_ID = '0I5V2JSR';
         const REDIRECT_URI = window.location.origin + window.location.pathname;
         const STORAGE_KEY_ACCOUNTS = 'mega_accounts';
         const STORAGE_KEY_ACTIVE = 'mega_active_account_email';
-        const APP_FOLDER_NAME = 'JellyfishDrive'; // 在Mega云盘中创建的根文件夹
+        const APP_FOLDER_NAME = 'JellyfishDrive'; 
 
         let ui = {};
-        let activeStorage = null; // 当前已登录的 mega.js Storage 实例
+        let activeStorage = null;
+        let storageInstances = new Map(); // [新增] 缓存已登录的storage实例
 
-        // --- 内部辅助函数 ---
         const _getAccounts = () => JSON.parse(localStorage.getItem(STORAGE_KEY_ACCOUNTS)) || [];
         const _saveAccounts = (accounts) => localStorage.setItem(STORAGE_KEY_ACCOUNTS, JSON.stringify(accounts));
         const _getActiveUserEmail = () => localStorage.getItem(STORAGE_KEY_ACTIVE);
         const _setActiveUserEmail = (email) => localStorage.setItem(STORAGE_KEY_ACTIVE, email);
+        
         const _getAppFolder = async (storage) => {
-            if (!storage.root) await storage.loadAttributes();
+            if (!storage.root) {
+                // [优化] 添加加载提示
+                showTopToast('正在连接 Mega 云盘...', 5000);
+                await storage.loadAttributes();
+            }
             let appFolder = storage.root.children.find(f => f.name === APP_FOLDER_NAME && f.directory);
             if (!appFolder) {
+                showTopToast('未找到应用根目录，正在创建...', 5000);
                 appFolder = await storage.createFolder(APP_FOLDER_NAME);
             }
             return appFolder;
         };
 
-        // --- UI 渲染函数 ---
         function _renderActiveAccount() {
             const activeEmail = _getActiveUserEmail();
             if (activeEmail) {
@@ -5704,12 +5709,10 @@ const getDefaultConfig = () => ({
             const accounts = _getAccounts();
             const activeEmail = _getActiveUserEmail();
             ui.authorizedList.innerHTML = '';
-
             if (accounts.length === 0) {
                 ui.authorizedList.innerHTML = '<div class="mega-empty-list">暂无已授权的账户</div>';
                 return;
             }
-
             accounts.forEach(account => {
                 const item = document.createElement('div');
                 item.className = 'mega-account-item';
@@ -5734,35 +5737,28 @@ const getDefaultConfig = () => ({
             _renderAuthorizedList();
         }
 
-        // --- 事件处理与逻辑 ---
         function _handleAuthorizeClick() {
             const authUrl = `https://mega.nz/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
             window.location.href = authUrl;
         }
 
         async function _handleOAuthCallback(fragment) {
+            showTopToast("正在处理 Mega 授权...", 10000);
             try {
                 const storage = await new Promise((resolve, reject) => {
-                    mega.load(fragment, (err, storage) => {
-                        if (err) return reject(err);
-                        resolve(storage);
-                    });
+                    mega.load(fragment, (err, storage) => err ? reject(err) : resolve(storage));
                 });
-
                 const userEmail = storage.user.email;
-                const session = storage.key; // 关键：获取可用于重连的 session
+                const session = storage.key;
                 let accounts = _getAccounts();
                 const existingIndex = accounts.findIndex(acc => acc.email === userEmail);
                 const newAccount = { email: userEmail, session: session };
-
-                if (existingIndex > -1) {
-                    accounts[existingIndex] = newAccount;
-                } else {
-                    accounts.push(newAccount);
-                }
+                if (existingIndex > -1) accounts[existingIndex] = newAccount;
+                else accounts.push(newAccount);
                 _saveAccounts(accounts);
                 _setActiveUserEmail(userEmail);
-
+                storageInstances.set(userEmail, storage); // [新增] 授权后立即缓存实例
+                activeStorage = storage;
                 showTopToast(`Mega 账户 "${userEmail}" 已成功连接！`, 3000);
             } catch (error) {
                 console.error("Mega OAuth 处理失败:", error);
@@ -5774,9 +5770,10 @@ const getDefaultConfig = () => ({
             if (!confirm(`确定要删除账户 "${email}" 吗？此操作将移除应用的授权。`)) return;
             let accounts = _getAccounts().filter(acc => acc.email !== email);
             _saveAccounts(accounts);
+            storageInstances.delete(email); // [新增] 从缓存中移除
             if (_getActiveUserEmail() === email) {
                 _setActiveUserEmail(accounts.length > 0 ? accounts[0].email : '');
-                activeStorage = null; // 清除当前活动实例
+                activeStorage = null;
             }
             _renderAll();
             showTopToast(`账户 "${email}" 已删除。`, 2000);
@@ -5785,10 +5782,8 @@ const getDefaultConfig = () => ({
         async function _handleAccountSwitch(email) {
             _setActiveUserEmail(email);
             _renderAll();
-            activeStorage = null; // 清除旧的实例，强制下次使用时重新登录
-            
-            if (document.getElementById('memoryModal').classList.contains('show') && 
-                document.getElementById('cloud-drive-section').classList.contains('active')) {
+            activeStorage = storageInstances.get(email) || null; // [修改] 尝试从缓存获取
+            if (document.getElementById('memoryModal').classList.contains('show') && document.getElementById('cloud-drive-section').classList.contains('active')) {
                 showTopToast(`活动账户已切换为 "${email}"，正在刷新文件列表...`, 3000);
                 setTimeout(MemoryApp.fetchFilesForSelectedProject, 100);
             } else {
@@ -5797,29 +5792,31 @@ const getDefaultConfig = () => ({
         }
 
         async function getActiveStorage() {
-            if (activeStorage && activeStorage.user) {
-                return activeStorage;
-            }
             const activeEmail = _getActiveUserEmail();
             if (!activeEmail) return null;
 
+            if (activeStorage && activeStorage.user.email === activeEmail) {
+                return activeStorage;
+            }
+            if (storageInstances.has(activeEmail)) {
+                activeStorage = storageInstances.get(activeEmail);
+                return activeStorage;
+            }
+
             const account = _getAccounts().find(acc => acc.email === activeEmail);
             if (!account || !account.session) {
-                _setActiveUserEmail(''); // 无效账户，清除
-                _renderAll();
+                _setActiveUserEmail('');_renderAll();
                 return null;
             }
 
+            showTopToast(`正在连接 Mega 账户: ${activeEmail}`, 10000);
             try {
-                activeStorage = await new Promise((resolve, reject) => {
-                    const storage = new mega.Storage({
-                        email: account.email,
-                        password: account.session // 使用session重连
-                    }, (err) => {
-                        if (err) return reject(err);
-                        resolve(storage);
-                    });
+                const storage = await new Promise((resolve, reject) => {
+                    new mega.Storage({ email: account.email, password: account.session }, (err, s) => err ? reject(err) : resolve(s));
                 });
+                storageInstances.set(activeEmail, storage);
+                activeStorage = storage;
+                showTopToast(`已连接`, 2000);
                 return activeStorage;
             } catch (err) {
                 console.error("Mega session 登录失败，可能已过期:", err);
@@ -5838,9 +5835,7 @@ const getDefaultConfig = () => ({
                     activeAccountDisplay: document.getElementById('mega-active-account-display'),
                     authorizedList: document.getElementById('mega-authorized-list'),
                 };
-                
                 if (!ui.openBtn) return;
-
                 ui.openBtn.addEventListener('click', () => { _renderAll(); ui.modal.classList.add('show'); });
                 ui.addAccountBtn.addEventListener('click', (e) => { e.preventDefault(); _handleAuthorizeClick(); });
                 
@@ -5860,7 +5855,7 @@ const getDefaultConfig = () => ({
                 return _getAccounts().find(acc => acc.email === activeEmail) || null;
             },
             getActiveStorage: getActiveStorage,
-             _getAppFolder: _getAppFolder,
+            _getAppFolder: _getAppFolder,
         };
     })();
 
@@ -8481,7 +8476,7 @@ const getDefaultConfig = () => ({
                     }
                 }
 
-                // [修改] fetchFilesForSelectedProject v6 (整合 Mega)
+                 // [修改] fetchFilesForSelectedProject v7 (整合 Mega + 修复项目名变动)
                 async function fetchFilesForSelectedProject() {
                     const requestToken = Symbol();
                     state.cloudDriveRequestToken = requestToken;
@@ -8496,19 +8491,20 @@ const getDefaultConfig = () => ({
                         return;
                     }
 
-                    const repoNamePart = projectConfig.text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-");
+                    // [核心修改] 使用 href 生成稳定的文件夹标识
+                    const projectIdentifier = `proj_${simpleHash(projectHref)}`;
 
                     // --- 1. 并行获取所有来源的文件 ---
                     const promises = [];
 
                     // 1a. 获取 GitHub 文件 (小文件)
                     if (checkConfig(false)) {
-                        const githubPath = `jellyfish_drive/${repoNamePart}`;
+                        const githubPath = `jellyfish_drive/${projectIdentifier}`;
                         promises.push(
                             (async () => {
                                 const { data: files } = await fetchFromGithub(githubPath);
                                 if (!files || !Array.isArray(files)) return [];
-                                return files.map(f => ({ ...f, storage: 'github', owner: GITHUB_CONFIG.owner, last_commit_date: new Date() })); // GitHub 日期暂不获取
+                                return Promise.all(files.map(async f => ({ ...f, storage: 'github', owner: GITHUB_CONFIG.owner, last_commit_date: await getFileCommitDate(f.path) })));
                             })().catch(e => { console.error("加载 GitHub 文件列表时出错:", e); return []; })
                         );
                     }
@@ -8521,8 +8517,8 @@ const getDefaultConfig = () => ({
                                 const storage = await MegaManager.getActiveStorage();
                                 if (!storage || state.cloudDriveRequestToken !== requestToken) return [];
                                 const appFolder = await MegaManager._getAppFolder(storage);
-                                const projectFolderName = repoNamePart || `drive-project-${projectConfig.href.length}`;
-                                let projectFolder = appFolder.children.find(f => f.name === projectFolderName && f.directory);
+                                
+                                const projectFolder = appFolder.children.find(f => f.name === projectIdentifier && f.directory);
                                 if (!projectFolder) return [];
 
                                 const megaFiles = projectFolder.children.map(file => ({
@@ -8554,9 +8550,12 @@ const getDefaultConfig = () => ({
                     allFiles.forEach(file => {
                         const li = document.createElement("li");
                         const ownerName = file.owner || '未知用户';
-                        const ownerSpan = `<span class="file-owner">${ownerName}</span>`;
+                        // [新增] 如果是GitHub，给ownerName加上logo
+                        const ownerDisplay = file.storage === 'github' ? `🐙 ${ownerName}` : ownerName;
+                        const ownerSpan = `<span class="file-owner">${ownerDisplay}</span>`;
                         const sizeText = formatFileSize(file.size);
-                        const dateText = new Date(file.last_commit_date || Date.now()).toISOString().split('T')[0];
+                        // [修改] 统一使用last_commit_date
+                        const dateText = new Date(file.last_commit_date).toISOString().split('T')[0];
                         const metaText = `${dateText} • ${sizeText}`;
 
                         li.innerHTML = `
@@ -8569,8 +8568,11 @@ const getDefaultConfig = () => ({
                         if (file.storage === 'mega') {
                             const fileNameSpan = li.querySelector('.file-name');
                             fileNameSpan.textContent = " " + fileNameSpan.textContent;
-                            const iconNode = document.createTextNode('☁️ ');
-                            fileNameSpan.prepend(iconNode);
+                            const iconNode = document.createTextNode(' M '); // 使用 M logo
+                            const iconSpan = document.createElement('span');
+                            iconSpan.style.cssText = 'font-weight: bold; color: #d9272e;';
+                            iconSpan.appendChild(iconNode);
+                            fileNameSpan.prepend(iconSpan);
                         }
                         ui.fileList.appendChild(li);
 
@@ -8578,6 +8580,7 @@ const getDefaultConfig = () => ({
                         li.querySelector(".delete-btn").addEventListener("click", () => deleteFile(file, li));
                     });
                 }
+
 
                 async function forceDownload(file, el) {
                     const fileNameSpan = el.querySelector(".file-name");
@@ -8729,7 +8732,7 @@ const getDefaultConfig = () => ({
                     }
                 }
 
-                // [重构] Mega 上传函数
+                 // [重构] Mega 上传函数
                 async function uploadToMega(file, fileName, projectHref) {
                     const storage = await MegaManager.getActiveStorage();
                     if (!storage) {
@@ -8747,6 +8750,9 @@ const getDefaultConfig = () => ({
                         uploadCancelBtn.removeEventListener('click', uploadCancelHandler);
                         ui.progressContainer.style.display = 'none';
                         window.megaFileStream = null;
+                        // [新增] 恢复上传按钮状态
+                        ui.uploadBtn.disabled = false;
+                        ui.uploadBtn.textContent = '上传文件';
                     };
                     const uploadCancelBtn = document.getElementById('upload-cancel-btn');
                     const uploadCancelHandler = () => { if (window.megaFileStream) window.megaFileStream.cancel(); };
@@ -8754,13 +8760,20 @@ const getDefaultConfig = () => ({
 
                     ui.progressContainer.style.display = 'flex';
                     ui.progressBar.style.width = '0%';
+                    // [新增] 禁用上传按钮
+                    ui.uploadBtn.disabled = true;
+                    ui.uploadBtn.textContent = '上传中...';
 
                     try {
                         const appFolder = await MegaManager._getAppFolder(storage);
-                        const projectFolderName = projectConfig.text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-") || `drive-project-${projectConfig.href.length}`;
-                        let projectFolder = appFolder.children.find(f => f.name === projectFolderName && f.directory);
+                        // [核心修改] 使用 href 生成稳定的文件夹标识
+                        const projectIdentifier = `proj_${simpleHash(projectHref)}`;
+                        
+                        let projectFolder = appFolder.children.find(f => f.name === projectIdentifier && f.directory);
                         if (!projectFolder) {
-                             projectFolder = await storage.createFolder(projectFolderName, appFolder);
+                             projectFolder = await storage.createFolder(projectIdentifier, appFolder);
+                             // [新增] 为文件夹添加描述属性，存储项目原始名称，方便用户在Mega网站上识别
+                             await projectFolder.setAttributes({ description: projectConfig.text });
                         }
 
                         window.megaFileStream = projectFolder.upload({ name: fileName, size: file.size }, file);
@@ -8796,13 +8809,17 @@ const getDefaultConfig = () => ({
                     const projectConfig = findButtonConfigByHref(projectHref);
                     if (!projectConfig) return alert("项目配置无效。");
 
-                    const folderName = projectConfig.text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-");
-                    const path = `jellyfish_drive/${folderName}/${fileName}`;
+                    // [核心修改] 使用 href 生成稳定的文件夹标识
+                    const folderIdentifier = `proj_${simpleHash(projectHref)}`;
+                    const path = `jellyfish_drive/${folderIdentifier}/${fileName}`;
                     
                     try {
                         ui.progressContainer.style.display = 'flex';
                         ui.progressBar.style.width = '0%';
                         document.getElementById('upload-cancel-btn').style.display = 'none'; // GitHub上传很快，不提供取消
+                        // [新增] 禁用上传按钮
+                        ui.uploadBtn.disabled = true;
+                        ui.uploadBtn.textContent = '上传中...';
 
                         await uploadFileViaGitData({
                             file: file,
@@ -8821,6 +8838,9 @@ const getDefaultConfig = () => ({
                     } finally {
                         ui.progressContainer.style.display = 'none';
                         document.getElementById('upload-cancel-btn').style.display = 'block';
+                        // [新增] 恢复上传按钮状态
+                        ui.uploadBtn.disabled = false;
+                        ui.uploadBtn.textContent = '上传文件';
                     }
                 }
 
