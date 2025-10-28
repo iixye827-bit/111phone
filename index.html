@@ -3439,19 +3439,19 @@ body.dark-mode .folder-item .sort-handle.memo-sort-handle {
     cursor: grabbing;
 }
 /* =============================================================== */
-/* ============= [新增] Codeberg 设置模态框专属样式 ============== */
+/* ============= [修改] Mega 设置模态框专属样式 ================== */
 /* =============================================================== */
-#codebergSettingsModal .modal-body label {
+#megaSettingsModal .modal-body label {
     font-size: 14px;
     color: #5a6778;
     font-weight: 600;
     margin-bottom: 8px;
 }
-body.dark-mode #codebergSettingsModal .modal-body label {
+body.dark-mode #megaSettingsModal .modal-body label {
     color: #c0c6cc;
 }
 
-.codeberg-account-display {
+.mega-account-display {
     padding: 12px 18px;
     border-radius: 12px;
     font-size: 16px;
@@ -3460,20 +3460,20 @@ body.dark-mode #codebergSettingsModal .modal-body label {
     box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day);
     transition: all .3s ease;
 }
-body.dark-mode .codeberg-account-display {
+body.dark-mode .mega-account-display {
     background: var(--bg-night-element);
     box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night);
 }
 
-.codeberg-account-display.inactive {
+.mega-account-display.inactive {
     color: #e53e3e;
 }
-.codeberg-account-display.active {
+.mega-account-display.active {
     color: var(--hold-border);
 }
 
 
-.codeberg-account-list-container {
+.mega-account-list-container {
     padding: 10px;
     min-height: 100px;
     max-height: 200px;
@@ -3484,59 +3484,59 @@ body.dark-mode .codeberg-account-display {
     display: flex;
     flex-direction: column;
 }
-body.dark-mode .codeberg-account-list-container {
+body.dark-mode .mega-account-list-container {
     background: var(--bg-night-element);
     box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night);
 }
 
-.codeberg-empty-list {
+.mega-empty-list {
     margin: auto;
     color: #889;
     font-size: 15px;
 }
 
-.codeberg-account-item {
+.mega-account-item {
     display: flex;
     align-items: center;
     padding: 12px 15px;
     border-radius: 8px;
     transition: background-color .2s;
 }
-.codeberg-account-item:hover {
+.mega-account-item:hover {
     background-color: rgba(0,0,0,0.05);
 }
-body.dark-mode .codeberg-account-item:hover {
+body.dark-mode .mega-account-item:hover {
     background-color: rgba(255,255,255,0.08);
 }
 
-.codeberg-account-item span {
+.mega-account-item span {
     flex-grow: 1;
     font-size: 16px;
     font-weight: 500;
 }
 
-.codeberg-account-item .account-actions {
+.mega-account-item .account-actions {
     display: flex;
     gap: 8px;
 }
 
-.codeberg-account-item .account-actions button {
+.mega-account-item .account-actions button {
     padding: 6px 12px;
     font-size: 13px;
     font-weight: 600;
 }
 /* 主题蓝色按钮的特殊样式 */
-.codeberg-auth-button {
+.mega-auth-button {
     color: white !important;
     background: var(--hold-border) !important;
     box-shadow: 0 4px 12px rgba(91, 153, 226, 0.4);
 }
-.codeberg-auth-button:active {
+.mega-auth-button:active {
     background: #4a8ad4 !important;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
 }
 
-.codeberg-guidance-section {
+.mega-guidance-section {
     text-align: center;
     font-size: 13px;
     color: #889;
@@ -3545,18 +3545,18 @@ body.dark-mode .codeberg-account-item:hover {
     padding-top: 20px;
     margin-top: 5px;
 }
-.codeberg-guidance-section a {
+.mega-guidance-section a {
     color: var(--hold-border);
     font-weight: 600;
     text-decoration: none;
 }
-.codeberg-guidance-section a:hover {
+.mega-guidance-section a:hover {
     text-decoration: underline;
 }
 
 /* 磨砂玻璃主题适配 */
-body.theme-glass .codeberg-account-display,
-body.theme-glass .codeberg-account-list-container {
+body.theme-glass .mega-account-display,
+body.theme-glass .mega-account-list-container {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
@@ -3564,20 +3564,31 @@ body.theme-glass .codeberg-account-list-container {
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: none;
 }
-body.theme-glass.dark-mode .codeberg-account-display,
-body.theme-glass.dark-mode .codeberg-account-list-container {
+body.theme-glass.dark-mode .mega-account-display,
+body.theme-glass.dark-mode .mega-account-list-container {
     background: rgba(10, 10, 10, 0.2);
     border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* =============================================================== */
-/* ========================= [新增结束] ========================== */
+/* ========================= [修改结束] ========================== */
 /* =============================================================== */
+
+        /* ===== [新增] 文件夹列表项样式优化 ===== */
+        .file-info .file-owner {
+            color: #889; /* 保持灰色字体 */
+            font-size: 1.1em; /* 比父元素(.file-meta)的字体稍大 */
+            font-weight: 500;
+        }
+        .file-meta .file-owner {
+             margin-right: 5px; /* 与后面的时间保持一点间距 */
+        }
+        /* ======================================= */
 
     </style>
 
  <style id="custom-jelly-ball-styles"></style>
-
+ <script src="https://unpkg.com/mega/dist/mega.js"></script>
     <!-- [新增] 用于全局字体的样式标签 -->
     <style id="global-font-style"></style>
     <!-- 手机模式滑动容器 -->
@@ -4392,11 +4403,11 @@ body.theme-glass.dark-mode .codeberg-account-list-container {
                     <div class="page-header">
                         <button data-action="back-to-hub" class="header-btn back-btn">&#10094;</button>
                         <h1 class="title">文件夹</h1>
-                        <!-- ============ [新增] Codeberg 设置入口 ============ -->
+                        <!-- ============ [修改] Mega 设置入口 ============ -->
                         <div class="header-controls">
-                            <button id="codebergSettingsBtn" class="header-btn" title="Codeberg 大文件存储设置" style="font-size: 22px;">&#9881;</button>
+                            <button id="megaSettingsBtn" class="header-btn" title="Mega 大文件存储设置" style="font-size: 22px;">&#9881;</button>
                         </div>
-                        <!-- ============ [新增结束] ============ -->
+                        <!-- ============ [修改结束] ============ -->
                     </div>
                     <div class="list-container">
                         <select id="categorySelector" class="modal-select"></select>
@@ -5648,55 +5659,38 @@ const getDefaultConfig = () => ({
 
         })();
     /* =============================================================== */
-    /* ============== [新增] Codeberg 管理器 V1.1 (修正版) ========== */
+    /* ================== [新增] Mega 管理器 V1.0 ==================== */
     /* =============================================================== */
-    const CodebergManager = (() => {
-        // [⚠️ 重要] 请在此处填写你在 Codeberg 申请的客户端 ID
-        const CLIENT_ID = '83a6cb6e-f745-4821-b2e1-b7c8ec21ac56';
+    const MegaManager = (() => {
+        // ⚠️ 重要: 这是Jellyfish Island应用的公用客户端ID，请勿修改。
+        const CLIENT_ID = '0I5V2JSR';
         const REDIRECT_URI = window.location.origin + window.location.pathname;
-        const STORAGE_KEY_ACCOUNTS = 'codeberg_accounts';
-        const STORAGE_KEY_ACTIVE = 'codeberg_active_account_username';
+        const STORAGE_KEY_ACCOUNTS = 'mega_accounts';
+        const STORAGE_KEY_ACTIVE = 'mega_active_account_email';
+        const APP_FOLDER_NAME = 'JellyfishDrive'; // 在Mega云盘中创建的根文件夹
 
-        // [核心修正] 将 ui 对象声明为一个空对象，延迟初始化
         let ui = {};
+        let activeStorage = null; // 当前已登录的 mega.js Storage 实例
 
         // --- 内部辅助函数 ---
         const _getAccounts = () => JSON.parse(localStorage.getItem(STORAGE_KEY_ACCOUNTS)) || [];
         const _saveAccounts = (accounts) => localStorage.setItem(STORAGE_KEY_ACCOUNTS, JSON.stringify(accounts));
-        const _getActiveUser = () => localStorage.getItem(STORAGE_KEY_ACTIVE);
-        const _setActiveUser = (username) => localStorage.setItem(STORAGE_KEY_ACTIVE, username);
-
-        const _generateRandomString = (length) => {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-            let result = '';
-            const randomValues = new Uint8Array(length);
-            window.crypto.getRandomValues(randomValues);
-            for (let i = 0; i < length; i++) {
-                result += chars[randomValues[i] % chars.length];
+        const _getActiveUserEmail = () => localStorage.getItem(STORAGE_KEY_ACTIVE);
+        const _setActiveUserEmail = (email) => localStorage.setItem(STORAGE_KEY_ACTIVE, email);
+        const _getAppFolder = async (storage) => {
+            if (!storage.root) await storage.loadAttributes();
+            let appFolder = storage.root.children.find(f => f.name === APP_FOLDER_NAME && f.directory);
+            if (!appFolder) {
+                appFolder = await storage.createFolder(APP_FOLDER_NAME);
             }
-            return result;
+            return appFolder;
         };
-
-        const _generateCodeVerifier = () => _generateRandomString(128);
-
-        async function _generateCodeChallenge(verifier) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(verifier);
-            const digest = await window.crypto.subtle.digest('SHA-256', data);
-            return window.btoa(String.fromCharCode(...new Uint8Array(digest)))
-                .replace(/\+/g, '-')
-                .replace(/\//g, '_')
-                .replace(/=/g, '');
-        }
 
         // --- UI 渲染函数 ---
         function _renderActiveAccount() {
-            const activeUser = _getActiveUser();
-            const accounts = _getAccounts();
-            const activeAccount = accounts.find(acc => acc.username === activeUser);
-
-            if (activeAccount) {
-                ui.activeAccountDisplay.textContent = activeAccount.username;
+            const activeEmail = _getActiveUserEmail();
+            if (activeEmail) {
+                ui.activeAccountDisplay.textContent = activeEmail;
                 ui.activeAccountDisplay.classList.remove('inactive');
                 ui.activeAccountDisplay.classList.add('active');
             } else {
@@ -5708,29 +5702,28 @@ const getDefaultConfig = () => ({
 
         function _renderAuthorizedList() {
             const accounts = _getAccounts();
-            const activeUser = _getActiveUser();
-            ui.authorizedList.innerHTML = ''; // 清空列表
+            const activeEmail = _getActiveUserEmail();
+            ui.authorizedList.innerHTML = '';
 
             if (accounts.length === 0) {
-                ui.authorizedList.innerHTML = '<div class="codeberg-empty-list">暂无已授权的账户</div>';
+                ui.authorizedList.innerHTML = '<div class="mega-empty-list">暂无已授权的账户</div>';
                 return;
             }
 
             accounts.forEach(account => {
                 const item = document.createElement('div');
-                item.className = 'codeberg-account-item';
-                const isActive = account.username === activeUser;
-
+                item.className = 'mega-account-item';
+                const isActive = account.email === activeEmail;
                 item.innerHTML = `
-                    <span>${account.username}</span>
+                    <span>${account.email}</span>
                     <div class="account-actions">
                         ${isActive ? '' : '<button class="modal-button" data-action="set-active">设为活动</button>'}
                         <button class="modal-button" data-action="delete" style="color: #e53e3e;">删除</button>
                     </div>
                 `;
-                item.querySelector('[data-action="delete"]').addEventListener('click', () => _handleAccountDelete(account.username));
+                item.querySelector('[data-action="delete"]').addEventListener('click', () => _handleAccountDelete(account.email));
                 if (!isActive) {
-                    item.querySelector('[data-action="set-active"]').addEventListener('click', () => _handleAccountSwitch(account.username));
+                    item.querySelector('[data-action="set-active"]').addEventListener('click', () => _handleAccountSwitch(account.email));
                 }
                 ui.authorizedList.appendChild(item);
             });
@@ -5742,128 +5735,134 @@ const getDefaultConfig = () => ({
         }
 
         // --- 事件处理与逻辑 ---
-        async function _handleAuthorizeClick() {
-            if (CLIENT_ID.startsWith('在此处')) {
-                alert('开发者尚未配置 Codeberg 客户端 ID！');
-                return;
-            }
-            const state = _generateRandomString(43);
-            sessionStorage.setItem('codeberg_oauth_state', state);
-            const codeVerifier = _generateCodeVerifier();
-            sessionStorage.setItem('codeberg_code_verifier', codeVerifier);
-            const codeChallenge = await _generateCodeChallenge(codeVerifier);
-            const params = new URLSearchParams({
-                client_id: CLIENT_ID,
-                redirect_uri: REDIRECT_URI,
-                response_type: 'code',
-                scope: 'repository',
-                state: state,
-                code_challenge: codeChallenge,
-                code_challenge_method: 'S256',
-            });
-            window.location.href = `https://codeberg.org/login/oauth/authorize?${params.toString()}`;
-        }
-        
-        async function _handleOAuthCallback(code, state) {
-            const savedState = sessionStorage.getItem('codeberg_oauth_state');
-            const codeVerifier = sessionStorage.getItem('codeberg_code_verifier');
-            sessionStorage.removeItem('codeberg_oauth_state');
-            sessionStorage.removeItem('codeberg_code_verifier');
-            if (!savedState || savedState !== state) { alert('OAuth 状态校验失败，请重试。'); return; }
-            if (!codeVerifier) { alert('OAuth code_verifier 丢失，请重试。'); return; }
-            try {
-                const tokenResponse = await fetch('https://codeberg.org/login/oauth/access_token', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ client_id: CLIENT_ID, grant_type: 'authorization_code', code: code, redirect_uri: REDIRECT_URI, code_verifier: codeVerifier }),
-                });
-                if (!tokenResponse.ok) throw new Error(`获取 Token 失败: ${tokenResponse.statusText}`);
-                const tokenData = await tokenResponse.json();
-                const userResponse = await fetch('https://codeberg.org/api/v1/user', { headers: { 'Authorization': `token ${tokenData.access_token}` } });
-                if (!userResponse.ok) throw new Error(`获取用户信息失败: ${userResponse.statusText}`);
-                const userData = await userResponse.json();
-                const username = userData.login;
-                let accounts = _getAccounts();
-                const existingAccountIndex = accounts.findIndex(acc => acc.username === username);
-                const newAccount = { username, accessToken: tokenData.access_token };
-                if (existingAccountIndex > -1) { accounts[existingAccountIndex] = newAccount; } 
-                else { accounts.push(newAccount); }
-                _saveAccounts(accounts);
-                _setActiveUser(username);
-                showTopToast(`Codeberg 账户 "${username}" 已成功连接！`, 3000);
-            } catch (error) {
-                console.error("Codeberg OAuth 处理失败:", error);
-                alert(`Codeberg 认证失败: ${error.message}`);
-            }
-        }
-        
-        function _handleAccountDelete(username) {
-            if (!confirm(`确定要删除账户 "${username}" 吗？此操作将移除应用的授权。`)) return;
-            let accounts = _getAccounts();
-            accounts = accounts.filter(acc => acc.username !== username);
-            _saveAccounts(accounts);
-            if (_getActiveUser() === username) {
-                _setActiveUser(accounts.length > 0 ? accounts[0].username : '');
-            }
-            _renderAll();
-            showTopToast(`账户 "${username}" 已删除。`, 2000);
+        function _handleAuthorizeClick() {
+            const authUrl = `https://mega.nz/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+            window.location.href = authUrl;
         }
 
-        function _handleAccountSwitch(username) {
-            _setActiveUser(username);
+        async function _handleOAuthCallback(fragment) {
+            try {
+                const storage = await new Promise((resolve, reject) => {
+                    mega.load(fragment, (err, storage) => {
+                        if (err) return reject(err);
+                        resolve(storage);
+                    });
+                });
+
+                const userEmail = storage.user.email;
+                const session = storage.key; // 关键：获取可用于重连的 session
+                let accounts = _getAccounts();
+                const existingIndex = accounts.findIndex(acc => acc.email === userEmail);
+                const newAccount = { email: userEmail, session: session };
+
+                if (existingIndex > -1) {
+                    accounts[existingIndex] = newAccount;
+                } else {
+                    accounts.push(newAccount);
+                }
+                _saveAccounts(accounts);
+                _setActiveUserEmail(userEmail);
+
+                showTopToast(`Mega 账户 "${userEmail}" 已成功连接！`, 3000);
+            } catch (error) {
+                console.error("Mega OAuth 处理失败:", error);
+                alert(`Mega 认证失败: ${error.message || '未知错误'}`);
+            }
+        }
+
+        function _handleAccountDelete(email) {
+            if (!confirm(`确定要删除账户 "${email}" 吗？此操作将移除应用的授权。`)) return;
+            let accounts = _getAccounts().filter(acc => acc.email !== email);
+            _saveAccounts(accounts);
+            if (_getActiveUserEmail() === email) {
+                _setActiveUserEmail(accounts.length > 0 ? accounts[0].email : '');
+                activeStorage = null; // 清除当前活动实例
+            }
             _renderAll();
-            // [核心修改] 检查 "记忆" 模态框是否处于 "文件夹" 视图，如果是，则立即刷新文件列表
+            showTopToast(`账户 "${email}" 已删除。`, 2000);
+        }
+
+        async function _handleAccountSwitch(email) {
+            _setActiveUserEmail(email);
+            _renderAll();
+            activeStorage = null; // 清除旧的实例，强制下次使用时重新登录
+            
             if (document.getElementById('memoryModal').classList.contains('show') && 
-                document.getElementById('cloud-drive-section').classList.contains('active'))
-            {
-                showTopToast(`活动账户已切换为 "${username}"，正在刷新文件列表...`, 2000);
-                // 延迟一小段时间确保UI更新完成，然后获取文件
+                document.getElementById('cloud-drive-section').classList.contains('active')) {
+                showTopToast(`活动账户已切换为 "${email}"，正在刷新文件列表...`, 3000);
                 setTimeout(MemoryApp.fetchFilesForSelectedProject, 100);
             } else {
-                 showTopToast(`活动账户已切换为 "${username}"。`, 2000);
+                showTopToast(`活动账户已切换为 "${email}"。`, 2000);
             }
         }
 
-        // --- 公开接口 ---
+        async function getActiveStorage() {
+            if (activeStorage && activeStorage.user) {
+                return activeStorage;
+            }
+            const activeEmail = _getActiveUserEmail();
+            if (!activeEmail) return null;
+
+            const account = _getAccounts().find(acc => acc.email === activeEmail);
+            if (!account || !account.session) {
+                _setActiveUserEmail(''); // 无效账户，清除
+                _renderAll();
+                return null;
+            }
+
+            try {
+                activeStorage = await new Promise((resolve, reject) => {
+                    const storage = new mega.Storage({
+                        email: account.email,
+                        password: account.session // 使用session重连
+                    }, (err) => {
+                        if (err) return reject(err);
+                        resolve(storage);
+                    });
+                });
+                return activeStorage;
+            } catch (err) {
+                console.error("Mega session 登录失败，可能已过期:", err);
+                alert(`Mega账户 "${activeEmail}" 的会话已过期，请重新授权。`);
+                _handleAuthorizeClick();
+                return null;
+            }
+        }
+
         return {
-            getActiveAccount: () => {
-                const activeUser = _getActiveUser();
-                if (!activeUser) return null;
-                return _getAccounts().find(acc => acc.username === activeUser) || null;
-            },
             init: async () => {
-                // [核心修正] 在 init 函数内部进行 UI 元素的选择，确保DOM已加载
                 ui = {
-                    modal: document.getElementById('codebergSettingsModal'),
-                    openBtn: document.getElementById('codebergSettingsBtn'),
-                    addAccountBtn: document.getElementById('add-codeberg-account-btn'),
-                    activeAccountDisplay: document.getElementById('codeberg-active-account-display'),
-                    authorizedList: document.getElementById('codeberg-authorized-list'),
+                    modal: document.getElementById('megaSettingsModal'),
+                    openBtn: document.getElementById('megaSettingsBtn'),
+                    addAccountBtn: document.getElementById('add-mega-account-btn'),
+                    activeAccountDisplay: document.getElementById('mega-active-account-display'),
+                    authorizedList: document.getElementById('mega-authorized-list'),
                 };
                 
-                if (!ui.openBtn) { console.error("CodebergManager: openBtn not found!"); return; }
+                if (!ui.openBtn) return;
 
-                ui.openBtn.addEventListener('click', () => {
-                    _renderAll();
-                    ui.modal.classList.add('show');
-                });
+                ui.openBtn.addEventListener('click', () => { _renderAll(); ui.modal.classList.add('show'); });
                 ui.addAccountBtn.addEventListener('click', (e) => { e.preventDefault(); _handleAuthorizeClick(); });
                 
-                const params = new URLSearchParams(window.location.search);
-                const code = params.get('code');
-                const state = params.get('state');
-                if (code && state) {
+                const fragment = window.location.hash.substring(1);
+                if (fragment.includes('access_token')) {
                     document.getElementById('memoryModal').classList.add('show');
                     document.querySelector('[data-action="goto-cloud"]').click();
-                    await _handleOAuthCallback(code, state);
-                    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                    window.history.replaceState({}, document.title, cleanUrl);
+                    await _handleOAuthCallback(fragment);
+                    window.location.hash = '';
+                    window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
                     setTimeout(() => { _renderAll(); ui.modal.classList.add('show'); }, 300);
                 }
             },
+            getActiveAccount: () => {
+                const activeEmail = _getActiveUserEmail();
+                if (!activeEmail) return null;
+                return _getAccounts().find(acc => acc.email === activeEmail) || null;
+            },
+            getActiveStorage: getActiveStorage,
+             _getAppFolder: _getAppFolder,
         };
     })();
-
 
     /* =============================================================== */
     /* ========================= [新增结束] ========================== */
@@ -8482,7 +8481,7 @@ const getDefaultConfig = () => ({
                     }
                 }
 
-                // [修改] fetchFilesForSelectedProject 重命名并重构为 fetchAllFilesForProject v3 (支持多账户聚合)
+                // [修改] fetchFilesForSelectedProject v6 (整合 Mega)
                 async function fetchFilesForSelectedProject() {
                     const requestToken = Symbol();
                     state.cloudDriveRequestToken = requestToken;
@@ -8496,58 +8495,56 @@ const getDefaultConfig = () => ({
                         ui.fileListStatus.textContent = "请选择一个项目以查看文件";
                         return;
                     }
-                    
+
                     const repoNamePart = projectConfig.text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-");
 
                     // --- 1. 并行获取所有来源的文件 ---
                     const promises = [];
 
-                    // 1a. 添加获取 GitHub 文件的 Promise
+                    // 1a. 获取 GitHub 文件 (小文件)
                     if (checkConfig(false)) {
                         const githubPath = `jellyfish_drive/${repoNamePart}`;
                         promises.push(
-                            fetchFromGithub(githubPath).then(({ data }) => 
-                                data ? data.map(f => ({ ...f, storage: 'github', owner: GITHUB_CONFIG.owner })) : []
-                            ).catch(e => {
-                                console.error("加载 GitHub 文件列表时出错:", e);
-                                return []; // 出错时返回空数组
-                            })
+                            (async () => {
+                                const { data: files } = await fetchFromGithub(githubPath);
+                                if (!files || !Array.isArray(files)) return [];
+                                return files.map(f => ({ ...f, storage: 'github', owner: GITHUB_CONFIG.owner, last_commit_date: new Date() })); // GitHub 日期暂不获取
+                            })().catch(e => { console.error("加载 GitHub 文件列表时出错:", e); return []; })
                         );
                     }
 
-                    // 1b. 为每个 Codeberg 账户添加获取文件的 Promise
-                    const allCodebergAccounts = JSON.parse(localStorage.getItem('codeberg_accounts') || '[]');
-                    for (const cbAccount of allCodebergAccounts) {
-                        const codebergRepoName = repoNamePart || `drive-project-${projectConfig.href.length}`;
-                        const cbUrl = `https://codeberg.org/api/v1/repos/${cbAccount.username}/${codebergRepoName}/contents/`;
+                    // 1b. 获取 Mega 文件 (大文件)
+                    const activeMegaAccount = MegaManager.getActiveAccount();
+                    if (activeMegaAccount) {
                         promises.push(
-                            fetch(cbUrl, { 
-                                headers: { 'Authorization': `token ${cbAccount.accessToken}` },
-                                cache: 'no-cache'
-                            }).then(res => res.ok ? res.json() : [])
-                            .then(files => files.map(f => ({ 
-                                ...f, 
-                                storage: 'codeberg', 
-                                owner: cbAccount.username, // [!!!] 核心：为文件打上所有者标签
-                                last_commit: { created_at: f.last_modified } 
-                            })))
-                            .catch(e => {
-                                console.warn(`加载 Codeberg 账户 ${cbAccount.username} 的文件列表失败:`, e);
-                                return []; // 出错时返回空数组
-                            })
+                            (async () => {
+                                const storage = await MegaManager.getActiveStorage();
+                                if (!storage || state.cloudDriveRequestToken !== requestToken) return [];
+                                const appFolder = await MegaManager._getAppFolder(storage);
+                                const projectFolderName = repoNamePart || `drive-project-${projectConfig.href.length}`;
+                                let projectFolder = appFolder.children.find(f => f.name === projectFolderName && f.directory);
+                                if (!projectFolder) return [];
+
+                                const megaFiles = projectFolder.children.map(file => ({
+                                    name: file.name,
+                                    size: file.size,
+                                    path: file.id, // Mega 中使用 Node ID 作为唯一路径
+                                    sha: file.id,  // 复用 sha 字段存储 ID 以便删除
+                                    storage: 'mega',
+                                    owner: activeMegaAccount.email,
+                                    last_commit_date: file.timestamp * 1000 // Mega 时间戳是秒
+                                }));
+                                return megaFiles;
+                            })().catch(e => { console.warn(`加载 Mega 账户 ${activeMegaAccount.email} 的文件列表失败:`, e); return []; })
                         );
                     }
-                    
-                    // --- 2. 等待所有请求完成并合并结果 ---
-                    const results = await Promise.allSettled(promises);
-                    if (state.cloudDriveRequestToken !== requestToken) { return; }
 
-                    const allFiles = results
-                        .filter(result => result.status === 'fulfilled' && Array.isArray(result.value))
-                        .flatMap(result => result.value)
-                        .sort((a,b) => new Date(b.last_commit?.created_at || b.last_modified || 0) - new Date(a.last_commit?.created_at || a.last_modified || 0));
+                    // --- 2. 合并并渲染 ---
+                    const results = await Promise.all(promises);
+                    if (state.cloudDriveRequestToken !== requestToken) return;
 
-                    // --- 3. 渲染UI ---
+                    const allFiles = results.flat().sort((a, b) => new Date(b.last_commit_date || 0) - new Date(a.last_commit_date || 0));
+
                     if (allFiles.length === 0) {
                         ui.fileListStatus.textContent = "该项目下暂无文件";
                         return;
@@ -8556,26 +8553,25 @@ const getDefaultConfig = () => ({
                     ui.fileListStatus.style.display = "none";
                     allFiles.forEach(file => {
                         const li = document.createElement("li");
-                        
-                        // [新增] 根据文件归属显示不同的图标和标签
-                        let storageInfo = '';
-                        if (file.storage === 'codeberg') {
-                            storageInfo = `📦 <span style="font-size: 0.8em; color: #aaa; margin-left: 4px;">${file.owner}</span> `;
-                        } else {
-                            storageInfo = `☁️ `;
-                        }
-
+                        const ownerName = file.owner || '未知用户';
+                        const ownerSpan = `<span class="file-owner">${ownerName}</span>`;
                         const sizeText = formatFileSize(file.size);
-                        const dateText = new Date(file.last_commit?.created_at || file.last_modified || Date.now()).toISOString().split('T')[0];
-                        const metaText = `${sizeText} • ${dateText}`;
+                        const dateText = new Date(file.last_commit_date || Date.now()).toISOString().split('T')[0];
+                        const metaText = `${dateText} • ${sizeText}`;
 
                         li.innerHTML = `
-                            <div class="file-info" data-storage="${file.storage}">
-                                <span class="file-name">${storageInfo}${file.name}</span>
-                                <span class="file-meta" data-path="${file.path}">${metaText}</span>
+                            <div class="file-info" data-storage="${file.storage}" data-owner="${file.owner}">
+                                <span class="file-name">${file.name}</span>
+                                <span class="file-meta" data-path="${file.path}">${ownerSpan} ${metaText}</span>
                             </div>
                             <button class="delete-btn" data-sha="${file.sha}">&times;</button>
                         `;
+                        if (file.storage === 'mega') {
+                            const fileNameSpan = li.querySelector('.file-name');
+                            fileNameSpan.textContent = " " + fileNameSpan.textContent;
+                            const iconNode = document.createTextNode('☁️ ');
+                            fileNameSpan.prepend(iconNode);
+                        }
                         ui.fileList.appendChild(li);
 
                         li.querySelector(".file-info").addEventListener("click", () => forceDownload(file, li));
@@ -8587,109 +8583,115 @@ const getDefaultConfig = () => ({
                     const fileNameSpan = el.querySelector(".file-name");
                     const originalText = fileNameSpan.textContent;
                     el.style.pointerEvents = "none";
-
-                    let url;
-                    let authToken;
-                    let acceptHeader = 'application/vnd.github.v3.raw';
-
-                    if (file.storage === 'codeberg') {
-                        const activeAccount = CodebergManager.getActiveAccount();
-                        const repoName = findButtonConfigByHref(ui.projectSelector.value).text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-");
-                        url = `https://codeberg.org/api/v1/repos/${activeAccount.username}/${repoName}/media/${file.path}`; // 使用 media API
-                        authToken = `token ${activeAccount.accessToken}`;
-                        acceptHeader = 'application/octet-stream'; // Codeberg raw content
-                    } else { // GitHub
-                        url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${file.path}`;
-                        authToken = `token ${GITHUB_CONFIG.token}`;
-                    }
-                    
+                    fileNameSpan.textContent = "准备中...";
+                
                     try {
-                        const xhr = new XMLHttpRequest();
-                        xhr.open('GET', url, true);
-                        xhr.setRequestHeader('Authorization', authToken);
-                        xhr.setRequestHeader('Accept', acceptHeader);
-                        xhr.responseType = 'blob';
+                        if (file.storage === 'mega') {
+                            const storage = await MegaManager.getActiveStorage();
+                            if (!storage) throw new Error("Mega 未登录");
+                            
+                            const megaFile = storage.files.get(file.path);
+                            if (!megaFile) throw new Error("在Mega中找不到此文件");
 
-                        let lastProgressText = '';
-                        xhr.onprogress = (event) => {
-                            let newProgressText = '正在下载...';
-                            if (event.lengthComputable) {
-                                newProgressText = `下载中... ${Math.round((event.loaded / event.total) * 100)}%`;
-                            }
-                            if (newProgressText !== lastProgressText) { fileNameSpan.textContent = newProgressText; lastProgressText = newProgressText;}
-                        };
-                        xhr.onload = () => {
-                            if (xhr.status === 200) {
-                                const blobUrl = URL.createObjectURL(xhr.response);
+                            fileNameSpan.textContent = "下载中 (0%)...";
+                            const stream = megaFile.download();
+                            const chunks = [];
+                            let downloaded = 0;
+
+                            stream.on('data', chunk => {
+                                chunks.push(chunk);
+                                downloaded += chunk.length;
+                                const progress = Math.round((downloaded / file.size) * 100);
+                                fileNameSpan.textContent = `下载中 (${progress}%)...`;
+                            });
+
+                            stream.on('error', err => { throw new Error(err.message); });
+
+                            stream.on('complete', () => {
+                                const blob = new Blob(chunks, { type: 'application/octet-stream' });
+                                const blobUrl = URL.createObjectURL(blob);
                                 const link = document.createElement("a");
                                 link.href = blobUrl;
                                 link.download = file.name;
-                                document.body.appendChild(link);
                                 link.click();
-                                document.body.removeChild(link);
                                 URL.revokeObjectURL(blobUrl);
                                 fileNameSpan.textContent = "下载完成";
-                            } else {
-                                fileNameSpan.textContent = "下载失败";
-                                alert(`下载失败: ${xhr.statusText}`);
-                            }
-                            setTimeout(() => { fileNameSpan.textContent = originalText; el.style.pointerEvents = "auto"; }, 2000);
-                        };
-                        xhr.onerror = async () => {
-                            fileNameSpan.textContent = "下载错误";
-                            alert("下载时发生网络错误");
-                            setTimeout(() => { fileNameSpan.textContent = originalText; el.style.pointerEvents = "auto"; }, 2000);
-                        };
-                        fileNameSpan.textContent = "准备下载...";
-                        xhr.send();
+                                setTimeout(() => { fileNameSpan.textContent = originalText; el.style.pointerEvents = "auto"; }, 2000);
+                            });
+
+                        } else { // GitHub
+                            const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${file.path}`;
+                            const authToken = `token ${GITHUB_CONFIG.token}`;
+                            const acceptHeader = 'application/vnd.github.v3.raw';
+                
+                            const xhr = new XMLHttpRequest();
+                            xhr.open('GET', url, true);
+                            xhr.setRequestHeader('Authorization', authToken);
+                            xhr.setRequestHeader('Accept', acceptHeader);
+                            xhr.responseType = 'blob';
+                            
+                            xhr.onprogress = (event) => {
+                                let newText = '正在下载...';
+                                if (event.lengthComputable) newText = `下载中... ${Math.round((event.loaded / event.total) * 100)}%`;
+                                fileNameSpan.textContent = newText;
+                            };
+                
+                            xhr.onload = () => {
+                                if (xhr.status === 200) {
+                                    const blobUrl = URL.createObjectURL(xhr.response);
+                                    const link = document.createElement("a");
+                                    link.href = blobUrl; link.download = file.name;
+                                    document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                                    URL.revokeObjectURL(blobUrl);
+                                    fileNameSpan.textContent = "下载完成";
+                                } else {
+                                    fileNameSpan.textContent = "下载失败";
+                                    alert(`下载失败: ${xhr.status} ${xhr.statusText}`);
+                                }
+                                setTimeout(() => { fileNameSpan.textContent = originalText; el.style.pointerEvents = "auto"; }, 2000);
+                            };
+                            
+                            xhr.onerror = () => {
+                                fileNameSpan.textContent = "下载错误";
+                                alert("下载时发生网络错误");
+                                setTimeout(() => { fileNameSpan.textContent = originalText; el.style.pointerEvents = "auto"; }, 2000);
+                            };
+                            
+                            fileNameSpan.textContent = "准备下载...";
+                            xhr.send();
+                        }
                     } catch (error) {
-                        alert("准备下载时出错: " + error.message);
+                        alert("下载时出错: " + error.message);
                         fileNameSpan.textContent = originalText;
                         el.style.pointerEvents = "auto";
                     }
                 }
+
+
                 async function deleteFile(file, el) {
-                    // ============ [核心修正 V2] 新增权限检查 ============
-                    const activeCbAccount = CodebergManager.getActiveAccount();
-                    const currentActiveUsername = activeCbAccount ? activeCbAccount.username : null;
-
-                    if (file.storage === 'codeberg' && file.owner !== currentActiveUsername) {
-                        alert(`删除失败！\n\n此文件属于账户【${file.owner}】。\n请先将活动账户切换为【${file.owner}】后再尝试删除。`);
-                        return;
-                    }
-                    // ========================= [修正结束] =========================
-
                     const confirmation = confirm(`确定要永久删除文件 "${file.name}" 吗？`);
                     if (!confirmation) return;
-
+                    
                     el.style.opacity = '0.5';
                     el.style.pointerEvents = 'none';
-                    let success = false;
-
+                    
                     try {
-                        if (file.storage === 'codeberg' && activeCbAccount) {
-                            const repoName = findButtonConfigByHref(ui.projectSelector.value).text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-");
-                            const url = `https://codeberg.org/api/v1/repos/${currentActiveUsername}/${repoName}/contents/${file.path}`;
-                            const res = await fetch(url, {
-                                method: 'DELETE',
-                                headers: { 'Authorization': `token ${activeCbAccount.accessToken}`, 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ message: `Delete file: ${file.name}`, sha: file.sha })
-                            });
-                            success = res.ok;
-                            if (!success) throw new Error(await res.text());
+                        if (file.storage === 'mega') {
+                            const storage = await MegaManager.getActiveStorage();
+                            if (!storage) throw new Error("Mega 未登录");
+                            const megaFile = storage.files.get(file.path);
+                            if (!megaFile) throw new Error("在Mega中找不到此文件");
+                            await megaFile.delete();
                         } else { // GitHub
-                            success = await deleteFromGithub(file.path, `Delete file: ${file.name}`, file.sha);
+                            const success = await deleteFromGithub(file.path, `Delete file: ${file.name}`, file.sha);
+                            if (!success) throw new Error("从 GitHub 删除文件失败");
                         }
 
-                        if (success) {
-                            el.remove();
-                            showTopToast(`文件 "${file.name}" 已删除。`, 2000);
-                            if (ui.fileList.children.length === 0) {
-                                ui.fileListStatus.textContent = "该项目下暂无文件";
-                                ui.fileListStatus.style.display = 'block';
-                            }
-                        } else {
-                           throw new Error('API request failed');
+                        el.remove();
+                        showTopToast(`文件 "${file.name}" 已删除。`, 2000);
+                        if (ui.fileList.children.length === 0) {
+                            ui.fileListStatus.textContent = "该项目下暂无文件";
+                            ui.fileListStatus.style.display = 'block';
                         }
                     } catch (error) {
                         alert(`删除失败: ${error.message}`);
@@ -8698,11 +8700,14 @@ const getDefaultConfig = () => ({
                     }
                 }
 
+
+                // [重构] 上传主函数 (v3 - 整合 Mega)
                 async function uploadFile() {
                     const FILE_SIZE_LIMIT_MB = 50;
-                    if (activeUploadXHR) {
+                    if (activeUploadXHR || window.megaFileStream) { // 检查两种上传状态
                         if (confirm("当前有文件正在上传，要终止它吗？")) {
-                            activeUploadXHR.abort();
+                            if (activeUploadXHR) activeUploadXHR.abort();
+                            if (window.megaFileStream) window.megaFileStream.cancel();
                         }
                         return;
                     }
@@ -8715,226 +8720,109 @@ const getDefaultConfig = () => ({
                         return alert("请选择要上传到的项目、文件，并确保文件名不为空。");
                     }
                     
-                    const useCodeberg = file.size >= FILE_SIZE_LIMIT_MB * 1024 * 1024;
+                    const useMega = file.size >= FILE_SIZE_LIMIT_MB * 1024 * 1024;
                     
-                    // 根据文件大小选择上传服务
-                    if (useCodeberg) {
-                        await uploadToCodeberg(file, fileName, selectedProjectHref);
+                    if (useMega) {
+                        await uploadToMega(file, fileName, selectedProjectHref);
                     } else {
                         await uploadToGithub(file, fileName, selectedProjectHref);
                     }
                 }
-                
-                // [新增] Codeberg 上传函数
-                async function uploadToCodecodebergRepoExists(repoName, authToken) {
-                    const activeAccount = CodebergManager.getActiveAccount();
-                    if (!activeAccount) return false;
-                
-                    const url = `https://codeberg.org/api/v1/repos/${activeAccount.username}/${repoName}`;
-                    try {
-                        const response = await fetch(url, {
-                            method: 'GET',
-                            headers: { 'Authorization': authToken },
-                            cache: 'no-cache' // <-- 核心修改：禁止缓存
-                        });
-                        return response.ok; // 如果仓库存在，API会返回200 OK
-                    } catch (error) {
-                        console.error('检查Codeberg仓库是否存在时出错:', error);
-                        return false;
-                    }
-                }
 
-                // [新增] Codeberg 上传函数
-                async function uploadToCodeberg(file, fileName, projectHref) {
-                    const activeAccount = CodebergManager.getActiveAccount();
-                    if (!activeAccount) {
-                        alert("检测到文件大于50MB，需要使用Codeberg存储。\n\n请先在 Codeberg 设置中连接并激活一个账户！");
-                        document.getElementById('codebergSettingsBtn').click();
+                // [重构] Mega 上传函数
+                async function uploadToMega(file, fileName, projectHref) {
+                    const storage = await MegaManager.getActiveStorage();
+                    if (!storage) {
+                        alert("检测到文件大于50MB，需要使用Mega存储。\n\n请先在 Mega 设置中连接并激活一个账户！");
+                        document.getElementById('megaSettingsBtn').click();
                         return;
                     }
-                
+
                     const projectConfig = findButtonConfigByHref(projectHref);
-                    if (!projectConfig) { return alert("项目配置无效。"); }
-                    const repoName = projectConfig.text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-") || `drive-${Date.now()}`;
-                    const authToken = `token ${activeAccount.accessToken}`;
-                
-                    showTopToast(`文件将上传至Codeberg账户: ${activeAccount.username}`, 3000);
-                    
-                    const repoExists = await uploadToCodecodebergRepoExists(repoName, authToken);
+                    if (!projectConfig) return alert("项目配置无效。");
 
-                    // 如果仓库不存在，则尝试创建
-                    if (!repoExists) {
-                        showTopToast(`正在为项目 "${projectConfig.text}" 创建Codeberg仓库...`, 3000);
-                        const repoCreateUrl = 'https://codeberg.org/api/v1/user/repos';
-                        try {
-                            const repoCreateRes = await fetch(repoCreateUrl, {
-                                method: 'POST',
-                                headers: { 'Authorization': authToken, 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ name: repoName, "private": true, "description": `Jellyfish Island drive for project: ${projectConfig.text}` })
-                            });
-                
-                            if (!repoCreateRes.ok && repoCreateRes.status !== 422) {
-                                const errorData = await repoCreateRes.json();
-                                throw new Error(errorData.message || `创建仓库失败, 状态码: ${repoCreateRes.status}`);
-                            }
-                        } catch (e) {
-                            alert(`创建Codeberg仓库失败: ${e.message}`);
-                            return;
+                    showTopToast(`文件将上传至Mega账户: ${storage.user.email}`, 3000);
+
+                    const cleanup = () => {
+                        uploadCancelBtn.removeEventListener('click', uploadCancelHandler);
+                        ui.progressContainer.style.display = 'none';
+                        window.megaFileStream = null;
+                    };
+                    const uploadCancelBtn = document.getElementById('upload-cancel-btn');
+                    const uploadCancelHandler = () => { if (window.megaFileStream) window.megaFileStream.cancel(); };
+                    uploadCancelBtn.addEventListener('click', uploadCancelHandler);
+
+                    ui.progressContainer.style.display = 'flex';
+                    ui.progressBar.style.width = '0%';
+
+                    try {
+                        const appFolder = await MegaManager._getAppFolder(storage);
+                        const projectFolderName = projectConfig.text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-") || `drive-project-${projectConfig.href.length}`;
+                        let projectFolder = appFolder.children.find(f => f.name === projectFolderName && f.directory);
+                        if (!projectFolder) {
+                             projectFolder = await storage.createFolder(projectFolderName, appFolder);
                         }
-                    }
-                
-                    const path = `${fileName}`;
-                    const url = `https://codeberg.org/api/v1/repos/${activeAccount.username}/${repoName}/contents/${path}`;
 
-                    setupAndRunUpload(file, url, authToken);
+                        window.megaFileStream = projectFolder.upload({ name: fileName, size: file.size }, file);
+
+                        window.megaFileStream.on('progress', ({ bytesLoaded, bytesTotal }) => {
+                            const percent = (bytesLoaded / bytesTotal) * 100;
+                            ui.progressBar.style.width = `${percent}%`;
+                        });
+
+                        window.megaFileStream.on('error', err => {
+                            showTopToast(`上传失败: ${err.message}`, 4000);
+                            cleanup();
+                        });
+
+                        window.megaFileStream.on('complete', () => {
+                            showTopToast("上传成功！", 2000);
+                            fetchFilesForSelectedProject();
+                            ui.fileUploader.value = "";
+                            ui.fileNameInput.value = "";
+                            ui.selectedFileName.textContent = '未选择任何文件';
+                            cleanup();
+                        });
+
+                    } catch (err) {
+                        alert(`上传到 Mega 失败: ${err.message}`);
+                        cleanup();
+                    }
                 }
 
-                
-                // [新增] GitHub 上传函数 (从原 uploadFile 逻辑中提取)
+                // [重构] GitHub 上传函数 (现在只处理小文件)
                 async function uploadToGithub(file, fileName, projectHref) {
-                     if (!checkConfig(true)) return;
-                     const projectConfig = findButtonConfigByHref(projectHref);
-                     if (!projectConfig) { return alert("项目配置无效。"); }
+                    if (!checkConfig(true)) return;
+                    const projectConfig = findButtonConfigByHref(projectHref);
+                    if (!projectConfig) return alert("项目配置无效。");
+
                     const folderName = projectConfig.text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g, "").replace(/\s+/g, "-");
                     const path = `jellyfish_drive/${folderName}/${fileName}`;
-                    const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${path}`;
                     
-                    setupAndRunUpload(file, url, `token ${GITHUB_CONFIG.token}`);
-                }
-
-                // [新增] 通用上传逻辑函数
-                async function setupAndRunUpload(file, url, authToken) {
-                    let progressToast = null;
-                    const manageProgressToast = (status, isFinal = false, duration = 3000) => {
-                        if (isFinal && !progressToast) { showTopToast(status, duration); return; }
-                        if (!progressToast) {
-                            progressToast = document.createElement('div');
-                            progressToast.className = 'top-toast';
-                            document.body.appendChild(progressToast);
-                            setTimeout(() => { if (progressToast) progressToast.classList.add('show'); }, 50);
-                        }
-                        progressToast.textContent = status;
-                        if (isFinal) {
-                            setTimeout(() => {
-                                if (progressToast) {
-                                    progressToast.classList.remove('show');
-                                    progressToast.addEventListener('transitionend', () => { if (progressToast) progressToast.remove(); progressToast = null; }, { once: true });
-                                }
-                            }, duration);
-                        }
-                    };
-
-                    const modalObserver = new MutationObserver(mutations => {
-                        for (const mutation of mutations) {
-                            if (mutation.attributeName === 'class' && !ui.modal.classList.contains('show') && activeUploadXHR) {
-                                const currentProgress = parseInt(ui.progressBar.style.width, 10) || 0;
-                                manageProgressToast(`上传中... ${currentProgress}%`);
-                                modalObserver.disconnect();
-                                return;
-                            }
-                        }
-                    });
-                    modalObserver.observe(ui.modal, { attributes: true });
-
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = async () => {
-                        const contentB64 = reader.result.split(',')[1];
-                        
-                        let existingFileSha = null;
-                        try {
-                            const shaRes = await fetch(url, { 
-                                method: 'GET', 
-                                headers: { 'Authorization': authToken },
-                                cache: 'no-cache'
-                            });
-                            if (shaRes.ok) {
-                                const fileData = await shaRes.json();
-                                existingFileSha = fileData.sha;
-                            }
-                        } catch(e) { console.warn("Could not fetch existing file sha, proceeding with create.", e); }
-
-                        // ============ [核心修正 V2] 根据上传目标服务，决定请求方法 ============
-                        const isGithubUpload = url.includes('api.github.com');
-                        let body;
-                        let method;
-
-                        if (isGithubUpload) {
-                            method = 'PUT'; // GitHub 强制使用 PUT
-                            body = {
-                                message: `Upload file via Jellyfish: ${file.name}`,
-                                content: contentB64,
-                            };
-                            if (existingFileSha) {
-                                body.sha = existingFileSha; // 仅在更新时添加 sha
-                            }
-                        } else { // 假定为 Codeberg/Gitea 逻辑
-                            if (existingFileSha) {
-                                method = 'PUT'; // 更新使用 PUT
-                                body = {
-                                    message: `Update file: ${file.name}`,
-                                    content: contentB64,
-                                    sha: existingFileSha
-                                };
-                            } else {
-                                method = 'POST'; // 创建使用 POST
-                                body = {
-                                    message: `Create file: ${file.name}`,
-                                    content: contentB64
-                                };
-                            }
-                        }
-                        // ========================= [修正结束] =========================
-                        
-                        activeUploadXHR = new XMLHttpRequest();
-                        activeUploadXHR.open(method, url, true); 
-                        activeUploadXHR.setRequestHeader('Authorization', authToken);
-                        activeUploadXHR.setRequestHeader('Content-Type', 'application/json');
-                        
-                        const uploadCancelBtn = document.getElementById('upload-cancel-btn');
-                        const uploadCancelHandler = () => { if (activeUploadXHR) activeUploadXHR.abort(); };
-                        uploadCancelBtn.addEventListener('click', uploadCancelHandler);
-
-                        activeUploadXHR.upload.onprogress = (e) => {
-                            if (e.lengthComputable) {
-                                const percent = (e.loaded / e.total) * 100;
-                                ui.progressBar.style.width =`${percent}%`;
-                                if(progressToast) manageProgressToast(`上传中... ${Math.round(percent)}%`);
-                            }
-                        };
-                        activeUploadXHR.onload = function() {
-                           if (this.status >= 200 && this.status < 300) {
-                                manageProgressToast("上传成功！", true, 2000);
-                                fetchFilesForSelectedProject();
-                                ui.fileUploader.value = "";
-                                ui.fileNameInput.value = "";
-                                ui.selectedFileName.textContent = '未选择任何文件';
-                            } else {
-                                const errorMsg = JSON.parse(this.responseText).message || `HTTP ${this.status}`;
-                                manageProgressToast(`上传失败: ${errorMsg}`, true, 4000);
-                            }
-                            cleanup();
-                        };
-                        activeUploadXHR.onerror = () => { manageProgressToast("网络错误", true, 4000); cleanup(); };
-                        activeUploadXHR.onabort = () => { manageProgressToast("已取消", true, 2000); cleanup(); };
-                        const cleanup = () => {
-                            uploadCancelBtn.removeEventListener('click', uploadCancelHandler);
-                            ui.progressContainer.style.display = 'none';
-                            activeUploadXHR = null;
-                            modalObserver.disconnect();
-                            if (progressToast && !progressToast.textContent.includes('成功') && !progressToast.textContent.includes('失败') && !progressToast.textContent.includes('取消')) {
-                                progressToast.classList.remove('show');
-                                progressToast.addEventListener('transitionend', () => progressToast.remove(), { once: true });
-                                progressToast = null;
-                            }
-                        };
+                    try {
                         ui.progressContainer.style.display = 'flex';
                         ui.progressBar.style.width = '0%';
-                        activeUploadXHR.send(JSON.stringify(body));
-                    };
-                    reader.onerror = () => { alert("读取文件失败！"); };
-                }
+                        document.getElementById('upload-cancel-btn').style.display = 'none'; // GitHub上传很快，不提供取消
 
+                        await uploadFileViaGitData({
+                            file: file,
+                            path: path,
+                            commitMessage: `Upload file via Jellyfish: ${fileName}`,
+                            onProgress: (p) => { ui.progressBar.style.width = `${p}%`; }
+                        });
+
+                        showTopToast("上传成功！", 2000);
+                        fetchFilesForSelectedProject();
+                        ui.fileUploader.value = "";
+                        ui.fileNameInput.value = "";
+                        ui.selectedFileName.textContent = '未选择任何文件';
+                    } catch (err) {
+                        alert(await handleApiError(`上传文件 ${fileName}`, err));
+                    } finally {
+                        ui.progressContainer.style.display = 'none';
+                        document.getElementById('upload-cancel-btn').style.display = 'block';
+                    }
+                }
 
         return {
             open: () => {
@@ -9135,6 +9023,68 @@ const getDefaultConfig = () => ({
                     processPhotoUploadQueue();
                     e.target.value = '';
                 });
+
+                // [新增] 为照片下载按钮添加分享功能
+                document.getElementById('download-photo-btn').addEventListener('click', async (e) => {
+                    // 检查浏览器是否支持 Web Share API 的文件分享功能
+                    if (!navigator.share || !navigator.canShare) {
+                        // 如果不支持，则不执行任何操作，让 a 标签的默认下载行为发生
+                        return;
+                    }
+
+                    // 如果支持，则阻止 a 标签的默认下载行为
+                    e.preventDefault();
+
+                    const downloadBtn = e.currentTarget;
+                    const imageUrl = downloadBtn.href;
+                    const title = downloadBtn.download || '分享的图片';
+
+                    try {
+                        // 显示加载提示，提升用户体验
+                        showTopToast('正在准备图片...', 60000); 
+
+                        // 使用 fetch API 获取图片数据
+                        const response = await fetch(imageUrl);
+                        if (!response.ok) {
+                            throw new Error('下载图片失败，无法分享。');
+                        }
+                        const blob = await response.blob();
+                        
+                        // 创建一个 File 对象，这是 navigator.share 所需的格式
+                        const file = new File([blob], title, { type: blob.type });
+
+                        // 移除加载提示
+                        const existingToast = document.querySelector('.top-toast');
+                        if (existingToast) existingToast.remove();
+
+                        // 再次确认浏览器能分享此类文件
+                        if (navigator.canShare({ files: [file] })) {
+                            // 调用原生分享
+                            await navigator.share({
+                                files: [file],
+                                title: title,
+                                text: '来自 Jellyfish Island 的分享'
+                            });
+                        } else {
+                             // 如果文件类型由于某些原因无法分享，则回退到传统下载
+                            alert('您的浏览器不支持分享此类型的文件，将尝试直接下载。');
+                            const link = document.createElement('a');
+                            link.href = imageUrl;
+                            link.download = title;
+                            link.click();
+                        }
+                    } catch (error) {
+                        // 移除加载提示
+                        const existingToast = document.querySelector('.top-toast');
+                        if (existingToast) existingToast.remove();
+                        // 如果用户手动关闭分享面板，会触发 AbortError，我们不应将其视为错误
+                        if (error.name !== 'AbortError') {
+                            console.error('分享图片时出错:', error);
+                            alert('无法分享图片: ' + error.message);
+                        }
+                    }
+                });
+
                 ui.photosetToggle.addEventListener('change', e => {
                     const isSet = e.target.checked;
                     const button = ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]');
@@ -11957,8 +11907,7 @@ const getDefaultConfig = () => ({
 
         // 初始化字体管理器
         FontManager.init();
-        CodebergManager.init(); // [新增] 初始化 Codeberg 管理器
-
+        MegaManager.init(); // [修改] 初始化 Mega 管理器
         
         // [核心修正] 初始化备份提醒管理器
         // 1. 先调用 initUI() 找到所有HTML元素
@@ -12126,18 +12075,18 @@ const getDefaultConfig = () => ({
             </div>
         </div>
     </div>
-    <!-- ============ [新增] Codeberg 大文件存储设置模态框 ============ -->
-    <div class="modal-overlay" id="codebergSettingsModal">
+    <!-- ============ [修改] Mega 大文件存储设置模态框 ============ -->
+    <div class="modal-overlay" id="megaSettingsModal">
         <div class="modal-content" style="max-width: 450px;">
             <div class="modal-header">
-                <div class="modal-title-group">Codeberg 大文件存储</div>
-                <button class="close-btn" data-modal-id="codebergSettingsModal">&times;</button>
+                <div class="modal-title-group">Mega 大文件存储</div>
+                <button class="close-btn" data-modal-id="megaSettingsModal">&times;</button>
             </div>
             <div class="modal-body" style="gap: 25px;">
                 <!-- 当前活动账户 -->
                 <div class="form-section">
                     <label>当前活动账户</label>
-                    <div id="codeberg-active-account-display" class="codeberg-account-display inactive">
+                    <div id="mega-active-account-display" class="mega-account-display inactive">
                         未连接
                     </div>
                 </div>
@@ -12145,30 +12094,30 @@ const getDefaultConfig = () => ({
                 <!-- 已授权账户列表 -->
                 <div class="form-section">
                     <label>已授权账户列表</label>
-                    <div id="codeberg-authorized-list" class="codeberg-account-list-container">
+                    <div id="mega-authorized-list" class="mega-account-list-container">
                         <!-- JS 动态填充 -->
-                        <div class="codeberg-empty-list">暂无已授权的账户</div>
+                        <div class="mega-empty-list">暂无已授权的账户</div>
                     </div>
                 </div>
 
                 <!-- 操作按钮 -->
                 <div class="form-section" style="margin-top: 10px;">
-                    <a id="add-codeberg-account-btn" class="modal-button codeberg-auth-button" href="#" style="text-align: center; text-decoration: none; display: block;">
-                        + 添加或切换 Codeberg 账户
+                    <a id="add-mega-account-btn" class="modal-button mega-auth-button" href="#" style="text-align: center; text-decoration: none; display: block;">
+                        + 授权或切换 Mega 账户
                     </a>
                 </div>
                 
                 <!-- 引导注册 -->
-                <div class="codeberg-guidance-section">
-                    <p>没有 Codeberg 账户？
-                        <a href="https://codeberg.org/user/sign_up" target="_blank" rel="noopener noreferrer">点此免费注册</a>
+                <div class="mega-guidance-section">
+                    <p>没有 Mega 账户？
+                        <a href="https://mega.nz/register" target="_blank" rel="noopener noreferrer">点此免费注册</a>
                     </p>
                     <p>此功能用于存储大于 50MB 的文件。</p>
                 </div>
             </div>
         </div>
     </div>
-    <!-- ============ [新增结束] ============ -->
+    <!-- ============ [修改结束] ============ -->
     <!-- [CORE-ADD END] -->
 </body>
 </html>
