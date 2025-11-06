@@ -29,7 +29,6 @@
   ],
   "settings": {
     "paginationEnabled": true,
-    "themeStyle": "glass",
     "jellyBall": {
       "enabled": true,
       "swipeBack": true,
@@ -42,6 +41,7 @@
         }
       ]
     },
+    "themeStyle": "glass",
     "globalFont": {
       "name": "",
       "url": ""
