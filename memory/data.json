@@ -66,6 +66,16 @@
         "timestamp": 1761069127470,
         "path": "memory/photos/1761069107451_ao3ksedk.png",
         "sha": "d419411eacba64b0a3bcd074530b106e0580ac07"
+      },
+      {
+        "id": 1762430491086,
+        "albumId": 1760872799858,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1762430491086,
+        "path": "memory/photos/1762430466232_92betb27.jpg",
+        "sha": "43b6579ff91d696e563e3763a29bb7ce0ac0bcef"
       }
     ]
   }
