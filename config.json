@@ -45,6 +45,16 @@
           "openExternally": false
         }
       ]
+    },
+    {
+      "name": "3",
+      "buttons": [
+        {
+          "text": "3",
+          "href": "3",
+          "openExternally": false
+        }
+      ]
     }
   ],
   "settings": {
