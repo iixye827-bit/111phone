@@ -96,10 +96,33 @@
             overflow-y: auto; /* 当内容超出时，只在此容器内显示垂直滚动条 */
             min-height: 0; /* Flex布局中的重要技巧，防止内容撑开容器 */
             padding-bottom: 30px; /* 保留底部空间，避免按钮紧贴屏幕边缘 */
-            /* [核心修改] 使用遮罩创建无感的渐变分界线 */
-            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15px);
-            mask-image: linear-gradient(to bottom, transparent 0%, black 15px);
+            position: relative; /* [新增] 为伪元素的绝对定位提供基准 */
         }
+        
+        /* [新增] 使用伪元素创建无冲突的渐变遮罩 */
+        .scrollable-nav-wrapper::before {
+            content: '';
+            position: absolute; /* 或使用 sticky 定位，取决于具体滚动效果需求 */
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 15px; /* 渐变的高度 */
+            background-image: linear-gradient(to bottom, var(--day-color1), transparent);
+            z-index: 10; /* 确保在按钮内容之上 */
+            pointer-events: none; /* 关键：让鼠标可以穿透此渐变层点击下方的按钮 */
+            transition: background-image 0.5s ease; /* 跟随主题切换的过渡 */
+        }
+
+        /* [新增] 夜间模式适配 */
+        body.dark-mode .scrollable-nav-wrapper::before {
+            background-image: linear-gradient(to bottom, var(--night-color1), transparent);
+        }
+
+        /* [新增] 磨砂玻璃主题适配：隐藏分界线 */
+        body.theme-glass .scrollable-nav-wrapper::before {
+            background-image: none; /* 或者 background-image: linear-gradient(to bottom, transparent, transparent); */
+        }
+
         /* 美化滚动条 (可选，但推荐) */
         .scrollable-nav-wrapper::-webkit-scrollbar {
             width: 5px;
@@ -346,7 +369,8 @@ body.dark-mode .progress-bar-wrapper {
         #memoryModal .note-timestamp { font-size: 12px; font-weight: 300; color: #9A86A4; margin-top: 12px; }
         #memoryModal .album-item { aspect-ratio: 1 / 1; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; }
         #memoryModal .album-item .folder-icon { font-size: 32px; }
-        #memoryModal .album-info { font-size: 12px; color: #889; }
+        #memoryModal .album-info { font-size: 12px; color: #889; margin-top: 6px; /* 新增此行 */ }
+
 #memoryModal #photo-list-container {
     display: flex;          /* 1. 声明为 Flexbox 弹性布局 */
     flex-wrap: wrap;        /* 2. 允许项目自动换行 */
@@ -657,9 +681,6 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         /* =============================================================== */
 
 
-        /* ===== [START] FROSTED GLASS THEME ===== */
-        body.theme-glass .modal-overlay,
-        /* ... */
 
 
         /* ===== [START] FROSTED GLASS THEME ===== */
@@ -667,6 +688,7 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         body.theme-glass #memoryPhotoViewerOverlay {
             background: transparent;
         }
+
         body.theme-glass .nav-btn,
         body.theme-glass .title-card,
         body.theme-glass .fab-main,
@@ -676,10 +698,9 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         body.theme-glass .player-content,
         body.theme-glass .player-popover,
         body.theme-glass #memoryModal .hub-btn,
-        body.theme-glass .phone-partition-item, /* ★★★ 新增此行 ★★★ */
         body.theme-glass #memoryModal .folder-item,
         body.theme-glass #memoryModal .note-item,
-        body.e-glass #memoryModal .album-item,
+        body.theme-glass #memoryModal .album-item,
         body.theme-glass #memoryModal .fab,
         body.theme-glass #memoryModal .editor-btn,
         body.theme-glass #memoryModal #note-editor-view,
@@ -692,6 +713,16 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
         }
+        
+        /* [兼容性修复] 将text-btn的样式覆盖单独出来，防止因其他特殊选择器导致整个规则块失效 */
+        body.theme-glass .nav-btn.text-btn {
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border: none;
+            box-shadow: none;
+        }
+
         body.theme-glass.dark-mode .nav-btn,
         body.theme-glass.dark-mode .title-card,
         body.theme-glass.dark-mode .fab-main,
@@ -746,7 +777,7 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
              background: rgba(30, 30, 30, 0.4);
         }
 
-                body.theme-glass .nav-btn:active,
+        body.theme-glass .nav-btn:active,
         body.theme-glass .modal-button:active,
         body.theme-glass .fab-main:active,
         body.theme-glass .fab-drawer-item:active {
@@ -763,50 +794,8 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
              background: rgba(200, 200, 200, 0.25);
              border-color: rgba(255, 255, 255, 0.15);
         }
-        /* [V3 最终修正] 强制修正颜色选择器布局，杜绝溢出 */
-        .color-input-wrapper {
-            display: flex;
-            align-items: center;
-            /* 使用一个非常小的间距 */
-            gap: 6px;
-            /* 容器的内边距也相应减小 */
-            padding: 5px 8px;
-        }
-
-        /* 为颜色选择器本身设置固定尺寸，且不允许收缩 */
-        .color-input-wrapper input[type="color"] {
-            width: 40px; /* 固定宽度 */
-            height: 28px; /* 固定高度 */
-            flex-shrink: 0; /* 核心：禁止此元素收缩 */
-            border: none;
-            padding: 0;
-            background: none;
-        }
-
-        /* 为十六进制输入框设置一个固定的、紧凑的尺寸 */
-        .color-input-wrapper .hex-display.modal-input {
-            flex: 0 0 auto; /* 核心：禁止增长和收缩，宽度由width属性决定 */
-            width: 85px; /* 核心：设置一个足以容纳7个字符和少量边距的固定宽度 */
-
-            /* 重置所有可能导致问题的样式 */
-            box-shadow: none !important;
-            background: transparent !important;
-            border: none !important;
-            outline: none !important;
-            padding: 0 5px; /* 给予文字左右5px的呼吸空间 */
-            margin: 0;
-            text-align: center; /* 文本居中 */
-
-            /* 确保文本颜色在不同模式下正确显示 */
-            color: var(--text-day);
-        }
-
-
-        body.dark-mode .color-input-wrapper .hex-display.modal-input {
-            color: var(--text-night);
-        }
-
         /* ===== [END] FROSTED GLASS THEME ===== */
+
         /* [新增] 为“已确认”的十六进制代码添加变淡的样式 */
         .hex-display.modal-input.confirmed-color {
             color: #a0aec0; /* 一个比默认文字更淡的灰色 */
@@ -2399,12 +2388,10 @@ body.dark-mode .baidu-account-item:hover {
 /* ============= [新增] 备忘录编辑器 v2.0 样式 ============= */
 /* =============================================================== */
 #memoryModal #note-editor-view {
-    position: relative; /* [核心修改] 为工具栏的绝对定位提供容器 */
     padding-bottom: 0; /* 为工具栏留出空间 */
 }
 #memoryModal .editor-content {
-    /* [核心修改] 为工具栏腾出固定的占位空间 */
-    padding-bottom: 60px;
+    padding-bottom: 10px;
 }
 #memoryModal #note-content-editor {
     /* [修改] 移除 flex-grow，让其高度由内容决定，由父容器 .editor-content 滚动 */
@@ -2462,11 +2449,7 @@ body.dark-mode .baidu-account-item:hover {
 
 
 .memo-toolbar {
-    position: absolute; /* [核心修改] 绝对定位 */
-    left: 0; /* [核心修改] */
-    right: 0; /* [核心修改] */
-    bottom: 0; /* [核心修改] 固定在底部 */
-    z-index: 10; /* [核心修改] 确保在内容之上 */
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: space-around; /* 核心修复：使用 space-around 自动均分间距，取代固定的 gap */
@@ -2474,14 +2457,12 @@ body.dark-mode .baidu-account-item:hover {
     background: var(--bg-day-element);
     box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
     border-top: 1px solid rgba(0,0,0,0.08);
-    /* [核心修改] 使用 calc 减去父容器的内边距 */
-    width: calc(100% - 20px);
-    margin: 0 10px; /* [核心修改] 替换负外边距为正常外边距 */
-    border-radius: 12px 12px 0 0; /* [核心修改] 调整圆角，使其更像悬浮面板 */
+    width: calc(100% + 20px);
+    margin: 0 -10px -10px -10px;
+    border-radius: 0 0 16px 16px;
     box-sizing: border-box;
-    /* [核心修改] 添加平滑过渡效果 */
-    transition: transform 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
+
 
 body.dark-mode .memo-toolbar {
     background: var(--bg-night-element);
@@ -3680,42 +3661,204 @@ body.dark-mode #fontSizeSliderPopup input[type="range"]::-webkit-slider-thumb {
     border-color: transparent;
 }
 /* =============================================================== */
-/* ============= [新增] 备忘录键盘适配样式 V1.0 ================ */
+/* ============= [最终修正] 备忘录一键回顶按钮样式 V6.0 ========= */
+/* =============================================================== */
+.memo-fab-back-to-top {
+    position: absolute;
+    right: 25px;
+    bottom: 75px;
+    z-index: 210;
+
+    width: 20px;
+    height: 20px;
+    
+    background: var(--bg-day-element);
+    color: var(--hold-border); /* 图标颜色将传递给内部的span */
+    box-shadow: 4px 4px 8px var(--shadow-dark-day), -4px -4px 8px var(--shadow-light-day);
+    
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    opacity: 0;
+    transform: scale(0.8) translateY(10px); /* 恢复按钮本身的动画，移除旋转 */
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* ★★★ 新增：只旋转图标本身 ★★★ */
+.back-to-top-icon {
+    display: inline-block; /* 使 transform 生效 */
+    transform: rotate(-90deg); /* 核心：只将图标逆时针旋转90度 */
+    font-size: 13px;
+    line-height: 1;
+    padding-left: 1px; /* 旋转后微调位置 */
+}
+
+/* ★★★ 修正：按钮显示时的动画（移除旋转） ★★★ */
+.memo-fab-back-to-top.show {
+    opacity: 1;
+    transform: scale(1) translateY(0); /* 恢复正确的显示动画 */
+    pointer-events: auto;
+}
+
+.memo-fab-back-to-top.show {
+    opacity: 1;
+    transform: scale(1) translateY(0); /* 显示时恢复正常大小和位置 */
+    pointer-events: auto;
+}
+
+.memo-fab-back-to-top:active {
+    box-shadow: inset 2px 2px 4px var(--shadow-dark-day), inset -2px -2px 4px var(--shadow-light-day);
+    transform: scale(0.95) !important;
+}
+
+/* 夜间模式适配 */
+body.dark-mode .memo-fab-back-to-top {
+    background: var(--bg-night-element);
+    color: var(--text-night);
+    box-shadow: 4px 4px 8px var(--shadow-dark-night), -4px -4px 8px var(--shadow-light-night);
+}
+
+body.dark-mode .memo-fab-back-to-top:active {
+    box-shadow: inset 2px 2px 4px var(--shadow-dark-night), inset -2px -2px 4px var(--shadow-light-night);
+}
+
+/* 磨砂玻璃主题适配 */
+body.theme-glass .memo-fab-back-to-top {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px 0 rgba(0, 0, 0, 0.1);
+}
+
+body.theme-glass.dark-mode .memo-fab-back-to-top {
+    background: rgba(20, 20, 20, 0.4);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+/* =============================================================== */
+/* ================ [新增] 摇摆挂件及设置弹窗样式 ================= */
 /* =============================================================== */
 
-/* 当键盘弹出时，为编辑器容器添加此类 */
-#memoryModal #note-editor-view.keyboard-visible {
-    /* 1. 将内边距从底部移除，因为工具栏将不再固定在底部 */
-    padding-bottom: 0; 
+/* 1. 挂件容器定位 (V2 - 全局固定定位) */
+#pendant-container {
+    position: fixed;    /* [核心修改] 改为固定定位，相对于视口 */
+    top: 0;             /* [核心修改] 初始 top 为 0，将由JS动态设置 */
+    right: 15%;         /* 水平位置保持不变 */
+    width: 50px;        /* 容器宽度 */
+    height: 100vh;      /* [核心修改] 高度占满整个屏幕，确保长绳子不会溢出 */
+    pointer-events: none; /* 保持事件穿透特性 */
+    z-index: 5;         /* [核心修改] 调整层级，使其在大部分内容之上，但在弹窗之下 */
+    transition: top 0.3s ease; /* [新增] 当窗口大小变化时，可以平滑过渡 */
 }
 
-#memoryModal #note-editor-view.keyboard-visible .editor-content {
-    /* 2. 为内容区域增加底部内边距，确保滚动到底部时，最后一行不会被工具栏遮挡 */
-    padding-bottom: 60px; /* 60px 约等于工具栏的高度 */
+/* 2. 动画效果 (基本复用原代码) */
+#pendant-container .all-wrap {
+    /* 引入变量以便JS修改 */
+    --bob-amount: -20px;
+    --anim-duration: 7s;
+    animation: bob var(--anim-duration) cubic-bezier(0.5, 0, 0.5, 1) infinite both;
+}
+#pendant-container .all {
+    position: relative;
+    transform-origin: center top; /* 线的顶端为摇摆支点 */
+    animation: swing var(--anim-duration) cubic-bezier(0.5, 0, 0.5, 1) infinite both;
 }
 
-#memoryModal #note-editor-view.keyboard-visible .memo-toolbar {
-    /* 3. 核心：将工具栏变为固定定位，使其脱离文档流并固定在可视窗口的底部 */
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    
-    /* 4. 确保工具栏在最上层，并重新定义其宽度和样式以适应新布局 */
-    z-index: 210; /* 高于编辑器页面 (z-index: 200) */
-    width: 100%;
-    max-width: 800px; /* 与 #memoryModal .modal-content 的 max-width 保持一致 */
-    margin: 0 auto; /* 水平居中 */
-    border-radius: 0; /* 在悬浮状态下移除圆角 */
-    
-    /* 5. 添加过渡效果，让上浮和下落更平滑 */
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateY(0);
+/* 3. 绳子样式 (可由JS修改) */
+#pendant-container .all::before {
+    content: "";
+    /* 引入CSS变量，方便JS动态修改 */
+    height: var(--line-length, 5rem); 
+    width: 2px;
+    background-color: var(--line-color, #000); 
+    position: absolute;
+    left: 50%;
+    top: 0; 
+    transform: translateX(-50%);
 }
 
-/* 针对磨砂玻璃主题的微调，确保悬浮时样式正确 */
-body.theme-glass #memoryModal #note-editor-view.keyboard-visible .memo-toolbar {
-    border-radius: 0;
+/* 4. 挂件图案样式 (可点击) */
+#pendant-shape {
+    display: block; /* 确保transform生效 */
+    position: absolute;
+    /* 核心：top值与绳子长度变量绑定，确保始终连接 */
+    top: var(--line-length, 5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    transform-origin: top center;
+    cursor: pointer; /* 鼠标变为手型，提示可点击 */
+    z-index: 20;      /* 确保图案在最前面，可以被点击 */
+    -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
+    pointer-events: auto; /* [核心修改] 让图案本身可以接收鼠标事件 */
+}
+
+
+#pendant-shape img {
+    width: 50px;
+    height: auto;
+    vertical-align: top; /* 消除图片底部空隙 */
+}
+
+#pendant-shape .emoji {
+    font-size: 40px; /* 如果是emoji，调整大小 */
+    line-height: 1;
+}
+
+/* 5. 动画关键帧 (复用原代码) */
+@keyframes swing {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(15deg); }
+    75% { transform: rotate(-15deg); }
+}
+@keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(var(--bob-amount)); }
+}
+
+/* 6. 挂件设置弹窗样式 (全新) */
+#pendant-settings-modal {
+    z-index: 1005; /* 确保层级够高 */
+}
+#pendant-settings-modal .modal-content {
+    max-width: 400px;
+}
+#pendant-settings-modal .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* 增加组间距 */
+}
+.pendant-settings-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.pendant-settings-group label {
+    font-size: 14px;
+    color: #5a6778;
+    font-weight: 600;
+}
+body.dark-mode .pendant-settings-group label {
+    color: #c0c6cc;
+}
+.pendant-settings-group .slider-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.pendant-settings-group input[type="range"] {
+    flex-grow: 1;
+}
+.pendant-settings-group .slider-value {
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 3em; /* 保证宽度，防止跳动 */
+    text-align: right;
 }
 
     </style>
@@ -3745,6 +3888,8 @@ body.theme-glass #memoryModal #note-editor-view.keyboard-visible .memo-toolbar {
     <div class="title-card" id="titleCard">
         <h1 class="editable-title" id="title">Jellyfish Island</h1>
         <div class="editable-subtitle" id="subtitle">长按🌞打开工具栏 | By淡季水母</div>
+
+
     </div>
 
     <div class="category-nav-container" id="categoryNavContainer">
@@ -3757,6 +3902,19 @@ body.theme-glass #memoryModal #note-editor-view.keyboard-visible .memo-toolbar {
             <p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>
         </div>
     </div>
+
+    <!-- ===== [新增] 摇摆挂件的HTML结构 (全局定位) ===== -->
+    <div id="pendant-container">
+        <div id="pendant-all-wrap" class="all-wrap">
+            <div id="pendant-all" class="all">
+                <!-- 使用一个span来方便地更改emoji或图片 -->
+                <span id="pendant-shape">
+                    <img src="https://tc.z.wiki/autoupload/fr/0x9Zm_rdfaeRRjK8iV0xPw5cKjQnMC1OZdesfpjt90qyl5f0KlZfm6UsKj-HyTuv/20251105/Nh10/1024X440/IMG_7008.png?imageMogr2/thumbnail/100x" alt="挂件" id="pendant-img">
+                </span>
+            </div>
+        </div>
+    </div>
+    <!-- ===== [新增结束] ===== -->
 
     <!-- 注意：悬浮按钮和模态框需要放在滑动容器之外，以保证它们在所有页面上都能正常显示和交互 -->
     <div class="fab-container" id="fabContainer">
@@ -4020,6 +4178,24 @@ body.theme-glass #memoryModal #note-editor-view.keyboard-visible .memo-toolbar {
     </div>
         <!-- ★ 在这里新增下面的代码块 ★ -->
 <div class="update-log-entry">
+    <h4>v6.0.0 <span class="update-date">- 2025.11.06</span></h4>
+    <ul>
+        <li><span class="tag new">新功能</span> 备忘录工具栏加强，支持调整文字大小和一键复制全文。</li>
+        <li><span class="tag new">新功能</span> 漫游模式支持上传 <code>.m4a</code> 格式的音乐文件。</li>
+        <li><span class="tag new">新功能</span> 新增照片上传取消功能，可在上传过程中随时中止任务。</li>
+        <li><span class="tag new">新功能</span> 数据清理功能现已支持按类别（如主配置、相册、云盘等）进行选择性清空。</li>
+        <li><span class="tag new">新功能</span> 备忘录的文件夹封面上增加项目数量显示。</li>
+        <li><span class="tag new">新功能</span> 新增对网易云盘的授权上传支持（此功能测试中，暂不可用）。</li>
+        <li><span class="tag opt">优化</span> 对于 iOS 设备，相册照片下载方式变更为“分享，”可选择保存到“照片”或“文件”应用。</li>
+        <li><span class="tag opt">优化</span> 修复了悬浮球的预览功能交互，点击“预览”可实时查看效果，应用后将刷新页面。</li>
+        <li><span class="tag opt">优化</span> 优化了悬浮球CSS自定义功能的帮助提示词。</li>
+        <li><span class="tag opt">优化</span> 优化了“记忆”模块的加载逻辑与显示效果，提升了启动速度。</li>
+        <li><span class="tag opt">优化</span> 上传照片时，默认不再勾选“创建照片集”选项。</li>
+        <li><span class="tag opt">优化</span> 优化了退出页面时管理模式的自动退出逻辑。</li>
+        <li><span class="tag fix">修复</span> 修复了在“磨砂玻璃”主题下，项目按钮的磨砂背景显示不正确的问题。</li>
+    </ul>
+</div>
+<div class="update-log-entry">
     <h4>v5.9.5 <span class="update-date">- 2025.10.19</span></h4>
     <ul>
         <li><span class="tag new">新功能</span> 新增备份提醒功能，支持定时或在关闭项目时弹出提醒，有效防止数据丢失。</li>
@@ -4162,7 +4338,7 @@ body.theme-glass #memoryModal #note-editor-view.keyboard-visible .memo-toolbar {
     </div>
     
     <footer class="update-footer">
-        当前版本: v5.9.5
+        当前版本: v6.0.0
     </footer>
 </div>
                     <div id="help-page-3" class="help-page-content">
@@ -4314,78 +4490,197 @@ body.theme-glass #memoryModal #note-editor-view.keyboard-visible .memo-toolbar {
     <div class="modal-overlay" id="jelly-css-help-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title-group"><span>💡 悬浮球 CSS 自定义向导</span></div>
+                <div class="modal-title-group"><span>💡 悬浮球 CSS 自定义模板</span></div>
                 <button class="close-btn" data-modal-id="jelly-css-help-modal">&times;</button>
             </div>
-            <div class="modal-body">
-                <div class="css-help-section">
-                    <h3>欢迎使用！</h3>
-                    <p>本向导能帮助你轻松创建漂亮的自定义悬浮球CSS主题，即使你完全不懂代码也没关系。</p>
-                    <p>只需按照以下步骤操作，就能让AI成为你的专属设计师。</p>
+            <div class="modal-body" style="gap: 15px;">
+                <div class="css-help-section" style="padding: 10px 15px;">
+                    <h3 style="color:#777; border-bottom: none; margin-bottom: 0;">悬浮球样式自定义模板</h3>
+                    <p style="font-size: 0.95em; color: #889; text-align: center; margin-top: 5px;">
+                        选择一个模板，点击“复制”，然后粘贴到下方的输入框内即可。
+                    </p>
                 </div>
+
+                <!-- 模板 1: 有背景 + 图床链接 -->
                 <div class="css-help-section">
-    <h4>方案 A：自定义双环辉光悬浮球</h4>
-    <p style="margin-bottom: 12px; font-size: 0.9em; color: #889;">此方案保留悬浮球默认的“内圈球体 + 外圈辉光”结构，适合进行颜色和风格的深度定制。</p>
-    
-    <h5 style="margin-top: 15px; margin-bottom: 5px;">AI 提示词模板 (方案 A)</h5>
-    <div class="css-help-text-block" id="css-prompt-template-A">
-        <button class="copy-btn">复制</button>
-请为我创建一个双环辉光悬浮球的CSS主题。要求如下：<br><br>
-1. <strong>整体风格描述</strong>: [例如：宇宙星云、魔法水晶、金属核心]<br>
-2. <strong>内圈球体样式 (<code>#floating-jellyfish-ball</code>)</strong>:<br>
-&nbsp;&nbsp;&nbsp;• 背景: [例如：深蓝色带有亮片，或紫色到蓝色的渐变]<br>
-&nbsp;&nbsp;&nbsp;• 内部图标(🪼)颜色: [例如：白色]<br>
-&nbsp;&nbsp;&nbsp;• 边框: [例如：1像素银色边框]<br>
-3. <strong>外圈辉光样式 (<code>.jelly-ball-wrapper</code>)</strong>:<br>
-&nbsp;&nbsp;&nbsp;• 辉光颜色: [例如：亮紫色]<br><br>
-请为以上要求生成CSS代码。外圈辉光颜色通过修改 <code>--hold-border</code> 变量实现。
-    </div>
+                    <h4>方案一: 图片图标 (有背景)</h4>
+                    <p style="font-size: 0.9em; color: #889; margin-top: -5px; margin-bottom: 10px;">保留半透明圆形背景，内部显示带辉光的图片。</p>
+                    <div class="css-help-text-block">
+                        <button class="copy-btn">复制</button>
+<pre><code>/* 步骤 1: 自定义辉光动画 */
+@keyframes icon-glow {
+  0%, 100% {
+    /* 修改颜色和范围 (初始/结束状态) */
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.7));
+  }
+  50% {
+    /* 修改颜色和范围 (最亮状态) */
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 1));
+  }
+}
 
-    <h5 style="margin-top: 15px; margin-bottom: 5px;">示例：宇宙星云</h5>
-    <div class="css-help-text-block" id="css-prompt-example-A">
-        <button class="copy-btn">复制</button>
-请为我创建一个双环辉光悬浮球的CSS主题。要求如下：<br><br>
-1. <strong>整体风格描述</strong>: 宇宙星云，深邃的太空感。<br>
-2. <strong>内圈球体样式 (<code>#floating-jellyfish-ball</code>)</strong>:<br>
-&nbsp;&nbsp;&nbsp;• 背景: 深邃的星空背景，可以使用深蓝到黑色的渐变。<br>
-&nbsp;&nbsp;&nbsp;• 内部图标(🪼)颜色: 明亮的白色，像一颗恒星。<br>
-&nbsp;&nbsp;&nbsp;• 边框: 不需要边框。<br>
-3. <strong>外圈辉光样式 (<code>.jelly-ball-wrapper</code>)</strong>:<br>
-&nbsp;&nbsp;&nbsp;• 辉光颜色: 梦幻的紫色 (<code>#8a2be2</code>)。<br><br>
-请为以上要求生成CSS代码。外圈辉光颜色通过修改 <code>--hold-border</code> 变量实现。
-    </div>
-</div>
+/* 步骤 2: (可选) 自定义球体背景 */
+#floating-jellyfish-ball {
+  background: rgba(0, 0, 0, 0.4); /* 半透明黑色背景 */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+body.dark-mode #floating-jellyfish-ball {
+  background: rgba(255, 255, 255, 0.2); /* 夜间模式半透明白色背景 */
+  border-color: rgba(255, 255, 255, 0.3);
+}
 
-<div class="css-help-section" style="margin-top: 20px;">
-    <h4>方案 B：替换为自定义图标</h4>
-    <p style="margin-bottom: 12px; font-size: 0.9em; color: #889;">此方案会完全隐藏默认的球体和辉光，将其替换为您指定的任意图片，适合追求极致个性化的用户。</p>
-    
-    <h5 style="margin-top: 15px; margin-bottom: 5px;">AI 提示词模板 (方案 B)</h5>
-    <div class="css-help-text-block" id="css-prompt-template-B">
-        <button class="copy-btn">复制</button>
-请为我生成一段CSS代码，将悬浮球替换为自定义图片。要求如下：<br><br>
-1. <strong>图片地址</strong>: [请在此处粘贴一个公开的图片URL，建议使用透明背景的.png格式图片]<br>
-2. <strong>可选样式</strong>:<br>
-&nbsp;&nbsp;&nbsp;• 边框: [例如：不需要边框，或 2像素金色边框]<br>
-&nbsp;&nbsp;&nbsp;• 鼠标悬停效果: [例如：放大1.1倍]<br><br>
-代码需要做到:<br>
-&nbsp;&nbsp;&nbsp;- 隐藏原来的内外圈辉光和图标。<br>
-&nbsp;&nbsp;&nbsp;- 将背景设置为我提供的图片地址。
-    </div>
+/* 步骤 3: 将图标设为图片并应用动画 */
+#floating-jellyfish-ball span {
+  display: block;
+  width: 65%; /* 调整图标占球体的比例 */
+  height: 65%;
+  font-size: 0; /* 隐藏原始的 🪼 */
+  
+  /* 在这里替换为你的图片链接 (推荐透明背景 .png) */
+  background-image: url('在这里替换为你的图片链接');
+  
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  
+  /* 关键：将辉光动画应用到有图片的 span 上 */
+  animation: icon-glow 2.5s infinite ease-in-out;
+}</code></pre>
+                    </div>
+                </div>
 
-    <h5 style="margin-top: 15px; margin-bottom: 5px;">示例：精灵球</h5>
-    <div class="css-help-text-block" id="css-prompt-example-B">
-        <button class="copy-btn">复制</button>
-请为我生成一段CSS代码，将悬浮球替换为自定义图片。要求如下：<br><br>
-1. <strong>图片地址</strong>: <code>https://www.freeiconspng.com/uploads/pok-mon-go-pokeball-png-10.png</code><br>
-2. <strong>可选样式</strong>:<br>
-&nbsp;&nbsp;&nbsp;• 边框: 不需要边框。<br>
-&nbsp;&nbsp;&nbsp;• 鼠标悬停效果: 旋转15度。<br><br>
-代码需要做到:<br>
-&nbsp;&nbsp;&nbsp;- 隐藏原来的内外圈辉光和图标。<br>
-&nbsp;&nbsp;&nbsp;- 将背景设置为我提供的图片地址。
-    </div>
-</div>
+                <!-- 模板 2: 有背景 + Emoji -->
+                <div class="css-help-section">
+                    <h4>方案二: Emoji 图标 (有背景)</h4>
+                    <p style="font-size: 0.9em; color: #889; margin-top: -5px; margin-bottom: 10px;">保留半透明圆形背景，内部显示带辉光的Emoji。</p>
+                    <div class="css-help-text-block">
+                        <button class="copy-btn">复制</button>
+<pre><code>/* 步骤 1: 自定义辉光动画 */
+@keyframes emoji-glow {
+  0%, 100% {
+    /* Emoji使用text-shadow来发光 (初始/结束状态) */
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.7), 0 0 10px rgba(255, 105, 180, 0.6);
+  }
+  50% {
+    /* (最亮状态) */
+    text-shadow: 0 0 10px rgba(255, 255, 255, 1), 0 0 20px rgba(255, 105, 180, 1);
+  }
+}
+
+/* 步骤 2: (可选) 自定义球体背景 */
+#floating-jellyfish-ball {
+  background: rgba(255, 182, 193, 0.5); /* 粉色背景 */
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 182, 193, 0.8);
+  font-size: 0; /* 隐藏原始图标 */
+}
+
+/* 步骤 3: 使用伪元素显示Emoji并应用动画 */
+#floating-jellyfish-ball::before {
+  content: '🌸'; /* 在这里替换为你想要的 Emoji */
+  font-size: 28px; /* 在这里调整 Emoji 的大小 */
+  
+  /* 关键：将辉光动画应用到显示Emoji的伪元素上 */
+  animation: emoji-glow 3s infinite ease-in-out;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- 模板 3: 无背景 + 图床链接 -->
+                <div class="css-help-section">
+                    <h4>方案三: 图片图标 (无背景)</h4>
+                    <p style="font-size: 0.9em; color: #889; margin-top: -5px; margin-bottom: 10px;">隐藏背景，仅显示发光的图片图标 (此方案完全复刻您提供的参考代码)。</p>
+                    <div class="css-help-text-block">
+                        <button class="copy-btn">复制</button>
+<pre><code>/* 步骤 1: 让球体容器完全透明 */
+#floating-jellyfish-ball {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
+  /* 在这里设定图标的尺寸 */
+  width: 48px;
+  height: 48px;
+  font-size: 0;
+}
+
+/* 步骤 2: 定义辉光动画 */
+@keyframes icon-glow {
+  0%, 100% {
+    /* 修改颜色和范围 (初始/结束状态) */
+    filter: drop-shadow(0 0 4px rgba(255, 105, 180, 0.7));
+  }
+  50% {
+    /* 修改颜色和范围 (最亮状态) */
+    filter: drop-shadow(0 0 14px rgba(255, 20, 147, 1));
+  }
+}
+
+/* 步骤 3: 将图标设为图片并应用动画 */
+#floating-jellyfish-ball span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  
+  /* 在这里替换为你的图片链接 (推荐透明背景 .png) */
+  background-image: url('在这里替换为你的图片链接');
+  
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  
+  /* 关键: 将辉光动画应用到 span 上 */
+  animation: icon-glow 2.5s infinite ease-in-out;
+}</code></pre>
+                    </div>
+                </div>
+                
+                <!-- 模板 4: 无背景 + Emoji -->
+                <div class="css-help-section">
+                    <h4>方案四: Emoji 图标 (无背景)</h4>
+                    <p style="font-size: 0.9em; color: #889; margin-top: -5px; margin-bottom: 10px;">隐藏背景，仅显示发光的Emoji图标。</p>
+                    <div class="css-help-text-block">
+                        <button class="copy-btn">复制</button>
+<pre><code>/* 步骤 1: 让球体容器完全透明 */
+#floating-jellyfish-ball {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  
+  /* 在这里设定图标的点击区域大小 */
+  width: 48px;
+  height: 48px;
+  font-size: 0; /* 隐藏原始图标 */
+}
+
+/* 步骤 2: 定义Emoji的辉光动画 */
+@keyframes emoji-glow {
+  0%, 100% {
+    /* Emoji使用text-shadow来发光 (初始/结束状态) */
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.7), 0 0 10px rgba(0, 255, 255, 0.6);
+  }
+  50% {
+    /* (最亮状态) */
+    text-shadow: 0 0 10px rgba(255, 255, 255, 1), 0 0 20px rgba(0, 255, 255, 1);
+  }
+}
+
+/* 步骤 3: 使用伪元素显示Emoji并应用动画 */
+#floating-jellyfish-ball::before {
+  content: '💎'; /* 在这里替换为你想要的 Emoji */
+  font-size: 36px; /* 在这里调整 Emoji 的大小 */
+  
+  /* 关键：将辉光动画应用到伪元素上 */
+  animation: emoji-glow 2.5s infinite ease-in-out;
+}</code></pre>
+                    </div>
+                </div>
                 </div>
 
             </div>
@@ -4500,6 +4795,11 @@ body.theme-glass #memoryModal #note-editor-view.keyboard-visible .memo-toolbar {
                         <div id="fontSizeSliderPopup" style="display: none;">
                             <input type="range" id="fontSizeSlider" min="12" max="28" value="16">
                         </div>
+
+                        <!-- ★★★ [最终修正] 一键回顶按钮 (仅旋转图标) V6 ★★★ -->
+                        <button id="memo-back-to-top" class="memo-fab-back-to-top" title="回到顶部">
+                            <span class="back-to-top-icon">➤</span>
+                        </button>
                     </div>
                 </div>
                 <!-- ALBUM / 相册部分 -->
@@ -4600,9 +4900,12 @@ body.theme-glass #memoryModal #note-editor-view.keyboard-visible .memo-toolbar {
                 <input type="text" id="photo-title-input" class="modal-input" placeholder="标题 (选填)">
                 <textarea id="photo-desc-input" class="modal-textarea" placeholder="描述 (选填)"></textarea>
             </div>
-            <div class="modal-footer">
-                <button data-action="skip-photo-details" class="modal-button">跳过</button>
-                <button data-action="save-photo-details" class="modal-button primary">保存</button>
+            <div class="modal-footer" style="justify-content: space-between;">
+                <button data-action="cancel-photo-upload" class="modal-button" style="color:#f56565;">取消</button>
+                <div>
+                    <button data-action="skip-photo-details" class="modal-button">跳过</button>
+                    <button data-action="save-photo-details" class="modal-button primary">保存</button>
+                </div>
             </div>
         </div>
     </div>
@@ -4715,7 +5018,7 @@ body.theme-glass #memoryModal #note-editor-view.keyboard-visible .memo-toolbar {
                 <div class="music-upload-section">
                     <h4>上传新歌曲</h4>
                     <div class="file-select-wrapper">
-                        <button id="upload-music-btn" class="modal-button">选择音乐 (.mp3)</button>
+                        <button id="upload-music-btn" class="modal-button">选择音乐 (.mp3, .m4a)</button>
                         <span id="upload-music-status" class="status-text"></span>
                     </div>
                      <input type="text" id="music-rename-input" class="modal-input" placeholder="歌曲名称 (自动填充)">
@@ -4726,7 +5029,7 @@ body.theme-glass #memoryModal #note-editor-view.keyboard-visible .memo-toolbar {
                     <div class="confirm-upload-wrapper">
                         <button id="confirm-upload-btn" class="modal-button">确认上传</button>
                     </div>
-                    <input type="file" id="music-file-picker" accept=".mp3" hidden>
+                    <input type="file" id="music-file-picker" accept=".mp3,.m4a" hidden>
                     <input type="file" id="lrc-file-picker" accept=".lrc" hidden>
                 </div>
                 <div class="music-playlist-section">
@@ -7345,14 +7648,47 @@ async function selectiveClearData() {
     }
 }
 
-// [新增] 为新的 "高级数据清理" 按钮和确认按钮绑定事件
+// [新增 V2] 为 "高级数据清理" 弹窗添加完整的交互逻辑
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('openClearDataModalBtn')?.addEventListener('click', () => {
+    const openClearModalBtn = document.getElementById('openClearDataModalBtn');
+    const confirmClearBtn = document.getElementById('confirmSelectiveClearBtn');
+    const selectAllCheckbox = document.getElementById('selectAllClearOptions');
+    const optionsContainer = document.getElementById('clear-options-container');
+
+    // 打开高级清理弹窗
+    openClearModalBtn?.addEventListener('click', () => {
         document.getElementById('settingsModal').classList.remove('show');
         document.getElementById('selectiveClearModal').classList.add('show');
     });
-    document.getElementById('confirmSelectiveClearBtn')?.addEventListener('click', selectiveClearData);
+
+    // 确认执行清理
+    confirmClearBtn?.addEventListener('click', selectiveClearData);
+
+    // "一键全选" 的核心逻辑
+    if (selectAllCheckbox && optionsContainer) {
+        // 监听 "一键全选" 复选框的变化
+        selectAllCheckbox.addEventListener('change', () => {
+            const isChecked = selectAllCheckbox.checked;
+            const individualCheckboxes = optionsContainer.querySelectorAll('input[type="checkbox"]');
+            individualCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+        });
+
+        // 监听下方所有独立复选框的变化，以联动 "一键全选" 的状态
+        optionsContainer.addEventListener('change', (e) => {
+            if (e.target.matches('input[type="checkbox"]')) {
+                const individualCheckboxes = optionsContainer.querySelectorAll('input[type="checkbox"]');
+                const total = individualCheckboxes.length;
+                const checkedCount = optionsContainer.querySelectorAll('input[type="checkbox"]:checked').length;
+                
+                // 如果所有都被选中，则"一键全选"也勾选上；否则取消勾选
+                selectAllCheckbox.checked = total === checkedCount;
+            }
+        });
+    }
 });
+
 
 // <-- 开始替换为 -->
     /* =============================================================== */
@@ -7752,17 +8088,20 @@ document.addEventListener('DOMContentLoaded', () => {
         function renderMemoFolders() {
             ui.folderList.innerHTML = '';
             memoryCache.memo.folders.forEach(folder => {
+                // [新增] 计算当前文件夹下的笔记数量
+                const itemCount = memoryCache.memo.notes.filter(note => note.folderId === folder.id).length;
                 const isSelected = state.memoFoldersToDelete.includes(folder.id);
                 const el = document.createElement('div');
                 el.className = `folder-item ${state.isMemoManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
                 el.dataset.folderId = folder.id;
                 el.dataset.action = "open-memo-folder";
-                // 新增了 sort-handle 和 rename-icon
-                el.innerHTML = `<span class="sort-handle memo-sort-handle" title="按住拖拽排序">☰</span><input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div class="folder-icon">📁</div><div class="folder-name">${folder.name}</div><span class="rename-icon" data-action="rename-memo-folder" title="重命名">&#9998;</span>`;
+                // [修改] 在HTML结构中添加项目数量信息，与相册封面对齐
+                el.innerHTML = `<span class="sort-handle memo-sort-handle" title="按住拖拽排序">☰</span><input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">📁</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${itemCount} 个项目</div><span class="rename-icon" data-action="rename-memo-folder" title="重命名">&#9998;</span>`;
                 ui.folderList.appendChild(el);
             });
             if (memoryCache.memo.folders.length === 0) ui.folderList.innerHTML = `<p class="empty-list-placeholder">没有文件夹</p>`;
         }
+
 
         function renderNotes() {
             ui.notesList.innerHTML = '';
@@ -7996,7 +8335,16 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchFilesForSelectedProject(); 
 },
 
-            'back-to-hub': () => { showPage('hub-view'); state.currentSection = null; document.getElementById('memory-modal-title').textContent = '记忆'; },
+            'back-to-hub': () => {
+                // 退出管理模式
+                if (state.isMemoManageMode) actions['toggle-memo-manage'](ui.modal.querySelector('[data-action="toggle-memo-manage"]'));
+                if (state.isAlbumManageMode) actions['toggle-album-manage'](ui.modal.querySelector('[data-action="toggle-album-manage"]'));
+                
+                showPage('hub-view'); 
+                state.currentSection = null; 
+                document.getElementById('memory-modal-title').textContent = '记忆'; 
+            },
+
             'add-memo-folder': () => { state.folderModalContext = { type: 'memo', id: null }; document.getElementById('folder-modal-title').textContent = '新文件夹'; ui.folderModal.querySelector('#folder-name-input').value = ''; ui.folderModal.classList.add('show'); },
             'add-album-folder': () => {
                 if (memoryCache.album.folders.length >= 100) { alert('相册数量已达上限（100个），请整理后再创建。'); return; }
@@ -8488,7 +8836,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let isPhotoSetMode = false;
             const isBatch = totalPhotos > 1;
             ui.photosetToggleContainer.style.display = isBatch ? 'block' : 'none';
-            ui.photosetToggle.checked = isBatch;
+            ui.photosetToggle.checked = false;
+
 
             let photosetData = { id: Date.now(), albumId: state.currentAlbumId, type: 'photoset', title: '', description: '', timestamp: Date.now(), photos: [] };
             
@@ -8508,16 +8857,29 @@ document.addEventListener('DOMContentLoaded', () => {
                         ui.photoDetailsModal.querySelector('#upload-thumbnail').src = URL.createObjectURL(file);
                         ui.photoDetailsModal.classList.add('show');
                         
-                        await new Promise(resolve => {
-                            const saveHandler = () => { state.isSavingPhoto = true; resolve(); };
-                            const skipHandler = () => { actions['skip-photo-details'](); state.isSavingPhoto = false; resolve(); };
-                            
+                        await new Promise((resolve, reject) => {
+                            const saveHandler = () => { state.isSavingPhoto = true; cleanUp(); resolve(); };
+                            const skipHandler = () => { actions['skip-photo-details'](); state.isSavingPhoto = false; cleanUp(); resolve(); };
+                            // [新增] 定义取消操作，通过 reject 中断 Promise 链
+                            const cancelHandler = () => { cleanUp(); reject(new Error('Upload cancelled by user')); };
+
                             const saveBtn = ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]');
                             const skipBtn = ui.photoDetailsModal.querySelector('[data-action="skip-photo-details"]');
+                            // [新增] 获取新添加的取消按钮
+                            const cancelBtn = ui.photoDetailsModal.querySelector('[data-action="cancel-photo-upload"]');
 
-                            saveBtn.addEventListener('click', saveHandler, { once: true });
-                            skipBtn.addEventListener('click', skipHandler, { once: true });
+                            const cleanUp = () => {
+                                saveBtn.removeEventListener('click', saveHandler);
+                                skipBtn.removeEventListener('click', skipHandler);
+                                cancelBtn.removeEventListener('click', cancelHandler);
+                            };
+                            
+                            saveBtn.addEventListener('click', saveHandler);
+                            skipBtn.addEventListener('click', skipHandler);
+                            // [新增] 为取消按钮绑定事件
+                            cancelBtn.addEventListener('click', cancelHandler);
                         });
+
                         
                         if (state.isSavingPhoto) {
                             title = document.getElementById('photo-title-input').value.trim();
@@ -8562,11 +8924,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 scheduleSave();
 
             } catch (error) {
-                showTopToast('照片上传失败，请检查网络或配置', 4000); // 显示最终失败状态
-                updateStatus('上传失败', true, error.message);
-                alert(error.message); 
-                state.photoUploadQueue = []; 
+                // [新增] 专门处理用户主动取消的逻辑
+                if (error.message === 'Upload cancelled by user') {
+                    showTopToast('上传已取消', 2000);
+                    updateStatus('已取消');
+                    ui.photoDetailsModal.classList.remove('show');
+                } else {
+                    showTopToast('照片上传失败，请检查网络或配置', 4000);
+                    updateStatus('上传失败', true, error.message);
+                    alert(error.message);
+                }
+                state.photoUploadQueue = [];
             } finally {
+
                 // [解决方案 1 清理] 无论成功或失败，都在任务结束后移除标记。
                 const index = activePhotoUploadXHRs.indexOf("photo_upload_session");
                 if (index > -1) {
@@ -9173,55 +9543,9 @@ open: async () => {
                         }
                     });
                 };
-                
-                // ============ [核心新增] 键盘适配逻辑 V1.0 ============
-                const noteEditorView = document.getElementById('note-editor-view');
-                const noteInputs = [document.getElementById('note-title-input'), editor];
-                let initialViewportHeight = window.innerHeight;
-                let isKeyboardVisible = false;
-
-                const onFocusHandler = () => {
-                    initialViewportHeight = window.innerHeight; // 聚焦时记录初始高度
-                    // 监听resize事件来检测键盘弹出
-                    window.addEventListener('resize', onResizeHandler);
-                };
-
-                const onBlurHandler = () => {
-                    // 失去焦点时，移除resize监听器以节省性能
-                    window.removeEventListener('resize', onResizeHandler);
-                    // 强制隐藏键盘并重置样式
-                    if (isKeyboardVisible) {
-                        noteEditorView.classList.remove('keyboard-visible');
-                        isKeyboardVisible = false;
-                    }
-                };
-
-                const onResizeHandler = () => {
-                    // 如果视窗高度显著减小（通常超过150px），则认为键盘已弹出
-                    if (window.innerHeight < initialViewportHeight - 150) {
-                        if (!isKeyboardVisible) {
-                            noteEditorView.classList.add('keyboard-visible');
-                            isKeyboardVisible = true;
-                        }
-                    } else { // 否则认为键盘已关闭
-                        if (isKeyboardVisible) {
-                            noteEditorView.classList.remove('keyboard-visible');
-                            isKeyboardVisible = false;
-                        }
-                    }
-                };
-
-                // 为标题输入框和内容编辑器绑定聚焦/失焦事件
-                noteInputs.forEach(input => {
-                    input.addEventListener('focus', onFocusHandler);
-                    input.addEventListener('blur', onBlurHandler);
-                });
-                // ============ [键盘适配逻辑结束] ============
-
 
                 editor.addEventListener('keyup', updateToolbarState);
                 editor.addEventListener('mouseup', updateToolbarState);
-
 
                 // [V2 新增] 监听输入事件，用于自动清理空的代码块
                 editor.addEventListener('input', () => {
@@ -9356,8 +9680,21 @@ open: async () => {
                     const li = e.target.closest('li');
                     const copyBtn = e.target.closest('.code-block-copy-btn');
                     
-                    if (li) {
+                    if (li && e.target.tagName !== 'SPAN' && !e.target.closest('.todo-text')) {
+                        // 核心修复1：只有当点击的不是文本SPAN时，才切换状态
                         li.classList.toggle('completed');
+                        
+                        // 核心修复2：确保取消勾选时删除线也被移除
+                        const textSpan = li.querySelector('.todo-text');
+                        if (textSpan) {
+                            if (li.classList.contains('completed')) {
+                                textSpan.style.textDecoration = 'line-through';
+                                textSpan.style.opacity = '0.6';
+                            } else {
+                                textSpan.style.textDecoration = 'none';
+                                textSpan.style.opacity = '1';
+                            }
+                        }
                     } else if (copyBtn) {
                         const codeBlock = copyBtn.closest('.memo-code-block');
                         const textToCopy = codeBlock.querySelector('pre')?.textContent || '';
@@ -9369,7 +9706,6 @@ open: async () => {
                     }
                     updateToolbarState();
                 });
-
                 // 为字号滑块添加事件监听
                 fontSizeSlider.addEventListener('input', () => {
                     if (fontSizeTargetSpan) {
@@ -9377,39 +9713,36 @@ open: async () => {
                     }
                 });
 
-                // ================= [新增] 备忘录工具栏悬浮逻辑 =================
-                if ('visualViewport' in window) {
-                    const toolbar = document.querySelector('.memo-toolbar');
-                    const editorView = document.getElementById('note-editor-view');
-                    const initialWindowHeight = window.innerHeight;
-
-                    window.visualViewport.addEventListener('resize', () => {
-                        // 仅当备忘录编辑器可见时才执行逻辑
-                        if (!editorView || !editorView.classList.contains('active')) {
-                            toolbar.style.transform = `translateY(0px)`;
-                            return;
-                        }
-                        
-                        // 计算键盘高度。offsetTop 提供了一个不错的近似值，对于更复杂的情况，
-                        // 用 initialHeight - height 更可靠，尤其是在分屏模式下。
-                        const keyboardHeight = initialWindowHeight - window.visualViewport.height;
-
-                        if (keyboardHeight > 100) { // 阈值，避免小的视图变化触发
-                            // 将工具栏向上移动键盘的高度
-                            toolbar.style.transform = `translateY(-${keyboardHeight}px)`;
-                        } else {
-                            // 键盘关闭，恢复原位
-                            toolbar.style.transform = `translateY(0px)`;
-                        }
-                    });
-                }
-                // ========================= [新增结束] =========================
-
                 ui.folderModal.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target) actions[target.dataset.action]?.(); });
                 ui.photoDetailsModal.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target) actions[target.dataset.action]?.(); });
                 ui.photoViewer.addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target) actions[target.dataset.action]?.(); });
                 document.getElementById('movePhotosModal').addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target && actions[target.dataset.action]) actions[target.dataset.action](target); });
-                document.getElementById('moveNotesModal').addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target && actions[target.dataset.action]) actions[target.dataset.action](target); });
+            document.getElementById('moveNotesModal').addEventListener('click', e => { const target = e.target.closest('[data-action]'); if (target && actions[target.dataset.action]) actions[target.dataset.action](target);                 });
+
+                // ★★★ [新增] 备忘录回顶按钮逻辑 ★★★
+                const noteEditorContent = document.querySelector('#memoryModal .editor-content');
+                const backToTopBtn = document.getElementById('memo-back-to-top');
+
+                if (noteEditorContent && backToTopBtn) {
+                    // 监听编辑区域的滚动事件
+                    noteEditorContent.addEventListener('scroll', () => {
+                        // 如果滚动距离大于300像素，显示按钮，否则隐藏
+                        if (noteEditorContent.scrollTop > 300) {
+                            backToTopBtn.classList.add('show');
+                        } else {
+                            backToTopBtn.classList.remove('show');
+                        }
+                    });
+
+                    // 为按钮添加点击事件，实现平滑滚动回顶部
+                    backToTopBtn.addEventListener('click', () => {
+                        noteEditorContent.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
+                        });
+                    });
+                }
+                // ★★★ [新增结束] ★★★
 
                 ui.photoUploader.addEventListener('change', e => {
                     if (!e.target.files.length) return;
@@ -9418,64 +9751,61 @@ open: async () => {
                     e.target.value = '';
                 });
 
-                // [新增] 为照片下载按钮添加分享功能
+
+
+                // [V2 优化] 为照片下载按钮添加平台差异化处理
                 document.getElementById('download-photo-btn').addEventListener('click', async (e) => {
-                    // 检查浏览器是否支持 Web Share API 的文件分享功能
-                    if (!navigator.share || !navigator.canShare) {
-                        // 如果不支持，则不执行任何操作，让 a 标签的默认下载行为发生
-                        return;
-                    }
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-                    // 如果支持，则阻止 a 标签的默认下载行为
-                    e.preventDefault();
-
-                    const downloadBtn = e.currentTarget;
-                    const imageUrl = downloadBtn.href;
-                    const title = downloadBtn.download || '分享的图片';
-
-                    try {
-                        // 显示加载提示，提升用户体验
-                        showTopToast('正在准备图片...', 60000); 
-
-                        // 使用 fetch API 获取图片数据
-                        const response = await fetch(imageUrl);
-                        if (!response.ok) {
-                            throw new Error('下载图片失败，无法分享。');
-                        }
-                        const blob = await response.blob();
+                    // 如果是 iOS 设备，则执行分享逻辑
+                    if (isIOS) {
+                        // 阻止 a 标签的默认下载行为
+                        e.preventDefault();
                         
-                        // 创建一个 File 对象，这是 navigator.share 所需的格式
-                        const file = new File([blob], title, { type: blob.type });
-
-                        // 移除加载提示
-                        const existingToast = document.querySelector('.top-toast');
-                        if (existingToast) existingToast.remove();
-
-                        // 再次确认浏览器能分享此类文件
-                        if (navigator.canShare({ files: [file] })) {
-                            // 调用原生分享
-                            await navigator.share({
-                                files: [file],
-                                title: title,
-                                text: '来自 Jellyfish Island 的分享'
-                            });
-                        } else {
-                             // 如果文件类型由于某些原因无法分享，则回退到传统下载
-                            alert('您的浏览器不支持分享此类型的文件，将尝试直接下载。');
-                            const link = document.createElement('a');
-                            link.href = imageUrl;
-                            link.download = title;
-                            link.click();
+                        // 检查浏览器是否支持 Web Share API 的文件分享功能
+                        if (!navigator.share || !navigator.canShare) {
+                            alert('您的浏览器不支持分享功能。');
+                            return;
                         }
-                    } catch (error) {
-                        // 移除加载提示
-                        const existingToast = document.querySelector('.top-toast');
-                        if (existingToast) existingToast.remove();
-                        // 如果用户手动关闭分享面板，会触发 AbortError，我们不应将其视为错误
-                        if (error.name !== 'AbortError') {
-                            console.error('分享图片时出错:', error);
-                            alert('无法分享图片: ' + error.message);
+
+                        const shareBtn = e.currentTarget;
+                        const imageUrl = shareBtn.href;
+                        const title = shareBtn.download || '分享的图片';
+
+                        try {
+                            showTopToast('正在准备图片...', 60000); 
+
+                            const response = await fetch(imageUrl);
+                            if (!response.ok) throw new Error('下载图片失败，无法分享。');
+                            
+                            const blob = await response.blob();
+                            const file = new File([blob], title, { type: blob.type });
+
+                            const existingToast = document.querySelector('.top-toast');
+                            if (existingToast) existingToast.remove();
+
+                            if (navigator.canShare({ files: [file] })) {
+                                await navigator.share({
+                                    files: [file],
+                                    title: title,
+                                    text: '来自 Jellyfish Island 的分享'
+                                });
+                            } else {
+                                alert('您的浏览器不支持分享此类型的文件。');
+                            }
+                        } catch (error) {
+                            const existingToast = document.querySelector('.top-toast');
+                            if (existingToast) existingToast.remove();
+                            if (error.name !== 'AbortError') {
+                                console.error('分享图片时出错:', error);
+                                alert('无法分享图片: ' + error.message);
+                            }
                         }
+                    }
+                    // 如果是安卓或电脑设备，不执行任何操作，让<a>标签的download属性自然生效
+                    else {
+                        // 此处无需代码，浏览器将自动处理下载
+                        return;
                     }
                 });
 
@@ -9993,7 +10323,9 @@ open: async () => {
             const displayName = sm.renameInput.value.trim();
             if (!displayName) { alert("请输入歌曲名称。"); return; }
             
-            const finalMusicFilename = displayName + '.mp3';
+            // [核心修正] 从原始文件名动态获取扩展名，而不是写死.mp3
+            const originalExtension = state.pendingMusicFile.name.slice(state.pendingMusicFile.name.lastIndexOf('.'));
+            const finalMusicFilename = displayName + originalExtension;
             const finalLrcFilename = displayName + '.lrc';
             sm.confirmUploadBtn.textContent = "取消上传 (0%)";
             sm.confirmUploadBtn.disabled = false;
@@ -10014,7 +10346,7 @@ open: async () => {
             } catch (e) { if (e.message !== "上传已取消。") alert(await handleApiError(`上传歌曲 ${displayName}`, e)); } 
             finally { sm.confirmUploadBtn.textContent = "确认上传"; sm.confirmUploadBtn.disabled = false; }
         }
-        
+
         function resetUploadForm() {
             const sm = ui.settingsModal;
             state.pendingMusicFile = null; state.pendingLrcFile = null;
@@ -12347,6 +12679,126 @@ open: async () => {
                     MemoryApp.scheduleSave(); // 复用 MemoryApp 的保存逻辑
                 }
             });
+/* =============================================================== */
+/* ================ [新增] 摇摆挂件设置功能逻辑 =================== */
+/* =============================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+
+    // 1. 获取所有需要的DOM元素
+    const pendantShape = document.getElementById('pendant-shape');
+    const pendantContainer = document.getElementById('pendant-container');
+    const settingsModal = document.getElementById('pendant-settings-modal');
+    
+    // 如果挂件元素不存在，则直接退出，避免报错
+    if (!pendantShape || !pendantContainer || !settingsModal) {
+        console.warn("摇摆挂件所需的核心元素未找到，功能将不被初始化。");
+        return;
+    }
+    
+    const lineLengthSlider = document.getElementById('line-length-slider');
+    const lineLengthValue = document.getElementById('line-length-value');
+    const lineColorPicker = document.getElementById('line-color-picker');
+    const shapeInput = document.getElementById('pendant-shape-input');
+    const applyBtn = document.getElementById('apply-pendant-settings');
+    const resetBtn = document.getElementById('reset-pendant-settings');
+
+    const PENDANT_CONFIG_KEY = 'jellyfish_pendant_config';
+
+    // 2. 默认设置
+    const defaultSettings = {
+        lineLength: '5rem',
+        lineColor: '#000000',
+        shapeContent: 'https://tc.z.wiki/autoupload/fr/0x9Zm_rdfaeRRjK8iV0xPw5cKjQnMC1OZdesfpjt90qyl5f0KlZfm6UsKj-HyTuv/20251105/Nh10/1024X440/IMG_7008.png?imageMogr2/thumbnail/100x'
+    };
+
+    // 3. 应用设置到DOM的函数
+    function applySettings(settings) {
+        // 应用CSS变量
+        pendantContainer.style.setProperty('--line-length', settings.lineLength);
+        pendantContainer.style.setProperty('--line-color', settings.lineColor);
+
+        // 更新挂件内容
+        const isUrl = settings.shapeContent.startsWith('http') || settings.shapeContent.startsWith('/');
+        if (isUrl) {
+            pendantShape.innerHTML = `<img src="${settings.shapeContent}" alt="挂件" id="pendant-img">`;
+        } else {
+            pendantShape.innerHTML = `<span class="emoji">${settings.shapeContent}</span>`;
+        }
+    }
+
+    // 4. 加载设置的函数
+    function loadSettings() {
+        let savedSettings;
+        try {
+            savedSettings = JSON.parse(localStorage.getItem(PENDANT_CONFIG_KEY));
+        } catch (e) {
+            savedSettings = null;
+        }
+        
+        const settings = { ...defaultSettings, ...savedSettings };
+        
+        applySettings(settings);
+        
+        // 更新设置弹窗内的UI状态
+        lineLengthSlider.value = parseFloat(settings.lineLength);
+        lineLengthValue.textContent = `${settings.lineLength}`;
+        lineColorPicker.value = settings.lineColor;
+        shapeInput.value = settings.shapeContent;
+    }
+
+    // 5. 事件监听器
+    
+    // 点击挂件，打开设置弹窗
+    pendantShape.addEventListener('click', (e) => {
+        e.stopPropagation(); // 防止事件冒泡
+        settingsModal.classList.add('show');
+    });
+
+    // 滑块实时更新显示值
+    lineLengthSlider.addEventListener('input', () => {
+        lineLengthValue.textContent = `${lineLengthSlider.value}rem`;
+    });
+
+    // 应用按钮点击事件
+    applyBtn.addEventListener('click', () => {
+        const newSettings = {
+            lineLength: `${lineLengthSlider.value}rem`,
+            lineColor: lineColorPicker.value,
+            shapeContent: shapeInput.value.trim() || '🪼' // 如果为空，则默认为水母emoji
+        };
+
+        // 保存到localStorage
+        localStorage.setItem(PENDANT_CONFIG_KEY, JSON.stringify(newSettings));
+
+        
+        // 应用新设置
+        applySettings(newSettings);
+        
+        // 关闭弹窗
+        settingsModal.classList.remove('show');
+
+        // 显示成功提示 (复用你的showTopToast函数)
+        if (typeof showTopToast === 'function') {
+            showTopToast("挂件设置已保存！", 2000);
+        }
+    });
+
+    // 恢复默认按钮点击事件
+    resetBtn.addEventListener('click', () => {
+        if (confirm("确定要恢复挂件的默认设置吗？")) {
+            // 移除本地存储
+            localStorage.removeItem(PENDANT_CONFIG_KEY);
+            // 重新加载默认设置
+            loadSettings();
+             // 关闭弹窗
+            settingsModal.classList.remove('show');
+        }
+    });
+    
+    // 页面加载时，立即加载并应用设置
+    loadSettings();
+});
+
     </script>
     <!-- ★★★ 新增：社区须知弹窗 ★★★ -->
     <div class="modal-overlay" id="communityNoticeModal">
@@ -12508,18 +12960,60 @@ open: async () => {
             </div>
             <div class="modal-body">
                 <p style="color: #e53e3e; font-weight: bold;">⚠️ 警告：此操作不可逆，请谨慎选择！</p>
-                <div id="clear-options-container" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
-                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03);"><input type="checkbox" data-clear-target="config" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>主配置和按钮</strong><br><span style="font-size: 12px; color: #889;">(config.json)</span></div></label>
-                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03);"><input type="checkbox" data-clear-target="memory" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>记忆数据 (备忘录/相册结构)</strong><br><span style="font-size: 12px; color: #889;">(memory/data.json)</span></div></label>
-                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03);"><input type="checkbox" data-clear-target="photos" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>相册照片文件</strong><br><span style="font-size: 12px; color: #889;">(/memory/photos/ 文件夹)</span></div></label>
-                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03);"><input type="checkbox" data-clear-target="music" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>漫游音乐及歌词</strong><br><span style="font-size: 12px; color: #889;">(/memory/music/ 等)</span></div></label>
-                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03);"><input type="checkbox" data-clear-target="projects" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>上传的项目文件</strong><br><span style="font-size: 12px; color: #889;">(/projects/ 文件夹)</span></div></label>
-                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03);"><input type="checkbox" data-clear-target="drive" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>文件夹(云盘)文件</strong><br><span style="font-size: 12px; color: #889;">(/jellyfish_drive/ 文件夹)</span></div></label>
-                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03);"><input type="checkbox" data-clear-target="local" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>浏览器本地缓存</strong><br><span style="font-size: 12px; color: #889;">(主题、背景、GitHub配置等)</span></div></label>
+                <!-- [V2 修正] 调整样式并为JS交互做准备 -->
+                <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid rgba(128,128,128,0.2); margin: 15px 0; cursor: pointer;">
+                    <input type="checkbox" id="selectAllClearOptions" style="width: 16px; height: 16px; flex-shrink: 0;">
+                    <strong style="user-select: none; font-size: 14px; font-weight: 600;">一键全选</strong>
+                </label>
+                <div id="clear-options-container" style="display: flex; flex-direction: column; gap: 15px;">
+                    <!-- 选项列表保持不变，但移除了margin-top -->
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03); cursor: pointer;"><input type="checkbox" data-clear-target="config" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>主配置和按钮</strong><br><span style="font-size: 12px; color: #889;">(config.json)</span></div></label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03); cursor: pointer;"><input type="checkbox" data-clear-target="memory" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>记忆数据 (备忘录/相册结构)</strong><br><span style="font-size: 12px; color: #889;">(memory/data.json)</span></div></label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03); cursor: pointer;"><input type="checkbox" data-clear-target="photos" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>相册照片文件</strong><br><span style="font-size: 12px; color: #889;">(/memory/photos/ 文件夹)</span></div></label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03); cursor: pointer;"><input type="checkbox" data-clear-target="music" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>漫游音乐及歌词</strong><br><span style="font-size: 12px; color: #889;">(/memory/music/ 等)</span></div></label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03); cursor: pointer;"><input type="checkbox" data-clear-target="projects" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>上传的项目文件</strong><br><span style="font-size: 12px; color: #889;">(/projects/ 文件夹)</span></div></label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03); cursor: pointer;"><input type="checkbox" data-clear-target="drive" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>文件夹(云盘)文件</strong><br><span style="font-size: 12px; color: #889;">(/jellyfish_drive/ 文件夹)</span></div></label>
+                    <label style="display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.03); cursor: pointer;"><input type="checkbox" data-clear-target="local" style="width: 18px; height: 18px; flex-shrink: 0;"><div><strong>浏览器本地缓存</strong><br><span style="font-size: 12px; color: #889;">(主题、背景、GitHub配置等)</span></div></label>
                 </div>
                 <button id="confirmSelectiveClearBtn" class="modal-button" style="margin-top: 20px; background: #e53e3e; color: white;">清除选中项</button>
             </div>
         </div>
     </div>
+<!-- ===== [新增] 摇摆挂件设置弹窗 ===== -->
+<div class="modal-overlay" id="pendant-settings-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="modal-title-group"><span>挂件设置</span></div>
+            <button class="close-btn" data-modal-id="pendant-settings-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- 调节线长 -->
+            <div class="pendant-settings-group">
+                <label for="line-length-slider">绳子长度</label>
+                <div class="slider-container">
+                    <input type="range" id="line-length-slider" min="0" max="15" value="5" step="0.5">
+                    <span id="line-length-value" class="slider-value">5 rem</span>
+                </div>
+            </div>
+
+            <!-- 调节颜色 -->
+            <div class="pendant-settings-group">
+                <label for="line-color-picker">绳子颜色</label>
+                <input type="color" id="line-color-picker" class="modal-input" value="#000000" style="padding: 5px; height: 40px;">
+            </div>
+
+            <!-- 更换形状/图片 -->
+            <div class="pendant-settings-group">
+                <label for="pendant-shape-input">挂件内容 (Emoji或图片链接)</label>
+                <input type="text" id="pendant-shape-input" class="modal-input" placeholder="输入单个Emoji或一个图片URL">
+            </div>
+
+            <!-- 应用按钮 -->
+            <button id="apply-pendant-settings" class="modal-button primary" style="color: var(--hold-border);">应用更改</button>
+            <button id="reset-pendant-settings" class="modal-button" style="color: #889;">恢复默认</button>
+        </div>
+    </div>
+</div>
+<!-- ===== [新增结束] ===== -->
 </body>
 </html>
