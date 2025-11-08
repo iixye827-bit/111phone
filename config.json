@@ -113,6 +113,12 @@
     "usageTime": {},
     "mobileMode": {
       "enabled": false
+    },
+    "checkInData": {
+      "total": 0,
+      "dates": [
+        "2025-11-08"
+      ]
     }
   },
   "themePresets": [
