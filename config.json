@@ -112,7 +112,7 @@
     },
     "usageTime": {},
     "mobileMode": {
-      "enabled": false
+      "enabled": true
     },
     "checkInData": {
       "total": 0,
