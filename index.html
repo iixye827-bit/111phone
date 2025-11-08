@@ -3860,6 +3860,156 @@ body.dark-mode .pendant-settings-group label {
     min-width: 3em; /* 保证宽度，防止跳动 */
     text-align: right;
 }
+/* =============================================================== */
+/* ============= [新增] 挂件设置悬浮窗升级样式 V1.0 =========== */
+/* =============================================================== */
+
+/* 重构 modal-body 以支持页面切换 */
+#pendant-settings-modal .modal-body {
+    padding: 15px 15px 80px 15px; /* 关键：为底部胶囊栏留出空间 */
+    position: relative; /* 为页面切换容器提供定位基准 */
+    overflow: hidden; /* 隐藏页面切换时的溢出 */
+}
+
+/* 页面容器的样式 (修正版) */
+.widget-hub-page {
+    /* 移除了 position: absolute 和相关的 top/left/right/bottom */
+    width: 100%;
+    height: 100%;
+    display: none; /* 默认隐藏所有页面 */
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto; /* 当页面内容过多时，允许独立滚动 */
+    padding-right: 5px; /* 为滚动条留出空间，防止内容挤压 */
+    margin-right: -5px;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+
+/* 活动页面的显示样式 */
+.widget-hub-page.active {
+    display: flex; /* 改为 flex 以便内部布局 */
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* [新增] 底部悬浮胶囊导航栏 */
+#widget-hub-capsule {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    right: 15px;
+    height: 60px;
+    background: var(--bg-day-element);
+    border-radius: 30px; /* 胶囊形状 */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1),
+                inset 2px 2px 4px var(--shadow-dark-day),
+                inset -2px -2px 4px var(--shadow-light-day);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+body.dark-mode #widget-hub-capsule {
+    background: var(--bg-night-element);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2),
+                inset 2px 2px 4px var(--shadow-dark-night),
+                inset -2px -2px 4px var(--shadow-light-night);
+}
+body.theme-glass #widget-hub-capsule {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+}
+body.theme-glass.dark-mode #widget-hub-capsule {
+    background: rgba(20, 20, 20, 0.35);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+
+/* 胶囊内的按钮样式 */
+.capsule-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 20px; /* 为了点击效果 */
+    padding: 6px 0;
+    transition: background-color 0.2s, transform 0.2s, color 0.3s;
+    color: #889; /* 默认图标和文字颜色 */
+}
+
+/* 按钮内的SVG图标样式 */
+.capsule-btn svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+body.dark-mode .capsule-btn, body.dark-mode .capsule-btn span {
+    color: #a0aec0;
+}
+.capsule-btn:not(.active) svg path,
+.capsule-btn:not(.active) svg rect {
+    fill: #889 !important; /* 强制未激活的图标为灰色 */
+}
+body.dark-mode .capsule-btn:not(.active) svg path,
+body.dark-mode .capsule-btn:not(.active) svg rect {
+    fill: #a0aec0 !important; /* 夜间模式未激活的图标颜色 */
+}
+
+
+/* 按钮内的文字样式 */
+.capsule-btn span {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* 激活状态的按钮样式 */
+.capsule-btn.active {
+    color: var(--hold-border); /* 激活时文字颜色高亮 */
+    font-weight: 700;
+}
+.capsule-btn.active svg {
+    transform: scale(1.1); /* 激活时图标放大 */
+}
+.capsule-btn.active svg path,
+.capsule-btn.active svg rect {
+    fill: var(--hold-border) !important; /* 激活时图标颜色高亮 */
+}
+
+/* 按钮点击效果 */
+.capsule-btn:active {
+    transform: scale(0.95);
+}
+
+/* 占位符样式 */
+.placeholder-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 18px;
+    color: #ccc;
+    font-weight: 600;
+    user-select: none;
+}
+body.dark-mode .placeholder-content {
+    color: #666;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
 
     </style>
 
@@ -4429,8 +4579,8 @@ body.dark-mode .pendant-settings-group label {
                         <div class="preset-row">
                             <select id="presetSelector" class="modal-select" style="flex-grow: 1;"></select>
                             <button id="addColorPresetBtn" title="添加新预设" class="modal-button" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">+</button>
-                            <button id="updateColorPresetBtn" title="更新当前预设" class="modal-button" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">↻</button>
-                            <button id="deleteColorPresetBtn" title="删除当前预设" class="modal-button delete" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">🗑</button>
+                            <button id="updateColorPresetBtn" title="更新当前预设" class="modal-button" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 24 24" style="vertical-align: middle;"> <path fill-rule="evenodd" clip-rule="evenodd" d="M6.00283 5.97646C7.54105 4.44489 9.65927 3.5 12.0001 3.5C16.6945 3.5 20.5001 7.30558 20.5001 12V13H22.5001V12C22.5001 6.20101 17.7991 1.5 12.0001 1.5C9.21634 1.5 6.52096 2.62797 4.55516 4.59569L2.51245 6.84208L3.99216 8.18762L6.00283 5.97646Z" fill="currentColor"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M4.5 1.5V6.5H9.5V8.5H2.5V1.5H4.5Z" fill="currentColor"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M17.9972 18.0235C16.4589 19.5551 14.3407 20.5 11.9999 20.5C7.30551 20.5 3.49993 16.6944 3.49993 12V11H1.49993V12C1.49993 17.799 6.20094 22.5 11.9999 22.5C14.901 22.5 17.5289 21.3221 19.4282 19.4209L21.4875 17.1579L20.0078 15.8124L17.9972 18.0235Z" fill="currentColor" data-color="color-2"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M19.5 22.5V17.5H14.5V15.5H21.5V22.5H19.5Z" fill="currentColor" data-color="color-2"></path> </svg></button>
+                            <button id="deleteColorPresetBtn" title="删除当前预设" class="modal-button delete" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 24 24" style="vertical-align: middle;"><path d="m4.458,9l.463,11.125c.067,1.612,1.384,2.875,2.998,2.875h8.163c1.613,0,2.93-1.263,2.998-2.875l.463-11.125H4.458Z" stroke-width="0" fill="currentColor"></path><path d="m16,5V1h-8v4H2v2h20v-2h-6Zm-6-2h4v2h-4v-2Z" fill="currentColor" stroke-width="0" data-color="color-2"></path></svg></button>
                         </div>
                     </div>
                     <div class="toggle-section"><span>每次启动时随机应用预设</span><label class="toggle-switch"><input type="checkbox" id="randomPaletteToggle"><span class="slider"></span></label></div>
@@ -4476,8 +4626,8 @@ body.dark-mode .pendant-settings-group label {
                     <div class="preset-row" style="margin-top: 15px;">
                         <select id="fontPresetSelector" class="modal-select" style="flex-grow: 1;"></select>
                         <button id="addFontPresetBtn" title="添加新预设" class="modal-button" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">+</button>
-                        <button id="updateFontPresetBtn" title="修改预设名" class="modal-button" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">✎</button>
-                        <button id="deleteFontPresetBtn" title="删除当前预设" class="modal-button delete" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;">🗑</button>
+                        <button id="updateFontPresetBtn" title="修改预设名" class="modal-button" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 24 24" style="vertical-align: middle;"><rect x="1" y="20" width="22" height="2" fill="currentColor" stroke-width="0" data-color="color-2"></rect><path d="m18.875,2.125c-1.492-1.493-3.922-1.493-5.414,0L4.079,11.507l-1.354,6.768,6.768-1.354,9.382-9.382c1.493-1.493,1.493-3.921,0-5.414Zm-1.414,4l-.875.875-2.586-2.586.875-.875c.713-.713,1.873-.713,2.586,0s.713,1.873,0,2.586Z" stroke-width="0" fill="currentColor"></path></svg></button>
+                        <button id="deleteFontPresetBtn" title="删除当前预设" class="modal-button delete" style="width: auto; padding: 12px; font-size: 16px; flex-shrink: 0;"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 24 24" style="vertical-align: middle;"><path d="m4.458,9l.463,11.125c.067,1.612,1.384,2.875,2.998,2.875h8.163c1.613,0,2.93-1.263,2.998-2.875l.463-11.125H4.458Z" stroke-width="0" fill="currentColor"></path><path d="m16,5V1h-8v4H2v2h20v-2h-6Zm-6-2h4v2h-4v-2Z" fill="currentColor" stroke-width="0" data-color="color-2"></path></svg></button>
                     </div>
                 </div>
                 <!-- [新增结束] -->
@@ -4781,7 +4931,7 @@ body.dark-mode #floating-jellyfish-ball {
                         </div>
                         <!-- [V3] 最终版工具栏布局：所有按钮平铺，由 Flexbox 自动均分间距 -->
                         <div class="memo-toolbar">
-                            <button class="toolbar-btn" data-command="todo" title="待办清单">✓</button>
+                            <button class="toolbar-btn" data-command="todo" title="待办清单"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20px" height="20px" viewBox="0 0 24 24" style="vertical-align: middle;"><polyline data-color="color-2" points="7 13 10 16 17 8" fill="none" stroke="currentColor" stroke-linecap="square" stroke-miterlimit="10" stroke-width="2"></polyline><rect x="2" y="2" width="20" height="20" rx="2" ry="2" fill="none" stroke="currentColor" stroke-linecap="square" stroke-miterlimit="10" stroke-width="2"></rect></svg></button>
                             <button class="toolbar-btn" data-command="bold" title="加粗">B</button>
                             <button class="toolbar-btn" data-command="italic" title="斜体">I</button>
                             <button class="toolbar-btn" data-command="underline" title="下划线">U</button>
@@ -8096,7 +8246,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.dataset.folderId = folder.id;
                 el.dataset.action = "open-memo-folder";
                 // [修改] 在HTML结构中添加项目数量信息，与相册封面对齐
-                el.innerHTML = `<span class="sort-handle memo-sort-handle" title="按住拖拽排序">☰</span><input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">📁</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${itemCount} 个项目</div><span class="rename-icon" data-action="rename-memo-folder" title="重命名">&#9998;</span>`;
+                el.innerHTML = `<span class="sort-handle memo-sort-handle" title="按住拖拽排序">☰</span><input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">📁</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${itemCount} 个项目</div><span class="rename-icon" data-action="rename-memo-folder" title="重命名"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20px" height="20px" viewBox="0 0 24 24" style="vertical-align: middle;"><path d="m18,22H5c-1.654,0-3-1.346-3-3V6c0-1.654,1.346-3,3-3h6v2h-6c-.552,0-1,.449-1,1v13c0,.551,.448,1,1,1h13c.552,0,1-.449,1-1v-6h2v6c0,1.654-1.346,3-3,3Z" stroke-width="0" fill="currentColor"></path><path d="m21.707,2.293c-1.178-1.18-3.236-1.18-4.414,0l-9.196,9.196-1.471,5.886,5.886-1.472,9.195-9.196c1.217-1.217,1.217-3.197,0-4.414Zm-1.414,3l-1.707,1.707-1.586-1.586,1.707-1.707c.424-.424,1.162-.424,1.586,0,.437.437,.437,1.149,0,1.586Z" fill="currentColor" stroke-width="0" data-color="color-2"></path></svg></span>`;
+
                 ui.folderList.appendChild(el);
             });
             if (memoryCache.memo.folders.length === 0) ui.folderList.innerHTML = `<p class="empty-list-placeholder">没有文件夹</p>`;
@@ -8134,7 +8285,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.className = `album-item ${state.isAlbumManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
                 el.dataset.albumId = folder.id;
                 el.dataset.action = "open-album-folder";
-                el.innerHTML = `<span class="sort-handle" title="按住拖拽排序">☰</span><input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">🖼️</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${itemCount} 个项目</div><span class="rename-icon" data-action="rename-album" title="重命名">&#9998;</span>`;
+                el.innerHTML = `<span class="sort-handle" title="按住拖拽排序">☰</span><input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div><div class="folder-icon">🖼️</div><div class="folder-name">${folder.name}</div></div><div class="album-info">${itemCount} 个项目</div><span class="rename-icon" data-action="rename-album" title="重命名"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20px" height="20px" viewBox="0 0 24 24" style="vertical-align: middle;"><path d="m18,22H5c-1.654,0-3-1.346-3-3V6c0-1.654,1.346-3,3-3h6v2h-6c-.552,0-1,.449-1,1v13c0,.551,.448,1,1,1h13c.552,0,1-.449,1-1v-6h2v6c0,1.654-1.346,3-3,3Z" stroke-width="0" fill="currentColor"></path><path d="m21.707,2.293c-1.178-1.18-3.236-1.18-4.414,0l-9.196,9.196-1.471,5.886,5.886-1.472,9.195-9.196c1.217-1.217,1.217-3.197,0-4.414Zm-1.414,3l-1.707,1.707-1.586-1.586,1.707-1.707c.424-.424,1.162-.424,1.586,0,.437.437,.437,1.149,0,1.586Z" fill="currentColor" stroke-width="0" data-color="color-2"></path></svg></span>`;
+
 
 
                 
@@ -12798,6 +12950,134 @@ document.addEventListener('DOMContentLoaded', () => {
     // 页面加载时，立即加载并应用设置
     loadSettings();
 });
+/* =============================================================== */
+/* ================ [新增] 摇摆挂件设置功能逻辑 ================= */
+/* =============================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+
+    // 1. 获取所有需要的DOM元素
+    const pendantShape = document.getElementById('pendant-shape');
+    const pendantContainer = document.getElementById('pendant-container');
+    const settingsModal = document.getElementById('pendant-settings-modal');
+    
+    // 如果挂件元素不存在，则直接退出，避免报错
+    if (!pendantShape || !pendantContainer || !settingsModal) {
+        console.warn("摇摆挂件所需的核心元素未找到，功能将不被初始化。");
+        return;
+    }
+    
+    // 挂件原始设置相关
+    const lineLengthSlider = document.getElementById('line-length-slider');
+    const lineLengthValue = document.getElementById('line-length-value');
+    const lineColorPicker = document.getElementById('line-color-picker');
+    const shapeInput = document.getElementById('pendant-shape-input');
+    const applyBtn = document.getElementById('apply-pendant-settings');
+    const resetBtn = document.getElementById('reset-pendant-settings');
+
+    // 新的胶囊导航和页面相关
+    const capsuleContainer = document.getElementById('widget-hub-capsule');
+    const modalTitle = document.getElementById('pendant-modal-title').querySelector('span');
+
+    const PENDANT_CONFIG_KEY = 'jellyfish_pendant_config';
+
+    // 2. 默认设置
+    const defaultSettings = {
+        lineLength: '5rem',
+        lineColor: '#000000',
+        shapeContent: 'https://tc.z.wiki/autoupload/fr/0x9Zm_rdfaeRRjK8iV0xPw5cKjQnMC1OZdesfpjt90qyl5f0KlZfm6UsKj-HyTuv/20251105/Nh10/1024X440/IMG_7008.png?imageMogr2/thumbnail/100x'
+    };
+
+    // 3. 应用设置到DOM的函数
+    function applySettings(settings) {
+        pendantContainer.style.setProperty('--line-length', settings.lineLength);
+        pendantContainer.style.setProperty('--line-color', settings.lineColor);
+        const isUrl = settings.shapeContent.startsWith('http') || settings.shapeContent.startsWith('/');
+        if (isUrl) {
+            pendantShape.innerHTML = `<img src="${settings.shapeContent}" alt="挂件" id="pendant-img">`;
+        } else {
+            pendantShape.innerHTML = `<span class="emoji">${settings.shapeContent}</span>`;
+        }
+    }
+
+    // 4. 加载设置的函数
+    function loadSettings() {
+        let savedSettings;
+        try {
+            savedSettings = JSON.parse(localStorage.getItem(PENDANT_CONFIG_KEY));
+        } catch (e) {
+            savedSettings = null;
+        }
+        const settings = { ...defaultSettings, ...savedSettings };
+        applySettings(settings);
+        lineLengthSlider.value = parseFloat(settings.lineLength);
+        lineLengthValue.textContent = `${settings.lineLength}`;
+        lineColorPicker.value = settings.lineColor;
+        shapeInput.value = settings.shapeContent;
+    }
+
+    // 5. 新的页面切换函数
+    function switchHubPage(targetId, title) {
+        // 移除所有按钮和页面的 active 类
+        capsuleContainer.querySelectorAll('.capsule-btn').forEach(btn => btn.classList.remove('active'));
+        settingsModal.querySelectorAll('.widget-hub-page').forEach(page => page.classList.remove('active'));
+
+        // 为目标按钮和页面添加 active 类
+        const targetButton = capsuleContainer.querySelector(`[data-target="${targetId}"]`);
+        const targetPage = document.getElementById(targetId);
+        
+        if(targetButton) targetButton.classList.add('active');
+        if(targetPage) targetPage.classList.add('active');
+
+        // 更新弹窗标题
+        if(modalTitle) modalTitle.textContent = title || '挂件中心';
+    }
+
+
+    // 6. 事件监听器
+    pendantShape.addEventListener('click', (e) => {
+        e.stopPropagation();
+        settingsModal.classList.add('show');
+        // 每次打开时，默认显示"设置"页面
+        switchHubPage('widget-page-settings', '页面设置');
+    });
+
+    // 为胶囊导航容器添加事件委托
+    capsuleContainer.addEventListener('click', (e) => {
+        const button = e.target.closest('.capsule-btn');
+        if (button) {
+            switchHubPage(button.dataset.target, button.dataset.title);
+        }
+    });
+
+    lineLengthSlider.addEventListener('input', () => {
+        lineLengthValue.textContent = `${lineLengthSlider.value}rem`;
+    });
+
+    applyBtn.addEventListener('click', () => {
+        const newSettings = {
+            lineLength: `${lineLengthSlider.value}rem`,
+            lineColor: lineColorPicker.value,
+            shapeContent: shapeInput.value.trim() || '🪼'
+        };
+        localStorage.setItem(PENDANT_CONFIG_KEY, JSON.stringify(newSettings));
+        applySettings(newSettings);
+        settingsModal.classList.remove('show');
+        if (typeof showTopToast === 'function') {
+            showTopToast("挂件设置已保存！", 2000);
+        }
+    });
+
+    resetBtn.addEventListener('click', () => {
+        if (confirm("确定要恢复挂件的默认设置吗？")) {
+            localStorage.removeItem(PENDANT_CONFIG_KEY);
+            loadSettings();
+            settingsModal.classList.remove('show');
+        }
+    });
+    
+    // 页面加载时，立即加载并应用设置
+    loadSettings();
+});
 
     </script>
     <!-- ★★★ 新增：社区须知弹窗 ★★★ -->
@@ -12979,41 +13259,79 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         </div>
     </div>
-<!-- ===== [新增] 摇摆挂件设置弹窗 ===== -->
+<!-- ===== [重构] 全新挂件设置悬浮窗 V2.0 ===== -->
 <div class="modal-overlay" id="pendant-settings-modal">
     <div class="modal-content">
         <div class="modal-header">
-            <div class="modal-title-group"><span>挂件设置</span></div>
+            <!-- 标题会由JS动态改变 -->
+            <div class="modal-title-group" id="pendant-modal-title"><span>挂件中心</span></div>
             <button class="close-btn" data-modal-id="pendant-settings-modal">&times;</button>
         </div>
+        
         <div class="modal-body">
-            <!-- 调节线长 -->
-            <div class="pendant-settings-group">
-                <label for="line-length-slider">绳子长度</label>
-                <div class="slider-container">
-                    <input type="range" id="line-length-slider" min="0" max="15" value="5" step="0.5">
-                    <span id="line-length-value" class="slider-value">5 rem</span>
+            <!-- 页面1: 签到 -->
+            <div class="widget-hub-page" id="widget-page-checkin">
+                <p class="placeholder-content">签到功能开发中...</p>
+            </div>
+
+            <!-- 页面2: 使用时长 -->
+            <div class="widget-hub-page" id="widget-page-usage">
+                <p class="placeholder-content">使用时长统计开发中...</p>
+            </div>
+
+            <!-- 页面3: 留言板 -->
+            <div class="widget-hub-page" id="widget-page-board">
+                <p class="placeholder-content">留言板功能开发中...</p>
+            </div>
+            
+            <!-- 页面4: 页面设置 (包含原有功能) -->
+            <div class="widget-hub-page" id="widget-page-settings">
+                <!-- 调节线长 -->
+                <div class="pendant-settings-group">
+                    <label for="line-length-slider">绳子长度</label>
+                    <div class="slider-container">
+                        <input type="range" id="line-length-slider" min="0" max="15" value="5" step="0.5">
+                        <span id="line-length-value" class="slider-value">5 rem</span>
+                    </div>
                 </div>
+                <!-- 调节颜色 -->
+                <div class="pendant-settings-group">
+                    <label for="line-color-picker">绳子颜色</label>
+                    <input type="color" id="line-color-picker" class="modal-input" value="#000000" style="padding: 5px; height: 40px;">
+                </div>
+                <!-- 更换形状/图片 -->
+                <div class="pendant-settings-group">
+                    <label for="pendant-shape-input">挂件内容 (Emoji或图片链接)</label>
+                    <input type="text" id="pendant-shape-input" class="modal-input" placeholder="输入单个Emoji或一个图片URL">
+                </div>
+                <!-- 应用按钮 -->
+                <button id="apply-pendant-settings" class="modal-button primary" style="color: var(--hold-border);">应用更改</button>
+                <button id="reset-pendant-settings" class="modal-button" style="color: #889;">恢复默认</button>
             </div>
 
-            <!-- 调节颜色 -->
-            <div class="pendant-settings-group">
-                <label for="line-color-picker">绳子颜色</label>
-                <input type="color" id="line-color-picker" class="modal-input" value="#000000" style="padding: 5px; height: 40px;">
-            </div>
+        </div>
 
-            <!-- 更换形状/图片 -->
-            <div class="pendant-settings-group">
-                <label for="pendant-shape-input">挂件内容 (Emoji或图片链接)</label>
-                <input type="text" id="pendant-shape-input" class="modal-input" placeholder="输入单个Emoji或一个图片URL">
-            </div>
-
-            <!-- 应用按钮 -->
-            <button id="apply-pendant-settings" class="modal-button primary" style="color: var(--hold-border);">应用更改</button>
-            <button id="reset-pendant-settings" class="modal-button" style="color: #889;">恢复默认</button>
+        <!-- 全新的胶囊导航栏 -->
+        <div id="widget-hub-capsule">
+            <button class="capsule-btn" data-target="widget-page-checkin" data-title="签到">
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24"><rect x="6" y="0" width="2" height="5" fill="#1c1f21"></rect><rect x="16" y="0" width="2" height="5" fill="#1c1f21"></rect><path d="m20,3H4c-1.654,0-3,1.346-3,3v12c0,1.654,1.346,3,3,3h16c1.654,0,3-1.346,3-3V6c0-1.654-1.346-3-3-3Zm0,16H4c-.551,0-1-.448-1-1v-9h18v9c0,.552-.449,1-1,1Z" fill="#1c1f21"></path></svg>
+                <span>签到</span>
+            </button>
+            <button class="capsule-btn" data-target="widget-page-usage" data-title="使用时长">
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24"><rect x="1" y="20" width="22" height="2" fill="#1c1f21"></rect><rect x="1" y="7" width="6" height="11" fill="#1c1f21"></rect><rect x="9" y="2" width="6" height="16" fill="#1c1f21"></rect><rect x="17" y="11" width="6" height="7" fill="#1c1f21"></rect></svg>
+                <span>时长</span>
+            </button>
+            <button class="capsule-btn" data-target="widget-page-board" data-title="留言板">
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 48 48"> <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C8.68629 2 6 4.68629 6 8V40C6 43.3137 8.68629 46 12 46H36C39.3137 46 42 43.3137 42 40V8C42 4.68629 39.3137 2 36 2H12ZM12 8H36V22H12V8ZM36 25H12V28H36V25ZM12 31H36V34H12V31ZM26 37H12V40H26V37Z" fill="#1c1f21"></path> </svg>
+                <span>留言板</span>
+            </button>
+            <button class="capsule-btn active" data-target="widget-page-settings" data-title="页面设置">
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24"><path d="m23,13.75v-3.5l-2.384-.841c-.176-.583-.407-1.142-.691-1.668l1.091-2.281-2.475-2.475-2.281,1.091c-.527-.284-1.086-.515-1.668-.691l-.841-2.384h-3.5l-.841,2.384c-.583.176-1.142.407-1.668.691l-2.281-1.091-2.475,2.475,1.091,2.281c-.284.527-.515,1.086-.691,1.668l-2.384.841v3.5l2.384.841c.176.583.407,1.142.691,1.668l-1.091,2.281,2.475,2.475,2.281-1.091c.527.284,1.086.515,1.668.691l.841,2.384h3.5l.841-2.384c.583-.176,1.142-.407,1.668-.691l2.281,1.091,2.475-2.475-1.091-2.281c.284-.527-.515,1.086.691-1.668l2.384-.841Zm-11,2.25c-2.206,0-4-1.794-4-4s1.794-4,4-4,4,1.794,4,4-1.794,4-4,4Z" fill="#1c1f21"></path></svg>
+                <span>设置</span>
+            </button>
         </div>
     </div>
 </div>
-<!-- ===== [新增结束] ===== -->
+<!-- ===== [重构结束] ===== -->
 </body>
 </html>
