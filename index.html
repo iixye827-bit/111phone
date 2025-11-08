@@ -4057,7 +4057,6 @@ body.theme-glass.dark-mode .leaderboard-item {
     border-color: rgba(255, 255, 255, 0.1);
 }
 
-
 /* 排名徽章 */
 .leaderboard-rank {
     flex-shrink: 0;
@@ -4113,16 +4112,17 @@ body.dark-mode .leaderboard-info-time {
 
 /* 整体容器尺寸和3D变换准备 */
 .calendar-flipper {
-    width: 90vmin; /* 使用vmin单位，使其相对于视口较小的一边 */
-    height: 90vmin;
-    max-width: 320px; /* 在大屏幕上限制最大尺寸 */
-    max-height: 320px;
+    /* [核心修正] 使用相对单位和 aspect-ratio 实现动态缩放 */
+    width: 85%; /* 宽度为父容器的90% */
+    max-width: 350px; /* 但最大不超过350px，保证在大屏幕上不会过大 */
+    aspect-ratio: 1 / 1; /* 强制保持1:1的正方形比例 */
+    height: auto; /* 高度自动计算以匹配宽度 */
+    
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
     perspective: 1000px; /* 增加透视，使3D效果更明显 */
 }
-
 
 /* 翻转后的状态 */
 .calendar-flipper.flipped {
@@ -4139,12 +4139,16 @@ body.dark-mode .leaderboard-info-time {
     display: flex;
     justify-content: center;
     align-items: center;
+    /* [新增] 为两个面都添加3D变换，强制启用硬件加速，修复移动端镜像问题 */
+    transform: translateZ(1px); 
 }
 
 /* 背面默认旋转180度 */
 .calendar-back {
-    transform: rotateY(180deg);
+    /* [修改] 将 transform 属性合并，并保持 Z 轴位移 */
+    transform: rotateY(180deg) translateZ(1px);
 }
+
 
 /* 复用并调整您原有的日历样式 */
 .calendar {
@@ -4211,17 +4215,21 @@ body.dark-mode .leaderboard-info-time {
     z-index: 1;
 }
 .date-number {
-    font-size: 110px;
+    /* [核心修正] 使用 clamp() 和 vw 实现动态字体大小 */
+    /* 解释: 基础大小为31vw，最小不小于80px，最大不超过110px */
+    font-size: clamp(80px, 31vw, 110px);
     font-weight: bold;
     color: #333;
     line-height: 1;
 }
 .date-full {
-    font-size: 16px;
+    /* [核心修正] 同理，为下方日期应用动态字体 */
+    font-size: clamp(14px, 4.5vw, 16px);
     color: #666;
-    margin-top: 20px;
+    margin-top: 10px;
     letter-spacing: 0.5px;
 }
+
 
 /* 月度日历的样式 */
 .monthly-calendar {
@@ -4241,18 +4249,21 @@ body.dark-mode .leaderboard-info-time {
     margin-bottom: 15px;
 }
 .monthly-calendar-header span {
-    font-size: 18px;
+    /* [核心修正] 动态字体 */
+    font-size: clamp(16px, 5vw, 18px);
     font-weight: 600;
 }
 .monthly-calendar-header button {
     background: transparent;
     border: none;
-    font-size: 20px;
+    /* [核心修正] 动态字体 */
+    font-size: clamp(18px, 5.5vw, 20px);
     cursor: pointer;
     padding: 5px 10px;
     border-radius: 8px;
     transition: background-color 0.2s;
 }
+
 .monthly-calendar-header button:hover {
     background-color: #f0f0f0;
 }
@@ -4264,8 +4275,10 @@ body.dark-mode .leaderboard-info-time {
 #monthly-calendar-table th, #monthly-calendar-table td {
     text-align: center;
     padding: 5px;
-    font-size: 14px;
+    /* [核心修正] 动态字体 */
+    font-size: clamp(12px, 4vw, 14px);
 }
+
 #monthly-calendar-table th {
     color: #aaa;
     font-weight: normal;
@@ -4295,14 +4308,6 @@ body.dark-mode .leaderboard-info-time {
     height: 6px;
     background-color: #63b3ed; /* 淡蓝色 */
     border-radius: 50%;
-}
-/* [新增] 日历字体自适应调整 */
-@media (max-width: 360px) {
-    .date-number { font-size: 90px; }
-    .date-full { font-size: 14px; }
-    .calendar-header { font-size: 20px; }
-    .monthly-calendar-header span { font-size: 16px; }
-    #monthly-calendar-table td, #monthly-calendar-table th { font-size: 12px; }
 }
 
     </style>
@@ -5914,6 +5919,7 @@ const getDefaultConfig = () => ({
             return;
         }
 
+
         const usageData = currentConfig.usageTime;
 
         const leaderboardData = Object.entries(usageData)
@@ -7004,16 +7010,25 @@ const getDefaultConfig = () => ({
     }
     
     async function saveGlobalConfig(commitMessage) {
+        // [新增] 每次保存到云端时，也同步更新本地缓存
+        try {
+            localStorage.setItem('jellyfishConfigCache', JSON.stringify(currentConfig));
+        } catch (e) {
+            console.error("Failed to save config to localStorage:", e);
+        }
+
         const content = utf8_to_b64(JSON.stringify(currentConfig, null, 2));
         const result = await saveToGithub('config.json', content, commitMessage, configSha);
         if (result.sha) {
             configSha = result.sha;
-            console.log('Global configuration saved successfully.');
+            // [新增] 云端同步成功后，更新本地缓存的 SHA 值，用于后续比对
+            localStorage.setItem('jellyfishConfigShaCache', configSha);
+            console.log('Global configuration saved to cloud and local cache.');
         } else {
             // Error handling is managed inside saveToGithub
         }
     }
-    
+
     function toggleManagementMode(forceState) {
         isManagementMode = forceState !== undefined ? forceState : !isManagementMode;
         
@@ -7665,43 +7680,75 @@ const getDefaultConfig = () => ({
         }
     });
 
-    async function loadInitialData() { 
-        navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>'; 
-        let fetchedConfig = await fetchConfigFromGithub(); 
+    async function loadInitialData() {
+        let cachedConfig = null;
+        let isRenderedFromCache = false;
+
+        // --- [新增] 性能优化核心逻辑 ---
+        // 1. 尝试从 localStorage 读取缓存
+        try {
+            const cachedData = localStorage.getItem('jellyfishConfigCache');
+            if (cachedData) {
+                cachedConfig = JSON.parse(cachedData);
+                currentConfig = cachedConfig; // 立即使用缓存数据
+                configSha = localStorage.getItem('jellyfishConfigShaCache'); // 读取缓存的SHA
+                
+                // 2. 使用缓存数据快速渲染UI
+                renderUIFromConfig();
+                isRenderedFromCache = true;
+                console.log("UI rendered from local cache.");
+            }
+        } catch (e) {
+            console.error("Failed to load or parse cache, will fetch from cloud.", e);
+        }
+        
+        // 3. 无论是否有缓存，都显示一个临时的加载状态
+        if (!isRenderedFromCache) {
+             navContainer.innerHTML = '<p id="loading-status" style="text-align: center; color: #889;">正在从云端加载配置...</p>';
+        }
+
+        // 4. 异步从云端获取最新数据
+        let fetchedConfig = await fetchConfigFromGithub();
+
+        // 5. 处理云端数据（迁移、合并、保存）
         let needsSave = false;
         let wasMigrated = false;
 
-        // [核心修复逻辑]
         if (fetchedConfig) {
-            // 云端存在配置，以此为基础进行合并和迁移
             const migrationResult = migrateLegacyConfig(fetchedConfig);
-            const migratedConfig = migrationResult.migratedConfig;
             wasMigrated = migrationResult.wasMigrated;
-
             const defaultConfig = getDefaultConfig();
-            // 正确的合并顺序：以用户数据 (migratedConfig) 为主，用默认配置 (defaultConfig) 补充缺失的字段
-            const mergedConfig = mergeDeep({}, defaultConfig, migratedConfig); 
+            const mergedConfig = mergeDeep({}, defaultConfig, migrationResult.migratedConfig);
             
-            currentConfig = mergedConfig;
-            
-            // 检查合并或迁移后是否有变化，有则需要保存
-            if (JSON.stringify(currentConfig) !== JSON.stringify(fetchedConfig) || wasMigrated) {
+            // 只有当云端数据与当前内存中的数据不同时，才更新
+            if (JSON.stringify(mergedConfig) !== JSON.stringify(currentConfig)) {
+                currentConfig = mergedConfig;
                 needsSave = true;
-                console.log("Config updated with new fields or migrated. Scheduling an auto-save.");
             }
-        } else {
-            // 只有当云端确实没有 config.json 文件时，才使用全新的默认配置并创建
-            console.log('Config.json not found on remote. Creating a new one with default settings.');
+        } else if (!isRenderedFromCache) {
+            // 仅在首次加载（无缓存、无云端数据）时创建新配置
+            console.log('No cache and no remote config. Creating a new one.');
             currentConfig = getDefaultConfig();
-            configSha = null; // 确保是创建新文件
-            needsSave = true; 
+            configSha = null;
+            needsSave = true;
         }
-
+        
         if (needsSave) {
-            await saveGlobalConfig(wasMigrated ? 'Auto-migrate legacy config format' : 'Auto-create or repair config.json');
+            await saveGlobalConfig(wasMigrated ? 'Auto-migrate legacy config' : 'Auto-create or sync config');
         }
 
-        // --- [UI 初始化逻辑保持不变] ---
+        // 6. 如果首次加载是从云端获取的，现在渲染UI
+        if (!isRenderedFromCache) {
+            renderUIFromConfig();
+            console.log("UI rendered from cloud data.");
+        } else if (needsSave) {
+             // 如果是从缓存渲染的，但云端有更新，可以给个提示
+             showTopToast("云端数据已同步更新，下次打开生效", 3000);
+        }
+    }
+
+    // [新增] 将UI渲染逻辑抽离成一个独立函数
+    function renderUIFromConfig() {
         const t = localStorage.getItem('theme');
         if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.body.classList.add('dark-mode');
@@ -7729,7 +7776,6 @@ const getDefaultConfig = () => ({
         loadColorState(); 
     }
 
-    
     function renderCategories() {
         const navContainerEl = document.getElementById('categoryNavContainer');
         if (!currentConfig.settings) {
@@ -13562,18 +13608,30 @@ const CheckInManager = (() => {
 
     // 更新撕页日历的显示
     function updateTearOffCalendar() {
-        const today = new Date();
-        const nextDay = new Date(today);
-        nextDay.setDate(today.getDate() + 1);
+        // [核心修正] 确保签到数据已加载
+        loadCheckInData(); 
+        
+        // 从数据源获取正确的累计签到天数
+        const totalDays = currentConfig.settings.checkInData.dates.length;
 
-        ui.currentNumEl.textContent = today.getDate();
-        ui.currentFullEl.textContent = getFormattedDate(today);
-        ui.nextNumEl.textContent = nextDay.getDate();
-        ui.nextFullEl.textContent = getFormattedDate(nextDay);
+        // [核心修正] 获取当天日期字符串
+        const todayStr = getFormattedDate(new Date());
+
+        // 更新当前卡片的大数字为累计天数，下方文字为当天日期
+        ui.currentNumEl.textContent = totalDays;
+        ui.currentFullEl.textContent = todayStr;
+        
+        // 更新下一张卡片的大数字为“当前天数+1”，下方文字为静态标签
+        ui.nextNumEl.textContent = totalDays + 1;
+        ui.nextFullEl.textContent = '明日签到';
     };
+
 
     // 处理签到逻辑
     function handleCheckIn() {
+        // [核心修复] 在使用前，调用加载函数确保 checkInData 对象存在
+        loadCheckInData();
+        
         const todayStr = getFormattedDate(new Date());
         
         if (currentConfig.settings.checkInData.dates.includes(todayStr)) {
@@ -13581,7 +13639,6 @@ const CheckInManager = (() => {
         } else {
             // 新增签到记录
             currentConfig.settings.checkInData.dates.push(todayStr);
-            currentConfig.settings.checkInData.total += 1;
             
             // 更新UI
             updateUI();
@@ -13598,12 +13655,16 @@ const CheckInManager = (() => {
 
     // 更新UI（总天数）
     function updateUI() {
-        // const totalDays = currentConfig.settings.checkInData?.total || 0; // 不再需要动态计算天数
+        // [核心修正] 仅设置标题文字，不再附加天数
         ui.header.textContent = `成为水母宝宝已经`;
     }
 
+
     // 渲染月度日历
     function renderMonthlyCalendar(year, month) {
+        // [核心修复] 在使用前，调用加载函数确保 checkInData 对象存在
+        loadCheckInData();
+        
         const checkInDates = new Set(currentConfig.settings.checkInData.dates);
         const todayStr = getFormattedDate(new Date());
 
@@ -13648,6 +13709,7 @@ const CheckInManager = (() => {
              if (date > daysInMonth) break;
         }
     }
+
     
     // 初始化函数
     function init() {
@@ -13677,6 +13739,11 @@ const CheckInManager = (() => {
         ui.header.addEventListener('click', () => {
             ui.flipper.classList.toggle('flipped');
         });
+        // [核心修复] 为背面的月份标题也添加点击翻转事件，使其可以翻回来
+        ui.monthYearEl.addEventListener('click', () => {
+            ui.flipper.classList.toggle('flipped');
+        });
+
 
         // 月份切换
         ui.prevMonthBtn.addEventListener('click', () => {
@@ -14012,6 +14079,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             </div>
+
             <!-- 页面2: 使用时长 -->
             <div class="widget-hub-page" id="widget-page-usage">
                 <!-- [新增] 排行榜列表容器 -->
