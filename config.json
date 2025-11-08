@@ -110,15 +110,8 @@
       "onExit": false,
       "projects": []
     },
-    "usageTime": {},
     "mobileMode": {
       "enabled": false
-    },
-    "checkInData": {
-      "total": 0,
-      "dates": [
-        "2025-11-08"
-      ]
     }
   },
   "themePresets": [
@@ -136,5 +129,6 @@
   "usageTime": {
     "https://raven7-7.github.io/Crow/": 81151,
     "https://jrsy081113-hue.github.io/new-730/": 48521
-  }
+  },
+  "dataStructureVersion": 2
 }
