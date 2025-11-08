@@ -3885,8 +3885,9 @@ body.dark-mode .pendant-settings-group label {
     opacity: 0;
     transform: translateX(10px);
     transition: opacity 0.3s ease, transform 0.3s ease;
+    /* 新增：让 flex 容器在内容不足时也不会收缩 */
+    flex-grow: 1;
 }
-
 
 /* 活动页面的显示样式 */
 .widget-hub-page.active {
@@ -4010,6 +4011,299 @@ body.dark-mode .placeholder-content {
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
+/* =============================================================== */
+/* ================ [新增] 使用时长排行榜专属样式 ================ */
+/* =============================================================== */
+
+/* 排行榜列表容器 */
+#usage-leaderboard-list {
+    list-style: none; /* 移除默认的数字列表样式 */
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 每个排行榜项目 */
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 15px;
+    border-radius: 12px;
+    background: var(--bg-day-element);
+    box-shadow: inset 3px 3px 6px var(--shadow-dark-day), inset -3px -3px 6px var(--shadow-light-day);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.dark-mode .leaderboard-item {
+    background: var(--bg-night-element);
+    box-shadow: inset 3px 3px 6px var(--shadow-dark-night), inset -3px -3px 6px var(--shadow-light-night);
+}
+
+/* [新增] 使用时长项目在磨砂玻璃主题下的样式 */
+body.theme-glass .leaderboard-item {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: none; /* 移除拟态的内阴影 */
+}
+
+body.theme-glass.dark-mode .leaderboard-item {
+    background: rgba(10, 10, 10, 0.2);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+
+/* 排名徽章 */
+.leaderboard-rank {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-day-element);
+    box-shadow: 3px 3px 6px var(--shadow-dark-day), -3px -3px 6px var(--shadow-light-day);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--hold-border);
+}
+body.dark-mode .leaderboard-rank {
+    background: var(--bg-night-element);
+    box-shadow: 3px 3px 6px var(--shadow-dark-night), -3px -3px 6px var(--shadow-light-night);
+}
+/* 前三名特殊样式 */
+.leaderboard-rank.rank-1 { background-color: #ffd700; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.leaderboard-rank.rank-2 { background-color: #c0c0c0; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.leaderboard-rank.rank-3 { background-color: #cd7f32; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+
+
+/* 项目信息 */
+.leaderboard-info {
+    flex-grow: 1;
+    min-width: 0; /* 防止内容溢出时撑开布局 */
+    text-align: left;
+}
+.leaderboard-info-name {
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.leaderboard-info-time {
+    font-size: 13px;
+    color: #889;
+    margin-top: 4px;
+}
+body.dark-mode .leaderboard-info-time {
+    color: #a0aec0;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+/* =============================================================== */
+/* =============== [新增] 签到翻转日历专属样式 ================= */
+/* =============================================================== */
+
+/* 整体容器尺寸和3D变换准备 */
+.calendar-flipper {
+    width: 90vmin; /* 使用vmin单位，使其相对于视口较小的一边 */
+    height: 90vmin;
+    max-width: 320px; /* 在大屏幕上限制最大尺寸 */
+    max-height: 320px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    perspective: 1000px; /* 增加透视，使3D效果更明显 */
+}
+
+
+/* 翻转后的状态 */
+.calendar-flipper.flipped {
+    transform: rotateY(180deg);
+}
+
+/* 正面和背面的通用样式 */
+.calendar-front, .calendar-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden; /* 隐藏翻转到背后的那一面 */
+    -webkit-backface-visibility: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 背面默认旋转180度 */
+.calendar-back {
+    transform: rotateY(180deg);
+}
+
+/* 复用并调整您原有的日历样式 */
+.calendar {
+    width: 100%; /* 继承父容器宽度 */
+    height: 100%;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+    position: relative;
+    overflow: hidden;
+    background-color: #fff;
+    font-family: 'Arial', sans-serif;
+}
+.calendar-header {
+    width: 100%;
+    height: 60px;
+    background-color: #8B4513; /* 棕色木头质感 */
+    border-bottom: 3px solid #6d3811;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer; /* 提示用户这里可以点击 */
+    transition: background-color 0.3s;
+}
+.calendar-header:hover {
+    background-color: #a0522d; /* 悬停时变亮一点 */
+}
+.calendar-date-current {
+    width: 100%;
+    height: calc(100% - 60px);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: grab;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+    z-index: 2;
+}
+.calendar-date-current:active { cursor: grabbing; }
+.calendar-date-next {
+    width: 100%;
+    height: calc(100% - 60px);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.09);
+    z-index: 1;
+}
+.date-number {
+    font-size: 110px;
+    font-weight: bold;
+    color: #333;
+    line-height: 1;
+}
+.date-full {
+    font-size: 16px;
+    color: #666;
+    margin-top: 20px;
+    letter-spacing: 0.5px;
+}
+
+/* 月度日历的样式 */
+.monthly-calendar {
+    width: 100%;
+    height: 100%;
+    padding: 15px;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+}
+.monthly-calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.monthly-calendar-header span {
+    font-size: 18px;
+    font-weight: 600;
+}
+.monthly-calendar-header button {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+.monthly-calendar-header button:hover {
+    background-color: #f0f0f0;
+}
+#monthly-calendar-table {
+    width: 100%;
+    flex-grow: 1;
+    border-collapse: collapse;
+}
+#monthly-calendar-table th, #monthly-calendar-table td {
+    text-align: center;
+    padding: 5px;
+    font-size: 14px;
+}
+#monthly-calendar-table th {
+    color: #aaa;
+    font-weight: normal;
+}
+#monthly-calendar-table td {
+    position: relative;
+    height: 14.28%; /* 均分高度 */
+}
+#monthly-calendar-table td.today {
+    background-color: #e3f2fd; /* 淡蓝色背景 */
+    color: #1565c0; /* 深蓝色文字 */
+    font-weight: bold;
+    border-radius: 50%;
+}
+
+#monthly-calendar-table td.other-month {
+    color: #ccc;
+}
+/* 已签到的小蓝点样式 */
+#monthly-calendar-table td.checked-in::after {
+    content: '';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background-color: #63b3ed; /* 淡蓝色 */
+    border-radius: 50%;
+}
+/* [新增] 日历字体自适应调整 */
+@media (max-width: 360px) {
+    .date-number { font-size: 90px; }
+    .date-full { font-size: 14px; }
+    .calendar-header { font-size: 20px; }
+    .monthly-calendar-header span { font-size: 16px; }
+    #monthly-calendar-table td, #monthly-calendar-table th { font-size: 12px; }
+}
 
     </style>
 
@@ -5293,9 +5587,12 @@ const getDefaultConfig = () => ({
                 message: '是时候该备份你的项目啦！', // 默认提醒文字
                 onExit: false, // 关闭项目时提醒
                 projects: [] // 需要提醒的项目href列表
-            }
+            },
+            // [核心重构] 将使用时长数据移至主配置
+            usageTime: {}
 
         },
+
         themePresets: [
             {
                 name: "原生主题",
@@ -5476,7 +5773,11 @@ const getDefaultConfig = () => ({
             handleEl.addEventListener('click', () => show(id));
             winEl.addEventListener('mousedown', () => focus(id));
             winEl.addEventListener('touchstart', () => focus(id), { passive: true });
+
+            // [新增] 在窗口创建时，开始计时
+            startUsageTracking(windows[id].url);
         }
+
 
 // <-- 结束替换为 -->
 
@@ -5527,8 +5828,14 @@ const getDefaultConfig = () => ({
         }
 
         function close(id) {
+            // [新增] 停止计时
+            if (currentTrackedProject && currentTrackedProject.href === windows[id]?.url) {
+                stopUsageTracking();
+            }
+
             const win = windows[id];
             if (!win) return;
+
             
             // 标记标签为不可见，以便在关闭动画期间，其他标签可以先移动到位
             const wasVisible = win.handle.classList.contains('visible');
@@ -5560,6 +5867,135 @@ const getDefaultConfig = () => ({
         return { create, closeAll };
     })();
     // ===== [END] FLOATING PROJECT WINDOW MANAGER =====
+    // [新增] ==========================================================
+    // [新增] 使用时长功能核心模块
+    // [新增] ==========================================================
+
+    // [核心修复] 将计时器追踪变量移至全局作用域
+    let currentTrackedProject = null;
+
+    /**
+     * 将毫秒数格式化为人类可读的字符串 (例如: "12小时 30分钟 5秒")
+     * @param {number} ms - 毫秒数
+     * @returns {string} 格式化后的时间字符串
+     */
+    function formatDuration(ms) {
+
+        if (ms < 1000) {
+            return "不足1秒";
+        }
+        let seconds = Math.floor(ms / 1000);
+        const hours = Math.floor(seconds / 3600);
+        seconds %= 3600;
+        const minutes = Math.floor(seconds / 60);
+        seconds %= 60;
+
+        const parts = [];
+        if (hours > 0) parts.push(`${hours}小时`);
+        if (minutes > 0) parts.push(`${minutes}分钟`);
+        if (seconds > 0 || parts.length === 0) parts.push(`${seconds}秒`);
+        
+        return parts.join(' ');
+    }
+
+    /**
+     * 渲染使用时长排行榜
+     */
+    function renderUsageLeaderboard() {
+        const listContainer = document.getElementById('usage-leaderboard-list');
+        const placeholder = document.getElementById('usage-leaderboard-placeholder');
+        if (!listContainer || !placeholder) return;
+
+        // [核心重构] 从全局配置 `currentConfig` 读取数据，而不是 `memoryCache`
+        if (!currentConfig || !currentConfig.usageTime) {
+            placeholder.textContent = '暂无使用记录';
+            placeholder.style.display = 'block';
+            listContainer.innerHTML = '';
+            return;
+        }
+
+        const usageData = currentConfig.usageTime;
+
+        const leaderboardData = Object.entries(usageData)
+            .map(([href, time]) => {
+                // 通过 href 查找项目名称
+                const project = findButtonConfigByHref(href);
+                return {
+                    name: project ? project.text : '未知项目',
+                    time: time
+                };
+            })
+            .sort((a, b) => b.time - a.time); // 按时间从多到少排序
+
+        if (leaderboardData.length === 0) {
+            placeholder.style.display = 'block';
+            listContainer.innerHTML = '';
+            return;
+        }
+
+        placeholder.style.display = 'none';
+        listContainer.innerHTML = leaderboardData.map((item, index) => {
+            const rank = index + 1;
+            let rankClass = `leaderboard-rank`;
+            if (rank <= 3) {
+                rankClass += ` rank-${rank}`;
+            }
+
+            return `
+                <li class="leaderboard-item">
+                    <div class="${rankClass}">${rank}</div>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-info-name">${item.name}</div>
+                        <div class="leaderboard-info-time">${formatDuration(item.time)}</div>
+                    </div>
+                </li>
+            `;
+        }).join('');
+    }
+
+    /**
+     * 开始追踪一个项目的使用时长
+     * @param {string} projectHref - 项目的唯一链接
+     */
+    function startUsageTracking(projectHref) {
+        // 如果当前有正在计时的项目，先停止并保存它
+        if (currentTrackedProject) {
+            stopUsageTracking();
+        }
+        // 开始追踪新项目
+        currentTrackedProject = {
+            href: projectHref,
+            startTime: Date.now()
+        };
+        console.log(`开始计时: ${projectHref}`);
+    }
+
+    /**
+     * 停止当前项目的计时并保存数据 (V3 - 解耦版)
+     */
+    function stopUsageTracking() {
+        if (!currentTrackedProject) return;
+
+        // [核心重构] 直接操作全局配置 `currentConfig`，它在应用启动时就已加载
+        const duration = Date.now() - currentTrackedProject.startTime;
+        const href = currentTrackedProject.href;
+
+        // 确保 usageTime 对象存在于主配置中
+        if (!currentConfig.usageTime) {
+            currentConfig.usageTime = {};
+        }
+
+        // 累加时间
+        currentConfig.usageTime[href] = (currentConfig.usageTime[href] || 0) + duration;
+        
+        console.log(`停止计时: ${href}, 本次使用: ${duration}ms, 总计: ${currentConfig.usageTime[href]}ms`);
+        
+        // [核心重构] 调用全局配置的保存函数，而不是 MemoryApp 的
+        saveGlobalConfig('Update project usage time');
+        
+        // 重置追踪器
+        currentTrackedProject = null;
+    }
 
     // ===== [START] FLOATING JELLYFISH BALL LOGIC (MODIFIED) =====
     const FloatingBallManager = (() => {
@@ -7599,18 +8035,23 @@ const getDefaultConfig = () => ({
     
     function openIframeModal(url) { 
         if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } 
+        
+        // [新增] 开始使用时长计时
+        startUsageTracking(url);
+
         iframeEl.src = url; 
         iframeModal.dataset.originalUrl = url; // [新增] 记录原始URL
         iframeModal.classList.add('active'); 
     }
 
-
      function closeIframeModal() { 
+        // [新增] 停止计时
+        stopUsageTracking();
+
         FloatingProjectWindowManager.closeAll();
         hideReturnConfirmation(); 
         iframeModal.classList.remove('active'); 
     }
-
 
     function showReturnConfirmation() { returnConfirmationToast.classList.add('show'); }
     function hideReturnConfirmation() { returnConfirmationToast.classList.remove('show'); }
@@ -8138,7 +8579,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let isSaving = false;
         let saveTimeout = null;
 
-        
         const ui = {
             modal: document.getElementById('memoryModal'),
             appContainer: document.getElementById('memoryAppContainer'),
@@ -8191,6 +8631,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] }
             };
         }
+
+
 
         function updateStatus(text, isError = false, reason = '') { ui.status.textContent = isError && reason ? `${text}: ${reason}` : text; ui.status.style.color = isError ? '#e53e3e' : 'inherit'; }
 
@@ -12088,6 +12530,10 @@ open: async () => {
                         widgetEl.addEventListener('click', function (e) {
                             e.stopPropagation();
                             const href = this.dataset.href;
+                            
+                            // [新增] 开始计时 (因为这个点击事件会直接打开iframe)
+                            startUsageTracking(href);
+
                             const config = findButtonConfigByHref(href);
                             if (config && config.openExternally) {
                                 window.open(href, '_blank', 'noopener,noreferrer');
@@ -12096,6 +12542,7 @@ open: async () => {
                             }
                         });
                         break;
+
                     case 'html':
                         Object.assign(widgetEl.style, { padding: '0', overflow: 'hidden' });
                         const iframe = document.createElement('iframe');
@@ -13046,6 +13493,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const button = e.target.closest('.capsule-btn');
         if (button) {
             switchHubPage(button.dataset.target, button.dataset.title);
+            // [新增] 如果点击的是“时长”按钮，则渲染排行榜
+            if (button.dataset.target === 'widget-page-usage') {
+                renderUsageLeaderboard();
+            }
         }
     });
 
@@ -13078,6 +13529,266 @@ document.addEventListener('DOMContentLoaded', () => {
     // 页面加载时，立即加载并应用设置
     loadSettings();
 });
+/* =============================================================== */
+/* ============= [新增] 签到功能管理器 V2.0 (翻转/云同步) ========= */
+/* =============================================================== */
+const CheckInManager = (() => {
+    // DOM 元素
+    let ui = {};
+
+    // 日历状态
+    let displayedDate = new Date();
+
+    // 初始化签到数据结构
+    function loadCheckInData() {
+        if (!currentConfig.settings) {
+            currentConfig.settings = {};
+        }
+        if (!currentConfig.settings.checkInData) {
+            currentConfig.settings.checkInData = {
+                total: 0,
+                dates: []
+            };
+        }
+    }
+
+    // 格式化日期为 YYYY-MM-DD
+    function getFormattedDate(dateObj) {
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    // 更新撕页日历的显示
+    function updateTearOffCalendar() {
+        const today = new Date();
+        const nextDay = new Date(today);
+        nextDay.setDate(today.getDate() + 1);
+
+        ui.currentNumEl.textContent = today.getDate();
+        ui.currentFullEl.textContent = getFormattedDate(today);
+        ui.nextNumEl.textContent = nextDay.getDate();
+        ui.nextFullEl.textContent = getFormattedDate(nextDay);
+    };
+
+    // 处理签到逻辑
+    function handleCheckIn() {
+        const todayStr = getFormattedDate(new Date());
+        
+        if (currentConfig.settings.checkInData.dates.includes(todayStr)) {
+            showTopToast("今天已经签过到啦！", 2000);
+        } else {
+            // 新增签到记录
+            currentConfig.settings.checkInData.dates.push(todayStr);
+            currentConfig.settings.checkInData.total += 1;
+            
+            // 更新UI
+            updateUI();
+            
+            // 保存到云端
+            saveGlobalConfig('Perform daily check-in');
+            
+            showTopToast("今日签到成功！", 2000);
+            
+            // 重新渲染背面的日历以显示新的蓝点
+            renderMonthlyCalendar(displayedDate.getFullYear(), displayedDate.getMonth());
+        }
+    }
+
+    // 更新UI（总天数）
+    function updateUI() {
+        // const totalDays = currentConfig.settings.checkInData?.total || 0; // 不再需要动态计算天数
+        ui.header.textContent = `成为水母宝宝已经`;
+    }
+
+    // 渲染月度日历
+    function renderMonthlyCalendar(year, month) {
+        const checkInDates = new Set(currentConfig.settings.checkInData.dates);
+        const todayStr = getFormattedDate(new Date());
+
+        ui.monthYearEl.textContent = `${year} 年 ${month + 1} 月`;
+        
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        const startDayOfWeek = firstDay.getDay(); // 0=Sun, 1=Mon...
+
+        const tableBody = ui.table.querySelector('tbody') || document.createElement('tbody');
+        tableBody.innerHTML = '';
+        ui.table.appendChild(tableBody);
+
+        let date = 1;
+        for (let i = 0; i < 6; i++) {
+            const row = document.createElement('tr');
+            for (let j = 0; j < 7; j++) {
+                const cell = document.createElement('td');
+                if (i === 0 && j < startDayOfWeek) {
+                    // 月初的空白格
+                    cell.classList.add('other-month');
+                } else if (date > daysInMonth) {
+                    // 月末的空白格
+                    cell.classList.add('other-month');
+                } else {
+                    const cellDate = new Date(year, month, date);
+                    const cellDateStr = getFormattedDate(cellDate);
+                    cell.textContent = date;
+
+                    if (cellDateStr === todayStr) {
+                        cell.classList.add('today');
+                    }
+                    if (checkInDates.has(cellDateStr)) {
+                        cell.classList.add('checked-in');
+                    }
+                    date++;
+                }
+                row.appendChild(cell);
+            }
+            tableBody.appendChild(row);
+             if (date > daysInMonth) break;
+        }
+    }
+    
+    // 初始化函数
+    function init() {
+        // 获取所有DOM元素
+        ui = {
+            flipper: document.querySelector('.calendar-flipper'),
+            header: document.getElementById('checkin-header'),
+            slidableCard: document.getElementById('slidableCard'),
+            currentNumEl: document.getElementById('currentDateNum'),
+            currentFullEl: document.getElementById('currentDateFull'),
+            nextNumEl: document.getElementById('nextDateNum'),
+            nextFullEl: document.getElementById('nextDateFull'),
+            prevMonthBtn: document.getElementById('prev-month-btn'),
+            nextMonthBtn: document.getElementById('next-month-btn'),
+            monthYearEl: document.getElementById('current-month-year'),
+            table: document.getElementById('monthly-calendar-table')
+        };
+        // 在table中创建thead
+        const thead = document.createElement('thead');
+        thead.innerHTML = `<tr>${['日', '一', '二', '三', '四', '五', '六'].map(d => `<th>${d}</th>`).join('')}</tr>`;
+        ui.table.appendChild(thead);
+        
+        loadCheckInData();
+        updateUI();
+
+        // 翻转事件
+        ui.header.addEventListener('click', () => {
+            ui.flipper.classList.toggle('flipped');
+        });
+
+        // 月份切换
+        ui.prevMonthBtn.addEventListener('click', () => {
+            displayedDate.setMonth(displayedDate.getMonth() - 1);
+            renderMonthlyCalendar(displayedDate.getFullYear(), displayedDate.getMonth());
+        });
+        ui.nextMonthBtn.addEventListener('click', () => {
+            displayedDate.setMonth(displayedDate.getMonth() + 1);
+            renderMonthlyCalendar(displayedDate.getFullYear(), displayedDate.getMonth());
+        });
+
+        // 初始化撕页日历
+        let startX = 0, startY = 0, isSliding = false;
+        const slideThreshold = 20;
+
+        const resetCard = (shouldCheckIn) => {
+            // 触发签到
+            if (shouldCheckIn) {
+                handleCheckIn();
+            }
+            // 动画结束后重置
+            setTimeout(() => {
+                ui.slidableCard.style.transition = 'none'; // 禁用过渡以便瞬时重置
+                ui.slidableCard.style.transform = 'translate(0, 0) rotate(0deg)';
+                ui.slidableCard.style.opacity = '1';
+                updateTearOffCalendar();
+                setTimeout(() => {
+                    // 恢复过渡
+                     ui.slidableCard.style.transition = 'all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
+                     ui.slidableCard.style.pointerEvents = 'auto'; // 恢复点击
+                }, 50);
+            }, 500);
+        };
+        
+        const handleSlideStart = (x, y) => {
+            startX = x;
+            startY = y;
+            isSliding = false;
+        };
+
+        const handleSlideMove = (x, y) => {
+            const deltaX = x - startX;
+            const deltaY = y - startY;
+            if (!isSliding && (Math.abs(deltaX) > slideThreshold || Math.abs(deltaY) > slideThreshold)) {
+                isSliding = true;
+            }
+            if (isSliding) {
+                 ui.slidableCard.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${deltaX / 10}deg)`;
+            }
+        };
+
+        const handleSlideEnd = (x, y) => {
+            if (!isSliding) return;
+            
+            const deltaX = x - startX;
+            const deltaY = y - startY;
+            const slideDistance = window.innerWidth;
+            let finalX = deltaX * 5;
+            let finalY = deltaY * 5;
+            let rotateAngle = deltaX > 0 ? 45 : -45;
+
+            ui.slidableCard.style.transition = 'all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1.2)';
+            ui.slidableCard.style.transform = `translate(${finalX}px, ${finalY}px) rotate(${rotateAngle}deg)`;
+            ui.slidableCard.style.opacity = '0';
+            ui.slidableCard.style.pointerEvents = 'none';
+
+            resetCard(true); // 传入 true 表示需要签到
+        };
+
+        ui.slidableCard.addEventListener('mousedown', (e) => handleSlideStart(e.clientX, e.clientY));
+        ui.slidableCard.addEventListener('touchstart', (e) => handleSlideStart(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+        
+        const mouseMoveHandler = (e) => handleSlideMove(e.clientX, e.clientY);
+        const touchMoveHandler = (e) => handleSlideMove(e.touches[0].clientX, e.touches[0].clientY);
+        
+        const mouseUpHandler = (e) => {
+            document.removeEventListener('mousemove', mouseMoveHandler);
+            document.removeEventListener('mouseup', mouseUpHandler);
+            handleSlideEnd(e.clientX, e.clientY);
+        };
+        const touchEndHandler = (e) => {
+            document.removeEventListener('touchmove', touchMoveHandler);
+            document.removeEventListener('touchend', touchEndHandler);
+            handleSlideEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        };
+
+        ui.slidableCard.addEventListener('mousedown', () => {
+             document.addEventListener('mousemove', mouseMoveHandler);
+             document.addEventListener('mouseup', mouseUpHandler);
+        });
+        ui.slidableCard.addEventListener('touchstart', () => {
+             document.addEventListener('touchmove', touchMoveHandler);
+             document.addEventListener('touchend', touchEndHandler);
+        }, { passive: true });
+
+        // 初始渲染
+        updateTearOffCalendar();
+        renderMonthlyCalendar(displayedDate.getFullYear(), displayedDate.getMonth());
+    }
+
+    return { init };
+})();
+
+// <-- 开始替换为 -->
+document.addEventListener('DOMContentLoaded', () => {
+    // ... 其他初始化代码 ...
+    
+    // 在最后添加签到管理器的初始化
+    CheckInManager.init();
+});
+// 您也可以直接将 CheckInManager.init(); 添加到现有的 DOMContentLoaded 事件监听器末尾
+// <-- 结束替换为 -->
 
     </script>
     <!-- ★★★ 新增：社区须知弹窗 ★★★ -->
@@ -13269,14 +13980,44 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         
         <div class="modal-body">
-            <!-- 页面1: 签到 -->
-            <div class="widget-hub-page" id="widget-page-checkin">
-                <p class="placeholder-content">签到功能开发中...</p>
+            <!-- 页面1: 签到 (V2.0 - 翻转日历) -->
+            <div class="widget-hub-page" id="widget-page-checkin" style="align-items: center; justify-content: center;">
+                <div class="calendar-flipper">
+                    <!-- 正面：撕页日历 -->
+                    <div class="calendar-front">
+                        <div class="calendar">
+                            <div class="calendar-header" id="checkin-header">成为水母宝宝已经 0 天</div>
+                            <div class="calendar-date-next">
+                                <div class="date-number" id="nextDateNum"></div>
+                                <div class="date-full" id="nextDateFull"></div>
+                            </div>
+                            <div class="calendar-date-current" id="slidableCard">
+                                <div class="date-number" id="currentDateNum"></div>
+                                <div class="date-full" id="currentDateFull"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 背面：月度日历 -->
+                    <div class="calendar-back">
+                        <div class="monthly-calendar">
+                             <div class="monthly-calendar-header">
+                                <button id="prev-month-btn">&lt;</button>
+                                <span id="current-month-year"></span>
+                                <button id="next-month-btn">&gt;</button>
+                            </div>
+                            <table id="monthly-calendar-table">
+                                <!-- JS 动态填充日历 -->
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-
             <!-- 页面2: 使用时长 -->
             <div class="widget-hub-page" id="widget-page-usage">
-                <p class="placeholder-content">使用时长统计开发中...</p>
+                <!-- [新增] 排行榜列表容器 -->
+                <ol id="usage-leaderboard-list"></ol>
+                <!-- [新增] 数据为空时的占位符 -->
+                <p id="usage-leaderboard-placeholder" class="empty-list-placeholder" style="display: none; grid-column: 1 / -1; margin-top: 50px;">暂无使用记录</p>
             </div>
 
             <!-- 页面3: 留言板 -->
