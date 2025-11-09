@@ -112,7 +112,9 @@
     },
     "checkinSettings": {
       "headerColor": "#4e94df",
-      "cardColor": "#95b7d0"
+      "cardColor": "#95b7d0",
+      "backgroundImage": "",
+      "blurAmount": 0
     },
     "usageTime": {},
     "mobileMode": {
