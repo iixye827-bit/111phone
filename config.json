@@ -110,6 +110,10 @@
       "onExit": false,
       "projects": []
     },
+    "checkinSettings": {
+      "headerColor": "#8B4513",
+      "cardColor": "#ffffff"
+    },
     "usageTime": {},
     "mobileMode": {
       "enabled": false
