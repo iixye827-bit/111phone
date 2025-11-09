@@ -111,7 +111,10 @@
       "projects": []
     },
     "checkinSettings": {
+      "headerBgType": "color",
       "headerColor": "#4e94df",
+      "headerImage": "",
+      "headerBlur": 5,
       "cardColor": "#457292",
       "backgroundImage": "",
       "blurAmount": 0
