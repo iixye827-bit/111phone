@@ -122,6 +122,9 @@
     "usageTime": {},
     "mobileMode": {
       "enabled": false
+    },
+    "pendant": {
+      "enabled": true
     }
   },
   "themePresets": [
