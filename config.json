@@ -102,6 +102,12 @@
       "url": ""
     },
     "fontPresets": [],
+    "pendant": {
+      "enabled": true,
+      "lineLength": "5rem",
+      "lineColor": "#000000",
+      "shapeContent": "☁️"
+    },
     "backupReminder": {
       "enabled": true,
       "timeBasedEnabled": false,
@@ -122,9 +128,6 @@
     "usageTime": {},
     "mobileMode": {
       "enabled": false
-    },
-    "pendant": {
-      "enabled": true
     }
   },
   "themePresets": [
