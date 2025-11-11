@@ -108,7 +108,7 @@
     },
     "fontPresets": [],
     "pendant": {
-      "enabled": true,
+      "enabled": false,
       "lineLength": "5rem",
       "lineColor": "#000000",
       "shapeContent": "🌹"
