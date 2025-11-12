@@ -130,7 +130,16 @@
       "backgroundImage": "",
       "blurAmount": 0
     },
-    "usageTime": {},
+    "usageTime": {
+      "includedCategories": [
+        "全部",
+        "小手机",
+        "1",
+        "2",
+        "3",
+        "4"
+      ]
+    },
     "mobileMode": {
       "enabled": false
     }
