@@ -132,10 +132,8 @@
       "blurAmount": 0
     },
     "usageTime": {
-      "includedCategories": [
-        "全部"
-      ],
-      "filterEnabled": true
+      "includedCategories": [],
+      "filterEnabled": false
     },
     "mobileMode": {
       "enabled": false
