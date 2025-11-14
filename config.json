@@ -132,7 +132,8 @@
       "blurAmount": 0
     },
     "usageTime": {
-      "includedCategories": []
+      "includedCategories": [],
+      "filterEnabled": true
     },
     "mobileMode": {
       "enabled": false
