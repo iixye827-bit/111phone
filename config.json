@@ -99,7 +99,7 @@
       "enabled": true,
       "swipeBack": true,
       "functions": {
-        "game": false
+        "game": true
       },
       "customCSS": "/* 步骤 1: 设置球体背景 (可选, 修改颜色) */\n#floating-jellyfish-ball {\n  background: rgba(173, 216, 230, 0.7); /* 淡蓝色背景 */\n  backdrop-filter: blur(5px);\n  -webkit-backdrop-filter: blur(5px);\n  border: 1px solid rgba(173, 216, 230, 0.9);\n  font-size: 0; /* 隐藏原始图标 */\n}\nbody.dark-mode #floating-jellyfish-ball {\n  background: rgba(70, 130, 180, 0.7); /* 深钢蓝色背景 */\n  border-color: rgba(135, 206, 235, 0.5);\n}\n\n/* 步骤 2: 使用伪元素显示新的 Emoji */\n#floating-jellyfish-ball::before {\n  content: '💧'; /* 在这里替换为你想要的 Emoji */\n  font-size: 28px; /* 在这里调整 Emoji 的大小 */\n}",
       "cssPresets": [
