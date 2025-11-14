@@ -133,7 +133,7 @@
     },
     "usageTime": {
       "includedCategories": [],
-      "filterEnabled": true
+      "filterEnabled": false
     },
     "mobileMode": {
       "enabled": false
