@@ -132,8 +132,10 @@
       "blurAmount": 0
     },
     "usageTime": {
-      "includedCategories": [],
-      "filterEnabled": false
+      "includedCategories": [
+        "小手机"
+      ],
+      "filterEnabled": true
     },
     "mobileMode": {
       "enabled": false
