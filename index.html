@@ -14182,20 +14182,24 @@ const CheckInManager = (() => {
         
         if (checkInData.dates.includes(todayStr)) {
             showTopToast("今天已经签过到啦！", 2000);
+            // 如果已经签到，也需要更新挂件状态，以防万一
+            if (typeof PendantManager !== 'undefined' && PendantManager.updateCheckInStatus) {
+                PendantManager.updateCheckInStatus(true);
+            }
+            return false; // 返回false表示未进行新的签到
         } else {
             checkInData.dates.push(todayStr);
             await DataManager.save('checkInData', 'Perform daily check-in');
             
             showTopToast("今日签到成功！", 2000);
             
-            // 签到成功后，立即更新所有UI
-            await updateTearOffCalendar();
-            await renderMonthlyCalendar(displayedDate.getFullYear(), displayedDate.getMonth());
-
-            // [新增] 通知挂件管理器更新签到状态，停止动画
+            // 通知挂件管理器更新签到状态
             if (typeof PendantManager !== 'undefined' && PendantManager.updateCheckInStatus) {
                 PendantManager.updateCheckInStatus(true);
             }
+            // 核心修复：签到成功后直接返回，避免后续函数重复显示提示
+            // UI的更新将由调用此函数的 resetCard() 统一处理
+            return true; // 返回true表示签到成功
         }
     }
 
@@ -14321,6 +14325,8 @@ const CheckInManager = (() => {
         let moveHandler, endHandler;
         const startHandler = (e) => {
             if (e.target.closest('.calendar-header')) {
+                // 核心修复：停止事件冒泡，防止与父元素的滑动事件冲突
+                e.stopPropagation();
                 return;
             }
 
@@ -14342,7 +14348,6 @@ const CheckInManager = (() => {
             }
             handleSlideStart(isTouch ? e.touches[0].clientX : e.clientX, isTouch ? e.touches[0].clientY : e.clientY);
         };
-
 
         ui.slidableCard.addEventListener('mousedown', startHandler);
         ui.slidableCard.addEventListener('touchstart', startHandler, { passive: true });
@@ -14774,7 +14779,7 @@ const PendantManager = (() => {
                     <!-- 正面：撕页日历 -->
                     <div class="calendar-front">
                         <div class="calendar">
-                            <div class="calendar-header" id="checkin-header">成为水母宝宝已经 0 天</div>
+                            <div class="calendar-header" id="checkin-header">成为水母宝宝已经</div>
                             <div class="calendar-date-next">
                                 <div class="date-number" id="nextDateNum"></div>
                                 <div class="date-full" id="nextDateFull"></div>
