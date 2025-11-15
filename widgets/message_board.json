@@ -34,7 +34,7 @@
         "enabled": true,
         "time": "2025-11-15T17:34",
         "type": "daily",
-        "disappearOnEnd": false
+        "disappearOnEnd": true
       },
       "isCompleted": false
     }
