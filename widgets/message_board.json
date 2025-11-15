@@ -41,7 +41,7 @@
     },
     {
       "id": 1763202628130,
-      "isCompleted": false,
+      "isCompleted": true,
       "title": "签到哦哦哦",
       "linkedProjectHref": "1",
       "reminder": {
