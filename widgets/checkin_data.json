@@ -10,7 +10,7 @@
     "2025-11-15"
   ],
   "background": {
-    "type": "color"
+    "type": "image"
   },
   "reminder": {
     "enabled": true
