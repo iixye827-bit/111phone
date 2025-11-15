@@ -926,6 +926,75 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         }
         /* ===== [END] FLOATING JELLYFISH BALL STYLES ===== */
 
+        /* ===== [START] MEMO LIST ITEM COPY BUTTON STYLES ===== */
+        .note-item {
+            position: relative; /* 确保子元素能够绝对定位 */
+        }
+
+        /* 复制按钮在备忘录列表项中的样式 */
+        .note-item-copy-btn {
+            position: absolute;
+            bottom: 8px; /* 距离底部 */
+            right: 8px; /* 距离右侧 */
+            width: 24px;   /* 按钮宽度 */
+            height: 24px;  /* 按钮高度 */
+            padding: 4px;  /* 增加点击区域 */
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #ADB5BD; /* 浅灰色 */
+            opacity: 0.5; /* 默认半透明 */
+            transition: opacity 0.2s, transform 0.2s;
+            z-index: 2; /* 确保在备忘录内容之上 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%; /* 圆形 */
+        }
+        
+        /* 鼠标悬停时 */
+        .note-item-copy-btn:hover {
+            opacity: 1;
+            transform: scale(1.1); /* 稍微放大 */
+            background-color: rgba(128,128,128,0.1); /* 浅色背景 */
+        }
+
+        /* 夜间模式 */
+        body.dark-mode .note-item-copy-btn {
+            color: #718096; /* 夜间模式下的浅灰色 */
+        }
+        body.dark-mode .note-item-copy-btn:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        /* 磨砂玻璃主题 */
+        body.theme-glass .note-item-copy-btn {
+            background: rgba(255, 255, 255, 0.1); /* 半透明背景 */
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+        body.theme-glass.dark-mode .note-item-copy-btn {
+             background: rgba(50, 50, 50, 0.25);
+             border-color: rgba(255, 255, 255, 0.1);
+             color: #CCC;
+        }
+
+        /* 调整图标尺寸，以便更好地适应24px的按钮 */
+        .note-item-copy-btn svg {
+            width: 16px; /* SVG图标的实际大小 */
+            height: 16px;
+        }
+
+        /* 隐藏复制按钮在管理模式下，避免干扰 */
+        .note-item.manage-mode .note-item-copy-btn {
+            display: none;
+        }
+        /* ===== [END] MEMO LIST ITEM COPY BUTTON STYLES ===== */
+
+
         /* ===== [START] FLOATING PROJECT WINDOW STYLES ===== */
         .floating-project-window {
             position: fixed;
@@ -4344,6 +4413,23 @@ body.dark-mode .leaderboard-info-time {
   /* 使用 `!important` 来确保此动画会覆盖默认的 'bob' 动画 */
   animation: remind-shake 1.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite both !important;
 }
+/* =============================================================== */
+/* ============= [新增] 备忘录导入文件名列表样式 ============= */
+/* =============================================================== */
+.memo-import-filename {
+    font-size: 12px;
+    color: #889;
+    padding: 3px 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+body.dark-mode .memo-import-filename {
+    color: #a0aec0;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
 
     </style>
 
@@ -5506,6 +5592,36 @@ body.dark-mode #floating-jellyfish-ball {
             </div>
         </div>
     </div>
+    <!-- [新增] 备忘录文件导入模态框 -->
+    <div id="memoImportModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header">
+                <div class="modal-title-group">导入文本文件</div>
+                <button class="close-btn" data-modal-id="memoImportModal">&times;</button>
+            </div>
+            <div class="modal-body" style="gap: 15px;">
+                <p style="font-size: 14px; color: #889;">支持导入 .txt, .xml, .doc, .docx 文件，将提取纯文本内容。</p>
+                <div class="file-select-wrapper">
+                    <input type="file" id="memoFilePicker" accept=".txt,.xml,.doc,.docx" multiple style="display: none;">
+                    <button id="memoFilePickerBtn" class="modal-button" style="width: 100%;">选择文件</button>
+                </div>
+                <div id="memoImportStatus" class="status-text" style="text-align: left; min-height: 20px; margin-bottom: 5px;"></div>
+                <!-- [新增] 用于显示已选文件名的列表容器 -->
+                <div id="memo-import-file-list" style="max-height: 110px; overflow-y: auto; padding: 8px; border-radius: 8px; background: rgba(0,0,0,0.03); display: none;"></div>
+                <div class="progress-container" id="memoImportProgressContainer">
+                    <div class="progress-bar-wrapper">
+                        <div id="memoImportProgressBar" class="progress-bar"></div>
+                    </div>
+                    <button id="memoImportCancelBtn" title="取消导入">✖</button>
+                </div>
+            </div>
+            <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button data-action="close-memo-import-modal" class="modal-button">取消</button>
+                <button id="confirmMemoImportBtn" class="modal-button" style="color:var(--hold-border)" disabled>导入</button>
+            </div>
+        </div>
+    </div>
+    <!-- [新增结束] -->
     <!-- ===== [END] MEMORY MODAL ===== -->
 
     <!-- 全屏照片查看器 -->
@@ -9133,10 +9249,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.className = `note-item ${note.isPinned ? 'pinned' : ''} ${state.isNoteManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`; 
                 el.dataset.noteId = note.id;
                 el.dataset.action = "open-note";
-                const preview = (note.content || '').substring(0, 100).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                // 提取纯文本内容用于预览和复制
+                // 创建一个虚拟div来解析HTML并获取纯文本
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = note.content || '';
+                const plainTextContent = tempDiv.textContent;
+
+                const preview = (plainTextContent).substring(0, 100).replace(/</g, "&lt;").replace(/>/g, "&gt;"); // 预览纯文本
                 const date = new Date(note.timestamp).toLocaleDateString('zh-CN');
                 // 添加复选框，并将图标从 📌 替换为 "置顶"
-                el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}><div class="note-content-area"><div class="note-title">${note.title || '无标题'}</div><div class="note-preview">${preview || '没有内容'}</div><div class="note-timestamp">${date}</div></div><button class="pin-btn" data-action="pin-note" data-note-id="${note.id}" title="置顶">置顶</button>`;
+                el.innerHTML = `
+                    <input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}>
+                    <div class="note-content-area">
+                        <div class="note-title">${note.title || '无标题'}</div>
+                        <div class="note-preview">${preview || '没有内容'}</div>
+                        <div class="note-timestamp">${date}</div>
+                    </div>
+                    <button class="pin-btn" data-action="pin-note" data-note-id="${note.id}" title="置顶">置顶</button>
+                    <!-- 新增的复制按钮 -->
+                    <button class="note-item-copy-btn" data-action="copy-note-text" data-note-id="${note.id}" title="复制备忘录正文">
+                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20px" height="20px" viewBox="0 0 20 20">
+                            <path d="m4,7h3c.552,0,1-.448,1-1v-3" fill="currentColor" stroke="currentColor" stroke-linejoin="round" stroke-width="2" data-color="color-2"></path>
+                            <path d="m16,14v-8c0-1.657-1.343-3-3-3h-4.586c-.265,0-.52.105-.707.293l-3.414,3.414c-.188.188-.293.442-.293.707v6.586c0,1.657,1.343,3,3,3h6c1.657,0,3-1.343,3-3Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                        </svg>
+                    </button>
+                `;
                 ui.notesList.appendChild(el);
             });
             if (notesInFolder.length === 0) ui.notesList.innerHTML = `<p class="empty-list-placeholder">没有笔记</p>`;
@@ -9516,6 +9653,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderNotes();
                 scheduleSave();
             },
+            // 新增：复制备忘录纯文本的动作
+            'copy-note-text': async (target) => {
+                // 阻止事件冒泡，防止触发父级“open-note”事件
+                // 注意：在 event delegation 场景下，事件参数 `e` 需要被传入 `actions`。
+                // 我会在 `ui.appContainer.addEventListener` 部分进行更正。
+                const noteId = parseInt(target.closest('[data-note-id]').dataset.noteId, 10);
+                const note = memoryCache.memo.notes.find(n => n.id === noteId);
+                if (note && note.content) {
+                    // 创建一个临时div，将HTML内容赋值给它，然后获取textContent以提取纯文本
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = note.content;
+                    const plainText = tempDiv.textContent;
+                    try {
+                        await navigator.clipboard.writeText(plainText);
+                        showTopToast(`"${note.title || '无标题'}" 已复制`, 2000);
+                    } catch (err) {
+                        showTopToast('复制失败，请手动复制', 2000);
+                        console.error('Failed to copy note text:', err);
+                    }
+                } else {
+                    showTopToast('备忘录内容为空，无法复制', 2000);
+                }
+            },
+
 
             'toggle-memo-manage': (target) => {
                 state.isMemoManageMode = !state.isMemoManageMode;
@@ -10639,12 +10800,216 @@ open: async () => {
                 }, { root: ui.photoList, rootMargin: "0px 0px 200px 0px" });
 
 
+                // [核心修改] 重构事件监听以支持长按
+                let pressTimer = null;
+                let isLongPress = false;
+                const FAB_ADD_NOTE_SELECTOR = '.fab[data-action="add-note"]';
+
+                const startPress = (e) => {
+                    const fabButton = e.target.closest(FAB_ADD_NOTE_SELECTOR);
+                    if (fabButton) {
+                        isLongPress = false;
+                        pressTimer = setTimeout(() => {
+                            isLongPress = true;
+                            // 打开导入模态框
+                            openMemoImportModal();
+                        }, 500); // 500毫秒定义为长按
+                    }
+                };
+
+                const cancelPress = (e) => {
+                    clearTimeout(pressTimer);
+                };
+
+                const endPress = (e) => {
+                    clearTimeout(pressTimer);
+                    const fabButton = e.target.closest(FAB_ADD_NOTE_SELECTOR);
+                    if (fabButton && isLongPress) {
+                        e.preventDefault(); // 阻止默认的点击事件
+                        e.stopPropagation(); // 阻止事件冒泡
+                    }
+                };
+
+                ui.appContainer.addEventListener('mousedown', startPress);
+                ui.appContainer.addEventListener('touchstart', startPress);
+                ui.appContainer.addEventListener('mouseup', endPress);
+                ui.appContainer.addEventListener('touchend', endPress);
+                ui.appContainer.addEventListener('mouseleave', cancelPress, true);
+
+
                 ui.appContainer.addEventListener('click', e => {
                     const target = e.target.closest('[data-action]');
+                    if(target && target.matches(FAB_ADD_NOTE_SELECTOR) && isLongPress) {
+                        isLongPress = false; // 重置标志
+                        return; // 如果是长按触发的点击，则忽略
+                    }
+                    
                     if (target && actions[target.dataset.action]) {
-                        actions[target.dataset.action](target);
+                        // 如果是复制备忘录按钮，阻止事件冒泡，防止打开备忘录
+                        if (target.dataset.action === 'copy-note-text') {
+                             e.stopPropagation(); // 阻止事件冒泡到父级的 open-note 处理器
+                        }
+                        actions[target.dataset.action](target, e); // 传递完整的事件对象
                     }
                 });
+
+
+                // [新增] 打开导入备忘录模态框的函数 (V3 - 优化UI和格式处理)
+                const openMemoImportModal = () => {
+                    const modal = document.getElementById('memoImportModal'); 
+                    const fileInput = modal.querySelector('#memoFilePicker');
+                    const filePickerBtn = modal.querySelector('#memoFilePickerBtn');
+                    const statusEl = modal.querySelector('#memoImportStatus');
+                    const fileListEl = modal.querySelector('#memo-import-file-list'); // [新增] 获取文件名列表容器
+                    const progressContainer = modal.querySelector('#memoImportProgressContainer');
+                    const progressBar = modal.querySelector('#memoImportProgressBar');
+                    const cancelImportBtn = modal.querySelector('#memoImportCancelBtn');
+                    const confirmImportBtn = modal.querySelector('#confirmMemoImportBtn');
+                    const cancelModalBtn = modal.querySelector('[data-action="close-memo-import-modal"]');
+                    const closeIconBtn = modal.querySelector('.close-btn');
+
+                    let activeFileReading = true;
+                    
+                    const closeModal = () => {
+                        activeFileReading = false;
+                        modal.classList.remove('show');
+                    }
+                    
+                    // 重置UI
+                    fileInput.value = '';
+                    statusEl.textContent = '最多可选择 20 个文件';
+                    fileListEl.innerHTML = ''; // [新增] 清空文件名列表
+                    fileListEl.style.display = 'none'; // [新增] 隐藏列表容器
+                    confirmImportBtn.disabled = true;
+                    progressContainer.style.display = 'none';
+                    progressBar.style.width = '0%';
+                    activeFileReading = true;
+                    
+                    cancelModalBtn.onclick = closeModal;
+                    closeIconBtn.onclick = closeModal;
+
+                    filePickerBtn.onclick = () => fileInput.click();
+                    
+                    // 文件选择后的处理 (已修改)
+                    fileInput.onchange = (e) => {
+                        const files = e.target.files;
+                        fileListEl.innerHTML = ''; // 每次选择都清空
+
+                        if (files.length > 20) {
+                            alert("一次最多只能选择20个文件！");
+                            fileInput.value = '';
+                            fileListEl.style.display = 'none';
+                            statusEl.textContent = '最多可选择 20 个文件';
+                            return;
+                        }
+                        if (files.length > 0) {
+                            statusEl.textContent = `已选择 ${files.length} 个文件`;
+                            // [Requirement 1 实现] 遍历文件并显示文件名
+                            Array.from(files).forEach(file => {
+                                const fileEl = document.createElement('div');
+                                fileEl.className = 'memo-import-filename';
+                                fileEl.textContent = file.name;
+                                fileListEl.appendChild(fileEl);
+                            });
+                            fileListEl.style.display = 'block';
+                            confirmImportBtn.disabled = false;
+                        } else {
+                            statusEl.textContent = '最多可选择 20 个文件';
+                            fileListEl.style.display = 'none';
+                            confirmImportBtn.disabled = true;
+                        }
+                    };
+                    
+                    // 绑定 "导入" 按钮 (已修改)
+                    confirmImportBtn.onclick = async () => {
+                        const files = fileInput.files;
+                        if (files.length === 0) return;
+                        
+                        confirmImportBtn.disabled = true;
+                        cancelModalBtn.style.display = 'none';
+                        progressContainer.style.display = 'flex';
+                        statusEl.textContent = '准备解析文件...';
+
+                        const cancelImportHandler = () => {
+                           activeFileReading = false;
+                           showTopToast('导入已取消', 2000);
+                           closeModal();
+                        };
+                        cancelImportBtn.addEventListener('click', cancelImportHandler, { once: true });
+                        
+                        const filePromises = Array.from(files).map((file, index) => {
+                            return new Promise(async (resolve, reject) => {
+                                if (!activeFileReading) return reject(new Error('Cancelled'));
+                                
+                                try {
+                                    statusEl.textContent = `正在解析: ${file.name}`;
+                                    const reader = new FileReader();
+                                    const getFileNameWithoutExtension = (fileName) => fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+                                    const title = getFileNameWithoutExtension(file.name);
+                                    let content = '';
+                                    if (file.name.endsWith('.docx')) {
+                                        const arrayBuffer = await new Promise((res, rej) => {
+                                            reader.onload = e => res(e.target.result); reader.onerror = rej; reader.readAsArrayBuffer(file);
+                                        });
+                                        const result = await mammoth.extractRawText({ arrayBuffer });
+                                        content = result.value;
+                                    } else {
+                                        content = await new Promise((res, rej) => {
+                                            reader.onload = e => res(e.target.result); reader.onerror = rej; reader.readAsText(file, 'UTF-8');
+                                        });
+                                    }
+                                     // [Requirement 2 实现] 格式化文本以保留换行和空格
+                                    let formattedContent = content
+                                        .replace(/&/g, "&amp;")
+                                        .replace(/</g, "&lt;")
+                                        .replace(/>/g, "&gt;")
+                                        .replace(/"/g, "&quot;")
+                                        .replace(/'/g, "&#039;")
+                                        .replace(/\r\n/g, '\n') // 统一换行符
+                                        .replace(/  /g, ' &nbsp;') // 替换连续空格
+                                        .replace(/\n/g, '<br>'); // 替换换行为<br>
+
+
+                                    resolve({ title, content: formattedContent });
+
+                                } catch (err) {
+                                    console.error(`解析文件 ${file.name} 失败:`, err);
+                                    reject(new Error(`无法解析 ${file.name}`));
+                                } finally {
+                                     const progressPercent = ((index + 1) / files.length) * 100;
+                                     progressBar.style.width = `${progressPercent}%`;
+                                }
+                            });
+                        });
+                        
+                        try {
+                            const results = await Promise.all(filePromises);
+                            
+                            statusEl.textContent = '解析完成，正在保存...';
+                            const now = Date.now();
+                            results.forEach((result, index) => {
+                                memoryCache.memo.notes.push({ id: now + index, folderId: state.currentMemoFolderId, title: result.title, content: result.content, timestamp: now + index, isPinned: false });
+                            });
+                            
+                            await scheduleSave();
+                            renderNotes();
+                            showTopToast(`${results.length} 篇备忘录导入成功！`, 2500);
+                            closeModal();
+                        } catch (error) {
+                            if (error.message !== 'Cancelled') {
+                               alert(error.message);
+                            }
+                        } finally {
+                           confirmImportBtn.disabled = false;
+                           cancelModalBtn.style.display = 'block';
+                           progressContainer.style.display = 'none';
+                           cancelImportBtn.removeEventListener('click', cancelImportHandler);
+                        }
+                    };
+
+                    modal.classList.add('show');
+                };
+
 
                 // [新增] 长图双击缩放逻辑
                 const viewerImg = ui.photoViewer.querySelector('#viewer-img');
@@ -12916,8 +13281,13 @@ open: async () => {
             // [V3 终极修复] 重构滑动逻辑，解决事件冲突
             let startY = 0, diffX = 0, diffY = 0, swipeIntention = null; // null, 'horizontal', 'vertical'
 
-            function handleTouchStart(e) {
-                // 如果正在滑动中，或者目标是组件等，则忽略新的触摸
+             function handleTouchStart(e) {
+                // [最终修复] 如果触摸起始点在日历组件内部，则完全中止全局滑动逻辑，将事件控制权交还给日历自身。
+                if (e.target.closest('.calendar-flipper')) {
+                    return;
+                }
+
+                // 如果正在滑动中，或者目标是其他交互组件，则忽略新的触摸
                 if (isSwiping || !isEnabled || e.target.closest('.widget, .widget-placeholder, .component-adder')) return;
                 
                 // 重置所有状态
@@ -12934,6 +13304,7 @@ open: async () => {
                 // 标记触摸 sequence 开始
                 isSwiping = true; 
             }
+
 
             function handleTouchMove(e) {
                 if (!isSwiping || !isEnabled) return;
@@ -14324,32 +14695,57 @@ const CheckInManager = (() => {
         
         let moveHandler, endHandler;
         const startHandler = (e) => {
-            if (e.target.closest('.calendar-header')) {
+            // [核心修复] 如果事件目标是日历头部或月历背面，则完全中止滑动逻辑。
+            if (e.target.closest('.calendar-header') || e.target.closest('.calendar-back')) {
                 return;
             }
 
+            // 阻止默认行为（如页面滚动），确保拖拽的流畅性
+            e.preventDefault();
+
             const isTouch = !!e.touches;
+            
+            // 为防止意外的重复绑定，先清理旧的监听器
             document.removeEventListener('mousemove', moveHandler);
             document.removeEventListener('mouseup', endHandler);
             document.body.removeEventListener('touchmove', moveHandler);
             document.body.removeEventListener('touchend', endHandler);
 
-            moveHandler = (moveEvent) => handleSlideMove(isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX, isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY);
-            endHandler = (endEvent) => handleSlideEnd(isTouch ? endEvent.changedTouches[0].clientX : endEvent.clientX, isTouch ? endEvent.changedTouches[0].clientY : endEvent.clientY);
+            // 定义本次拖拽过程中的 move 和 end 处理器
+            moveHandler = (moveEvent) => {
+                const clientX = isTouch ? moveEvent.touches[0].clientX : moveEvent.clientX;
+                const clientY = isTouch ? moveEvent.touches[0].clientY : moveEvent.clientY;
+                handleSlideMove(clientX, clientY);
+            };
+            endHandler = (endEvent) => {
+                const clientX = isTouch ? endEvent.changedTouches[0].clientX : endEvent.clientX;
+                const clientY = isTouch ? endEvent.changedTouches[0].clientY : endEvent.clientY;
+                handleSlideEnd(clientX, clientY);
 
+                // [核心修复] 拖拽结束后，务必移除全局监听器，避免干扰其他操作
+                document.removeEventListener('mousemove', moveHandler);
+                document.removeEventListener('mouseup', endHandler);
+                document.body.removeEventListener('touchmove', moveHandler);
+                document.body.removeEventListener('touchend', endHandler);
+            };
+
+            // 绑定全局监听器
             if (isTouch) {
-                document.body.addEventListener('touchmove', moveHandler, { passive: true });
+                document.body.addEventListener('touchmove', moveHandler, { passive: false });
                 document.body.addEventListener('touchend', endHandler, { once: true });
             } else {
                 document.addEventListener('mousemove', moveHandler);
                 document.addEventListener('mouseup', endHandler, { once: true });
             }
+            
+            // 记录起始位置
             handleSlideStart(isTouch ? e.touches[0].clientX : e.clientX, isTouch ? e.touches[0].clientY : e.clientY);
         };
 
-
+        // [核心修复] 将滑动监听器精确地绑定到可撕下的卡片上
         ui.slidableCard.addEventListener('mousedown', startHandler);
-        ui.slidableCard.addEventListener('touchstart', startHandler, { passive: true });
+        // [核心修复] 将 passive 设置为 false，以便在 moveHandler 中调用 preventDefault() 防止页面滚动
+        ui.slidableCard.addEventListener('touchstart', startHandler, { passive: false });
 
         await updateTearOffCalendar();
         await renderMonthlyCalendar(displayedDate.getFullYear(), displayedDate.getMonth());
@@ -14734,6 +15130,35 @@ const PendantManager = (() => {
         </div>
     </div>
     <!-- [新增结束] -->
+    <!-- ============= [ 新增：备忘录导入模态框 ] ============= -->
+    <div class="modal-overlay" id="importMemoModal">
+        <div class="modal-content" style="max-width: 420px;">
+            <div class="modal-header">
+                <div class="modal-title-group"><span>导入备忘录</span></div>
+                <button class="close-btn" data-modal-id="importMemoModal">&times;</button>
+            </div>
+            <div class="modal-body" style="gap: 15px;">
+                <div class="important-note" style="margin-top: 0;">
+                    <p style="margin: 0; line-height: 1.6;">支持导入 <strong>.txt, .doc, .docx, .xml</strong> 格式的文件。将提取纯文本，并以文件名作为标题批量创建备忘录。</p>
+                </div>
+                
+                <div class="file-select-wrapper" style="flex-direction: column; gap: 15px;">
+                    <input type="file" id="memoFilePicker" multiple accept=".txt,.doc,.docx,.xml" style="display: none;">
+                    <button id="memoFilePickerBtn" class="modal-button" style="width: 100%;">选择文件</button>
+                    <span id="memoFilePickerStatus" class="status-text" style="text-align: center; min-height: 20px;">未选择任何文件</span>
+                </div>
+                
+                <div id="memoImportProgressContainer" style="display: none; text-align: center; color: #889;">
+                    <div class="music-loader" style="margin-bottom: 8px;"></div>
+                    <span id="memoImportStatus"></span>
+                </div>
+
+                <button id="startMemoImportBtn" class="modal-button" disabled>开始导入</button>
+            </div>
+        </div>
+    </div>
+    <!-- ============= [ 新增结束 ] ============= -->
+
     <!-- [新增] 选择性数据清理模态框 -->
     <div class="modal-overlay" id="selectiveClearModal">
         <div class="modal-content" style="max-width: 450px;">
@@ -14935,5 +15360,35 @@ const PendantManager = (() => {
     </div>
 </div>
 <!-- ===== [重构结束] ===== -->
+<!-- ============= [ 新增：备忘录导入模态框 ] ============= -->
+<div class="modal-overlay" id="importMemoModal">
+    <div class="modal-content" style="max-width: 420px;">
+        <div class="modal-header">
+            <div class="modal-title-group"><span>导入备忘录</span></div>
+            <button class="close-btn" data-modal-id="importMemoModal">&times;</button>
+        </div>
+        <div class="modal-body" style="gap: 15px;">
+            <div class="important-note" style="margin-top: 0;">
+                <p style="margin: 0; line-height: 1.6;">支持导入 <strong>.txt, .doc, .docx, .xml</strong> 格式的文件。将提取纯文本，并以文件名作为标题批量创建备忘录。</p>
+            </div>
+            
+            <div class="file-select-wrapper" style="flex-direction: column; gap: 15px;">
+                <input type="file" id="memoFilePicker" multiple accept=".txt,.doc,.docx,.xml" style="display: none;">
+                <button id="memoFilePickerBtn" class="modal-button" style="width: 100%;">选择文件</button>
+                <span id="memoFilePickerStatus" class="status-text" style="text-align: center; min-height: 20px;">未选择任何文件</span>
+            </div>
+            
+            <div id="memoImportProgressContainer" style="display: none; text-align: center; color: #889;">
+                <div class="music-loader" style="margin-bottom: 8px;"></div>
+                <span id="memoImportStatus"></span>
+            </div>
+
+            <button id="startMemoImportBtn" class="modal-button" disabled>开始导入</button>
+        </div>
+    </div>
+</div>
+<!-- ============= [ 新增结束 ] ============= -->
+<!-- 将这个 script 标签放在 </body> 之前 -->
+<script src="https://unpkg.com/mammoth@1.7.0/mammoth.browser.min.js"></script>
 </body>
 </html>
