@@ -4495,49 +4495,56 @@ body.dark-mode .message-card.completed {
 }
 
 .message-card-header {
+    /* [需求修改] 使用 flex 布局实现左右对齐 */
     display: flex;
-    justify-content: center; /* 居中顶部内容 */
-    align-items: center;
-    gap: 8px;
+    justify-content: space-between; /* 核心：两端对齐 */
+    align-items: center; /* 垂直居中 */
+    gap: 15px; /* 标题和链接之间的最小间距 */
     width: 100%;
 }
 .message-card-time {
-    /* [需求修改] 隐藏提醒时间 */
+    /* 保持隐藏 */
     display: none;
 }
 .message-card-title {
-    /* [需求修改] 显著增大标题字号 */
-    font-size: 24px;
+    /* [需求修改] 再次增大字号并改为左对齐 */
+    font-size: 28px;
     font-weight: 700;
-    text-align: center;
+    text-align: left; /* 靠左显示 */
     word-break: break-word;
-    /* [新增] 为标题添加轻微文字阴影，使其在图片背景上更清晰 */
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    /* [新增] 确保标题不会被链接挤压 */
+    flex-grow: 1;
+    min-width: 0;
 }
 
 .message-card-link-info {
+    /* [需求修改] 调整链接样式并使其靠右 */
     display: flex;
-    justify-content: center;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
+    font-size: 14px; /* 稍微增大字体 */
+    font-weight: 600; /* 加粗 */
     color: #889;
     background-color: rgba(128,128,128,0.08);
-    padding: 5px 10px;
+    padding: 6px 12px; /* 调整内边距 */
     border-radius: 8px;
-    margin: 5px auto 0 auto;
-    max-width: 90%;
+    /* [移除] margin-left/right: auto，因为父元素已经是 flex 布局 */
+    margin-top: 5px;
+    max-width: 50%; /* 限制最大宽度，防止过长 */
+    flex-shrink: 0; /* 防止被标题挤压 */
+     white-space: nowrap; /* [新增] 确保内容不换行 */
 }
+
 .message-card-link-info .link-icon {
-    font-size: 16px;
-    flex-shrink: 0;
+    /* [需求修改] 隐藏 "链接" 文字 */
+    display: none;
 }
 .message-card-link-info .link-name {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 
 /* 弹窗内 segmented-control 样式 */
 #messageBoardModal .segmented-control .slider-indicator { 
@@ -4549,6 +4556,23 @@ body.dark-mode .message-card.completed {
 #reminder-type-daily:checked ~ .slider-indicator { transform: translateX(100%); }
 #reminder-type-periodic:checked ~ .slider-indicator { transform: translateX(200%); }
 
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+/* =============================================================== */
+/* ================== [新增] 留言板弹窗透明度优化 ================= */
+/* =============================================================== */
+#messageBoardModal .modal-content {
+    background: rgba(240, 245, 255, 0.85); /* 日间模式：带85%透明度的淡蓝色背景 */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+body.dark-mode #messageBoardModal .modal-content {
+    background: rgba(22, 33, 62, 0.85); /* 夜间模式：带85%透明度的深蓝色背景 */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
@@ -14355,15 +14379,11 @@ open: async () => {
 /* =============================================================== */
 /* ================== [新增] 留言板功能管理器 V2 ================== */
 /* =============================================================== */
-/* =============================================================== */
-/* ================== [新增] 留言板功能管理器 V2 ================== */
-/* =============================================================== */
 const MessageBoardManager = (() => {
     let ui = {};
     let isEditing = false;
     let editingMessageId = null;
     let reminderInterval = null;
-    // [新增] 用于暂存待保存的背景图片Data URL
     let pendingBgImageDataUrl = null;
 
     function init() {
@@ -14378,7 +14398,7 @@ const MessageBoardManager = (() => {
             reminderTimeInput: document.getElementById('messageReminderTime'),
             allDayToggle: document.getElementById('messageAllDayToggle'),
             saveBtn: document.getElementById('saveMessageBtn'),
-            // [新增] 背景图片相关UI元素
+            deleteBtn: document.getElementById('deleteMessageBtn'), // [需求新增] 删除按钮
             bgImagePicker: document.getElementById('messageBgImagePicker'),
             uploadBgBtn: document.getElementById('uploadMessageBgBtn'),
             clearBgBtn: document.getElementById('clearMessageBgBtn'),
@@ -14390,21 +14410,32 @@ const MessageBoardManager = (() => {
         ui.reminderToggle.addEventListener('change', () => {
             ui.reminderDetails.style.display = ui.reminderToggle.checked ? 'flex' : 'none';
         });
-        ui.allDayToggle.addEventListener('change', () => {
-             ui.reminderTimeInput.disabled = ui.allDayToggle.checked;
-             if(ui.allDayToggle.checked) {
-                const today = new Date();
-                today.setHours(9, 0, 0, 0); // 默认设置为当天的早上9点
-                ui.reminderTimeInput.value = today.toISOString().slice(0, 16).replace('T', ' ');
-             }
-        });
-        ui.saveBtn.addEventListener('click', saveMessage);
 
-        // [新增] 背景图片上传和清除的事件监听
+        // [需求修改] 全天提醒开关控制时间选择器的显隐
+        ui.allDayToggle.addEventListener('change', () => {
+             // 获取时间输入框的父容器（通常是 .form-section）
+            const timeInputContainer = ui.reminderTimeInput.closest('.form-section') || ui.reminderTimeInput;
+            const isAllDay = ui.allDayToggle.checked;
+            
+            timeInputContainer.style.display = isAllDay ? 'none' : 'block';
+
+            if(isAllDay) {
+                // 如果是全天，可以自动填充一个默认时间，但这部分对用户不可见
+                const today = new Date();
+                today.setHours(9, 0, 0, 0);
+                ui.reminderTimeInput.value = today.toISOString().slice(0, 16);
+            }
+        });
+
+        ui.saveBtn.addEventListener('click', saveMessage);
+        
+        // [需求新增] 为删除按钮绑定事件
+        ui.deleteBtn.addEventListener('click', deleteMessage);
+
         ui.uploadBgBtn.addEventListener('click', () => ui.bgImagePicker.click());
         ui.bgImagePicker.addEventListener('change', handleImageUpload);
         ui.clearBgBtn.addEventListener('click', () => {
-            pendingBgImageDataUrl = 'CLEARED'; // 使用特殊标记表示清除
+            pendingBgImageDataUrl = 'CLEARED';
             ui.uploadBgBtn.textContent = '上传图片';
             showTopToast("背景图已清除，保存后生效", 2000);
         });
@@ -14412,7 +14443,6 @@ const MessageBoardManager = (() => {
         startReminderChecker();
     }
 
-    // [新增] 处理图片上传并生成Data URL的函数
     function handleImageUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -14424,7 +14454,6 @@ const MessageBoardManager = (() => {
             showTopToast("图片已选择，保存后生效", 2000);
         };
         reader.readAsDataURL(file);
-        // 清空input的值，确保下次选择同一文件也能触发change事件
         event.target.value = '';
     }
 
@@ -14443,42 +14472,36 @@ const MessageBoardManager = (() => {
             card.className = `message-card ${msg.isCompleted ? 'completed' : ''}`;
             card.dataset.messageId = msg.id;
 
-            // [需求修改] 应用背景图片
             if (msg.background) {
                 card.style.backgroundImage = `url(${msg.background})`;
                 card.style.backgroundSize = 'cover';
                 card.style.backgroundPosition = 'center';
-                // 当有背景图时，强制文字为白色以保证可读性
                 card.style.color = '#FFFFFF';
             }
             
             const contentWrapper = document.createElement('div');
             contentWrapper.className = 'message-card-content-wrapper';
 
-            // [需求修改] 将 header 移到 title 下方，并始终渲染它，以便提供一个 flex 容器
-            // 时间本身已在CSS中被隐藏 (display: none)
-            const reminderHtml = `
-                <div class="message-card-header">
-                    <span class="message-card-time">${/* 时间文本，但不可见 */''}</span>
-                </div>`;
+            // [需求修改] 标题和链接在同一个容器内左右对齐
+            const headerContainer = document.createElement('div');
+            headerContainer.className = 'message-card-header';
 
             const titleHtml = `<div class="message-card-title">${msg.title}</div>`;
+            headerContainer.innerHTML = titleHtml;
 
-            let linkHtml = '';
             if (msg.linkedProjectHref) {
                 const project = findButtonConfigByHref(msg.linkedProjectHref);
                 const projectName = project ? project.text : '未知项目';
-                // [新增] 如果有背景图，给链接区域也加上一点半透明背景以增强可读性
                 const linkStyle = msg.background ? 'style="background-color: rgba(0,0,0,0.3);"' : '';
-                linkHtml = `
+                const linkHtml = `
                     <div class="message-card-link-info" ${linkStyle}>
-                        <span class="link-icon">🔗</span>
+                        <span class="link-icon">链接</span>
                         <span class="link-name">${projectName}</span>
                     </div>`;
+                headerContainer.innerHTML += linkHtml;
             }
 
-            // [需求修改] 调整HTML结构顺序
-            contentWrapper.innerHTML = titleHtml + linkHtml + reminderHtml;
+            contentWrapper.appendChild(headerContainer);
             card.appendChild(contentWrapper);
             ui.container.appendChild(card);
         });
@@ -14518,7 +14541,7 @@ const MessageBoardManager = (() => {
             isClick = false; 
         }
 
-        if (diffX < 0) diffX = 0; // 只允许向右滑动
+        if (diffX < 0) diffX = 0;
 
         targetCard.style.transform = `translateX(${diffX}px)`;
         targetCard.style.opacity = 1 - (diffX / (targetCard.offsetWidth * 0.7));
@@ -14535,23 +14558,42 @@ const MessageBoardManager = (() => {
         const threshold = targetCard.offsetWidth * 0.4;
 
         if (diffX > threshold) {
-            targetCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-            targetCard.style.transform = `translateX(${targetCard.offsetWidth}px)`;
-            targetCard.style.opacity = '0';
-            
             const messageId = parseInt(targetCard.dataset.messageId, 10);
             const messageData = await DataManager.get('messageBoardData');
             const msg = messageData.messages.find(m => m.id === messageId);
+
             if (msg) {
-                msg.isCompleted = true;
-                await DataManager.save('messageBoardData', 'Complete message');
+                // [需求修改] 条件滑动逻辑
+                if (msg.reminder.type === 'once' && msg.reminder.enabled) {
+                    // "仅一次"提醒，彻底删除
+                    targetCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                    targetCard.style.transform = `translateX(${targetCard.offsetWidth}px)`;
+                    targetCard.style.opacity = '0';
+                    
+                    messageData.messages = messageData.messages.filter(m => m.id !== messageId);
+                    await DataManager.save('messageBoardData', 'Remove one-time message');
+                    showTopToast("留言已完成并移除", 2000);
+                    setTimeout(() => targetCard.remove(), 300);
+                } else {
+                    // "每日"提醒或无提醒，标记为完成
+                    msg.isCompleted = true;
+                    await DataManager.save('messageBoardData', 'Complete message');
+                    // 重新渲染以显示完成状态
+                    renderBoard();
+                }
+            } else {
+                // 找不到数据也恢复卡片
+                resetCardPosition();
             }
-            setTimeout(() => renderBoard(), 300);
 
         } else if (isClick) {
              const messageId = parseInt(targetCard.dataset.messageId, 10);
              openModal(messageId);
         } else {
+            resetCardPosition();
+        }
+        
+        function resetCardPosition() {
             targetCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
             targetCard.style.transform = 'translateX(0px)';
             targetCard.style.opacity = '1';
@@ -14581,9 +14623,11 @@ const MessageBoardManager = (() => {
         isEditing = !!messageId;
         editingMessageId = messageId;
         populateProjectSelector();
-        // 重置暂存的背景图数据
         pendingBgImageDataUrl = null; 
         ui.uploadBgBtn.textContent = '上传图片';
+        
+        // [需求修改] 控制删除按钮的显隐
+        ui.deleteBtn.style.display = isEditing ? 'block' : 'none';
 
         if (isEditing) {
             ui.modalTitle.textContent = '编辑留言';
@@ -14596,24 +14640,19 @@ const MessageBoardManager = (() => {
             ui.reminderToggle.checked = msg.reminder?.enabled || false;
             ui.reminderDetails.style.display = ui.reminderToggle.checked ? 'flex' : 'none';
 
-            // [新增] 如果有背景，更新按钮文字
             if (msg.background) {
                 ui.uploadBgBtn.textContent = '已设置背景';
             }
 
             if (msg.reminder && msg.reminder.enabled) {
                 ui.allDayToggle.checked = msg.reminder.isAllDay;
-                ui.reminderTimeInput.disabled = msg.reminder.isAllDay;
-                
-                // 兼容旧数据可能没有时间的情况
+                // [需求修改] 控制时间输入框显隐
+                const timeInputContainer = ui.reminderTimeInput.closest('.form-section') || ui.reminderTimeInput;
+                timeInputContainer.style.display = msg.reminder.isAllDay ? 'none' : 'block';
+
                 if (msg.reminder.time) {
                     const reminderDate = new Date(msg.reminder.time);
-                    const formattedDateTime = reminderDate.getFullYear() +
-                        '-' + String(reminderDate.getMonth() + 1).padStart(2, '0') +
-                        '-' + String(reminderDate.getDate()).padStart(2, '0') +
-                        'T' + String(reminderDate.getHours()).padStart(2, '0') +
-                        ':' + String(reminderDate.getMinutes()).padStart(2, '0');
-                    ui.reminderTimeInput.value = formattedDateTime;
+                    ui.reminderTimeInput.value = reminderDate.toISOString().slice(0, 16);
                 } else {
                      ui.reminderTimeInput.value = '';
                 }
@@ -14637,7 +14676,8 @@ const MessageBoardManager = (() => {
 
     function resetReminderFields() {
         ui.reminderTimeInput.value = '';
-        ui.reminderTimeInput.disabled = false;
+        const timeInputContainer = ui.reminderTimeInput.closest('.form-section') || ui.reminderTimeInput;
+        timeInputContainer.style.display = 'block';
         ui.allDayToggle.checked = false;
         document.getElementById('reminder-type-once').checked = true;
     }
@@ -14651,21 +14691,14 @@ const MessageBoardManager = (() => {
         let message;
         if (isEditing) {
             const index = messageData.messages.findIndex(m => m.id === editingMessageId);
-            if (index > -1) {
-                message = messageData.messages[index];
-            } else { // 如果找不到，则当作新消息处理
-                isEditing = false;
-            }
+            if (index > -1) message = messageData.messages[index];
+            else isEditing = false;
         }
         
-        if (!isEditing) { // 新建消息
-            message = {
-                id: Date.now(),
-                isCompleted: false
-            };
+        if (!isEditing) {
+            message = { id: Date.now(), isCompleted: false };
         }
         
-        // 更新所有字段
         message.title = title;
         message.linkedProjectHref = ui.linkProjectSelect.value;
         message.reminder = {
@@ -14675,13 +14708,9 @@ const MessageBoardManager = (() => {
             type: document.querySelector('input[name="reminder-type"]:checked').value
         };
 
-        // [新增] 处理背景图片逻辑
         if (pendingBgImageDataUrl) {
-            if (pendingBgImageDataUrl === 'CLEARED') {
-                delete message.background; // 删除背景属性
-            } else {
-                message.background = pendingBgImageDataUrl; // 更新或添加背景
-            }
+            if (pendingBgImageDataUrl === 'CLEARED') delete message.background;
+            else message.background = pendingBgImageDataUrl;
         }
 
         if (isEditing) {
@@ -14695,6 +14724,21 @@ const MessageBoardManager = (() => {
         ui.modal.classList.remove('show');
         renderBoard();
         showTopToast(isEditing ? '留言已更新' : '留言已添加', 2000);
+    }
+
+    // [需求新增] 删除留言的函数
+    async function deleteMessage() {
+        if (!isEditing || !editingMessageId) return;
+
+        if (confirm("确定要永久删除这条留言吗？")) {
+            const messageData = await DataManager.get('messageBoardData');
+            messageData.messages = messageData.messages.filter(m => m.id !== editingMessageId);
+            
+            await DataManager.save('messageBoardData', 'Delete message');
+            ui.modal.classList.remove('show');
+            renderBoard();
+            showTopToast('留言已删除', 2000);
+        }
     }
 
     function startReminderChecker() {
@@ -14738,11 +14782,12 @@ const MessageBoardManager = (() => {
                 // 对于一次性提醒，我们不再自动完成，仅提醒
             }
 
-        }, 30 * 1000); // 检查频率降低到30秒
+        }, 30 * 1000);
     }
 
     return { init, renderBoard };
 })();
+
 
 // 在主 DOMContentLoaded 事件中初始化留言板管理器
 document.addEventListener('DOMContentLoaded', () => {
@@ -15976,7 +16021,11 @@ const PendantManager = (() => {
                         <!-- "提醒后消失" 的 <label> 已被移除 -->
                     </div>
                 </div>
-                <button id="saveMessageBtn" class="modal-button primary">保存留言</button>
+                <!-- [需求修改] 将保存和删除按钮放在一个容器中，方便布局 -->
+                <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                    <button id="deleteMessageBtn" class="modal-button delete" style="display: none; margin-right: auto;">删除</button>
+                    <button id="saveMessageBtn" class="modal-button primary">保存留言</button>
+                </div>
             </div>
         </div>
     </div>
