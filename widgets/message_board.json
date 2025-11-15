@@ -32,9 +32,9 @@
       "linkedProjectHref": "https://raven7-7.github.io/Crow/",
       "reminder": {
         "enabled": true,
-        "time": "2025-11-15T17:34",
-        "type": "daily",
-        "disappearOnEnd": true
+        "time": "2025-11-15T01:00",
+        "isAllDay": true,
+        "type": "daily"
       },
       "isCompleted": false
     }
