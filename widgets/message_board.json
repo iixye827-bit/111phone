@@ -36,7 +36,7 @@
         "isAllDay": true,
         "type": "daily"
       },
-      "isCompleted": true
+      "isCompleted": false
     }
   ]
 }
