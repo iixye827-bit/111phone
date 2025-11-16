@@ -50,18 +50,6 @@
         "isAllDay": false,
         "type": "once"
       }
-    },
-    {
-      "id": 1763273279322,
-      "isCompleted": false,
-      "title": "签到哦哦哦",
-      "linkedProjectHref": "",
-      "reminder": {
-        "enabled": true,
-        "time": "2025-11-16T01:00",
-        "isAllDay": true,
-        "type": "once"
-      }
     }
   ]
 }
