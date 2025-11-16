@@ -60,7 +60,7 @@
         "enabled": true,
         "time": "",
         "isAllDay": false,
-        "type": "daily"
+        "type": "once"
       }
     }
   ]
