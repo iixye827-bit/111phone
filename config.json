@@ -140,7 +140,7 @@
       "filterEnabled": true
     },
     "mobileMode": {
-      "enabled": false
+      "enabled": true
     }
   },
   "themePresets": [
