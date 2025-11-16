@@ -137,7 +137,7 @@
       "includedCategories": [
         "小手机"
       ],
-      "filterEnabled": true
+      "filterEnabled": false
     },
     "mobileMode": {
       "enabled": false
