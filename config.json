@@ -109,7 +109,12 @@
       "name": "GlobalCustomFont",
       "url": "https://files.catbox.moe/iotio6.ttf"
     },
-    "fontPresets": [],
+    "fontPresets": [
+      {
+        "name": "粗体",
+        "url": "https://files.catbox.moe/iotio6.ttf"
+      }
+    ],
     "pendant": {
       "enabled": true,
       "lineLength": "5rem",
