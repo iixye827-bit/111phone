@@ -4975,141 +4975,8 @@ body.dark-mode .tag-actions-toggle-btn:active {
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
 /* =============================================================== */
-/* ============= [新增] 通行密钥弹窗及层级修复样式 ============= */
-/* =============================================================== */
-#passkey-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: 10000; /* 确保在最顶层 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-}
-
-#passkey-modal {
-    width: 90%;
-    max-width: 320px;
-    padding: 25px;
-    background: var(--bg-day-element);
-    color: var(--text-day);
-    border-radius: 16px;
-    box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-body.dark-mode #passkey-modal {
-    background: var(--bg-night-element);
-    color: var(--text-night);
-    box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night);
-}
-
-#passkey-modal h3 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-
-#passkey-modal p {
-    font-size: 14px;
-    color: #889;
-    margin-top: -10px;
-}
-
-#passkey-input {
-    /* 复用现有样式 */
-    padding: 12px 15px;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    text-align: center;
-    background: var(--bg-day-element);
-    color: var(--text-day);
-    box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day);
-    transition:all .3s ease;
-    caret-color:var(--hold-border)
-}
-body.dark-mode #passkey-input {
-    background: var(--bg-night-element);
-    color: var(--text-night);
-    box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night);
-}
-#passkey-input:focus {
-    outline: none;
-    box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day),0 0 0 2px var(--hold-border);
-}
-body.dark-mode #passkey-input:focus {
-    box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night),0 0 0 2px var(--hold-border);
-}
-
-#passkey-submit {
-    /* 复用现有样式 */
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    color: var(--hold-border);
-    background: var(--bg-day-element);
-    box-shadow: 4px 4px 8px var(--shadow-dark-day),-4px -4px 8px var(--shadow-light-day);
-    transition: all .2s ease;
-}
-body.dark-mode #passkey-submit {
-    background: var(--bg-night-element);
-    box-shadow: 4px 4px 8px var(--shadow-dark-night),-4px -4px 8px var(--shadow-light-night);
-}
-#passkey-submit:active {
-    box-shadow: inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day);
-}
-body.dark-mode #passkey-submit:active {
-    box-shadow: inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night);
-}
-
-#passkey-error {
-    color: #e53e3e;
-    font-weight: 600;
-    font-size: 14px;
-    margin-top: 5px;
-    display: none; /* 默认隐藏 */
-}
-
-/* 错误提示时的晃动动画 */
-@keyframes shake {
-  10%, 90% { transform: translate3d(-1px, 0, 0); }
-  20%, 80% { transform: translate3d(2px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-  40%, 60% { transform: translate3d(4px, 0, 0); }
-}
-#passkey-modal.shake {
-    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
-}
-
-/* 修复层级：当弹窗显示时，模糊背景内容 */
-body.passkey-pending > *:not(#passkey-overlay) {
-    filter: blur(5px);
-    pointer-events: none;
-    transition: filter 0.3s ease;
-}
-/* =============================================================== */
-/* ========================= [新增结束] ========================== */
-/* =============================================================== */
-
-
-/* =============================================================== */
 /* =========== [新增] 文件标签功能磨砂玻璃主题适配 V1.0 ========== */
 /* =============================================================== */
-
 
 /* 1. 适配标签功能折叠/展开按钮 */
 body.theme-glass .tag-actions-toggle-btn,
@@ -5422,6 +5289,9 @@ body.dark-mode .info-tooltip-trigger {
     transform: translateX(-50%) translateY(0);
 }
 /* =============================================================== */
+/* ========================= [修正结束] ========================== */
+/* =============================================================== */
+/* =============================================================== */
 /* ============== [新增] 弥散渐变开屏动画样式 V1.0 =============== */
 /* =============================================================== */
 #splash-screen {
@@ -5445,7 +5315,6 @@ body.dark-mode .info-tooltip-trigger {
     pointer-events: none; /* 淡出后不再响应鼠标事件 */
 }
 
-/* 创建一个从上到下的白色渐变蒙版，让颜色从下方自然浮现 */
 #splash-screen::before {
     content: '';
     position: absolute;
@@ -5453,81 +5322,91 @@ body.dark-mode .info-tooltip-trigger {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, white 40%, rgba(255, 255, 255, 0) 80%);
+    /* [修改] 调整白色渐变蒙版，让颜色区域更靠上 */
+    background: linear-gradient(to bottom, white 30%, rgba(255, 255, 255, 0) 70%);
     z-index: 1; /* 在颜色斑点之上，但在文字之下 */
 }
 
 .gradient-blob {
     position: absolute;
     border-radius: 50%;
-    /* [修改] 减小模糊值，让色块边缘更明显 */
-    filter: blur(80px);
-    /* [修改] 稍微增加不透明度，让颜色更鲜明 */
+    /* [修改] 再次减小模糊值，让色块更清晰 */
+    filter: blur(60px);
     opacity: 0.7;
-    will-change: transform; /* 性能优化：告诉浏览器这个元素会变化 */
+    will-change: transform;
 }
-/* 第一个颜色斑点 */
+
+/* 第一个颜色斑点 - [修改] 尺寸变小 */
 .gradient-blob.blob1 {
-    width: 600px;
-    height: 600px;
-    background-color: #EED0F2; /* 紫色 */
-    /* [修改] 动画时长从25s缩短到12s，加快速度 */
+    width: 450px;
+    height: 450px;
+    background-color: #EED0F2;
     animation: moveBlob1 12s infinite alternate;
 }
-/* 第二个颜色斑点 */
+
+/* 第二个颜色斑点 - [修改] 尺寸变小 */
 .gradient-blob.blob2 {
-    width: 500px;
-    height: 500px;
-    background-color: #9EBAEB; /* 蓝色 */
-    /* [修改] 动画时长从30s缩短到15s，加快速度 */
+    width: 400px;
+    height: 400px;
+    background-color: #9EBAEB;
     animation: moveBlob2 15s infinite alternate;
 }
 
-/* 第三个颜色斑点 */
+/* 第三个颜色斑点 - [修改] 尺寸变小 */
 .gradient-blob.blob3 {
-    width: 450px;
-    height: 450px;
-    background-color: #96DFF5; /* 青色 */
-    /* [修改] 动画时长从20s缩短到10s，加快速度 */
+    width: 350px;
+    height: 350px;
+    background-color: #96DFF5;
     animation: moveBlob3 10s infinite alternate;
 }
 
-/* 标题容器 */
+/* 标题容器 - [修改] 移除容器的动画 */
 .splash-title-container {
     position: relative;
-    z-index: 2; /* 确保标题在白色蒙版之上 */
+    z-index: 2;
     text-align: center;
-    color: #4a5568; /* 深灰色字体，保证可读性 */
-    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5); /* 轻微文字阴影 */
-    opacity: 0;
-    animation: fadeInTitle 1.5s 0.5s ease-out forwards; /* 动画时长从2.5s改为1.5s */
+    color: #4a5568;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5);
 }
 
-.splash-title-container h1 {
-    font-size: 56px; /* 从 48px 放大到 56px */
-    font-weight: 700;
+/* [新增] 主标题和副标题的通用样式 */
+.splash-main-title, .splash-subtitle {
+    opacity: 0; /* 初始状态完全透明 */
     margin: 0;
-    transform: translateY(-80px); /* 新增：向上移动 20px */
+    will-change: transform, opacity, filter; /* 性能优化 */
 }
 
-.splash-title-container p {
-    font-size: 22px; /* 从 20px 放大到 22px */
-    margin-top: 8px;
-    transform: translateY(-80px); /* 新增：向上移动 20px */
+/* [新增] 为主标题（中文）设置动画 */
+.splash-main-title {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 8px; /* 调整与副标题的间距 */
+    animation: slideAndFadeIn 1.2s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
+/* [新增] 为副标题（英文）设置动画 */
+.splash-subtitle {
+    font-size: 20px;
+    /* 延迟时间比主标题长，实现先后出现的效果 */
+    animation: slideAndFadeIn 1.2s 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
 
-/* 定义标题淡入动画 */
-@keyframes fadeInTitle {
-    from {
+/* [新增] 定义全新的标题动画 */
+@keyframes slideAndFadeIn {
+    0% {
         opacity: 0;
-        transform: translateY(20px);
+        /* 从下方20px处开始，放大10%，且带有模糊效果 */
+        transform: translateY(20px) scale(1.1);
+        filter: blur(4px);
     }
-    to {
+    100% {
         opacity: 1;
-        transform: translateY(0);
+        /* 移动到原位，恢复正常大小，模糊消失 */
+        transform: translateY(0) scale(1);
+        filter: blur(0);
     }
 }
+
 
 /* 定义颜色斑点移动动画 - [修改] 增大了位移和旋转范围 */
 @keyframes moveBlob1 {
@@ -5548,6 +5427,33 @@ body.dark-mode .info-tooltip-trigger {
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
+        /* =============================================================== */
+        /* ============ [新增] 网页内悬浮球后台保活辉光样式 ============ */
+        /* =============================================================== */
+        @keyframes breathing-blue-glow-jelly {
+          0%, 100% {
+            /* 使用 filter: drop-shadow 为图标本身添加辉光 */
+            filter: drop-shadow(0 0 3px rgba(59, 130, 246, 0.6));
+          }
+          50% {
+            filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.9));
+          }
+        }
+
+        .jelly-menu-btn.glowing {
+          /* 关键：将按钮背景变为透明，移除阴影和边框 */
+          background: transparent !important;
+          box-shadow: none !important;
+          border: none !important;
+          /* 应用新的辉光动画 */
+          animation: breathing-blue-glow-jelly 2.5s infinite ease-in-out;
+          /* 提高层级，确保辉光不会被其他按钮遮挡 */
+          z-index: 10; 
+        }
+
+        /* =============================================================== */
+        /* ========================= [新增结束] ========================== */
+        /* =============================================================== */
 
     </style>
 
@@ -5561,24 +5467,11 @@ body.dark-mode .info-tooltip-trigger {
         <div class="gradient-blob blob2"></div>
         <div class="gradient-blob blob3"></div>
         <div class="splash-title-container">
-            <h1>水母岛</h1>
-            <p>Jellyfish Island</p>
+            <h1 class="splash-main-title">水母岛</h1>
+            <p class="splash-subtitle">Jellyfish Island</p>
         </div>
     </div>
     <!-- ===================== [新增结束] ===================== -->
-
-    <!-- ============= [新增] 通行密钥弹窗 ============= -->
-    <div id="passkey-overlay">
-        <div id="passkey-modal">
-            <h3>请输入通行密钥</h3>
-            <p>通行密钥每月更新</p>
-            <input type="password" id="passkey-input" placeholder="在此输入密钥" autocomplete="off">
-            <button id="passkey-submit">进入</button>
-            <p id="passkey-error">密钥错误，请重试</p>
-        </div>
-    </div>
-    <!-- ===================== [新增结束] ===================== -->
-
     <!-- 手机模式滑动容器 -->
     <div class="main-wrapper" id="mainWrapper">
         <div class="page-slider" id="pageSlider">
@@ -7072,86 +6965,8 @@ body.dark-mode #floating-jellyfish-ball {
     </div>
     <!-- ============= [ 新增结束 ] ============= -->
        <script>
-    // ============= [新增] 通行密钥验证逻辑 V1.0 =============
-    (function handlePasskeyAuthentication() {
-        // --- 请在这里替换每月密钥 ---
-        const currentPasskeys = [
-            'Fp9xVz2r', 'jK4gA8sL', 'nB6hT1wE', 'gD5pQ7zY', 'zC8vE3uF',
-            'rW7mI2oP', 'tY1sK9bN', 'uE3jH5fA', 'aV4cQ6xZ', 'iO9lP1wE',
-            'kR2sB8nM', 'qL7gT3dV', 'xU6hF4cY', 'oP1iEa5b', 'wM5zK9pV',
-            'vC3jD7fX', 'eG9xV1zR', 'bN4hT6wQ', 'sA2kL8mJ', 'yU8iO6pZ'
-        ];
-        // ------------------------------------
-
-        const overlay = document.getElementById('passkey-overlay');
-        // 确保在执行脚本时弹窗元素已存在
-        if (!overlay) {
-            // 如果DOM还没加载完，就延迟执行
-            document.addEventListener('DOMContentLoaded', handlePasskeyAuthentication);
-            return;
-        }
-
-        const modal = document.getElementById('passkey-modal');
-        const input = document.getElementById('passkey-input');
-        const submitBtn = document.getElementById('passkey-submit');
-        const errorMsg = document.getElementById('passkey-error');
-
-        // 使用 "年-月" 作为唯一标识，例如 "2024-10"
-        const currentMonthIdentifier = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
-        const validatedMonth = localStorage.getItem('passkeyValidatedMonth');
-
-        // 检查当月是否已经验证过
-        if (currentMonthIdentifier === validatedMonth) {
-            overlay.style.display = 'none'; // 如果已验证，直接隐藏弹窗
-            return;
-        }
-
-        // 如果未验证，模糊背景内容
-        document.body.classList.add('passkey-pending');
-
-        const validate = () => {
-            const enteredKey = input.value.trim();
-            if (currentPasskeys.includes(enteredKey)) {
-                // 密钥正确
-                localStorage.setItem('passkeyValidatedMonth', currentMonthIdentifier);
-                
-                // 移除模糊并播放弹窗消失动画
-                document.body.classList.remove('passkey-pending');
-                overlay.style.opacity = '0';
-                overlay.addEventListener('transitionend', () => {
-                    overlay.style.display = 'none';
-                }, { once: true });
-
-            } else {
-                // 密钥错误
-                errorMsg.style.display = 'block';
-                modal.classList.add('shake');
-                input.focus();
-
-                setTimeout(() => {
-                    modal.classList.remove('shake');
-                    errorMsg.style.display = 'none';
-                    input.value = '';
-                }, 820);
-            }
-        };
-
-        submitBtn.addEventListener('click', validate);
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // 防止回车键触发表单提交等默认行为
-                validate();
-            }
-        });
-        
-        // 页面加载完成后立即让输入框获得焦点，方便用户直接输入
-        input.focus();
-    })();
-    // ===================== [新增结束] =====================
-
     // [新增] 字符串哈希函数，用于检测内容变更
     function simpleHash(str) {
-
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
             const char = str.charCodeAt(i);
@@ -7899,6 +7714,25 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTrackedProject = null;
     }
 
+    let isAudioUnlocked = false;
+    function unlockAudioContext(audioElement) {
+        if (isAudioUnlocked || !audioElement) return;
+        const originalVolume = audioElement.volume;
+        audioElement.muted = true;
+        const playPromise = audioElement.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                audioElement.pause();
+                audioElement.currentTime = 0;
+                audioElement.muted = false;
+                audioElement.volume = originalVolume;
+                isAudioUnlocked = true;
+                console.log("Audio context unlocked successfully.");
+            }).catch(error => {
+                console.warn("Audio context unlock failed, will retry on next interaction.", error);
+            });
+        }
+    }
 
     // ===== [START] FLOATING JELLYFISH BALL LOGIC (MODIFIED) =====
     const FloatingBallManager = (() => {
@@ -7913,14 +7747,16 @@ document.addEventListener('DOMContentLoaded', () => {
         let activeMenuBtn = null;
         const LONG_PRESS_DURATION = 400; /* MODIFICATION: Shortened long-press time */
         const DRAG_THRESHOLD = 10;
-        const ALL_FUNCTIONS = [
-            { id: 'album', icon: '🖼️', title: '相册' },
-            { id: 'folder', icon: '📁', title: '文件夹' },
-            { id: 'return', icon: '🔙', title: '返回' },
-            { id: 'fullscreen', icon: '⛶', title: '全屏' }, // <-- [新增] 全屏功能
-            { id: 'memo', icon: '📝', title: '备忘录' },
-            { id: 'quick_switch', icon: '🔗', title: '快速切换' }
-        ];
+            const ALL_FUNCTIONS = [
+                { id: 'album', icon: '🖼️', title: '相册' },
+                { id: 'folder', icon: '📁', title: '文件夹' },
+                { id: 'return', icon: '🔙', title: '返回' },
+                { id: 'fullscreen', icon: '⛶', title: '全屏' },
+                // [新增] 后台保活功能
+                { id: 'keepAlive', icon: '🎧', title: '后台保活' },
+                { id: 'memo', icon: '📝', title: '备忘录' },
+                { id: 'quick_switch', icon: '🔗', title: '快速切换' }
+            ];
 
         function _create() {
             if (currentConfig.settings.jellyBall?.enabled !== true) return;
@@ -8081,6 +7917,62 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'quick_switch':
                     _showQuickSwitchMenu();
                     break;
+
+                // [新增] 后台保活逻辑 (V2: 跨平台兼容版)
+                case 'keepAlive':
+                    const audio = document.getElementById('keep-alive-audio');
+                    const btn = button; // `button` is the clicked menu item
+
+                    if (!audio || !btn) return;
+
+                    // 检查音频是否已经解锁。如果尚未解锁，则执行解锁流程。
+                    if (!window.isAudioUnlocked) {
+                        // 创建一个临时的、全屏的、半透明的遮罩层
+                        const unlockOverlay = document.createElement('div');
+                        unlockOverlay.style.cssText = `
+                            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                            background: rgba(0,0,0,0.5); z-index: 9999;
+                            display: flex; align-items: center; justify-content: center;
+                            color: white; font-size: 18px; font-weight: bold; cursor: pointer;
+                            backdrop-filter: blur(5px);
+                        `;
+                        unlockOverlay.textContent = '点击屏幕任意位置以开启后台播放功能';
+                        
+                        // 将遮罩层添加到 iframe 的 body 中
+                        document.body.appendChild(unlockOverlay);
+
+                        // 为遮罩层添加一个一次性的点击事件监听器
+                        unlockOverlay.addEventListener('click', () => {
+                            // 调用之前添加的 unlockAudioContext 函数
+                            unlockAudioContext(audio);
+                            
+                            // 解锁成功后，立即尝试播放
+                            if (audio.paused) {
+                                audio.play().then(() => {
+                                    btn.classList.add('glowing');
+                                }).catch(e => console.error("解锁后播放失败:", e));
+                            }
+                            
+                            // 移除遮罩层
+                            unlockOverlay.remove();
+                        }, { once: true });
+
+                    } else {
+                        // 如果音频已解锁，则直接切换播放/暂停状态
+                        if (audio.paused) {
+                            audio.play().then(() => {
+                                btn.classList.add('glowing');
+                            }).catch(e => console.error("切换播放失败:", e));
+                        } else {
+                            audio.pause();
+                            btn.classList.remove('glowing');
+                        }
+                    }
+                    
+                    // 保持菜单打开，以便随时切换状态
+                    return;
+
+
                 case 'fullscreen':
                     const iframeModalEl = document.getElementById('iframeModal');
                     if (iframeModalEl && iframeModalEl.classList.contains('active')) {
@@ -8106,6 +7998,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             _closeMenu();
+
         }
 
         function _showQuickSwitchMenu() {
@@ -9045,6 +8938,9 @@ async function saveGlobalConfig(commitMessage) {
 
     function attachButtonListeners(btn) {
         btn.addEventListener('click', async function(e) {
+            // [新增] 首次点击时解锁音频上下文
+            unlockAudioContext(document.getElementById('keep-alive-audio'));
+
             if (isManagementMode) {
                 const href = this.dataset.href;
                 if (!e.target.classList.contains('delete-icon')) {
@@ -9088,6 +8984,7 @@ async function saveGlobalConfig(commitMessage) {
             }
         });
     }
+
 
     function findButtonConfigByHref(href) {
         for (const category of currentConfig.categories) {
@@ -9186,7 +9083,7 @@ async function saveGlobalConfig(commitMessage) {
         localStorage.setItem('theme', i?'dark':'light');
         applyAllBackgrounds();
         WanderView.updateTheme();
-        renderLockscreenWidgets(); // 新增：切换主题时重新渲染组件
+        // renderLockscreenWidgets(); // [临时修复] 注释掉此行以解决脚本中断问题
 
         // [新增] 联动Giscus主题
         const giscusFrame = document.querySelector('.giscus-frame');
@@ -9195,6 +9092,7 @@ async function saveGlobalConfig(commitMessage) {
             giscusFrame.contentWindow.postMessage({ giscus: { setConfig: { theme: newTheme } } }, 'https://giscus.app');
         }
     };
+
 
      function setThemeStyle(styleName) {
         const pneumorphismSettings = document.getElementById('pneumorphism-settings');
@@ -9670,7 +9568,6 @@ async function saveGlobalConfig(commitMessage) {
             // 对于首次访问(t为null)或已设置为'light'的情况，都执行日间模式逻辑
             fabMainBtn.textContent = '🌞';
         }
-
 
         if (cachedConfigStr) {
             try {
@@ -17871,6 +17768,10 @@ const PendantManager = (() => {
 /* =============================================================== */
 /* ========================= [重构/新增结束] ======================== */
 /* =============================================================== */
+
+
+// [修改] 移除此处的 CheckInManager 初始化，统一由 PendantManager 根据开关状态控制
+// document.addEventListener('DOMContentLoaded', () => { CheckInManager.init(); });
 /* =============================================================== */
 /* ============== [新增] 开屏动画消失控制逻辑 V1.0 ============== */
 /* =============================================================== */
@@ -17900,10 +17801,6 @@ if (splashScreen) {
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
-
-
-// [修改] 移除此处的 CheckInManager 初始化，统一由 PendantManager 根据开关状态控制
-// document.addEventListener('DOMContentLoaded', () => { CheckInManager.init(); });
 
     </script>
     <!-- ★★★ 新增：社区须知弹窗 ★★★ -->
@@ -18507,5 +18404,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ball.addEventListener('touchstart', onDragStart, { passive: false });
 });
 </script>
+    <!-- [新增] 用于后台保活的静音音频播放器 -->
+    <audio id="keep-alive-audio" src="silence.m4a" loop></audio>
 </body>
 </html>
