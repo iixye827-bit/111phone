@@ -106,8 +106,8 @@
       "iconType": "svg"
     },
     "globalFont": {
-      "name": "",
-      "url": ""
+      "name": "GlobalCustomFont",
+      "url": "https://files.catbox.moe/iotio6.ttf"
     },
     "fontPresets": [],
     "pendant": {
