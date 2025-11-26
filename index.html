@@ -7714,6 +7714,25 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTrackedProject = null;
     }
 
+    let isAudioUnlocked = false;
+    function unlockAudioContext(audioElement) {
+        if (isAudioUnlocked || !audioElement) return;
+        const originalVolume = audioElement.volume;
+        audioElement.muted = true;
+        const playPromise = audioElement.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                audioElement.pause();
+                audioElement.currentTime = 0;
+                audioElement.muted = false;
+                audioElement.volume = originalVolume;
+                isAudioUnlocked = true;
+                console.log("Audio context unlocked successfully.");
+            }).catch(error => {
+                console.warn("Audio context unlock failed, will retry on next interaction.", error);
+            });
+        }
+    }
 
 
     // ===== [START] FLOATING JELLYFISH BALL LOGIC (MODIFIED) =====
@@ -7900,20 +7919,61 @@ document.addEventListener('DOMContentLoaded', () => {
                     _showQuickSwitchMenu();
                     break;
 
-                // [新增] 后台保活逻辑
+// 修改后的新代码
+                // [新增] 后台保活逻辑 (V2.0 - 兼容安卓)
                 case 'keepAlive':
                     const keepAliveAudio = document.getElementById('keep-alive-audio');
-                    const keepAliveBtn = button; // `button` 是当前被点击的功能球元素
+                    const keepAliveBtn = button;
+
                     if (keepAliveAudio && keepAliveBtn) {
+                        // 检查浏览器是否支持 Media Session API
+                        if ('mediaSession' in navigator) {
+                            if (keepAliveAudio.paused) {
+                                // 1. 在播放前设置媒体元数据
+                                navigator.mediaSession.metadata = new MediaMetadata({
+                                    title: '后台保活运行中',
+                                    artist: 'Jellyfish Island',
+                                    album: '系统进程',
+                                    artwork: [
+                                        { src: 'icons/icon-96x96.png', sizes: '96x96', type: 'image/png' },
+                                        { src: 'icons/icon-128x128.png', sizes: '128x128', type: 'image/png' },
+                                        { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png' }
+                                    ]
+                                });
+
+                                // 2. 设置媒体通知栏的播放/暂停动作处理
+                                navigator.mediaSession.setActionHandler('play', () => {
+                                    keepAliveAudio.play();
+                                    navigator.mediaSession.playbackState = "playing";
+                                    keepAliveBtn.classList.add('glowing');
+                                });
+                                navigator.mediaSession.setActionHandler('pause', () => {
+                                    keepAliveAudio.pause();
+                                    navigator.mediaSession.playbackState = "paused";
+                                    keepAliveBtn.classList.remove('glowing');
+                                });
+                            }
+                        }
+
+                        // 执行播放或暂停操作
                         if (keepAliveAudio.paused) {
                             keepAliveAudio.play().then(() => {
+                                if ('mediaSession' in navigator) {
+                                    navigator.mediaSession.playbackState = "playing";
+                                }
                                 keepAliveBtn.classList.add('glowing');
+                                
                             }).catch(error => {
                                 console.error("后台保活音频播放失败:", error);
                                 alert("无法自动播放音频，请与页面进行一次交互后再试。");
                             });
                         } else {
                             keepAliveAudio.pause();
+                            if ('mediaSession' in navigator) {
+                                navigator.mediaSession.playbackState = "paused";
+                                // 当用户手动暂停时，清空媒体信息，让通知消失
+                                navigator.mediaSession.metadata = null;
+                            }
                             keepAliveBtn.classList.remove('glowing');
                         }
                     }
@@ -8885,6 +8945,9 @@ async function saveGlobalConfig(commitMessage) {
 
     function attachButtonListeners(btn) {
         btn.addEventListener('click', async function(e) {
+            // [新增] 首次点击时解锁音频上下文
+            unlockAudioContext(document.getElementById('keep-alive-audio'));
+
             if (isManagementMode) {
                 const href = this.dataset.href;
                 if (!e.target.classList.contains('delete-icon')) {
@@ -8928,7 +8991,6 @@ async function saveGlobalConfig(commitMessage) {
             }
         });
     }
-
 
     function findButtonConfigByHref(href) {
         for (const category of currentConfig.categories) {
