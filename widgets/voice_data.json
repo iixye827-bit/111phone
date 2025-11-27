@@ -6,6 +6,13 @@
       "subtitle": "1",
       "path": "memory/voices/1764230629063_szzxclu.mpeg",
       "sha": "78b87c809e0144aa03d2f42ca738a222faa6a688"
+    },
+    {
+      "id": 1764231279295,
+      "speaker": "1",
+      "subtitle": "1",
+      "path": "memory/voices/1764231257171_0qr0t2t.quicktime",
+      "sha": "dce1604556bb95b73886b24fd7419023974206e8"
     }
   ],
   "playOnStartup": true,
