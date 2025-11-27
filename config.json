@@ -5,124 +5,30 @@
     {
       "name": "全部",
       "buttons": []
-    },
-    {
-      "name": "小手机",
-      "buttons": [
-        {
-          "text": "2",
-          "href": "3",
-          "openExternally": false
-        },
-        {
-          "text": "jrsy",
-          "href": "https://jrsy081113-hue.github.io/new-730/",
-          "openExternally": false
-        },
-        {
-          "text": "章鱼机",
-          "href": "https://finn-green.github.io/zyj/",
-          "openExternally": false
-        },
-        {
-          "text": "1900",
-          "href": "https://vauid.github.io/1900UwU/",
-          "openExternally": false
-        },
-        {
-          "text": "测试",
-          "href": "1",
-          "openExternally": false
-        }
-      ]
-    },
-    {
-      "name": "1",
-      "buttons": [
-        {
-          "text": "1",
-          "href": "1",
-          "openExternally": false
-        }
-      ]
-    },
-    {
-      "name": "2",
-      "buttons": [
-        {
-          "text": "2",
-          "href": "2",
-          "openExternally": false
-        }
-      ]
-    },
-    {
-      "name": "3",
-      "buttons": [
-        {
-          "text": "3",
-          "href": "3",
-          "openExternally": false
-        }
-      ]
-    },
-    {
-      "name": "4",
-      "buttons": [
-        {
-          "text": "44",
-          "href": "4",
-          "openExternally": false
-        }
-      ]
-    },
-    {
-      "name": "5",
-      "buttons": [
-        {
-          "text": "55",
-          "href": "5",
-          "openExternally": false
-        }
-      ]
     }
   ],
   "settings": {
     "paginationEnabled": true,
-    "themeStyle": "glass",
+    "themeStyle": "neumorphism",
     "jellyBall": {
-      "enabled": true,
+      "enabled": false,
       "swipeBack": true,
-      "functions": {
-        "game": true
-      },
-      "customCSS": "/* 步骤 1: 设置球体背景 (可选, 修改颜色) */\n#floating-jellyfish-ball {\n  background: rgba(173, 216, 230, 0.7); /* 淡蓝色背景 */\n  backdrop-filter: blur(5px);\n  -webkit-backdrop-filter: blur(5px);\n  border: 1px solid rgba(173, 216, 230, 0.9);\n  font-size: 0; /* 隐藏原始图标 */\n}\nbody.dark-mode #floating-jellyfish-ball {\n  background: rgba(70, 130, 180, 0.7); /* 深钢蓝色背景 */\n  border-color: rgba(135, 206, 235, 0.5);\n}\n\n/* 步骤 2: 使用伪元素显示新的 Emoji */\n#floating-jellyfish-ball::before {\n  content: '💧'; /* 在这里替换为你想要的 Emoji */\n  font-size: 28px; /* 在这里调整 Emoji 的大小 */\n}",
-      "cssPresets": [
-        {
-          "name": "爱心",
-          "css": "#floating-jellyfish-ball {\n  background: transparent !important;\n  border: none !important;\n  box-shadow: none !important;\n  backdrop-filter: none !important;\n  -webkit-backdrop-filter: none !important;\n  \n  /* 调整图标大小和位置，使其居中 */\n  font-size: 38px;\n  line-height: 1;\n  padding-top: 2px; /* 微调垂直居中 */\n}\n\n/* 步骤 2: 修改悬浮球内的图标 */\n#floating-jellyfish-ball span {\n  /* 使用 CSS content 替换图标，确保辉光效果正确应用 */\n  display: block;\n  font-size: 0; /* 隐藏原始的 🪼 图标 */\n}\n#floating-jellyfish-ball span::before {\n  content: '💗'; /* 设置新图标为爱心 */\n  font-size: 38px; /* 恢复图标大小 */\n}\n\n/* 步骤 3: 重新定义辉光动画，使其更适合爱心 */\n@keyframes heart-glow {\n  0% {\n    filter: drop-shadow(0 0 4px rgba(255, 105, 180, 0.7));\n  }\n  50% {\n    /* 使用 deep pink 实现更强的发光效果 */\n    filter: drop-shadow(0 0 14px rgba(255, 20, 147, 1));\n  }\n  100% {\n    filter: drop-shadow(0 0 4px rgba(255, 105, 180, 0.7));\n  }\n}\n\n/* 步骤 4: 将新动画应用到辉光层 */\n.jelly-ball-wrapper .jelly-ball-glow {\n  /* 确保应用新的动画而不是旧的 */\n  animation: heart-glow 2.5s infinite ease-in-out !important;\n}\n\n/* 步骤 5: (可选) 拖动时放大爱心，而不是整个球 */\n#floating-jellyfish-ball.dragging {\n  /* 覆盖原有的放大效果，直接放大图标本身 */\n  transform: none !important;\n}\n#floating-jellyfish-ball.dragging span::before {\n  transform: scale(1.15);\n  display: block;\n}"
-        }
-      ],
-      "iconType": "svg"
+      "functions": {},
+      "customCSS": ""
     },
     "globalFont": {
-      "name": "GlobalCustomFont",
-      "url": "https://files.catbox.moe/iotio6.ttf"
+      "name": "",
+      "url": ""
     },
-    "fontPresets": [
-      {
-        "name": "粗体",
-        "url": "https://files.catbox.moe/iotio6.ttf"
-      }
-    ],
+    "fontPresets": [],
     "pendant": {
-      "enabled": true,
+      "enabled": false,
       "lineLength": "5rem",
       "lineColor": "#000000",
-      "shapeContent": "🌹"
+      "shapeContent": "☁️"
     },
     "backupReminder": {
-      "enabled": true,
+      "enabled": false,
       "timeBasedEnabled": false,
       "times": [],
       "message": "是时候该备份你的项目啦！",
@@ -130,22 +36,8 @@
       "projects": []
     },
     "checkinSettings": {
-      "headerColor": "#af5555",
-      "cardColor": "#c8dfee",
-      "headerBgType": "color",
-      "headerImage": "",
-      "headerBlur": 5,
-      "backgroundImage": "",
-      "blurAmount": 0
-    },
-    "usageTime": {
-      "includedCategories": [
-        "小手机"
-      ],
-      "filterEnabled": false
-    },
-    "mobileMode": {
-      "enabled": false
+      "headerColor": "#8B4513",
+      "cardColor": "#ffffff"
     }
   },
   "themePresets": [
@@ -160,9 +52,5 @@
     }
   ],
   "lockscreenWidgets": {},
-  "usageTime": {
-    "https://raven7-7.github.io/Crow/": 81151,
-    "https://jrsy081113-hue.github.io/new-730/": 48521
-  },
   "dataStructureVersion": 2
 }
