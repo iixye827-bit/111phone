@@ -7,6 +7,14 @@
       "filename": "示范音频(1).mp3",
       "path": "opening_voices/1764246347652_示范音频(1).mp3",
       "isFavorite": true
+    },
+    {
+      "id": 1764249819744,
+      "title": "222",
+      "speaker": "333",
+      "filename": "silence.m4a",
+      "path": "opening_voices/1764249786178_silence.m4a",
+      "isFavorite": false
     }
   ],
   "settings": {
