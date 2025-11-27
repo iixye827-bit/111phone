@@ -19,6 +19,6 @@
   ],
   "settings": {
     "playOnStartup": true,
-    "randomPlay": true
+    "randomPlay": false
   }
 }
