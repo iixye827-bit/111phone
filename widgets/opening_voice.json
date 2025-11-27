@@ -1,0 +1,14 @@
+{
+  "voices": [
+    {
+      "id": 1764245072296,
+      "speaker": "易遇",
+      "filename": "示范音频(1).mp3",
+      "path": "opening_voices/1764245069901_示范音频(1).mp3"
+    }
+  ],
+  "settings": {
+    "playOnStartup": true,
+    "randomPlay": true
+  }
+}
