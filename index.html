@@ -6036,6 +6036,7 @@ const PendantVoiceManager = (() => {
         triggerSplashAnimation();
     }
 </script>
+
     <!-- [新增] 用于全局字体的样式标签 -->
     <style id="global-font-style"></style>
 
@@ -8078,9 +8079,13 @@ const PendantVoiceManager = (() => {
             playRandomVoice();
         }
     }
+    async function refreshUI() {
+        await loadData();
+        renderSettingsUI();
+        renderVoiceList();
+    }
 
-
-    return { init, playOnStartup };
+    return { init, playOnStartup, refreshUI };
 })();
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
@@ -18396,13 +18401,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    capsuleContainer.addEventListener('click', (e) => {
+    capsuleContainer.addEventListener('click', async (e) => {
         const button = e.target.closest('.capsule-btn');
         if (button) {
-            switchHubPage(button.dataset.target, button.dataset.title);
-            if (button.dataset.target === 'widget-page-usage') renderUsageLeaderboard();
-             // [修复] 确保在切换到签到页面时初始化日历，避免UI元素未找到的错误
-            if (button.dataset.target === 'widget-page-checkin') CheckInManager.init();
+            const targetPage = button.dataset.target;
+            switchHubPage(targetPage, button.dataset.title);
+            
+            // 根据点击的页面执行相应的刷新操作
+            if (targetPage === 'widget-page-usage') {
+                renderUsageLeaderboard();
+            } else if (targetPage === 'widget-page-checkin') {
+                CheckInManager.init();
+            } else if (targetPage === 'widget-page-voice') {
+                // ★★★ 核心新增：当切换到语音页面时，强制重新加载数据并渲染UI ★★★
+                if (typeof PendantVoiceManager !== 'undefined' && PendantVoiceManager.refreshUI) {
+                    await PendantVoiceManager.refreshUI();
+                }
+            }
         }
     });
 
