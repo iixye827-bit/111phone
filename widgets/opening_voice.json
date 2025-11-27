@@ -1,12 +1,5 @@
 {
-  "voices": [
-    {
-      "id": 1764246084281,
-      "speaker": "111",
-      "filename": "示范音频(1).mp3",
-      "path": "opening_voices/1764246082006_示范音频(1).mp3"
-    }
-  ],
+  "voices": [],
   "settings": {
     "playOnStartup": true,
     "randomPlay": true
