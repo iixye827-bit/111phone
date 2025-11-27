@@ -759,7 +759,7 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         body.theme-glass.dark-mode #memoryModal #note-editor-view,
         body.theme-glass.dark-mode .management-controls,
         body.theme-glass.dark-mode #returnConfirmationToast {
-            background: rgba(20, 20, 20, 0.25);
+           background: rgba(10, 10, 10, 0.2);
             border-color: rgba(255, 255, 255, 0.1);
         }
 
@@ -769,7 +769,8 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         body.theme-glass .segmented-control,
         body.theme-glass .toggle-section,
         body.theme-glass #file-list-container,
-        body.theme-glass .color-input-wrapper {
+        body.theme-glass .color-input-wrapper,
+        body.theme-glass .voice-list-container {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
@@ -777,16 +778,19 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: none;
         }
+
         body.theme-glass.dark-mode .modal-input,
         body.theme-glass.dark-mode .modal-select,
         body.theme-glass.dark-mode .modal-textarea,
         body.theme-glass.dark-mode .segmented-control,
         body.theme-glass.dark-mode .toggle-section,
         body.theme-glass.dark-mode #file-list-container,
-        body.theme-glass.dark-mode .color-input-wrapper {
+        body.theme-glass.dark-mode .color-input-wrapper,
+        body.theme-glass.dark-mode .voice-list-container {
             background: rgba(10, 10, 10, 0.2);
             border-color: rgba(255, 255, 255, 0.1);
         }
+
 
         body.theme-glass .modal-button {
             background: rgba(255, 255, 255, 0.25);
@@ -813,6 +817,19 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
              background: rgba(200, 200, 200, 0.25);
              border-color: rgba(255, 255, 255, 0.15);
         }
+        /* [新增] 适配语音列表项的磨砂玻璃风格 */
+        body.theme-glass .voice-list-item {
+            background: transparent;
+        }
+        body.theme-glass .voice-list-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        body.theme-glass.dark-mode .voice-list-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== [END] FROSTED GLASS THEME ===== */
+
         /* ===== [END] FROSTED GLASS THEME ===== */
 
         /* [新增] 为“已确认”的十六进制代码添加变淡的样式 */
@@ -828,7 +845,7 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         /* ===== [START] FLOATING JELLYFISH BALL STYLES (MODIFIED) ===== */
         .jelly-ball-wrapper { /* MODIFICATION: New wrapper for custom CSS support */
             position: fixed;
-            z-index: 2005;
+            z-index: 3005; /* [核心修复] 将层级提升到记忆模块(3000)之上 */
             width: 42px;
             height: 42px;
             display: flex;
@@ -837,6 +854,7 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
             transition: opacity 0.3s ease, transform 0.3s ease, left 0.2s ease-out, top 0.2s ease-out;
             pointer-events: none; /* MODIFICATION: Wrapper is non-interactive */
         }
+
         .jelly-ball-wrapper .jelly-ball-glow { /* MODIFICATION: New glow element */
             position: absolute;
             width: 100%;
@@ -1000,9 +1018,10 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         /* ===== [START] FLOATING PROJECT WINDOW STYLES ===== */
         .floating-project-window {
             position: fixed;
-            z-index: 2010;
+            z-index: 3010; /* [层级修复] 提升层级，与记忆模块的子弹窗对齐 */
             width: 350px;
             height: 500px;
+
             background: var(--bg-day-element);
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -2382,13 +2401,28 @@ body.dark-mode .widget-bg-picker-popup .bg-picker-button:hover {
     background-color: rgba(255,255,255,0.15);
 }
 /* =============================================================== */
-/* ========================= [新增结束] ========================== */
-/* =============================================================== */
-/* =============================================================== */
 /* =================== [V2 BUG修复] 弹窗层级修正 =================== */
 /* =============================================================== */
 #jelly-css-help-modal.modal-overlay {
     z-index: 1003; /* 确保高于悬浮球设置弹窗(1002) */
+}
+
+/* [核心修复] 提升“记忆”主应用窗口、子弹窗和照片查看器的层级 */
+#memoryModal.modal-overlay {
+    z-index: 3000; /* 高于项目iframe(2000)和悬浮球(2005) */
+}
+#memoryFolderModal.modal-overlay,
+#memoryPhotoDetailsModal.modal-overlay,
+#movePhotosModal.modal-overlay,
+#moveNotesModal.modal-overlay,
+#memoImportModal.modal-overlay,
+#tagManagementModal.modal-overlay,
+#viewByTagModal.modal-overlay,
+#memoryDataRecoveryModal.modal-overlay {
+    z-index: 3010; /* 比父窗口(3000)更高，确保子弹窗在主窗口之上 */
+}
+#memoryPhotoViewerOverlay {
+    z-index: 5000; /* 保持或设置一个非常高的值，覆盖所有内容 */
 }
 /* =============================================================== */
 /* ========================= [修复结束] ========================== */
@@ -4975,8 +5009,141 @@ body.dark-mode .tag-actions-toggle-btn:active {
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
 /* =============================================================== */
+/* ============= [新增] 通行密钥弹窗及层级修复样式 ============= */
+/* =============================================================== */
+#passkey-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10000; /* 确保在最顶层 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+#passkey-modal {
+    width: 90%;
+    max-width: 320px;
+    padding: 25px;
+    background: var(--bg-day-element);
+    color: var(--text-day);
+    border-radius: 16px;
+    box-shadow: 12px 12px 24px var(--shadow-dark-day), -12px -12px 24px var(--shadow-light-day);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+body.dark-mode #passkey-modal {
+    background: var(--bg-night-element);
+    color: var(--text-night);
+    box-shadow: 12px 12px 24px var(--shadow-dark-night), -12px -12px 24px var(--shadow-light-night);
+}
+
+#passkey-modal h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+#passkey-modal p {
+    font-size: 14px;
+    color: #889;
+    margin-top: -10px;
+}
+
+#passkey-input {
+    /* 复用现有样式 */
+    padding: 12px 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    text-align: center;
+    background: var(--bg-day-element);
+    color: var(--text-day);
+    box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day);
+    transition:all .3s ease;
+    caret-color:var(--hold-border)
+}
+body.dark-mode #passkey-input {
+    background: var(--bg-night-element);
+    color: var(--text-night);
+    box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night);
+}
+#passkey-input:focus {
+    outline: none;
+    box-shadow:inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day),0 0 0 2px var(--hold-border);
+}
+body.dark-mode #passkey-input:focus {
+    box-shadow:inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night),0 0 0 2px var(--hold-border);
+}
+
+#passkey-submit {
+    /* 复用现有样式 */
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--hold-border);
+    background: var(--bg-day-element);
+    box-shadow: 4px 4px 8px var(--shadow-dark-day),-4px -4px 8px var(--shadow-light-day);
+    transition: all .2s ease;
+}
+body.dark-mode #passkey-submit {
+    background: var(--bg-night-element);
+    box-shadow: 4px 4px 8px var(--shadow-dark-night),-4px -4px 8px var(--shadow-light-night);
+}
+#passkey-submit:active {
+    box-shadow: inset 4px 4px 8px var(--shadow-dark-day),inset -4px -4px 8px var(--shadow-light-day);
+}
+body.dark-mode #passkey-submit:active {
+    box-shadow: inset 4px 4px 8px var(--shadow-dark-night),inset -4px -4px 8px var(--shadow-light-night);
+}
+
+#passkey-error {
+    color: #e53e3e;
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: 5px;
+    display: none; /* 默认隐藏 */
+}
+
+/* 错误提示时的晃动动画 */
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+#passkey-modal.shake {
+    animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* 修复层级：当弹窗显示时，模糊背景内容 */
+body.passkey-pending > *:not(#passkey-overlay) {
+    filter: blur(5px);
+    pointer-events: none;
+    transition: filter 0.3s ease;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+
+
+/* =============================================================== */
 /* =========== [新增] 文件标签功能磨砂玻璃主题适配 V1.0 ========== */
 /* =============================================================== */
+
 
 /* 1. 适配标签功能折叠/展开按钮 */
 body.theme-glass .tag-actions-toggle-btn,
@@ -5043,152 +5210,182 @@ body.theme-glass.dark-mode .filter-tag-option.selected {
 /* =============================================================== */
 
 
-/* =============================================================== */
-/* ================= [新增] 悬浮球专属样式 v1.0 ================== */
-/* =============================================================== */
-#floating-ball {
-    position: fixed;
-    z-index: 1000;
-    top: 50%; /* 初始垂直位置在屏幕中间 */
-    width: 60px;
-    height: 60px;
-    background: rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    color: var(--text-day);
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    
-    cursor: grab;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: none; /* 防止页面滚动 */
+    /* =============================================================== */
+    /* ============== [重构] 独立悬浮工具球 V5.1 (最小化功能修复) ============== */
+    /* =============================================================== */
+    const FloatingToolV4 = (() => {
+        const wrapper = document.getElementById('custom-tool-wrapper');
+        const ball = document.getElementById('custom-tool-inner'); // 球本体
+        
+        if (!wrapper || !ball) {
+            console.error("Floating Tool V5: Wrapper or Ball element not found.");
+            return { init: () => {} };
+        }
 
-    /* 核心：通过 transition 实现平滑的吸附和形状变化 */
-    transition: left 0.3s ease-out, border-radius 0.3s ease-out;
-}
+        // [核心修复] 将 minimizedModalState 的存储从 ID 改为元素引用
+        let minimizedModalState = {
+            element: null 
+        };
 
-body.dark-mode #floating-ball {
-    background: rgba(30, 30, 30, 0.5);
-    border-color: rgba(255, 255, 255, 0.15);
-    color: var(--text-night);
-}
+        // 拖拽逻辑保持不变
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+        const storageKey = 'floatingToolPosition_v4';
 
-/* 状态 1: 吸附在左侧 (半胶囊) */
-#floating-ball.snap-left {
-    left: 0;
-    /* 通过 border-radius 创建左侧半圆，右侧直角的效果 */
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-top-right-radius: 30px; /* 高度的一半 */
-    border-bottom-right-radius: 30px; /* 高度的一半 */
-    /* 将球体向左移动一半宽度，实现半隐藏效果 */
-    transform: translate(-50%, -50%);
-}
+        const onDragStart = (e) => {
+            wrapper.classList.remove('snap-left', 'snap-right');
+            wrapper.classList.add('dragging');
+            isDragging = true;
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            const rect = wrapper.getBoundingClientRect();
+            offset.x = clientX - rect.left;
+            offset.y = clientY - rect.top;
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('touchmove', onDragMove, { passive: false });
+            document.addEventListener('mouseup', onDragEnd, { once: true });
+            document.addEventListener('touchend', onDragEnd, { once: true });
+        };
 
-/* 状态 2: 吸附在右侧 (半胶囊) */
-#floating-ball.snap-right {
-    left: 100%;
-    /* 通过 border-radius 创建右侧半圆，左侧直角的效果 */
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border-top-left-radius: 30px;
-    border-bottom-left-radius: 30px;
-    /* 将球体向右移动一半宽度，实现半隐藏效果 */
-    transform: translate(-50%, -50%);
-}
+        const onDragMove = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            let newX = clientX - offset.x;
+            let newY = clientY - offset.y;
+            newX = Math.max(0, Math.min(newX, window.innerWidth - wrapper.offsetWidth));
+            newY = Math.max(0, Math.min(newY, window.innerHeight - wrapper.offsetHeight));
+            wrapper.style.left = `${newX}px`;
+            wrapper.style.top = `${newY}px`;
+        };
 
-/* 状态 3: 拖拽中 (圆形) */
-#floating-ball.dragging {
-    border-radius: 50%; /* 变为完美的圆形 */
-    transform: translate(-50%, -50%) scale(1.1); /* 拖动时稍微放大，并保持中心对齐 */
-    cursor: grabbing;
-    transition: none; /* 拖拽时禁用所有过渡动画，确保实时跟随 */
-}
-/* =============================================================== */
-/* ========================= [新增结束] ========================== */
-/* =============================================================== */
-/* =============================================================== */
-/* ============== [新增] 独立悬浮工具球专属样式 v2.0 ============== */
-/* =============================================================== */
-/* V2.0 修复了z-index冲突，优化了定位和动画逻辑，并增加了位置持久化支持 */
+        const onDragEnd = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            wrapper.classList.remove('dragging');
+            const ballRect = wrapper.getBoundingClientRect();
+            const isLeft = (ballRect.left + ballRect.width / 2) < (window.innerWidth / 2);
+            wrapper.style.left = isLeft ? '0' : '100%';
+            wrapper.classList.add(isLeft ? 'snap-left' : 'snap-right');
+            localStorage.setItem(storageKey, JSON.stringify({
+                side: isLeft ? 'left' : 'right',
+                top: wrapper.style.top
+            }));
+            document.removeEventListener('mousemove', onDragMove);
+            document.removeEventListener('touchmove', onDragMove);
+        };
 
-#custom-floating-tool {
-    position: fixed;
-    z-index: 1010; /* V2 修复：提升层级，高于大部分弹窗 */
-    width: 50px;   /* V2 优化：设定一个固定的尺寸 */
-    height: 50px;
-    
-    /* V2 优化：使用更可靠的背景和模糊效果，并适配主题 */
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    color: var(--text-day);
-    
-    /* V2 优化：使用 Flexbox 轻松居中图标 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
+        const loadPosition = () => {
+            try {
+                const savedPos = JSON.parse(localStorage.getItem(storageKey));
+                if (savedPos && savedPos.side && savedPos.top) {
+                    wrapper.style.top = savedPos.top;
+                    wrapper.style.left = savedPos.side === 'left' ? '0' : '100%';
+                    wrapper.classList.add(savedPos.side === 'left' ? 'snap-left' : 'snap-right');
+                } else {
+                    wrapper.style.top = '70%';
+                    wrapper.style.left = '100%';
+                    wrapper.classList.add('snap-right');
+                }
+            } catch(e) {
+                wrapper.style.top = '70%';
+                wrapper.style.left = '100%';
+                wrapper.classList.add('snap-right');
+            }
+        };
 
-    cursor: grab;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: none;
+        // ★★★ [核心修复] minimizeModal 函数现在保存元素引用 ★★★
+        const minimizeModal = (modalId) => {
+            const modalElement = document.getElementById(modalId);
+            if (!modalElement) return;
+            
+            minimizedModalState.element = modalElement; // 保存元素本身
+            
+            modalElement.classList.remove('show');
+            wrapper.style.display = 'flex'; // 显示悬浮球
+            showTopToast("已收起到悬浮球", 2000);
+        };
+        
+        // ★★★ [核心修复] restoreModal 函数现在直接使用元素引用 ★★★
+        const restoreModal = () => {
+            // 直接检查状态对象中的 element 是否存在
+            if (!minimizedModalState || !minimizedModalState.element) return;
+            
+            // 直接使用已保存的元素引用，不再需要 document.getElementById
+            minimizedModalState.element.classList.add('show');
+            
+            wrapper.style.display = 'none'; // 隐藏悬浮球
+            minimizedModalState.element = null; // 清空状态
+        };
+        
+        const closeModalCompletely = () => {
+            if (!minimizedModalState) return;
+            wrapper.style.display = 'none';
+            minimizedModalState.element = null;
+        };
 
-    /* V2 核心：使用独立的 transition 属性，动画更平滑、可控 */
-    transition: left 0.3s ease-out, transform 0.3s ease-out, border-radius 0.3s ease-out;
-}
+        const init = () => {
+            // [核心修复] 初始时隐藏悬浮球
+            wrapper.style.display = 'none';
 
-/* 夜间模式适配 */
-body.dark-mode #custom-floating-tool {
-    background: rgba(30, 30, 30, 0.5);
-    border-color: rgba(255, 255, 255, 0.15);
-    color: var(--text-night);
-}
+            let pressTimer = null;
+            let isClickAction = true;
 
-/* 拖拽状态：变为圆形并放大 */
-#custom-floating-tool.dragging {
-    border-radius: 50%; /* 变为完美的圆形 */
-    transform: scale(1.1); /* 拖动时稍微放大 */
-    cursor: grabbing;
-    transition: none; /* 拖拽时禁用所有过渡动画，确保实时跟随 */
-}
+            const startAction = (e) => {
+                isClickAction = true;
+                pressTimer = setTimeout(() => {
+                    isClickAction = false;
+                    onDragStart(e);
+                }, 200);
+            };
 
-/* 吸附在左侧的状态：半隐藏的半胶囊形状 */
-#custom-floating-tool.snap-left {
-    left: 0;
-    /* V2 核心：通过 border-radius 创建左侧半圆，右侧直角的效果 */
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-top-right-radius: 25px; /* 高度的一半 */
-    border-bottom-right-radius: 25px; /* 高度的一半 */
-    /* V2 核心：将球体向左移动一半宽度，实现半隐藏效果 */
-    transform: translateX(-50%);
-}
+            const endAction = (e) => {
+                clearTimeout(pressTimer);
+                if (isClickAction && !isDragging) {
+                    restoreModal(); // 点击时恢复
+                } else {
+                    onDragEnd(e); // 拖拽结束时吸附
+                }
+            };
+            
+            ball.addEventListener('mousedown', startAction);
+            ball.addEventListener('mouseup', endAction);
+            ball.addEventListener('touchstart', startAction, { passive: false });
+            ball.addEventListener('touchend', endAction);
+            
+            // 为 memoryModal 的最小化按钮绑定事件
+            const minimizeBtn = document.querySelector('[data-action="minimize-memory-modal"]');
+            if (minimizeBtn) {
+                minimizeBtn.addEventListener('click', () => minimizeModal('memoryModal'));
+            }
+            
+            // 为 memoryModal 的关闭按钮绑定清理函数
+            const closeBtn = document.querySelector('[data-modal-id="memoryModal"]');
+            if(closeBtn) {
+                closeBtn.addEventListener('click', closeModalCompletely);
+            }
+            
+            // 为 memoryModal 的背景遮罩层也添加关闭清理
+            const memoryModalOverlay = document.getElementById('memoryModal');
+            if(memoryModalOverlay){
+                memoryModalOverlay.addEventListener('click', (e)=>{
+                    if(e.target === memoryModalOverlay) {
+                        closeModalCompletely();
+                    }
+                });
+            }
 
-/* 吸附在右侧的状态：半隐藏的半胶囊形状 */
-#custom-floating-tool.snap-right {
-    left: 100%;
-    /* V2 核心：通过 border-radius 创建右侧半圆，左侧直角的效果 */
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border-top-left-radius: 25px;
-    border-bottom-left-radius: 25px;
-    /* V2 核心：将球体向右移动一半宽度，实现半隐藏效果 */
-    transform: translateX(-50%);
-}
-/* =============================================================== */
-/* ========================= [新增结束] ========================== */
-/* =============================================================== */
+            loadPosition();
+        };
+
+        return { init };
+    })();
+
+    // 初始化新的悬浮工具球
+    FloatingToolV4.init();
+
 /* =============================================================== */
 /* =========== [更新] 悬浮球应用层级修复 V1.1 =========== */
 /* =============================================================== */
@@ -5360,13 +5557,15 @@ body.dark-mode .info-tooltip-trigger {
     animation: moveBlob3 10s infinite alternate;
 }
 
-/* 标题容器 - [修改] 移除容器的动画 */
+/* 标题容器 */
 .splash-title-container {
     position: relative;
     z-index: 2;
     text-align: center;
     color: #4a5568;
     text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5);
+    /* [新增] 通过transform属性将容器整体向上移动 */
+    transform: translateY(-10vh);
 }
 
 /* [新增] 主标题和副标题的通用样式 */
@@ -5381,15 +5580,23 @@ body.dark-mode .info-tooltip-trigger {
     font-size: 48px;
     font-weight: 700;
     margin-bottom: 8px; /* 调整与副标题的间距 */
-    animation: slideAndFadeIn 1.2s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    /* animation: slideAndFadeIn 1.2s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; */ /* [修改] 移除自动播放的动画 */
 }
 
 /* [新增] 为副标题（英文）设置动画 */
 .splash-subtitle {
     font-size: 20px;
-    /* 延迟时间比主标题长，实现先后出现的效果 */
+    /* animation: slideAndFadeIn 1.2s 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; */ /* [修改] 移除自动播放的动画 */
+}
+
+/* [新增] 将动画效果绑定到 .font-loaded 类上 */
+body.font-loaded .splash-main-title {
+    animation: slideAndFadeIn 1.2s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+body.font-loaded .splash-subtitle {
     animation: slideAndFadeIn 1.2s 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
+
 
 /* [新增] 定义全新的标题动画 */
 @keyframes slideAndFadeIn {
@@ -5454,13 +5661,384 @@ body.dark-mode .info-tooltip-trigger {
         /* =============================================================== */
         /* ========================= [新增结束] ========================== */
         /* =============================================================== */
+/* ============== [最终重构] 独立悬浮工具球 V4.0 (已根据新需求修改) ============== */
+/* ================================================================================= */
+
+/* 外部容器：负责定位、移动和形状变化 */
+#custom-tool-wrapper {
+    position: fixed;
+    z-index: 2010;
+    /* 需求1: 尺寸稍微增大 (从50px -> 28px) */
+    width: 28px;
+    height: 28px;
+    /* 事件穿透，交由内部球体处理 */
+    pointer-events: none;
+    /* 容器默认也是 Flex 居中布局 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 为所有可能变化的属性添加平滑过渡 */
+    transition: all 0.3s ease-out;
+}
+
+/* 拖拽时，禁用容器的动画，确保实时跟随 */
+#custom-tool-wrapper.dragging {
+    transition: none;
+}
+
+/* 内部球体：负责外观和交互 */
+#custom-tool-inner {
+    /* 尺寸继承自父容器 */
+    width: 100%;
+    height: 100%;
+    /* 需求2: 半透明背景 */
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+    
+    /* 图标颜色改为蓝色 */
+    color: var(--hold-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 图标大小按比例缩小 */
+    font-size: 20px;
+    
+    pointer-events: auto;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    
+    /* 拖拽时的放大效果，有平滑过渡 */
+    transition: transform 0.2s ease, border-radius 0.3s ease-out;
+}
+
+/* 夜间模式 */
+body.dark-mode #custom-tool-inner {
+    background: rgba(30, 30, 30, 0.6);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: var(--hold-border);
+}
+
+/* 拖拽状态：放大球体，改变光标 */
+#custom-tool-wrapper.dragging #custom-tool-inner {
+    transform: scale(1.15);
+    cursor: grabbing;
+}
+
+/* 左侧吸附：变为半胶囊型，图标居中 */
+#custom-tool-wrapper.snap-left {
+    width: 40px; /* 容器变长 (28px球 + 12px直边) */
+    transform: translateX(-14px); /* 向左移出半个球体 (28/2 = 14) */
+    justify-content: flex-end; /* 核心：将内部球体推到容器右侧，使其完全可见 */
+}
+#custom-tool-wrapper.snap-left #custom-tool-inner {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 14px; /* 右侧保持圆角 */
+    border-bottom-right-radius: 14px;
+}
+
+/* 右侧吸附：变为半胶囊型，图标居中 */
+#custom-tool-wrapper.snap-right {
+    width: 40px; /* 容器变长 */
+    transform: translateX(calc(-100% + 14px)); /* 向左移动 (容器宽度-半个球体)，使右边缘贴合屏幕 */
+    justify-content: flex-start; /* 核心：将内部球体推到容器左侧，使其完全可见 */
+}
+#custom-tool-wrapper.snap-right #custom-tool-inner {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 14px; /* 左侧保持圆角 */
+    border-bottom-left-radius: 14px;
+}
+/* =============================================================== */
+/* =========== [新增] 开屏动画字体隔离样式 V1.0 ========== */
+/* =============================================================== */
+#splash-screen .splash-main-title,
+#splash-screen .splash-subtitle {
+    /* 使用标准的系统字体栈，并添加 !important 来覆盖全局字体设置 */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif !important;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+/* =============================================================== */
+/* =================== [新增] 语音挂件功能专属样式 ==================== */
+/* =============================================================== */
+.voice-list-container {
+    flex-grow: 1;
+    min-height: 120px;
+    max-height: 250px; /* 限制最大高度，超出则滚动 */
+    overflow-y: auto;
+    border-radius: 12px;
+    padding: 10px;
+    background: var(--bg-day-element);
+    box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+body.dark-mode .voice-list-container {
+    background: var(--bg-night-element);
+    box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night);
+}
+
+.voice-list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.03);
+    transition: background-color 0.2s;
+}
+.voice-list-item:hover {
+    background: rgba(0,0,0,0.06);
+}
+body.dark-mode .voice-list-item {
+    background: rgba(255,255,255,0.04);
+}
+body.dark-mode .voice-list-item:hover {
+    background: rgba(255,255,255,0.08);
+}
+.voice-list-item .voice-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+.voice-list-item .voice-speaker {
+    font-size: 12px;
+    color: #889;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.voice-list-item .voice-subtitle-preview {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* [新增] 为了确保单行文本也能被正确截断，添加以下两行 */
+    display: block;
+    line-height: 1.4;
+}
+
+.voice-list-item .voice-actions button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 4px;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    line-height: 1;
+    color: #a0aec0;
+    transition: all 0.2s;
+}
+.voice-list-item .voice-actions button:hover {
+    background-color: rgba(0,0,0,0.1);
+    color: var(--text-day);
+}
+body.dark-mode .voice-list-item .voice-actions button:hover {
+    color: var(--text-night);
+}
+.voice-list-item .voice-actions .delete-voice-btn:hover {
+    color: #f56565;
+}
+
+/* 正在播放的语音项的特殊高亮样式 */
+.voice-list-item.playing .voice-speaker {
+    color: var(--hold-border);
+}
+.voice-list-item.playing .voice-actions .play-voice-btn {
+    color: var(--hold-border);
+}
+
+/* 视频转语音的提示信息 */
+.important-note.video-to-audio-note {
+    font-size: 13px;
+    padding: 8px 12px;
+    line-height: 1.6;
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+/* =============================================================== */
+/* ================== [新增] 语音挂件功能管理器 V1.0 ================ */
+/* =============================================================== */
+const PendantVoiceManager = (() => {
+    let ui = {};
+    let pendantVoiceData = null; // 用于缓存语音数据
+    let pendingAudioDataUrl = null; // 临时存储待保存的音频数据
+    let currentAudio = null; // 用于控制当前播放的音频
+
+    async function init() {
+        // 获取所有UI元素
+        ui = {
+            modal: document.getElementById('pendant-settings-modal'),
+            voiceListContainer: document.getElementById('voice-list-container'),
+            playOnStartupToggle: document.getElementById('voicePlayOnStartupToggle'),
+            randomPlayToggle: document.getElementById('voiceRandomPlayToggle'),
+            speakerInput: document.getElementById('voice-speaker-input'),
+            subtitleInput: document.getElementById('voice-subtitle-input'),
+            audioPicker: document.getElementById('voice-audio-picker'),
+            uploadAudioBtn: document.getElementById('voice-upload-audio-btn'),
+            audioStatus: document.getElementById('voice-audio-status'),
+            videoPicker: document.getElementById('voice-video-picker'),
+            uploadVideoBtn: document.getElementById('voice-upload-video-btn'),
+            videoStatus: document.getElementById('voice-video-status'),
+            progressContainer: document.getElementById('voice-upload-progress-container'),
+            progressBar: document.getElementById('voice-upload-progress-bar'),
+            cancelBtn: document.getElementById('voice-upload-cancel-btn'),
+            saveBtn: document.getElementById('voice-save-btn'),
+        };
+
+        // 绑定事件
+        ui.uploadAudioBtn.addEventListener('click', () => ui.audioPicker.click());
+        ui.uploadVideoBtn.addEventListener('click', () => ui.videoPicker.click());
+        
+        ui.audioPicker.addEventListener('change', (e) => handleFileSelection(e.target.files[0], 'audio'));
+        ui.videoPicker.addEventListener('change', (e) => handleFileSelection(e.target.files[0], 'video'));
+
+        ui.saveBtn.addEventListener('click', saveVoice);
+        
+        ui.playOnStartupToggle.addEventListener('change', () => toggleSetting('playOnStartup', ui.playOnStartupToggle.checked));
+        ui.randomPlayToggle.addEventListener('change', () => toggleSetting('randomPlay', ui.randomPlayToggle.checked));
+
+        // 使用事件委托处理列表项的点击
+        ui.voiceListContainer.addEventListener('click', handleListClick);
+
+        // [V2 修复] 加载数据并渲染
+        await loadData();
+        renderSettingsUI(); // 在init中调用，确保UI元素已存在
+        renderVoiceList();
+    }
+
+
+    async function toggleSetting(key, value) {
+        if (!pendantVoiceData) await loadData();
+        pendantVoiceData[key] = value;
+        await DataManager.save('pendantVoiceData', `Update voice setting: ${key}`);
+        showTopToast('设置已保存', 1500);
+    }
+    
+    // [V2 修复] loadData 只负责加载数据，不操作UI
+    async function loadData() {
+        if (pendantVoiceData) return; // 如果已加载，则直接返回
+        pendantVoiceData = await DataManager.get('pendantVoiceData');
+    }
+
+    // [V2 新增] renderSettingsUI 负责将数据渲染到UI上
+    function renderSettingsUI() {
+        if (!pendantVoiceData || !ui.playOnStartupToggle) return; // 安全检查
+        ui.playOnStartupToggle.checked = pendantVoiceData.playOnStartup;
+        ui.randomPlayToggle.checked = pendantVoiceData.randomPlay;
+    }
+
+
+    function handleFileSelection(file, type) {
+        if (!file) return;
+
+        const statusEl = type === 'audio' ? ui.audioStatus : ui.videoStatus;
+        statusEl.textContent = `读取中: ${file.name}`;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            pendingAudioDataUrl = e.target.result;
+            statusEl.textContent = `已选择: ${file.name}`;
+            if (type === 'audio') {
+                ui.videoStatus.textContent = '';
+                ui.videoPicker.value = '';
+            } else {
+                ui.audioStatus.textContent = '';
+                ui.audioPicker.value = '';
+            }
+        };
+        reader.onerror = () => {
+             statusEl.textContent = `读取失败!`;
+        };
+        reader.readAsDataURL(file);
+    }
+
+/* =============================================================== */
+/* ================= [新增] 修复语音挂件输入框溢出问题 ================== */
+/* =============================================================== */
+#widget-page-voice .modal-input,
+#widget-page-voice .modal-textarea {
+    box-sizing: border-box; /* 确保 padding 包含在宽度内 */
+    width: 100%;            /* 强制宽度为父容器的100% */
+    min-width: 0;           /* 关键修复：允许输入框在flex/grid布局中收缩，防止溢出 */
+}
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+
 
     </style>
 
- <style id="custom-jelly-ball-styles"></style>
+    <style id="custom-jelly-ball-styles"></style>
+    
+    <!-- [核心修复] 新增 mammoth.js 库，用于解析 .docx 文件 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.7.0/mammoth.browser.min.js"></script>
+    
+ <script>
+    // 定义一个函数，用于在字体加载完成后触发动画
+    const triggerSplashAnimation = () => {
+        document.body.classList.add('font-loaded');
+        console.log('✅ 字体已就绪，启动开屏动画。');
+    };
 
+    try {
+        const cachedConfigStr = localStorage.getItem('currentConfig');
+        if (cachedConfigStr) {
+            const config = JSON.parse(cachedConfigStr);
+            const fontUrl = config?.settings?.globalFont?.url;
+
+            if (fontUrl) {
+                // 步骤1: 动态创建@font-face规则
+                const FONT_FAMILY_NAME = 'GlobalCustomFont';
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    @font-face {
+                        font-family: '${FONT_FAMILY_NAME}';
+                        src: url('${fontUrl}');
+                        font-display: swap;
+                    }
+                `;
+                document.head.appendChild(style);
+
+                // 步骤2: 使用Font Loading API等待字体加载
+                // '1em' 是一个技巧，表示我们关心这个字体的任何字符是否可用
+                document.fonts.load(`1em ${FONT_FAMILY_NAME}`).then(() => {
+                    // 字体加载成功！触发动画
+                    triggerSplashAnimation();
+                }).catch(error => {
+                    // 如果字体加载失败（例如URL无效），也立即触发动画，防止白屏
+                    console.error('自定义字体加载失败:', error);
+                    triggerSplashAnimation();
+                });
+            } else {
+                // 如果没有配置自定义字体，直接触发动画
+                triggerSplashAnimation();
+            }
+        } else {
+            // 如果连本地配置缓存都没有，也直接触发动画
+            triggerSplashAnimation();
+        }
+    } catch (e) {
+        console.error('字体加载&动画同步脚本执行失败:', e);
+        // 发生任何未知错误时，确保动画能播放
+        triggerSplashAnimation();
+    }
+</script>
     <!-- [新增] 用于全局字体的样式标签 -->
     <style id="global-font-style"></style>
+
     <!-- ============= [新增] 弥散渐变开屏动画 ============= -->
     <div id="splash-screen">
         <div class="gradient-blob blob1"></div>
@@ -5472,6 +6050,18 @@ body.dark-mode .info-tooltip-trigger {
         </div>
     </div>
     <!-- ===================== [新增结束] ===================== -->
+    <!-- ============= [新增] 通行密钥弹窗 ============= -->
+    <div id="passkey-overlay">
+        <div id="passkey-modal">
+            <h3>请输入通行密钥</h3>
+            <p>通行密钥每月更新</p>
+            <input type="password" id="passkey-input" placeholder="在此输入密钥" autocomplete="off">
+            <button id="passkey-submit">进入</button>
+            <p id="passkey-error">密钥错误，请重试</p>
+        </div>
+    </div>
+    <!-- ===================== [新增结束] ===================== -->
+
     <!-- 手机模式滑动容器 -->
     <div class="main-wrapper" id="mainWrapper">
         <div class="page-slider" id="pageSlider">
@@ -5785,11 +6375,16 @@ body.dark-mode .info-tooltip-trigger {
     </div>
         <!-- ★ 在这里新增下面的代码块 ★ -->
         <div class="update-log-entry">
-            <h4>v6.0.1 <span class="update-date">- 2025.11.30</span></h4>
+            <h4>v6.1.0 <span class="update-date">- 2025.11.30</span></h4>
             <ul>
-                <li><span class="tag new">新功能</span> 相册新增视频上传功能。</li>
+                <li><span class="tag new">新功能</span> 新增开屏动画。</li>
+                <li><span class="tag new">新功能</span> 新增通行密钥，每月于群内更新。</li>
+                                <li><span class="tag new">新功能</span> 新增开场语音功能。</li>
+                <li><span class="tag new">新功能</span> “相册”新增短视频上传功能。</li>
+                <li><span class="tag new">新功能</span> “网页内悬浮球”增加后台保活功能，目前仅iOS可用。</li>
                 <li><span class="tag new">新功能</span> “记忆”功能新增数据恢复机制，当数据损坏时可从历史版本一键恢复。</li>
                 <li><span class="tag new">新功能</span> “文件夹”新增文件标签系统，支持添加、管理并按标签筛选文件。</li>
+                <li><span class="tag new">新功能</span> 新增“记忆”窗口最小化和悬浮角标。</li>
                 <li><span class="tag fix">修复</span> 解决了“挂件中心-签到”日历点击无法正常翻转的问题。</li>
                 <li><span class="tag fix">修复</span> 修复了“备忘录”复制功能无法保留换行和空行格式的Bug。</li>
                 <li><span class="tag fix">修复</span> 修复了“留言板”中的链接在特定情况下无法打开的问题。</li>
@@ -5976,7 +6571,7 @@ body.dark-mode .info-tooltip-trigger {
     </div>
     
     <footer class="update-footer">
-        当前版本: v6.0.1
+        当前版本: v6.1.0
     </footer>
 </div>
                     <div id="help-page-3" class="help-page-content">
@@ -6394,7 +6989,11 @@ body.dark-mode #floating-jellyfish-ball {
                     <span id="memory-modal-title">记忆</span>
                     <span id="memory-sync-status" style="font-size: 12px; font-weight: normal; margin-left: 8px;"></span>
                 </div>
-                <button class="close-btn" data-modal-id="memoryModal">&times;</button>
+                <!-- [新增] 使用 div 包裹最小化和关闭按钮 -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="close-btn" data-action="minimize-memory-modal" style="font-weight: 900; font-size: 26px; line-height: 1;" title="最小化"><svg t="1764149626872" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3302" width="18" height="18"><path d="M896 548H128a36 36 0 0 1 0-72h768a36 36 0 0 1 0 72z" p-id="3303" fill="currentColor"></path></svg></button>
+                    <button class="close-btn" data-modal-id="memoryModal">&times;</button>
+                </div>
             </div>
             <div class="app-container" id="memoryAppContainer">
                 <!-- HUB / 入口页面 -->
@@ -6965,8 +7564,86 @@ body.dark-mode #floating-jellyfish-ball {
     </div>
     <!-- ============= [ 新增结束 ] ============= -->
        <script>
+    // ============= [新增] 通行密钥验证逻辑 V1.0 =============
+    (function handlePasskeyAuthentication() {
+        // --- 请在这里替换每月密钥 ---
+        const currentPasskeys = [
+            'Fp9xVz2r', 'jK4gA8sL', 'nB6hT1wE', 'gD5pQ7zY', 'zC8vE3uF',
+            'rW7mI2oP', 'tY1sK9bN', 'uE3jH5fA', 'aV4cQ6xZ', 'iO9lP1wE',
+            'kR2sB8nM', 'qL7gT3dV', 'xU6hF4cY', 'oP1iEa5b', 'wM5zK9pV',
+            'vC3jD7fX', 'eG9xV1zR', 'bN4hT6wQ', 'sA2kL8mJ', 'yU8iO6pZ'
+        ];
+        // ------------------------------------
+
+        const overlay = document.getElementById('passkey-overlay');
+        // 确保在执行脚本时弹窗元素已存在
+        if (!overlay) {
+            // 如果DOM还没加载完，就延迟执行
+            document.addEventListener('DOMContentLoaded', handlePasskeyAuthentication);
+            return;
+        }
+
+        const modal = document.getElementById('passkey-modal');
+        const input = document.getElementById('passkey-input');
+        const submitBtn = document.getElementById('passkey-submit');
+        const errorMsg = document.getElementById('passkey-error');
+
+        // 使用 "年-月" 作为唯一标识，例如 "2024-10"
+        const currentMonthIdentifier = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
+        const validatedMonth = localStorage.getItem('passkeyValidatedMonth');
+
+        // 检查当月是否已经验证过
+        if (currentMonthIdentifier === validatedMonth) {
+            overlay.style.display = 'none'; // 如果已验证，直接隐藏弹窗
+            return;
+        }
+
+        // 如果未验证，模糊背景内容
+        document.body.classList.add('passkey-pending');
+
+        const validate = () => {
+            const enteredKey = input.value.trim();
+            if (currentPasskeys.includes(enteredKey)) {
+                // 密钥正确
+                localStorage.setItem('passkeyValidatedMonth', currentMonthIdentifier);
+                
+                // 移除模糊并播放弹窗消失动画
+                document.body.classList.remove('passkey-pending');
+                overlay.style.opacity = '0';
+                overlay.addEventListener('transitionend', () => {
+                    overlay.style.display = 'none';
+                }, { once: true });
+
+            } else {
+                // 密钥错误
+                errorMsg.style.display = 'block';
+                modal.classList.add('shake');
+                input.focus();
+
+                setTimeout(() => {
+                    modal.classList.remove('shake');
+                    errorMsg.style.display = 'none';
+                    input.value = '';
+                }, 820);
+            }
+        };
+
+        submitBtn.addEventListener('click', validate);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // 防止回车键触发表单提交等默认行为
+                validate();
+            }
+        });
+        
+        // 页面加载完成后立即让输入框获得焦点，方便用户直接输入
+        input.focus();
+    })();
+    // ===================== [新增结束] =====================
+
     // [新增] 字符串哈希函数，用于检测内容变更
     function simpleHash(str) {
+
         let hash = 0;
         for (let i = 0; i < str.length; i++) {
             const char = str.charCodeAt(i);
@@ -7016,7 +7693,8 @@ const DataManager = (() => {
     const modulePaths = {
         usageTime: 'stats/usage_time.json',
         checkInData: 'widgets/checkin_data.json',
-        messageBoardData: 'widgets/message_board.json' // 新增此行
+        messageBoardData: 'widgets/message_board.json',
+        pendantVoiceData: 'widgets/voice_data.json' // <-- 新增
     };
 
     // 模块的默认数据结构
@@ -7027,10 +7705,17 @@ const DataManager = (() => {
             background: { type: 'color', value: '#ffffff', blur: 5 },
             reminder: { enabled: false } 
         },
-        messageBoardData: { // 新增此块
+        messageBoardData: {
             messages: [] 
+        },
+        // [新增] 语音挂件的默认数据结构
+        pendantVoiceData: {
+            voices: [], // 存储所有语音对象
+            playOnStartup: false, // 开屏播放开关
+            randomPlay: true // 随机播放开关
         }
     };
+
 
 
     /**
@@ -7101,6 +7786,306 @@ const DataManager = (() => {
 
     return { get, save };
 })();
+
+/* =============================================================== */
+/* ================== [新增] 语音挂件功能管理器 V1.0 ================ */
+/* =============================================================== */
+const PendantVoiceManager = (() => {
+    let ui = {};
+    let pendantVoiceData = null; // 用于缓存语音数据
+    let pendingAudioDataUrl = null; // 临时存储待保存的音频数据
+    let currentAudio = null; // 用于控制当前播放的音频
+
+    async function init() {
+        // 获取所有UI元素
+        ui = {
+            modal: document.getElementById('pendant-settings-modal'),
+            voiceListContainer: document.getElementById('voice-list-container'),
+            playOnStartupToggle: document.getElementById('voicePlayOnStartupToggle'),
+            randomPlayToggle: document.getElementById('voiceRandomPlayToggle'),
+            speakerInput: document.getElementById('voice-speaker-input'),
+            subtitleInput: document.getElementById('voice-subtitle-input'),
+            audioPicker: document.getElementById('voice-audio-picker'),
+            uploadAudioBtn: document.getElementById('voice-upload-audio-btn'),
+            audioStatus: document.getElementById('voice-audio-status'),
+            videoPicker: document.getElementById('voice-video-picker'),
+            uploadVideoBtn: document.getElementById('voice-upload-video-btn'),
+            videoStatus: document.getElementById('voice-video-status'),
+            progressContainer: document.getElementById('voice-upload-progress-container'),
+            progressBar: document.getElementById('voice-upload-progress-bar'),
+            cancelBtn: document.getElementById('voice-upload-cancel-btn'),
+            saveBtn: document.getElementById('voice-save-btn'),
+        };
+
+        // 绑定事件
+        ui.uploadAudioBtn.addEventListener('click', () => ui.audioPicker.click());
+        ui.uploadVideoBtn.addEventListener('click', () => ui.videoPicker.click());
+        
+        ui.audioPicker.addEventListener('change', (e) => handleFileSelection(e.target.files[0], 'audio'));
+        ui.videoPicker.addEventListener('change', (e) => handleFileSelection(e.target.files[0], 'video'));
+
+        ui.saveBtn.addEventListener('click', saveVoice);
+        
+        ui.playOnStartupToggle.addEventListener('change', () => toggleSetting('playOnStartup', ui.playOnStartupToggle.checked));
+        ui.randomPlayToggle.addEventListener('change', () => toggleSetting('randomPlay', ui.randomPlayToggle.checked));
+
+        // 使用事件委托处理列表项的点击
+        ui.voiceListContainer.addEventListener('click', handleListClick);
+
+        // [V2 修复] 加载数据并渲染
+        await loadData();
+        renderSettingsUI(); // 在init中调用，确保UI元素已存在
+        renderVoiceList();
+    }
+
+
+    async function toggleSetting(key, value) {
+        if (!pendantVoiceData) await loadData();
+        pendantVoiceData[key] = value;
+        await DataManager.save('pendantVoiceData', `Update voice setting: ${key}`);
+        showTopToast('设置已保存', 1500);
+    }
+    
+    // [V2 修复] loadData 只负责加载数据，不操作UI
+    async function loadData() {
+        if (pendantVoiceData) return; // 如果已加载，则直接返回
+        pendantVoiceData = await DataManager.get('pendantVoiceData');
+    }
+
+    // [V2 新增] renderSettingsUI 负责将数据渲染到UI上
+    function renderSettingsUI() {
+        if (!pendantVoiceData || !ui.playOnStartupToggle) return; // 安全检查
+        ui.playOnStartupToggle.checked = pendantVoiceData.playOnStartup;
+        ui.randomPlayToggle.checked = pendantVoiceData.randomPlay;
+    }
+
+    function handleFileSelection(file, type) {
+        if (!file) return;
+
+        const statusEl = type === 'audio' ? ui.audioStatus : ui.videoStatus;
+        statusEl.textContent = `读取中: ${file.name}`;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            pendingAudioDataUrl = e.target.result;
+            statusEl.textContent = `已选择: ${file.name}`;
+            if (type === 'audio') {
+                ui.videoStatus.textContent = '';
+                ui.videoPicker.value = '';
+            } else {
+                ui.audioStatus.textContent = '';
+                ui.audioPicker.value = '';
+            }
+        };
+        reader.onerror = () => {
+             statusEl.textContent = `读取失败!`;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function saveVoice() {
+        const speaker = ui.speakerInput.value.trim();
+        const subtitle = ui.subtitleInput.value.trim();
+
+        if (!speaker) {
+            alert('请填写"语音人"！');
+            return;
+        }
+        if (!pendingAudioDataUrl) {
+            alert('请选择一个语音或视频文件！');
+            return;
+        }
+
+        // [核心修改] 仅改变按钮状态，不再显示进度条
+        ui.saveBtn.disabled = true;
+        ui.saveBtn.textContent = '上传中…';
+        
+        // 将Base64数据转换为Blob对象以便上传
+        const fetchRes = await fetch(pendingAudioDataUrl);
+        const blob = await fetchRes.blob();
+        
+        // 定义上传路径和文件名
+        const extension = blob.type.split('/')[1] || 'mp3';
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${extension}`;
+        const path = `memory/voices/${fileName}`;
+
+        try {
+            // 使用已有的 uploadFileViaGitData 函数上传文件, onProgress回调不再需要
+            const uploadResult = await uploadFileViaGitData({
+                file: new File([blob], fileName, { type: blob.type }),
+                path: path,
+                commitMessage: `Upload voice: ${fileName}`,
+                onProgress: (percent) => {
+                    // 进度条逻辑已删除，此回调为空
+                }
+            });
+
+            // 关键：只保存文件路径，而不是文件内容
+            const newVoice = {
+                id: Date.now(),
+                speaker: speaker,
+                subtitle: subtitle,
+                path: uploadResult.path, // 保存路径
+                sha: uploadResult.sha,    // 保存SHA，方便未来管理
+            };
+
+            pendantVoiceData.voices.push(newVoice);
+            await DataManager.save('pendantVoiceData', `Add voice: ${speaker}`);
+
+            // 重置表单
+            ui.speakerInput.value = '';
+            ui.subtitleInput.value = '';
+            ui.audioPicker.value = '';
+            ui.videoPicker.value = '';
+            ui.audioStatus.textContent = '';
+            ui.videoStatus.textContent = '';
+            pendingAudioDataUrl = null;
+
+            renderVoiceList();
+            showTopToast('语音已成功保存！', 2000);
+
+        } catch (error) {
+            console.error("上传语音失败:", error);
+            alert(`上传语音失败: ${error.message}`);
+        } finally {
+            // 无论成功或失败，都恢复UI状态
+            ui.saveBtn.disabled = false;
+            ui.saveBtn.textContent = '保存语音';
+            // [核心修改] 删除进度条隐藏逻辑
+        }
+    }
+
+
+    function renderVoiceList() {
+        const voices = pendantVoiceData.voices;
+        if (voices.length === 0) {
+            ui.voiceListContainer.innerHTML = '<p class="placeholder-content" style="font-size: 14px;">暂无语音，请在下方添加</p>';
+            return;
+        }
+
+        ui.voiceListContainer.innerHTML = voices.map(voice => `
+            <div class="voice-list-item" data-voice-id="${voice.id}">
+                <div class="voice-info">
+                    <div class="voice-subtitle-preview">${voice.subtitle || '...'}</div>
+                    <div class="voice-speaker">${voice.speaker}</div>
+                </div>
+                <div class="voice-actions">
+                    <button class="play-voice-btn" title="播放">▶</button>
+                    <button class="delete-voice-btn" title="删除">✖</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+
+    async function handleListClick(e) {
+        const playBtn = e.target.closest('.play-voice-btn');
+        const deleteBtn = e.target.closest('.delete-voice-btn');
+        
+        if (playBtn) {
+            const voiceId = parseInt(playBtn.closest('.voice-list-item').dataset.voiceId, 10);
+            playVoiceById(voiceId);
+        } else if (deleteBtn) {
+            const voiceId = parseInt(deleteBtn.closest('.voice-list-item').dataset.voiceId, 10);
+            if (confirm('确定要删除这条语音吗？')) {
+                pendantVoiceData.voices = pendantVoiceData.voices.filter(v => v.id !== voiceId);
+                await DataManager.save('pendantVoiceData', 'Delete voice');
+                renderVoiceList();
+                showTopToast('语音已删除', 1500);
+            }
+        }
+    }
+    
+    function stopCurrentAudio() {
+        if(currentAudio) {
+            currentAudio.pause();
+            currentAudio.src = '';
+            currentAudio = null;
+        }
+        document.querySelectorAll('.voice-list-item.playing').forEach(el => {
+            el.classList.remove('playing');
+            el.querySelector('.play-voice-btn').innerHTML = '▶';
+        });
+    }
+
+    async function playVoiceById(id) {
+        const voice = pendantVoiceData.voices.find(v => v.id === id);
+        if (!voice || !voice.path) return; // 检查 path 是否存在
+
+        // 如果点击的是正在播放的按钮，则停止播放
+        if (currentAudio && !currentAudio.paused && currentAudio.dataset.voiceId === String(id)) {
+            stopCurrentAudio();
+            return;
+        }
+        
+        stopCurrentAudio(); // 停止任何其他正在播放的语音
+        
+        const listItem = ui.voiceListContainer.querySelector(`[data-voice-id="${id}"]`);
+        const playBtn = listItem?.querySelector('.play-voice-btn');
+        if(playBtn) playBtn.innerHTML = '<div class="music-loader"></div>'; // 显示加载动画
+        
+        try {
+            // 使用 getSecureFileUrl 获取安全的音频URL
+            const audioUrl = await getSecureFileUrl(voice.path);
+            
+            if (!audioUrl) throw new Error('无法获取音频URL');
+            
+            currentAudio = new Audio(audioUrl);
+            currentAudio.dataset.voiceId = id; // 标记当前播放的ID
+            currentAudio.play().catch(e => {
+                console.error("播放语音失败:", e);
+                if(playBtn) playBtn.innerHTML = '▶';
+            });
+            
+            if (listItem) {
+                listItem.classList.add('playing');
+                if(playBtn) playBtn.innerHTML = '❚❚';
+            }
+
+            currentAudio.onended = () => {
+                if (listItem) {
+                    listItem.classList.remove('playing');
+                   if(playBtn) playBtn.innerHTML = '▶';
+                }
+                currentAudio = null;
+            };
+        } catch (error) {
+            console.error("播放语音时出错:", error);
+            alert(`播放语音失败: ${error.message}`);
+            if(playBtn) playBtn.innerHTML = '▶';
+        }
+    }
+
+    async function playRandomVoice() {
+        if (!pendantVoiceData) await loadData();
+        const { voices, randomPlay } = pendantVoiceData;
+
+        if (voices.length === 0) return;
+
+        let indexToPlay = 0;
+        if (randomPlay) {
+            indexToPlay = Math.floor(Math.random() * voices.length);
+        }
+        
+        playVoiceById(voices[indexToPlay].id);
+    }
+
+    async function playOnStartup() {
+        // [V2 修复] 先确保数据已加载
+        await loadData();
+        // 然后再安全地检查设置并播放
+        if (pendantVoiceData && pendantVoiceData.playOnStartup) {
+            playRandomVoice();
+        }
+    }
+
+
+    return { init, playOnStartup };
+})();
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+
 
 /**
  * [新增] 一次性数据迁移函数 V1.0
@@ -7919,61 +8904,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     _showQuickSwitchMenu();
                     break;
 
-// 修改后的新代码
-                // [新增] 后台保活逻辑 (V2.0 - 兼容安卓)
+                // [新增] 后台保活逻辑
                 case 'keepAlive':
                     const keepAliveAudio = document.getElementById('keep-alive-audio');
-                    const keepAliveBtn = button;
-
+                    const keepAliveBtn = button; // `button` 是当前被点击的功能球元素
                     if (keepAliveAudio && keepAliveBtn) {
-                        // 检查浏览器是否支持 Media Session API
-                        if ('mediaSession' in navigator) {
-                            if (keepAliveAudio.paused) {
-                                // 1. 在播放前设置媒体元数据
-                                navigator.mediaSession.metadata = new MediaMetadata({
-                                    title: '后台保活运行中',
-                                    artist: 'Jellyfish Island',
-                                    album: '系统进程',
-                                    artwork: [
-                                        { src: 'icons/icon-96x96.png', sizes: '96x96', type: 'image/png' },
-                                        { src: 'icons/icon-128x128.png', sizes: '128x128', type: 'image/png' },
-                                        { src: 'icons/icon-192x192.png', sizes: '192x192', type: 'image/png' }
-                                    ]
-                                });
-
-                                // 2. 设置媒体通知栏的播放/暂停动作处理
-                                navigator.mediaSession.setActionHandler('play', () => {
-                                    keepAliveAudio.play();
-                                    navigator.mediaSession.playbackState = "playing";
-                                    keepAliveBtn.classList.add('glowing');
-                                });
-                                navigator.mediaSession.setActionHandler('pause', () => {
-                                    keepAliveAudio.pause();
-                                    navigator.mediaSession.playbackState = "paused";
-                                    keepAliveBtn.classList.remove('glowing');
-                                });
-                            }
-                        }
-
-                        // 执行播放或暂停操作
                         if (keepAliveAudio.paused) {
                             keepAliveAudio.play().then(() => {
-                                if ('mediaSession' in navigator) {
-                                    navigator.mediaSession.playbackState = "playing";
-                                }
                                 keepAliveBtn.classList.add('glowing');
-                                
                             }).catch(error => {
                                 console.error("后台保活音频播放失败:", error);
                                 alert("无法自动播放音频，请与页面进行一次交互后再试。");
                             });
                         } else {
                             keepAliveAudio.pause();
-                            if ('mediaSession' in navigator) {
-                                navigator.mediaSession.playbackState = "paused";
-                                // 当用户手动暂停时，清空媒体信息，让通知消失
-                                navigator.mediaSession.metadata = null;
-                            }
                             keepAliveBtn.classList.remove('glowing');
                         }
                     }
@@ -9287,13 +10231,53 @@ async function saveGlobalConfig(commitMessage) {
     }
     
     const settingsModalElements = { githubRepoInput: document.getElementById("githubRepoInput"), githubTokenInput: document.getElementById("githubTokenInput"), saveSettingsBtn: document.getElementById("saveSettingsBtn"), manualSyncBtn: document.getElementById('manualSyncBtn') };
-    function setupModals(){document.querySelectorAll(".close-btn").forEach(e=>e.addEventListener("click",()=>{document.getElementById(e.dataset.modalId).classList.remove("show")})),document.querySelectorAll(".modal-overlay").forEach(e=>e.addEventListener("click",t=>e===t.target&&e.classList.remove("show"))),document.getElementById("helpBtn").addEventListener("click", () => {
-    // 切换弹窗和菜单的显示
-    document.getElementById("helpModal").classList.add("show");
-    toggleFabMenu(false);
-})
+    function setupModals() {
+        document.querySelectorAll(".close-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                // [核心修复] 只有当按钮有关联的 modalId 时，才执行通用关闭逻辑
+                if (btn.dataset.modalId) {
+                    const modal = document.getElementById(btn.dataset.modalId);
+                    if (modal) {
+                        modal.classList.remove("show");
+                    }
+                }
+                // 对于没有 modalId 的 close-btn (如最小化按钮)，此通用监听器将不执行任何操作。
+            });
+        });
+        document.querySelectorAll(".modal-overlay").forEach(e => e.addEventListener("click", t => e === t.target && e.classList.remove("show"))), document.getElementById("helpBtn").addEventListener("click", () => {
+            document.getElementById("helpModal").classList.add("show");
+            toggleFabMenu(false);
+        }), document.getElementById("dataSyncBtn").addEventListener("click", () => {
+            GITHUB_CONFIG.owner && GITHUB_CONFIG.repo && (settingsModalElements.githubRepoInput.value = `${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`), settingsModalElements.githubTokenInput.value = GITHUB_CONFIG.token || "", document.getElementById("settingsModal").classList.add("show"), toggleFabMenu(!1)
+        }), document.getElementById("addNavBtn").addEventListener("click", () => {
+            openAddModal();
+            toggleFabMenu(false);
+        }), document.getElementById("colorBtn").addEventListener("click", () => {
+            document.getElementById("colorPaletteModal").classList.add("show");
+            updateColorUI(getCurrentColors());
+            updateBgStatus();
+            toggleFabMenu(false);
+        }), document.getElementById("memoryBtn").addEventListener('click', () => {
+            MemoryApp.open();
+            toggleFabMenu(false);
+        }), document.getElementById('jelly-css-help-modal').querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const textBlock = e.target.parentElement;
+                const textToCopy = textBlock.innerText.replace(e.target.innerText, '').trim();
+                try {
+                    await navigator.clipboard.writeText(textToCopy);
+                    const originalText = e.target.textContent;
+                    e.target.textContent = '已复制!';
+                    setTimeout(() => {
+                        e.target.textContent = originalText;
+                    }, 1500);
+                } catch (err) {
+                    alert('复制失败，请手动复制。');
+                }
+            });
+        });
+    }
 
-,document.getElementById("dataSyncBtn").addEventListener("click",()=>{GITHUB_CONFIG.owner&&GITHUB_CONFIG.repo&&(settingsModalElements.githubRepoInput.value=`${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}`),settingsModalElements.githubTokenInput.value=GITHUB_CONFIG.token||"",document.getElementById("settingsModal").classList.add("show"),toggleFabMenu(!1)}),document.getElementById("addNavBtn").addEventListener("click",()=>{openAddModal(); toggleFabMenu(false);}),document.getElementById("colorBtn").addEventListener("click", ()=>{document.getElementById("colorPaletteModal").classList.add("show"); updateColorUI(getCurrentColors()); updateBgStatus(); toggleFabMenu(false);}),document.getElementById("memoryBtn").addEventListener('click', () => { MemoryApp.open(); toggleFabMenu(false); }), document.getElementById('jelly-css-help-modal').querySelectorAll('.copy-btn').forEach(btn => { btn.addEventListener('click', async (e) => { const textBlock = e.target.parentElement; const textToCopy = textBlock.innerText.replace(e.target.innerText, '').trim(); try { await navigator.clipboard.writeText(textToCopy); const originalText = e.target.textContent; e.target.textContent = '已复制!'; setTimeout(() => { e.target.textContent = originalText; }, 1500); } catch (err) { alert('复制失败，请手动复制。'); } }); });}
     function saveGithubConfig(e){localStorage.setItem("githubConfig",JSON.stringify(e)),GITHUB_CONFIG=e}function loadGithubConfig(){const e=localStorage.getItem("githubConfig");e&&(GITHUB_CONFIG=JSON.parse(e))}function checkConfig(e=!0){return!GITHUB_CONFIG.owner||!GITHUB_CONFIG.repo||!GITHUB_CONFIG.token?(e&&alert("请先配置GitHub仓库信息。\n(打开菜单 -> 数据同步)"),!1):!0}
     
     function isObject(item) { return (item && typeof item === 'object' && !Array.isArray(item)); }
@@ -9664,7 +10648,8 @@ async function saveGlobalConfig(commitMessage) {
             console.log("后台静默加载非核心数据模块...");
             DataManager.get('usageTime');
             DataManager.get('checkInData');
-            DataManager.get('messageBoardData'); // 新增此行
+            DataManager.get('messageBoardData');
+            DataManager.get('pendantVoiceData'); // <-- 新增
 
 
         } catch (error) {
@@ -10039,9 +11024,9 @@ function openEditModal(buttonData) {
 }
 
     
-    function openIframeModal(url) { 
-        if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } 
-        
+function openIframeModal(url) { 
+    if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } 
+   
         // [新增] 开始使用时长计时
         startUsageTracking(url);
 
@@ -16535,12 +17520,190 @@ document.addEventListener('DOMContentLoaded', () => {
         BackupReminderManager.initUI();
         // 2. 再调用 init() 为这些元素绑定事件
         BackupReminderManager.init();
+    /* =============================================================== */
+    /* ============== [重构] 独立悬浮工具球 V5.1 (最小化功能修复) ============== */
+    /* =============================================================== */
+    const FloatingToolV4 = (() => {
+        const wrapper = document.getElementById('custom-tool-wrapper');
+        const ball = document.getElementById('custom-tool-inner'); // 球本体
+        
+        if (!wrapper || !ball) {
+            console.error("Floating Tool V5: Wrapper or Ball element not found.");
+            return { init: () => {} };
+        }
+
+        // [核心修复] 将 minimizedModalState 的存储从 ID 改为元素引用
+        let minimizedModalState = {
+            element: null 
+        };
+
+        // 拖拽逻辑保持不变
+        let isDragging = false;
+        let offset = { x: 0, y: 0 };
+        const storageKey = 'floatingToolPosition_v4';
+
+        const onDragStart = (e) => {
+            wrapper.classList.remove('snap-left', 'snap-right');
+            wrapper.classList.add('dragging');
+            isDragging = true;
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            const rect = wrapper.getBoundingClientRect();
+            offset.x = clientX - rect.left;
+            offset.y = clientY - rect.top;
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('touchmove', onDragMove, { passive: false });
+            document.addEventListener('mouseup', onDragEnd, { once: true });
+            document.addEventListener('touchend', onDragEnd, { once: true });
+        };
+
+        const onDragMove = (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            let newX = clientX - offset.x;
+            let newY = clientY - offset.y;
+            newX = Math.max(0, Math.min(newX, window.innerWidth - wrapper.offsetWidth));
+            newY = Math.max(0, Math.min(newY, window.innerHeight - wrapper.offsetHeight));
+            wrapper.style.left = `${newX}px`;
+            wrapper.style.top = `${newY}px`;
+        };
+
+        const onDragEnd = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            wrapper.classList.remove('dragging');
+            const ballRect = wrapper.getBoundingClientRect();
+            const isLeft = (ballRect.left + ballRect.width / 2) < (window.innerWidth / 2);
+            wrapper.style.left = isLeft ? '0' : '100%';
+            wrapper.classList.add(isLeft ? 'snap-left' : 'snap-right');
+            localStorage.setItem(storageKey, JSON.stringify({
+                side: isLeft ? 'left' : 'right',
+                top: wrapper.style.top
+            }));
+            document.removeEventListener('mousemove', onDragMove);
+            document.removeEventListener('touchmove', onDragMove);
+        };
+
+        const loadPosition = () => {
+            try {
+                const savedPos = JSON.parse(localStorage.getItem(storageKey));
+                if (savedPos && savedPos.side && savedPos.top) {
+                    wrapper.style.top = savedPos.top;
+                    wrapper.style.left = savedPos.side === 'left' ? '0' : '100%';
+                    wrapper.classList.add(savedPos.side === 'left' ? 'snap-left' : 'snap-right');
+                } else {
+                    wrapper.style.top = '70%';
+                    wrapper.style.left = '100%';
+                    wrapper.classList.add('snap-right');
+                }
+            } catch(e) {
+                wrapper.style.top = '70%';
+                wrapper.style.left = '100%';
+                wrapper.classList.add('snap-right');
+            }
+        };
+
+        // ★★★ [核心修复] minimizeModal 函数现在保存元素引用 ★★★
+        const minimizeModal = (modalId) => {
+            const modalElement = document.getElementById(modalId);
+            if (!modalElement) return;
+            
+            minimizedModalState.element = modalElement; // 保存元素本身
+            
+            modalElement.classList.remove('show');
+            wrapper.style.display = 'flex'; // 显示悬浮球
+            showTopToast("已收起到悬浮球", 2000);
+        };
+        
+        // ★★★ [核心修复] restoreModal 函数现在直接使用元素引用 ★★★
+        const restoreModal = () => {
+            // 直接检查状态对象中的 element 是否存在
+            if (!minimizedModalState || !minimizedModalState.element) return;
+            
+            // 直接使用已保存的元素引用，不再需要 document.getElementById
+            minimizedModalState.element.classList.add('show');
+            
+            wrapper.style.display = 'none'; // 隐藏悬浮球
+            minimizedModalState.element = null; // 清空状态
+        };
+        
+        const closeModalCompletely = () => {
+            if (!minimizedModalState) return;
+            wrapper.style.display = 'none';
+            minimizedModalState.element = null;
+        };
+
+        const init = () => {
+            // [核心修复] 初始时隐藏悬浮球
+            wrapper.style.display = 'none';
+
+            let pressTimer = null;
+            let isClickAction = true;
+
+            const startAction = (e) => {
+                isClickAction = true;
+                pressTimer = setTimeout(() => {
+                    isClickAction = false;
+                    onDragStart(e);
+                }, 200);
+            };
+
+
+            const endAction = (e) => {
+                clearTimeout(pressTimer);
+                if (isClickAction && !isDragging) {
+                    restoreModal(); // 点击时恢复
+                } else {
+                    onDragEnd(e); // 拖拽结束时吸附
+                }
+            };
+            
+            ball.addEventListener('mousedown', startAction);
+            ball.addEventListener('mouseup', endAction);
+            ball.addEventListener('touchstart', startAction, { passive: false });
+            ball.addEventListener('touchend', endAction);
+            
+            // 为 memoryModal 的最小化按钮绑定事件
+            const minimizeBtn = document.querySelector('[data-action="minimize-memory-modal"]');
+            if (minimizeBtn) {
+                minimizeBtn.addEventListener('click', () => minimizeModal('memoryModal'));
+            }
+            
+            // 为 memoryModal 的关闭按钮绑定清理函数
+            const closeBtn = document.querySelector('[data-modal-id="memoryModal"]');
+            if(closeBtn) {
+                closeBtn.addEventListener('click', closeModalCompletely);
+            }
+            
+            // 为 memoryModal 的背景遮罩层也添加关闭清理
+            const memoryModalOverlay = document.getElementById('memoryModal');
+            if(memoryModalOverlay){
+                memoryModalOverlay.addEventListener('click', (e)=>{
+                    if(e.target === memoryModalOverlay) {
+                        closeModalCompletely();
+                    }
+                });
+            }
+
+            loadPosition();
+        };
+
+        return { init };
+    })();
+
+    // 初始化新的悬浮工具球
+    FloatingToolV4.init();
+
         /* =============================================================== */
         /* ==================== [新增] 初始化挂件与签到管理器 ===================== */
         /* =============================================================== */
         PendantManager.init();
         // [V3.0 最终修复] 确保签到管理器在挂件系统之后初始化，保证数据流正确
         CheckInManager.init();
+        PendantVoiceManager.init(); // <-- 新增
+
 
         /* =============================================================== */
         /* ========================= [新增结束] ========================== */
@@ -17801,7 +18964,16 @@ if (splashScreen) {
     // 5. 在这里调用隐藏函数。你现有的 `window.addEventListener('load', ...)` 
     //    的末尾是最佳时机，因为它确保了所有初始化脚本都已执行。
     //    我们在这里再加一个短暂的延时，给动态内容一个渲染缓冲，体验更佳。
-    setTimeout(hideSplashScreen, 3000); // 延迟2500毫秒
+
+    // [新增] 在动画开始时尝试播放开屏语音
+    setTimeout(() => {
+        if(typeof PendantVoiceManager !== 'undefined') {
+            PendantVoiceManager.playOnStartup();
+        }
+    }, 500); // 延迟半秒，确保音频有机会加载
+
+    setTimeout(hideSplashScreen, 3500);
+
 
 }
 /* =============================================================== */
@@ -18041,6 +19213,9 @@ if (splashScreen) {
             </div>
         </div>
     </div>
+<div id="custom-tool-wrapper">
+  <div id="custom-tool-inner">✦</div>
+</div>
 <!-- ===== [重构] 全新挂件设置悬浮窗 V2.0 ===== -->
 <div class="modal-overlay" id="pendant-settings-modal">
     <div class="modal-content">
@@ -18102,6 +19277,68 @@ if (splashScreen) {
                     </div> -->
                 </div>
             </div>
+
+            <!-- [新增] 页面: 语音功能 -->
+            <div class="widget-hub-page" id="widget-page-voice">
+                <!-- 语音显示框 -->
+                <div class="voice-list-container" id="voice-list-container">
+                    <!-- JS 动态填充语音列表 -->
+                    <p class="placeholder-content" style="font-size: 14px;">暂无语音，请在下方添加</p>
+                </div>
+
+                <!-- 总开关设置 -->
+                <div class="toggle-section" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 12px;">
+                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                        <span>开屏时播放语音</span>
+                        <label class="toggle-switch"><input type="checkbox" id="voicePlayOnStartupToggle"><span class="slider"></span></label>
+                    </div>
+                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                        <span>随机播放</span>
+                        <label class="toggle-switch"><input type="checkbox" id="voiceRandomPlayToggle"><span class="slider"></span></label>
+                    </div>
+                </div>
+
+                <!-- 添加/编辑语音的折叠区域 -->
+                <details open>
+                    <summary>添加/编辑语音</summary>
+                    <div class="details-content" style="display: flex; flex-direction: column; gap: 15px;">
+                        
+
+                        <div class="form-section">
+                            <label for="voice-subtitle-input">留言</label>
+                            <textarea id="voice-subtitle-input" class="modal-textarea" rows="2" placeholder="这段语音的文字内容"></textarea>
+                        </div>
+                        <div class="form-section">
+                            <label for="voice-speaker-input">留言者</label>
+                            <input type="text" id="voice-speaker-input" class="modal-input" placeholder="例如：水母">
+                        </div>
+
+                        
+                        <div class="file-select-wrapper">
+                            <input type="file" id="voice-audio-picker" accept=".mp3,.m4a" style="display: none;">
+                            <button id="voice-upload-audio-btn" class="modal-button">添加语音文件</button>
+                            <span id="voice-audio-status" class="status-text"></span>
+                        </div>
+                        
+                        <div class="file-select-wrapper">
+                            <input type="file" id="voice-video-picker" accept="video/*" style="display: none;">
+                            <button id="voice-upload-video-btn" class="modal-button">视频转语音</button>
+                            <span id="voice-video-status" class="status-text"></span>
+                        </div>
+                       
+
+                        <div id="voice-upload-progress-container" class="progress-container" style="display: none;">
+                            <div class="progress-bar-wrapper">
+                                <div id="voice-upload-progress-bar" class="progress-bar"></div>
+                            </div>
+                            <button id="voice-upload-cancel-btn" title="取消上传">✖</button>
+                        </div>
+                        
+                        <button id="voice-save-btn" class="modal-button primary" style="color: var(--hold-border);">保存语音</button>
+                    </div>
+                </details>
+            </div>
+
             <!-- 页面4: 页面设置 (重构后) -->
             <div class="widget-hub-page" id="widget-page-settings">
 
@@ -18196,7 +19433,6 @@ if (splashScreen) {
                 </details>
             </div>
 
-
         <!-- 全新的胶囊导航栏 -->
         <div id="widget-hub-capsule">
             <button class="capsule-btn active" data-target="widget-page-checkin" data-title="签到">
@@ -18211,8 +19447,13 @@ if (splashScreen) {
                 <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 48 48"> <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C8.68629 2 6 4.68629 6 8V40C6 43.3137 8.68629 46 12 46H36C39.3137 46 42 43.3137 42 40V8C42 4.68629 39.3137 2 36 2H12ZM12 8H36V22H12V8ZM36 25H12V28H36V25ZM12 31H36V34H12V31ZM26 37H12V40H26V37Z" fill="#1c1f21"></path> </svg>
                 <span>留言板</span>
             </button>
+            <!-- [新增] 语音功能按钮 -->
+            <button class="capsule-btn" data-target="widget-page-voice" data-title="语音">
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 48 48"> <path fill-rule="evenodd" clip-rule="evenodd" d="M44.5 22.8058V36.7697H41.5V26.7336L33.5 28.9154V39.7697H30.5V26.624L44.5 22.8058Z" fill="#1c1f21" data-color="color-2"></path> <path d="M34.6553 6C41.1936 6.00004 46.5 11.3827 46.5 18.0215C46.5 18.8041 46.4157 19.5911 46.2627 20.3799C45.5279 19.8461 44.5896 19.6716 43.7109 19.9111L29.7109 23.7295C28.4058 24.0854 27.5001 25.2712 27.5 26.624V33.0605C24.6087 33.9212 22.5001 36.5987 22.5 39.7695C22.5 41.1623 22.9082 42.4594 23.6094 43.5498C17.8247 40.4299 2.50007 28.7644 2.5 18.0215C2.5 11.3827 7.80196 6.00004 14.3447 6C18.6567 6 21.882 8.74049 24.5 11.8252C27.1224 8.74496 30.3433 6 34.6553 6Z" fill="#1c1f21"></path> <path d="M29.5 43.7697C31.7091 43.7697 33.5 41.9789 33.5 39.7697C33.5 37.5606 31.7091 35.7697 29.5 35.7697C27.2909 35.7697 25.5 37.5606 25.5 39.7697C25.5 41.9789 27.2909 43.7697 29.5 43.7697Z" fill="#1c1f21" data-color="color-2"></path> <path d="M40.5 40.7697C42.7091 40.7697 44.5 38.9789 44.5 36.7697C44.5 34.5606 42.7091 32.7697 40.5 32.7697C38.2909 32.7697 36.5 34.5606 36.5 36.7697C36.5 38.9789 38.2909 40.7697 40.5 40.7697Z" fill="#1c1f21" data-color="color-2"></path> </svg>
+                <span>语音</span>
+            </button>
             <button class="capsule-btn" data-target="widget-page-settings" data-title="页面设置">
-                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24"><path d="m23,13.75v-3.5l-2.384-.841c-.176-.583-.407-1.142-.691-1.668l1.091-2.281-2.475-2.475-2.281,1.091c-.527-.284-1.086-.515-1.668-.691l-.841-2.384h-3.5l-.841,2.384c-.583-.176-1.142-.407-1.668-.691l-2.281-1.091-2.475,2.475,1.091,2.281c-.284-.527-.515,1.086-.691,1.668l-2.384.841v3.5l2.384.841c.176.583.407,1.142.691,1.668l-1.091,2.281,2.475,2.475,2.281-1.091c.527.284,1.086.515,1.668-.691l.841,2.384h3.5l.841-2.384c.583-.176,1.142-.407,1.668-.691l2.281,1.091,2.475-2.475-1.091-2.281c.284-.527-.515,1.086.691-1.668l2.384-.841Zm-11,2.25c-2.206,0-4-1.794-4-4s1.794-4,4-4,4,1.794,4,4-1.794,4-4,4Z" fill="#1c1f21"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24"><path d="m23,13.75v-3.5l-2.384-.841c-.176-.583-.407-1.142-.691-1.668l1.091-2.281-2.475-2.475-2.281,1.091c-.527-.284-1.086-.515-1.668-.691l-.841-2.384h-3.5l-.841,2.384c-.583-.176-1.142-.407-1.668-.691l-2.281-1.091-2.475,2.475,1.091,2.281c-.284-.527-.515,1.086-.691,1.668l-2.384.841v3.5l2.384.841c.176.583.407,1.142.691,1.668l-1.091,2.281,2.475,2.475,2.281-1.091c.527.284,1.086-.515,1.668-.691l.841,2.384h3.5l.841-2.384c.583-.176,1.142-.407,1.668-.691l2.281,1.091,2.475-2.475-1.091-2.281c.284-.527-.515,1.086.691-1.668l2.384-.841Zm-11,2.25c-2.206,0-4-1.794-4-4s1.794-4,4-4,4,1.794,4,4-1.794,4-4,4Z" fill="#1c1f21"></path></svg>
                 <span>设置</span>
             </button>
         </div>
@@ -18314,102 +19555,7 @@ if (splashScreen) {
             </div>
         </div>
     </div>
-<div id="floating-ball">✦</div>
 
-<!-- 将这个 script 标签放在 </body> 之前 -->
-<script src="https://unpkg.com/mammoth@1.7.0/mammoth.browser.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const ball = document.getElementById('floating-ball');
-    if (!ball) return;
-
-    let isDragging = false;
-    let offsetX, offsetY;
-
-    // --- 辅助函数 ---
-    const snapToEdge = () => {
-        const ballRect = ball.getBoundingClientRect();
-        const screenWidth = window.innerWidth;
-        
-        // 判断球体中心点在哪一侧
-        if (ballRect.left + ballRect.width / 2 < screenWidth / 2) {
-            // 吸附到左侧
-            ball.classList.remove('snap-right');
-            ball.classList.add('snap-left');
-        } else {
-            // 吸附到右侧
-            ball.classList.remove('snap-left');
-            ball.classList.add('snap-right');
-        }
-    };
-
-    // --- 事件处理函数 ---
-    const onDragStart = (e) => {
-        isDragging = true;
-        ball.classList.add('dragging');
-        // 移除吸附状态的类
-        ball.classList.remove('snap-left', 'snap-right');
-
-        // 统一处理触摸和鼠标事件
-        const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-
-        const rect = ball.getBoundingClientRect();
-        // 计算鼠标/手指在球体内的偏移量
-        offsetX = clientX - rect.left;
-        offsetY = clientY - rect.top;
-
-        // 添加移动和结束事件的监听器
-        document.addEventListener('mousemove', onDragMove);
-        document.addEventListener('touchmove', onDragMove, { passive: false });
-        document.addEventListener('mouseup', onDragEnd, { once: true });
-        document.addEventListener('touchend', onDragEnd, { once: true });
-    };
-
-    const onDragMove = (e) => {
-        if (!isDragging) return;
-        e.preventDefault(); // 阻止页面滚动等默认行为
-
-        const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-        const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-
-        let newX = clientX - offsetX;
-        let newY = clientY - offsetY;
-
-        // 边界检测，防止球体移出屏幕
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
-        const ballWidth = ball.offsetWidth;
-        const ballHeight = ball.offsetHeight;
-        
-        newX = Math.max(0, Math.min(newX, screenWidth - ballWidth));
-        newY = Math.max(0, Math.min(newY, screenHeight - ballHeight));
-        
-        // 直接更新 left 和 top
-        ball.style.left = `${newX + ballWidth / 2}px`;
-        ball.style.top = `${newY + ballHeight / 2}px`;
-    };
-
-    const onDragEnd = (e) => {
-        isDragging = false;
-        ball.classList.remove('dragging');
-        
-        snapToEdge(); // 松手时执行吸附
-
-        // 移除监听器
-        document.removeEventListener('mousemove', onDragMove);
-        document.removeEventListener('touchmove', onDragMove);
-    };
-
-    // --- 初始化 ---
-    // 初始位置吸附在右侧
-    ball.classList.add('snap-right'); 
-    
-    // 绑定开始拖拽的事件
-    ball.addEventListener('mousedown', onDragStart);
-    ball.addEventListener('touchstart', onDragStart, { passive: false });
-});
-</script>
     <!-- [新增] 用于后台保活的静音音频播放器 -->
     <audio id="keep-alive-audio" src="silence.m4a" loop></audio>
 </body>
