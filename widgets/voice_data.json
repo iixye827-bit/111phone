@@ -1,13 +1,5 @@
 {
-  "voices": [
-    {
-      "id": 1764228929666,
-      "speaker": "111",
-      "subtitle": "111",
-      "path": "memory/voices/1764228927227_se0y8lt.mpeg",
-      "sha": "78b87c809e0144aa03d2f42ca738a222faa6a688"
-    }
-  ],
+  "voices": [],
   "playOnStartup": true,
   "randomPlay": true
 }
