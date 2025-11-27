@@ -8057,28 +8057,45 @@ const PendantVoiceManager = (() => {
         }
     }
 
-    async function playRandomVoice() {
-        if (!pendantVoiceData) await loadData();
-        const { voices, randomPlay } = pendantVoiceData;
-
-        if (voices.length === 0) return;
+    // ★★★ 核心修改：让函数接收参数，而不是依赖模块内状态 ★★★
+    function playRandomVoice(voices, isRandom) {
+        if (!voices || voices.length === 0) return;
 
         let indexToPlay = 0;
-        if (randomPlay) {
+        if (isRandom) {
             indexToPlay = Math.floor(Math.random() * voices.length);
+        }
+        
+        // 注意：playVoiceById 依然依赖模块内的 pendantVoiceData,
+        // 但开屏播放时，pendantVoiceData 可能尚未被 playVoiceById 的调用者填充，
+        // 所以我们需要确保 playVoiceById 也能处理直接传入的数据。
+        // 为了最小改动，我们暂时在调用 playVoiceById 前，确保 pendantVoiceData 有值。
+        if (!pendantVoiceData) {
+            pendantVoiceData = { voices: voices };
         }
         
         playVoiceById(voices[indexToPlay].id);
     }
 
     async function playOnStartup() {
-        // [V2 修复] 先确保数据已加载
-        await loadData();
-        // 然后再安全地检查设置并播放
-        if (pendantVoiceData && pendantVoiceData.playOnStartup) {
-            playRandomVoice();
+        // ★★★ 核心修改：不再等待，而是直接调用 DataManager.get 进行一次性的、独立的快速数据获取 ★★★
+        try {
+            // 这一步会优先从内存缓存读取，如果主程序已经加载过，则速度极快
+            // 如果主程序还没加载，它会独立发起网络请求，不依赖全局的 loadInitialData
+            const data = await DataManager.get('pendantVoiceData');
+
+            // 拿到数据后，再检查是否需要播放
+            if (data && data.playOnStartup && data.voices && data.voices.length > 0) {
+                console.log('触发开屏语音播放...');
+                // 将数据传递给独立的播放函数，避免污染模块内的 pendantVoiceData 状态
+                playRandomVoice(data.voices, data.randomPlay);
+            }
+        } catch (error) {
+            console.error("开屏语音加载失败:", error);
+            // 即使失败也不阻塞主程序
         }
     }
+
     async function refreshUI() {
         await loadData();
         renderSettingsUI();
@@ -18957,42 +18974,51 @@ const PendantManager = (() => {
 // [修改] 移除此处的 CheckInManager 初始化，统一由 PendantManager 根据开关状态控制
 // document.addEventListener('DOMContentLoaded', () => { CheckInManager.init(); });
 /* =============================================================== */
-/* ============== [新增] 开屏动画消失控制逻辑 V1.0 ============== */
+/* ============== [重构] 开屏动画与语音同步播放 V2.0 ============== */
 /* =============================================================== */
 
 // 1. 获取开屏动画的元素
 const splashScreen = document.getElementById('splash-screen');
 
-// 2. 只有在开屏动画元素存在时才执行后续逻辑
 if (splashScreen) {
-    // 3. 定义一个函数来隐藏开屏动画
+    // 2. 定义隐藏动画的函数
     const hideSplashScreen = () => {
-        // 添加 .hidden 类来触发CSS中的淡出动画
-        splashScreen.classList.add('hidden');
-        
-        // 4. [推荐] 监听动画过渡结束事件，结束后从DOM中彻底移除该元素，释放资源
-        splashScreen.addEventListener('transitionend', () => {
-            splashScreen.remove();
-        }, { once: true }); // once: true 保证事件只触发一次
+        if (splashScreen) {
+            splashScreen.classList.add('hidden');
+            splashScreen.addEventListener('transitionend', () => {
+                if (splashScreen) splashScreen.remove();
+            }, { once: true });
+        }
     };
 
-    // 5. 在这里调用隐藏函数。你现有的 `window.addEventListener('load', ...)` 
-    //    的末尾是最佳时机，因为它确保了所有初始化脚本都已执行。
-    //    我们在这里再加一个短暂的延时，给动态内容一个渲染缓冲，体验更佳。
-
-    // [新增] 在动画开始时尝试播放开屏语音
-    setTimeout(() => {
-        if(typeof PendantVoiceManager !== 'undefined') {
-            PendantVoiceManager.playOnStartup();
+    // 3. 定义一个函数，既播放语音又设置隐藏动画的定时器
+    const playVoiceAndScheduleHide = async () => {
+        // ★★★ 核心新增：直接调用 PendantVoiceManager 的 playOnStartup ★★★
+        if (typeof PendantVoiceManager !== 'undefined' && PendantVoiceManager.playOnStartup) {
+            // 使用 await 等待语音是否能成功播放的尝试
+            await PendantVoiceManager.playOnStartup();
         }
-    }, 500); // 延迟半秒，确保音频有机会加载
+        
+        // 不管语音是否播放成功，都在3.5秒后隐藏开屏动画
+        setTimeout(hideSplashScreen, 3500);
+    };
 
-    setTimeout(hideSplashScreen, 3500);
-
-
+    // 4. ★★★ 核心修改：在字体加载动画开始时，就调用这个新函数 ★★★
+    document.addEventListener('DOMContentLoaded', () => {
+        const checkFontLoaded = () => {
+            if (document.body.classList.contains('font-loaded')) {
+                // 一旦字体就绪（即动画开始），立即尝试播放语音
+                playVoiceAndScheduleHide();
+            } else {
+                // 如果字体还未就绪，稍等片刻再检查
+                setTimeout(checkFontLoaded, 100);
+            }
+        };
+        checkFontLoaded();
+    });
 }
 /* =============================================================== */
-/* ========================= [新增结束] ========================== */
+/* ========================= [重构结束] ========================== */
 /* =============================================================== */
 
     </script>
