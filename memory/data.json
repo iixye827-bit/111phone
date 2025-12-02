@@ -133,7 +133,8 @@
   },
   "renderer": {
     "groups": [
-      "未分组"
+      "未分组",
+      "测试"
     ],
     "items": [
       {
@@ -155,7 +156,7 @@
         "id": 1764660899856,
         "title": "2048",
         "path": "memory/renderer_html/item_1764660899856.html",
-        "group": "未分组"
+        "group": "测试"
       }
     ]
   },
