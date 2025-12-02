@@ -7,11 +7,11 @@
       "buttons": []
     },
     {
-      "name": "小手机",
+      "name": "123456",
       "buttons": [
         {
-          "text": "111",
-          "href": "222",
+          "text": "333",
+          "href": "444",
           "openExternally": false
         }
       ]
@@ -27,11 +27,11 @@
       ]
     },
     {
-      "name": "123456",
+      "name": "小手机",
       "buttons": [
         {
-          "text": "333",
-          "href": "444",
+          "text": "111",
+          "href": "222",
           "openExternally": false
         }
       ]
