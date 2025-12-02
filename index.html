@@ -433,10 +433,17 @@ body.dark-mode .progress-bar-wrapper {
         .photo-item-set .count-overlay { position: absolute; bottom: 5px; right: 8px; background: rgba(0,0,0,0.5); color: white; padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 4px; z-index: 5; }
         #memoryPhotoViewerOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 5000; display: flex; flex-direction: column; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         #memoryPhotoViewerOverlay.active { opacity: 1; pointer-events: auto; }
+        /* [修改] 将 viewer-header 和 viewer-btn 的样式选择器通用化 */
+        .iframe-modal-overlay .viewer-header,
         #memoryPhotoViewerOverlay .viewer-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 20px; color: white; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); z-index: 10;}
         #memoryPhotoViewerOverlay .viewer-header .counter { font-size: 16px; font-weight: bold; }
+
+        .iframe-modal-overlay .viewer-btn,
         #memoryPhotoViewerOverlay .viewer-btn { background: rgba(40,40,40,0.5); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 18px; cursor: pointer; transition: background-color 0.2s; }
+        
+        .iframe-modal-overlay .viewer-btn:hover,
         #memoryPhotoViewerOverlay .viewer-btn:hover { background: rgba(60,60,60,0.7); }
+
         #memoryPhotoViewerOverlay .viewer-content { flex-grow: 1; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
         #viewer-img-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transition: padding 0.3s ease; }
         #memoryPhotoViewerOverlay #viewer-img { max-width: 100%; max-height: 100%; object-fit: contain; }
@@ -477,10 +484,10 @@ body.dark-mode .progress-bar-wrapper {
         .management-controls.active { display: flex; }
         .management-controls .modal-button { flex-grow: 1; margin: 0; padding: 12px; }
 .folder-item.manage-mode, .album-item.manage-mode, .photo-item.manage-mode, .photo-item-set.manage-mode, .note-item.manage-mode { cursor: pointer; }
-.folder-item .manage-checkbox, .album-item .manage-checkbox, .photo-item .manage-checkbox, .photo-item-set .manage-checkbox, .note-item .manage-checkbox { display: none; position: absolute; top: 10px; left: 10px; width: 22px; height: 22px; z-index: 5; }
-.folder-item.manage-mode .manage-checkbox, .album-item.manage-mode .manage-checkbox, .photo-item.manage-mode .manage-checkbox, .photo-item-set.manage-mode .manage-checkbox, .note-item.manage-mode .manage-checkbox { display: block; }
-.folder-item.manage-selected, .album-item.manage-selected, .photo-item.manage-selected, .photo-item-set.manage-selected, .note-item.manage-selected { border: 2px solid var(--hold-border); box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day) !important; }
-body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-selected, body.dark-mode .photo-item.manage-selected, body.dark-mode .photo-item-set.manage-selected, body.dark-mode .note-item.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
+.folder-item .manage-checkbox, .album-item .manage-checkbox, .photo-item .manage-checkbox, .photo-item-set .manage-checkbox, .note-item .manage-checkbox, .renderer-card .manage-checkbox { display: none; position: absolute; top: 10px; left: 10px; width: 22px; height: 22px; z-index: 5; }
+.folder-item.manage-mode .manage-checkbox, .album-item.manage-mode .manage-checkbox, .photo-item.manage-mode .manage-checkbox, .photo-item-set.manage-mode .manage-checkbox, .note-item.manage-mode .manage-checkbox, .renderer-card.manage-mode .manage-checkbox { display: block; }
+.folder-item.manage-selected, .album-item.manage-selected, .photo-item.manage-selected, .photo-item-set.manage-selected, .note-item.manage-selected, .renderer-card.manage-selected { border: 2px solid var(--hold-border); box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day) !important; }
+body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-selected, body.dark-mode .photo-item.manage-selected, body.dark-mode .photo-item-set.manage-selected, body.dark-mode .note-item.manage-selected, body.dark-mode .renderer-card.manage-selected { box-shadow: 0 0 0 2px var(--hold-border), 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night) !important; }
         #cloud-drive-section .list-container { display: flex; flex-direction: column; gap: 15px; padding: 15px; overflow-y: hidden; min-height: 0; }
         #file-list-container { flex-shrink: 1; flex-grow: 1; min-height: 100px; overflow-y: auto; border-radius: 10px; padding: 5px; background:var(--bg-day-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day); display: flex; flex-direction: column; }
         body.dark-mode #file-list-container { background:var(--bg-night-element); box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night); }
@@ -501,7 +508,96 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         .delete-btn { background:transparent; border:none; cursor:pointer; padding:0; flex-shrink:0; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:background .2s,color .2s; color:#bbb; font-size:22px; font-weight:bold; line-height:1; }
         .delete-btn:hover { background:#f0f0f0; color:#e53e3e; } body.dark-mode .delete-btn { color:#889; } body.dark-mode .delete-btn:hover { background:rgba(255,255,255,0.1); color:#fc8181; }
 
-        /* ===== [END] MEMORY MODAL STYLES ===== */
+        /* ----- [新增] 渲染器页面样式 ----- */
+        #renderer-list-container {
+            /* 关键: 使用Grid布局，每行自动填充最小150px，最大1fr的卡片，实现响应式2列布局 */
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        }
+        
+        .renderer-card {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            border: none;
+            border-radius: 14px;
+            box-shadow: 8px 8px 16px var(--shadow-dark-day), -8px -8px 16px var(--shadow-light-day);
+            background: var(--bg-day-element);
+            color: var(--text-day);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden;
+            /* [修改] 使用 Flex 布局来排列标题和内容 */
+            display: flex;
+            flex-direction: column;
+            gap: 8px; /* 标题和渲染内容之间的间距 */
+            padding: 12px; /* 统一内边距 */
+        }
+
+        .renderer-card-title {
+            flex-shrink: 0; /* 防止标题被压缩 */
+            font-size: 16px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .renderer-card-content {
+            flex-grow: 1; /* 让 iframe 容器填满剩余空间 */
+            min-height: 0; /* Flex 布局中的重要技巧 */
+            border-radius: 8px; /* 给iframe区域一个圆角 */
+            overflow: hidden; /* 确保iframe内容不溢出圆角 */
+            background: rgba(128,128,128,0.05); /* iframe加载前的占位背景 */
+        }
+        
+        .renderer-card-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            pointer-events: none; /* 关键：让鼠标事件穿透iframe，可以点击整个卡片 */
+        }
+
+
+        body.dark-mode .renderer-card {
+            box-shadow: 8px 8px 16px var(--shadow-dark-night), -8px -8px 16px var(--shadow-light-night);
+            background: var(--bg-night-element);
+            color: var(--text-night);
+        }
+
+        .renderer-card:active {
+            box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day);
+            transform: translateY(0);
+        }
+        
+        body.dark-mode .renderer-card:active {
+            box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night);
+        }
+
+        body.theme-glass .renderer-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        body.theme-glass.dark-mode .renderer-card {
+            background: rgba(20, 20, 20, 0.25);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* [新增] 修复渲染器模态框层级 */
+        #rendererAddModal {
+            z-index: 3010; /* 设置一个比记忆模块(z-index: 3000)更高的值 */
+        }
+        
+        /* ----- [新增结束] ----- */
+
+
+/* ===== [END] MEMORY MODAL STYLES ===== */
+
         
         /* ===== [START] WANDER VIEW 4.0 STYLES (Architecture) ===== */
         @keyframes breathing-glow {
@@ -681,6 +777,11 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         .fab-drawer-item.has-update::after {
             /* ... */
         }
+        /* [修复] 提升移动渲染器模态框的层级，确保在其他弹窗之上 */
+        #moveRendererModal.modal-overlay {
+            z-index: 3020; /* 比 memoryFolderModal (3010) 略高，确保绝对顶层 */
+        }
+
         /* ===== [END] HELP MODAL UPDATE STYLES ===== */
 
 
@@ -759,7 +860,7 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         body.theme-glass.dark-mode #memoryModal #note-editor-view,
         body.theme-glass.dark-mode .management-controls,
         body.theme-glass.dark-mode #returnConfirmationToast {
-           background: rgba(10, 10, 10, 0.2);
+            background: rgba(20, 20, 20, 0.25);
             border-color: rgba(255, 255, 255, 0.1);
         }
 
@@ -769,8 +870,7 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         body.theme-glass .segmented-control,
         body.theme-glass .toggle-section,
         body.theme-glass #file-list-container,
-        body.theme-glass .color-input-wrapper,
-        body.theme-glass .voice-list-container {
+        body.theme-glass .color-input-wrapper {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
@@ -778,19 +878,16 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: none;
         }
-
         body.theme-glass.dark-mode .modal-input,
         body.theme-glass.dark-mode .modal-select,
         body.theme-glass.dark-mode .modal-textarea,
         body.theme-glass.dark-mode .segmented-control,
         body.theme-glass.dark-mode .toggle-section,
         body.theme-glass.dark-mode #file-list-container,
-        body.theme-glass.dark-mode .color-input-wrapper,
-        body.theme-glass.dark-mode .voice-list-container {
+        body.theme-glass.dark-mode .color-input-wrapper {
             background: rgba(10, 10, 10, 0.2);
             border-color: rgba(255, 255, 255, 0.1);
         }
-
 
         body.theme-glass .modal-button {
             background: rgba(255, 255, 255, 0.25);
@@ -817,19 +914,6 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
              background: rgba(200, 200, 200, 0.25);
              border-color: rgba(255, 255, 255, 0.15);
         }
-        /* [新增] 适配语音列表项的磨砂玻璃风格 */
-        body.theme-glass .voice-list-item {
-            background: transparent;
-        }
-        body.theme-glass .voice-list-item:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
-        body.theme-glass.dark-mode .voice-list-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* ===== [END] FROSTED GLASS THEME ===== */
-
         /* ===== [END] FROSTED GLASS THEME ===== */
 
         /* [新增] 为“已确认”的十六进制代码添加变淡的样式 */
@@ -5765,219 +5849,158 @@ body.dark-mode #custom-tool-inner {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif !important;
 }
 /* =============================================================== */
-/* ========================= [新增结束] ========================== */
+/* ============= [新增] 开场语音列表项样式 V2.0 =============== */
 /* =============================================================== */
-/* =============================================================== */
-/* =================== [新增] 语音挂件功能专属样式 ==================== */
-/* =============================================================== */
-.voice-list-container {
-    flex-grow: 1;
-    min-height: 120px;
-    max-height: 250px; /* 限制最大高度，超出则滚动 */
-    overflow-y: auto;
-    border-radius: 12px;
-    padding: 10px;
-    background: var(--bg-day-element);
-    box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-body.dark-mode .voice-list-container {
-    background: var(--bg-night-element);
-    box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night);
-}
-
 .voice-list-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     padding: 10px 12px;
-    border-radius: 8px;
-    background: rgba(0,0,0,0.03);
-    transition: background-color 0.2s;
+    border-radius: 10px; /* 稍微增大圆角 */
+    transition: all 0.2s;
+    /* [新增] 为磨砂玻璃主题做准备 */
+    border: 1px solid transparent; 
+}
+.voice-list-item:not(:last-child) {
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
 }
 .voice-list-item:hover {
-    background: rgba(0,0,0,0.06);
-}
-body.dark-mode .voice-list-item {
-    background: rgba(255,255,255,0.04);
+    background-color: rgba(0,0,0,0.04);
 }
 body.dark-mode .voice-list-item:hover {
-    background: rgba(255,255,255,0.08);
+    background-color: rgba(255,255,255,0.06);
 }
-.voice-list-item .voice-info {
+
+/* [新增] 磨砂玻璃主题下的语音列表项 */
+body.theme-glass .voice-list-item {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+body.theme-glass.dark-mode .voice-list-item {
+    background: rgba(10, 10, 10, 0.2);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+body.theme-glass .voice-list-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+body.theme-glass.dark-mode .voice-list-item:hover {
+    background: rgba(10, 10, 10, 0.3);
+}
+
+.voice-info {
     flex-grow: 1;
     min-width: 0;
 }
-.voice-list-item .voice-speaker {
+.voice-speaker {
+    font-weight: 600;
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.voice-filename {
     font-size: 12px;
     color: #889;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-.voice-list-item .voice-subtitle-preview {
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    /* [新增] 为了确保单行文本也能被正确截断，添加以下两行 */
-    display: block;
-    line-height: 1.4;
+    margin-top: 4px;
 }
 
-.voice-list-item .voice-actions button {
-    background: transparent;
+/* [修改] 统一删除和喜欢按钮的样式 */
+.voice-delete-btn, .voice-favorite-btn {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
     border: none;
-    cursor: pointer;
-    font-size: 18px;
-    padding: 4px;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    line-height: 1;
-    color: #a0aec0;
+    cursor: pointer;
+    background: transparent;
+    color: #aaa;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: all 0.2s;
 }
-.voice-list-item .voice-actions button:hover {
-    background-color: rgba(0,0,0,0.1);
-    color: var(--text-day);
+.voice-delete-btn:hover {
+    color: #e53e3e;
+    background-color: rgba(229, 62, 62, 0.1);
 }
-body.dark-mode .voice-list-item .voice-actions button:hover {
+
+/* [新增] 喜欢按钮的特定样式 */
+.voice-favorite-btn {
+    font-size: 18px; /* 爱心图标小一点 */
+}
+.voice-favorite-btn:hover {
+    color: #e53e3e;
+    transform: scale(1.1);
+}
+.voice-list-item.favorited .voice-favorite-btn {
+    color: #e53e3e; /* 喜欢后变为红色 */
+    font-weight: bold; /* 加粗，让爱心更明显 */
+}
+
+
+/* [修改] 语音播放按钮样式 (增加磨砂玻璃适配) */
+.voice-play-btn {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-day-element);
+    box-shadow: 2px 2px 4px var(--shadow-dark-day), -2px -2px 4px var(--shadow-light-day);
+    color: var(--text-day);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+}
+.voice-play-btn:active {
+    box-shadow: inset 1px 1px 2px var(--shadow-dark-day), inset -1px -1px 2px var(--shadow-light-day);
+    transform: scale(0.95);
+}
+body.dark-mode .voice-play-btn {
+    background: var(--bg-night-element);
+    box-shadow: 2px 2px 4px var(--shadow-dark-night), -2px -2px 4px var(--shadow-light-night);
     color: var(--text-night);
 }
-.voice-list-item .voice-actions .delete-voice-btn:hover {
-    color: #f56565;
+body.dark-mode .voice-play-btn:active {
+     box-shadow: inset 1px 1px 2px var(--shadow-dark-night), inset -1px -1px 2px var(--shadow-light-night);
+}
+/* [新增] 磨砂玻璃主题下的播放按钮 */
+body.theme-glass .voice-play-btn,
+body.theme-glass.dark-mode .voice-play-btn {
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+body.theme-glass.dark-mode .voice-play-btn {
+    background: rgba(30, 30, 30, 0.4);
+}
+body.theme-glass .voice-play-btn:active {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+    transform: translateY(1px) scale(1);
 }
 
-/* 正在播放的语音项的特殊高亮样式 */
-.voice-list-item.playing .voice-speaker {
-    color: var(--hold-border);
+.voice-play-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
 }
-.voice-list-item.playing .voice-actions .play-voice-btn {
+.voice-play-btn.playing {
     color: var(--hold-border);
 }
 
-/* 视频转语音的提示信息 */
-.important-note.video-to-audio-note {
-    font-size: 13px;
-    padding: 8px 12px;
-    line-height: 1.6;
-}
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
-/* =============================================================== */
-/* ================== [新增] 语音挂件功能管理器 V1.0 ================ */
-/* =============================================================== */
-const PendantVoiceManager = (() => {
-    let ui = {};
-    let pendantVoiceData = null; // 用于缓存语音数据
-    let pendingAudioDataUrl = null; // 临时存储待保存的音频数据
-    let currentAudio = null; // 用于控制当前播放的音频
-
-    async function init() {
-        // 获取所有UI元素
-        ui = {
-            modal: document.getElementById('pendant-settings-modal'),
-            voiceListContainer: document.getElementById('voice-list-container'),
-            playOnStartupToggle: document.getElementById('voicePlayOnStartupToggle'),
-            randomPlayToggle: document.getElementById('voiceRandomPlayToggle'),
-            speakerInput: document.getElementById('voice-speaker-input'),
-            subtitleInput: document.getElementById('voice-subtitle-input'),
-            audioPicker: document.getElementById('voice-audio-picker'),
-            uploadAudioBtn: document.getElementById('voice-upload-audio-btn'),
-            audioStatus: document.getElementById('voice-audio-status'),
-            videoPicker: document.getElementById('voice-video-picker'),
-            uploadVideoBtn: document.getElementById('voice-upload-video-btn'),
-            videoStatus: document.getElementById('voice-video-status'),
-            progressContainer: document.getElementById('voice-upload-progress-container'),
-            progressBar: document.getElementById('voice-upload-progress-bar'),
-            cancelBtn: document.getElementById('voice-upload-cancel-btn'),
-            saveBtn: document.getElementById('voice-save-btn'),
-        };
-
-        // 绑定事件
-        ui.uploadAudioBtn.addEventListener('click', () => ui.audioPicker.click());
-        ui.uploadVideoBtn.addEventListener('click', () => ui.videoPicker.click());
-        
-        ui.audioPicker.addEventListener('change', (e) => handleFileSelection(e.target.files[0], 'audio'));
-        ui.videoPicker.addEventListener('change', (e) => handleFileSelection(e.target.files[0], 'video'));
-
-        ui.saveBtn.addEventListener('click', saveVoice);
-        
-        ui.playOnStartupToggle.addEventListener('change', () => toggleSetting('playOnStartup', ui.playOnStartupToggle.checked));
-        ui.randomPlayToggle.addEventListener('change', () => toggleSetting('randomPlay', ui.randomPlayToggle.checked));
-
-        // 使用事件委托处理列表项的点击
-        ui.voiceListContainer.addEventListener('click', handleListClick);
-
-        // [V2 修复] 加载数据并渲染
-        await loadData();
-        renderSettingsUI(); // 在init中调用，确保UI元素已存在
-        renderVoiceList();
-    }
-
-
-    async function toggleSetting(key, value) {
-        if (!pendantVoiceData) await loadData();
-        pendantVoiceData[key] = value;
-        await DataManager.save('pendantVoiceData', `Update voice setting: ${key}`);
-        showTopToast('设置已保存', 1500);
-    }
-    
-    // [V2 修复] loadData 只负责加载数据，不操作UI
-    async function loadData() {
-        if (pendantVoiceData) return; // 如果已加载，则直接返回
-        pendantVoiceData = await DataManager.get('pendantVoiceData');
-    }
-
-    // [V2 新增] renderSettingsUI 负责将数据渲染到UI上
-    function renderSettingsUI() {
-        if (!pendantVoiceData || !ui.playOnStartupToggle) return; // 安全检查
-        ui.playOnStartupToggle.checked = pendantVoiceData.playOnStartup;
-        ui.randomPlayToggle.checked = pendantVoiceData.randomPlay;
-    }
-
-
-    function handleFileSelection(file, type) {
-        if (!file) return;
-
-        const statusEl = type === 'audio' ? ui.audioStatus : ui.videoStatus;
-        statusEl.textContent = `读取中: ${file.name}`;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            pendingAudioDataUrl = e.target.result;
-            statusEl.textContent = `已选择: ${file.name}`;
-            if (type === 'audio') {
-                ui.videoStatus.textContent = '';
-                ui.videoPicker.value = '';
-            } else {
-                ui.audioStatus.textContent = '';
-                ui.audioPicker.value = '';
-            }
-        };
-        reader.onerror = () => {
-             statusEl.textContent = `读取失败!`;
-        };
-        reader.readAsDataURL(file);
-    }
-
-/* =============================================================== */
-/* ================= [新增] 修复语音挂件输入框溢出问题 ================== */
-/* =============================================================== */
-#widget-page-voice .modal-input,
-#widget-page-voice .modal-textarea {
-    box-sizing: border-box; /* 确保 padding 包含在宽度内 */
-    width: 100%;            /* 强制宽度为父容器的100% */
-    min-width: 0;           /* 关键修复：允许输入框在flex/grid布局中收缩，防止溢出 */
-}
-/* =============================================================== */
-/* ========================= [新增结束] ========================== */
-/* =============================================================== */
-
 
     </style>
 
@@ -5987,54 +6010,50 @@ const PendantVoiceManager = (() => {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.7.0/mammoth.browser.min.js"></script>
     
  <script>
-    // 定义一个函数，用于在字体加载完成后触发动画
-    const triggerSplashAnimation = () => {
-        document.body.classList.add('font-loaded');
-        console.log('✅ 字体已就绪，启动开屏动画。');
-    };
+    // ★★★ 核心修改：将所有逻辑包裹在 DOMContentLoaded 事件中 ★★★
+    document.addEventListener('DOMContentLoaded', () => {
+        // 定义一个函数，用于在字体加载完成后触发动画
+        const triggerSplashAnimation = () => {
+            // 此时 document.body 必定存在
+            document.body.classList.add('font-loaded');
+            console.log('✅ 字体已就绪，启动开屏动画。');
+        };
 
-    try {
-        const cachedConfigStr = localStorage.getItem('currentConfig');
-        if (cachedConfigStr) {
-            const config = JSON.parse(cachedConfigStr);
-            const fontUrl = config?.settings?.globalFont?.url;
+        try {
+            const cachedConfigStr = localStorage.getItem('currentConfig');
+            if (cachedConfigStr) {
+                const config = JSON.parse(cachedConfigStr);
+                const fontUrl = config?.settings?.globalFont?.url;
 
-            if (fontUrl) {
-                // 步骤1: 动态创建@font-face规则
-                const FONT_FAMILY_NAME = 'GlobalCustomFont';
-                const style = document.createElement('style');
-                style.innerHTML = `
-                    @font-face {
-                        font-family: '${FONT_FAMILY_NAME}';
-                        src: url('${fontUrl}');
-                        font-display: swap;
-                    }
-                `;
-                document.head.appendChild(style);
+                if (fontUrl) {
+                    const FONT_FAMILY_NAME = 'GlobalCustomFont';
+                    const style = document.createElement('style');
+                    style.innerHTML = `
+                        @font-face {
+                            font-family: '${FONT_FAMILY_NAME}';
+                            src: url('${fontUrl}');
+                            font-display: swap;
+                        }
+                    `;
+                    document.head.appendChild(style);
 
-                // 步骤2: 使用Font Loading API等待字体加载
-                // '1em' 是一个技巧，表示我们关心这个字体的任何字符是否可用
-                document.fonts.load(`1em ${FONT_FAMILY_NAME}`).then(() => {
-                    // 字体加载成功！触发动画
+                    document.fonts.load(`1em ${FONT_FAMILY_NAME}`).then(() => {
+                        triggerSplashAnimation();
+                    }).catch(error => {
+                        console.error('自定义字体加载失败:', error);
+                        triggerSplashAnimation();
+                    });
+                } else {
                     triggerSplashAnimation();
-                }).catch(error => {
-                    // 如果字体加载失败（例如URL无效），也立即触发动画，防止白屏
-                    console.error('自定义字体加载失败:', error);
-                    triggerSplashAnimation();
-                });
+                }
             } else {
-                // 如果没有配置自定义字体，直接触发动画
                 triggerSplashAnimation();
             }
-        } else {
-            // 如果连本地配置缓存都没有，也直接触发动画
+        } catch (e) {
+            console.error('字体加载&动画同步脚本执行失败:', e);
             triggerSplashAnimation();
         }
-    } catch (e) {
-        console.error('字体加载&动画同步脚本执行失败:', e);
-        // 发生任何未知错误时，确保动画能播放
-        triggerSplashAnimation();
-    }
+    });
 </script>
 
     <!-- [新增] 用于全局字体的样式标签 -->
@@ -6060,8 +6079,38 @@ const PendantVoiceManager = (() => {
             <button id="passkey-submit">进入</button>
             <p id="passkey-error">密钥错误，请重试</p>
         </div>
-    </div>
+</div>
     <!-- ===================== [新增结束] ===================== -->
+
+    <!-- ============= [新增] 渲染器添加/编辑模态框 ============= -->
+    <div class="modal-overlay" id="rendererAddModal">
+        <div class="modal-content" style="max-width: 600px; height: 80vh;">
+            <div class="modal-header">
+                <div id="renderer-modal-title" class="modal-title-group">新建渲染卡片</div>
+                <button class="close-btn" data-modal-id="rendererAddModal">&times;</button>
+            </div>
+            <div class="modal-body" style="gap: 15px;">
+                <!-- [新增] 分组选择输入框 -->
+                <input type="text" id="renderer-group-input" class="modal-input" placeholder="选择或创建分组 (默认为'未分组')" list="renderer-group-datalist">
+                <datalist id="renderer-group-datalist"></datalist>
+
+                <input type="text" id="renderer-title-input" class="modal-input" placeholder="卡片标题 (自动从文件名填充)">
+                
+                <div class="file-select-wrapper">
+                    <input type="file" id="renderer-file-picker" accept=".html,.htm" style="display: none;">
+                    <button id="renderer-file-picker-btn" class="modal-button">选择HTML文件</button>
+                    <span id="renderer-file-status" class="status-text">或在下方直接粘贴代码</span>
+                </div>
+
+                <textarea id="renderer-html-input" class="modal-textarea" placeholder="在此输入或粘贴HTML代码..." style="flex-grow: 1; resize: none;"></textarea>
+            </div>
+            <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button data-action="close-renderer-modal" class="modal-button">取消</button>
+                <button id="save-renderer-item-btn" class="modal-button" style="color:var(--hold-border)">保存</button>
+            </div>
+        </div>
+    </div>
+    <!-- ======================= [新增结束] ======================= -->
 
     <!-- 手机模式滑动容器 -->
     <div class="main-wrapper" id="mainWrapper">
@@ -6378,10 +6427,9 @@ const PendantVoiceManager = (() => {
         <div class="update-log-entry">
             <h4>v6.1.0 <span class="update-date">- 2025.11.30</span></h4>
             <ul>
-                <li><span class="tag new">新功能</span> 新增开屏动画。</li>
+                <li><span class="tag new">新功能</span> 新增开屏动画及开屏自定义语音。</li>
                 <li><span class="tag new">新功能</span> 新增通行密钥，每月于群内更新。</li>
-                                <li><span class="tag new">新功能</span> 新增开场语音功能。</li>
-                <li><span class="tag new">新功能</span> “相册”新增短视频上传功能。</li>
+                <li><span class="tag new">新功能</span> 相册新增视频上传功能。</li>
                 <li><span class="tag new">新功能</span> “网页内悬浮球”增加后台保活功能，目前仅iOS可用。</li>
                 <li><span class="tag new">新功能</span> “记忆”功能新增数据恢复机制，当数据损坏时可从历史版本一键恢复。</li>
                 <li><span class="tag new">新功能</span> “文件夹”新增文件标签系统，支持添加、管理并按标签筛选文件。</li>
@@ -6572,7 +6620,7 @@ const PendantVoiceManager = (() => {
     </div>
     
     <footer class="update-footer">
-        当前版本: v6.1.0
+        当前版本: v6.0.1
     </footer>
 </div>
                     <div id="help-page-3" class="help-page-content">
@@ -7002,6 +7050,8 @@ body.dark-mode #floating-jellyfish-ball {
                     <div id="hub-view-content">
                         <button data-action="goto-memo" class="hub-btn">备忘录</button>
                         <button data-action="goto-album" class="hub-btn">相册</button>
+                        <!-- [新增] 渲染器入口按钮 -->
+                        <button data-action="goto-renderer" class="hub-btn">渲染器</button>
                         <button data-action="goto-cloud" class="hub-btn">文件夹</button>
                     </div>
                 </div>
@@ -7176,6 +7226,31 @@ body.dark-mode #floating-jellyfish-ball {
                         </div>
                     </div>
                 </div>
+                <!-- [新增] RENDERER / 渲染器部分 -->
+                <div id="renderer-section" class="page">
+                    <div class="page-header">
+                        <button data-action="back-to-hub" class="header-btn back-btn">&#10094;</button>
+                        <h1 class="title">渲染器</h1>
+                        <!-- [新增] 管理按钮 -->
+                        <div class="header-controls">
+                            <button data-action="toggle-renderer-manage" class="header-btn manage-btn">管理</button>
+                        </div>
+                    </div>
+                    <!-- [新增] 分组导航栏容器 -->
+                    <div id="renderer-group-nav-container" class="category-nav-container">
+                        <div id="renderer-group-nav" class="category-nav"></div>
+                    </div>
+                    <div id="renderer-list-container" class="list-container">
+                        <!-- JS将在此动态填充方形卡片 -->
+                    </div>
+                    <button data-action="add-renderer-item" class="fab">+</button>
+                    <!-- [新增] 渲染器管理控制条 -->
+                    <div id="renderer-management-controls" class="management-controls">
+                        <button data-action="select-all-renderer" class="modal-button">全选</button>
+                        <button data-action="move-selected-renderer" class="modal-button">移动选中</button>
+                        <button data-action="delete-selected-renderer" class="modal-button" style="color:#f56565;">删除选中</button>
+                   </div>
+                </div>
                 <!-- CLOUD DRIVE / 文件夹 -->
                 <div id="cloud-drive-section" class="page">
                     <div class="page-header">
@@ -7296,6 +7371,21 @@ body.dark-mode #floating-jellyfish-ball {
             <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
                 <button data-action="close-move-notes-modal" class="modal-button">取消</button>
                 <button data-action="confirm-move-notes" class="modal-button" style="color:var(--hold-border)">确认移动</button>
+            </div>
+        </div>
+    </div>
+    <!-- [新增] 移动渲染卡片模态框 -->
+    <div id="moveRendererModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <div class="modal-title-group">移动到分组...</div>
+            </div>
+            <div class="modal-body">
+                <select id="renderer-destination-selector" class="modal-select"></select>
+            </div>
+            <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <button data-action="close-move-renderer-modal" class="modal-button">取消</button>
+                <button data-action="confirm-move-renderer" class="modal-button" style="color:var(--hold-border)">确认移动</button>
             </div>
         </div>
     </div>
@@ -7565,21 +7655,22 @@ body.dark-mode #floating-jellyfish-ball {
     </div>
     <!-- ============= [ 新增结束 ] ============= -->
        <script>
-    // ============= [新增] 通行密钥验证逻辑 V1.0 =============
+    // ============= [新增] 通行密钥验证逻辑 V2.0 (支持永久通行证) =============
     (function handlePasskeyAuthentication() {
-        // --- 请在这里替换每月密钥 ---
+        // --- 每月密钥 ---
         const currentPasskeys = [
             'Fp9xVz2r', 'jK4gA8sL', 'nB6hT1wE', 'gD5pQ7zY', 'zC8vE3uF',
             'rW7mI2oP', 'tY1sK9bN', 'uE3jH5fA', 'aV4cQ6xZ', 'iO9lP1wE',
             'kR2sB8nM', 'qL7gT3dV', 'xU6hF4cY', 'oP1iEa5b', 'wM5zK9pV',
             'vC3jD7fX', 'eG9xV1zR', 'bN4hT6wQ', 'sA2kL8mJ', 'yU8iO6pZ'
         ];
+        
+        // --- [核心修改] 新增永久通行证密钥 ---
+        const PERMANENT_PASSKEY = 'JELLYFISHFOREVER';
         // ------------------------------------
 
         const overlay = document.getElementById('passkey-overlay');
-        // 确保在执行脚本时弹窗元素已存在
         if (!overlay) {
-            // 如果DOM还没加载完，就延迟执行
             document.addEventListener('DOMContentLoaded', handlePasskeyAuthentication);
             return;
         }
@@ -7589,26 +7680,41 @@ body.dark-mode #floating-jellyfish-ball {
         const submitBtn = document.getElementById('passkey-submit');
         const errorMsg = document.getElementById('passkey-error');
 
-        // 使用 "年-月" 作为唯一标识，例如 "2024-10"
         const currentMonthIdentifier = new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
         const validatedMonth = localStorage.getItem('passkeyValidatedMonth');
+        
+        // --- [核心修改] 增加对永久通行证标记的检查 ---
+        const isPermanentlyValidated = localStorage.getItem('isPermanentlyValidated') === 'true';
 
-        // 检查当月是否已经验证过
-        if (currentMonthIdentifier === validatedMonth) {
-            overlay.style.display = 'none'; // 如果已验证，直接隐藏弹窗
+        // 如果拥有永久通行证，或当月已验证，则直接跳过
+        if (isPermanentlyValidated || currentMonthIdentifier === validatedMonth) {
+            overlay.style.display = 'none';
             return;
         }
 
-        // 如果未验证，模糊背景内容
         document.body.classList.add('passkey-pending');
 
         const validate = () => {
             const enteredKey = input.value.trim();
-            if (currentPasskeys.includes(enteredKey)) {
-                // 密钥正确
+            let isValid = false;
+
+            if (enteredKey === PERMANENT_PASSKEY) {
+                // --- [核心修改] 处理永久通行证逻辑 ---
+                localStorage.setItem('isPermanentlyValidated', 'true');
+                // 为保持清洁，可以移除可能存在的旧月度标记
+                localStorage.removeItem('passkeyValidatedMonth');
+                isValid = true;
+
+            } else if (currentPasskeys.includes(enteredKey)) {
+                // 处理月度密钥逻辑 (保持不变)
                 localStorage.setItem('passkeyValidatedMonth', currentMonthIdentifier);
-                
-                // 移除模糊并播放弹窗消失动画
+                // 确保清除了永久标记，以防用户想切回月度模式
+                localStorage.removeItem('isPermanentlyValidated');
+                isValid = true;
+            }
+
+            if (isValid) {
+                // 密钥正确后的通用逻辑
                 document.body.classList.remove('passkey-pending');
                 overlay.style.opacity = '0';
                 overlay.addEventListener('transitionend', () => {
@@ -7616,7 +7722,7 @@ body.dark-mode #floating-jellyfish-ball {
                 }, { once: true });
 
             } else {
-                // 密钥错误
+                // 密钥错误逻辑 (保持不变)
                 errorMsg.style.display = 'block';
                 modal.classList.add('shake');
                 input.focus();
@@ -7632,15 +7738,15 @@ body.dark-mode #floating-jellyfish-ball {
         submitBtn.addEventListener('click', validate);
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                e.preventDefault(); // 防止回车键触发表单提交等默认行为
+                e.preventDefault();
                 validate();
             }
         });
         
-        // 页面加载完成后立即让输入框获得焦点，方便用户直接输入
         input.focus();
     })();
-    // ===================== [新增结束] =====================
+    // ===================== [修改结束] =====================
+
 
     // [新增] 字符串哈希函数，用于检测内容变更
     function simpleHash(str) {
@@ -7695,10 +7801,10 @@ const DataManager = (() => {
         usageTime: 'stats/usage_time.json',
         checkInData: 'widgets/checkin_data.json',
         messageBoardData: 'widgets/message_board.json',
-        pendantVoiceData: 'widgets/voice_data.json' // <-- 新增
+        openingVoiceData: 'widgets/opening_voice.json' // [新增] 开场语音的数据文件路径
     };
 
-    // 模块的默认数据结构
+
     const moduleDefaults = {
         usageTime: {},
         checkInData: { 
@@ -7706,18 +7812,16 @@ const DataManager = (() => {
             background: { type: 'color', value: '#ffffff', blur: 5 },
             reminder: { enabled: false } 
         },
-        messageBoardData: {
-            messages: [] 
-        },
-        // [新增] 语音挂件的默认数据结构
-        pendantVoiceData: {
-            voices: [], // 存储所有语音对象
-            playOnStartup: false, // 开屏播放开关
-            randomPlay: true // 随机播放开关
+        messageBoardData: { messages: [] },
+        // [新增] 开场语音的数据模块默认值
+        openingVoiceData: {
+            voices: [],
+            settings: {
+                playOnStartup: true,
+                randomPlay: true
+            }
         }
     };
-
-
 
     /**
      * 异步获取一个数据模块
@@ -7787,327 +7891,6 @@ const DataManager = (() => {
 
     return { get, save };
 })();
-
-/* =============================================================== */
-/* ================== [新增] 语音挂件功能管理器 V1.0 ================ */
-/* =============================================================== */
-const PendantVoiceManager = (() => {
-    let ui = {};
-    let pendantVoiceData = null; // 用于缓存语音数据
-    let pendingAudioDataUrl = null; // 临时存储待保存的音频数据
-    let currentAudio = null; // 用于控制当前播放的音频
-
-    async function init() {
-        // 获取所有UI元素
-        ui = {
-            modal: document.getElementById('pendant-settings-modal'),
-            voiceListContainer: document.getElementById('voice-list-container'),
-            playOnStartupToggle: document.getElementById('voicePlayOnStartupToggle'),
-            randomPlayToggle: document.getElementById('voiceRandomPlayToggle'),
-            speakerInput: document.getElementById('voice-speaker-input'),
-            subtitleInput: document.getElementById('voice-subtitle-input'),
-            audioPicker: document.getElementById('voice-audio-picker'),
-            uploadAudioBtn: document.getElementById('voice-upload-audio-btn'),
-            audioStatus: document.getElementById('voice-audio-status'),
-            videoPicker: document.getElementById('voice-video-picker'),
-            uploadVideoBtn: document.getElementById('voice-upload-video-btn'),
-            videoStatus: document.getElementById('voice-video-status'),
-            progressContainer: document.getElementById('voice-upload-progress-container'),
-            progressBar: document.getElementById('voice-upload-progress-bar'),
-            cancelBtn: document.getElementById('voice-upload-cancel-btn'),
-            saveBtn: document.getElementById('voice-save-btn'),
-        };
-
-        // 绑定事件
-        ui.uploadAudioBtn.addEventListener('click', () => ui.audioPicker.click());
-        ui.uploadVideoBtn.addEventListener('click', () => ui.videoPicker.click());
-        
-        ui.audioPicker.addEventListener('change', (e) => handleFileSelection(e.target.files[0], 'audio'));
-        ui.videoPicker.addEventListener('change', (e) => handleFileSelection(e.target.files[0], 'video'));
-
-        ui.saveBtn.addEventListener('click', saveVoice);
-        
-        ui.playOnStartupToggle.addEventListener('change', () => toggleSetting('playOnStartup', ui.playOnStartupToggle.checked));
-        ui.randomPlayToggle.addEventListener('change', () => toggleSetting('randomPlay', ui.randomPlayToggle.checked));
-
-        // 使用事件委托处理列表项的点击
-        ui.voiceListContainer.addEventListener('click', handleListClick);
-
-        // [V2 修复] 加载数据并渲染
-        await loadData();
-        renderSettingsUI(); // 在init中调用，确保UI元素已存在
-        renderVoiceList();
-    }
-
-
-    async function toggleSetting(key, value) {
-        if (!pendantVoiceData) await loadData();
-        pendantVoiceData[key] = value;
-        await DataManager.save('pendantVoiceData', `Update voice setting: ${key}`);
-        showTopToast('设置已保存', 1500);
-    }
-    
-    // [V2 修复] loadData 只负责加载数据，不操作UI
-    async function loadData() {
-        if (pendantVoiceData) return; // 如果已加载，则直接返回
-        pendantVoiceData = await DataManager.get('pendantVoiceData');
-    }
-
-    // [V2 新增] renderSettingsUI 负责将数据渲染到UI上
-    function renderSettingsUI() {
-        if (!pendantVoiceData || !ui.playOnStartupToggle) return; // 安全检查
-        ui.playOnStartupToggle.checked = pendantVoiceData.playOnStartup;
-        ui.randomPlayToggle.checked = pendantVoiceData.randomPlay;
-    }
-
-    function handleFileSelection(file, type) {
-        if (!file) return;
-
-        const statusEl = type === 'audio' ? ui.audioStatus : ui.videoStatus;
-        statusEl.textContent = `读取中: ${file.name}`;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            pendingAudioDataUrl = e.target.result;
-            statusEl.textContent = `已选择: ${file.name}`;
-            if (type === 'audio') {
-                ui.videoStatus.textContent = '';
-                ui.videoPicker.value = '';
-            } else {
-                ui.audioStatus.textContent = '';
-                ui.audioPicker.value = '';
-            }
-        };
-        reader.onerror = () => {
-             statusEl.textContent = `读取失败!`;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    async function saveVoice() {
-        const speaker = ui.speakerInput.value.trim();
-        const subtitle = ui.subtitleInput.value.trim();
-
-        if (!speaker) {
-            alert('请填写"语音人"！');
-            return;
-        }
-        if (!pendingAudioDataUrl) {
-            alert('请选择一个语音或视频文件！');
-            return;
-        }
-
-        // [核心修改] 仅改变按钮状态，不再显示进度条
-        ui.saveBtn.disabled = true;
-        ui.saveBtn.textContent = '上传中…';
-        
-        // 将Base64数据转换为Blob对象以便上传
-        const fetchRes = await fetch(pendingAudioDataUrl);
-        const blob = await fetchRes.blob();
-        
-        // 定义上传路径和文件名
-        const extension = blob.type.split('/')[1] || 'mp3';
-        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${extension}`;
-        const path = `memory/voices/${fileName}`;
-
-        try {
-            // 使用已有的 uploadFileViaGitData 函数上传文件, onProgress回调不再需要
-            const uploadResult = await uploadFileViaGitData({
-                file: new File([blob], fileName, { type: blob.type }),
-                path: path,
-                commitMessage: `Upload voice: ${fileName}`,
-                onProgress: (percent) => {
-                    // 进度条逻辑已删除，此回调为空
-                }
-            });
-
-            // 关键：只保存文件路径，而不是文件内容
-            const newVoice = {
-                id: Date.now(),
-                speaker: speaker,
-                subtitle: subtitle,
-                path: uploadResult.path, // 保存路径
-                sha: uploadResult.sha,    // 保存SHA，方便未来管理
-            };
-
-            pendantVoiceData.voices.push(newVoice);
-            await DataManager.save('pendantVoiceData', `Add voice: ${speaker}`);
-
-            // 重置表单
-            ui.speakerInput.value = '';
-            ui.subtitleInput.value = '';
-            ui.audioPicker.value = '';
-            ui.videoPicker.value = '';
-            ui.audioStatus.textContent = '';
-            ui.videoStatus.textContent = '';
-            pendingAudioDataUrl = null;
-
-            renderVoiceList();
-            showTopToast('语音已成功保存！', 2000);
-
-        } catch (error) {
-            console.error("上传语音失败:", error);
-            alert(`上传语音失败: ${error.message}`);
-        } finally {
-            // 无论成功或失败，都恢复UI状态
-            ui.saveBtn.disabled = false;
-            ui.saveBtn.textContent = '保存语音';
-            // [核心修改] 删除进度条隐藏逻辑
-        }
-    }
-
-
-    function renderVoiceList() {
-        const voices = pendantVoiceData.voices;
-        if (voices.length === 0) {
-            ui.voiceListContainer.innerHTML = '<p class="placeholder-content" style="font-size: 14px;">暂无语音，请在下方添加</p>';
-            return;
-        }
-
-        ui.voiceListContainer.innerHTML = voices.map(voice => `
-            <div class="voice-list-item" data-voice-id="${voice.id}">
-                <div class="voice-info">
-                    <div class="voice-subtitle-preview">${voice.subtitle || '...'}</div>
-                    <div class="voice-speaker">${voice.speaker}</div>
-                </div>
-                <div class="voice-actions">
-                    <button class="play-voice-btn" title="播放">▶</button>
-                    <button class="delete-voice-btn" title="删除">✖</button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-
-    async function handleListClick(e) {
-        const playBtn = e.target.closest('.play-voice-btn');
-        const deleteBtn = e.target.closest('.delete-voice-btn');
-        
-        if (playBtn) {
-            const voiceId = parseInt(playBtn.closest('.voice-list-item').dataset.voiceId, 10);
-            playVoiceById(voiceId);
-        } else if (deleteBtn) {
-            const voiceId = parseInt(deleteBtn.closest('.voice-list-item').dataset.voiceId, 10);
-            if (confirm('确定要删除这条语音吗？')) {
-                pendantVoiceData.voices = pendantVoiceData.voices.filter(v => v.id !== voiceId);
-                await DataManager.save('pendantVoiceData', 'Delete voice');
-                renderVoiceList();
-                showTopToast('语音已删除', 1500);
-            }
-        }
-    }
-    
-    function stopCurrentAudio() {
-        if(currentAudio) {
-            currentAudio.pause();
-            currentAudio.src = '';
-            currentAudio = null;
-        }
-        document.querySelectorAll('.voice-list-item.playing').forEach(el => {
-            el.classList.remove('playing');
-            el.querySelector('.play-voice-btn').innerHTML = '▶';
-        });
-    }
-
-    async function playVoiceById(id) {
-        const voice = pendantVoiceData.voices.find(v => v.id === id);
-        if (!voice || !voice.path) return; // 检查 path 是否存在
-
-        // 如果点击的是正在播放的按钮，则停止播放
-        if (currentAudio && !currentAudio.paused && currentAudio.dataset.voiceId === String(id)) {
-            stopCurrentAudio();
-            return;
-        }
-        
-        stopCurrentAudio(); // 停止任何其他正在播放的语音
-        
-        const listItem = ui.voiceListContainer.querySelector(`[data-voice-id="${id}"]`);
-        const playBtn = listItem?.querySelector('.play-voice-btn');
-        if(playBtn) playBtn.innerHTML = '<div class="music-loader"></div>'; // 显示加载动画
-        
-        try {
-            // 使用 getSecureFileUrl 获取安全的音频URL
-            const audioUrl = await getSecureFileUrl(voice.path);
-            
-            if (!audioUrl) throw new Error('无法获取音频URL');
-            
-            currentAudio = new Audio(audioUrl);
-            currentAudio.dataset.voiceId = id; // 标记当前播放的ID
-            currentAudio.play().catch(e => {
-                console.error("播放语音失败:", e);
-                if(playBtn) playBtn.innerHTML = '▶';
-            });
-            
-            if (listItem) {
-                listItem.classList.add('playing');
-                if(playBtn) playBtn.innerHTML = '❚❚';
-            }
-
-            currentAudio.onended = () => {
-                if (listItem) {
-                    listItem.classList.remove('playing');
-                   if(playBtn) playBtn.innerHTML = '▶';
-                }
-                currentAudio = null;
-            };
-        } catch (error) {
-            console.error("播放语音时出错:", error);
-            alert(`播放语音失败: ${error.message}`);
-            if(playBtn) playBtn.innerHTML = '▶';
-        }
-    }
-
-    // ★★★ 核心修改：让函数接收参数，而不是依赖模块内状态 ★★★
-    function playRandomVoice(voices, isRandom) {
-        if (!voices || voices.length === 0) return;
-
-        let indexToPlay = 0;
-        if (isRandom) {
-            indexToPlay = Math.floor(Math.random() * voices.length);
-        }
-        
-        // 注意：playVoiceById 依然依赖模块内的 pendantVoiceData,
-        // 但开屏播放时，pendantVoiceData 可能尚未被 playVoiceById 的调用者填充，
-        // 所以我们需要确保 playVoiceById 也能处理直接传入的数据。
-        // 为了最小改动，我们暂时在调用 playVoiceById 前，确保 pendantVoiceData 有值。
-        if (!pendantVoiceData) {
-            pendantVoiceData = { voices: voices };
-        }
-        
-        playVoiceById(voices[indexToPlay].id);
-    }
-
-    async function playOnStartup() {
-        // ★★★ 核心修改：不再等待，而是直接调用 DataManager.get 进行一次性的、独立的快速数据获取 ★★★
-        try {
-            // 这一步会优先从内存缓存读取，如果主程序已经加载过，则速度极快
-            // 如果主程序还没加载，它会独立发起网络请求，不依赖全局的 loadInitialData
-            const data = await DataManager.get('pendantVoiceData');
-
-            // 拿到数据后，再检查是否需要播放
-            if (data && data.playOnStartup && data.voices && data.voices.length > 0) {
-                console.log('触发开屏语音播放...');
-                // 将数据传递给独立的播放函数，避免污染模块内的 pendantVoiceData 状态
-                playRandomVoice(data.voices, data.randomPlay);
-            }
-        } catch (error) {
-            console.error("开屏语音加载失败:", error);
-            // 即使失败也不阻塞主程序
-        }
-    }
-
-    async function refreshUI() {
-        await loadData();
-        renderSettingsUI();
-        renderVoiceList();
-    }
-
-    return { init, playOnStartup, refreshUI };
-})();
-/* =============================================================== */
-/* ========================= [新增结束] ========================== */
-/* =============================================================== */
-
 
 /**
  * [新增] 一次性数据迁移函数 V1.0
@@ -10565,8 +10348,68 @@ async function saveGlobalConfig(commitMessage) {
         }
     });
 
-// <-- 开始替换为 -->
+    // [V4 优化] 播放开场语音的独立函数，实现预加载和即时播放
+    async function playOpeningVoice() {
+        // 此函数不应显示任何加载提示，以保证开屏体验
+        if (!checkConfig(false)) return;
+
+        try {
+            // [核心修改] 使用 DataManager 获取数据，利用其缓存机制
+            const voiceData = await DataManager.get('openingVoiceData');
+
+            if (voiceData.settings?.playOnStartup && voiceData.voices?.length > 0) {
+                
+                let voiceToPlay = null;
+                const favoriteVoice = voiceData.voices.find(v => v.isFavorite);
+
+                if (voiceData.settings.randomPlay) {
+                    const randomIndex = Math.floor(Math.random() * voiceData.voices.length);
+                    voiceToPlay = voiceData.voices[randomIndex];
+                } else if (favoriteVoice) {
+                    voiceToPlay = favoriteVoice;
+                } else {
+                    voiceToPlay = voiceData.voices[0];
+                }
+
+                if (voiceToPlay && voiceToPlay.path) {
+                    // [核心修改] 立即获取安全URL，这个过程会利用缓存
+                    const audioUrl = await getSecureFileUrl(voiceToPlay.path);
+                    if (audioUrl) {
+                        // [核心修改] 创建一个Audio对象并立即开始加载
+                        const audio = new Audio(audioUrl);
+                        audio.preload = 'auto'; // 提示浏览器尽快加载
+
+                        // 尝试播放。如果浏览器因未交互而阻止，则设置一个一次性的交互监听器
+                        const playPromise = audio.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(error => {
+                                // 如果播放失败 (很可能是因为用户还未交互)，则设置一个监听器
+                                console.warn("开场语音自动播放失败，等待用户交互后重试。", error);
+                                
+                                const playOnFirstInteraction = () => {
+                                    // 再次尝试播放，此时应该会成功
+                                    audio.play().catch(err => console.error("交互后播放语音仍然失败:", err));
+                                    // 播放后立即移除监听器，避免重复触发
+                                    document.body.removeEventListener('click', playOnFirstInteraction, true);
+                                    document.body.removeEventListener('touchstart', playOnFirstInteraction, true);
+                                };
+
+                                // 监听 click 和 touchstart 事件
+                                document.body.addEventListener('click', playOnFirstInteraction, { once: true, capture: true });
+                                document.body.addEventListener('touchstart', playOnFirstInteraction, { once: true, capture: true });
+                            });
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error("加载或播放开场语音时出错:", error);
+        }
+    }
+
     async function loadInitialData() {
+        // [核心修改] playOpeningVoice() 已被移出此函数，将在 DOMContentLoaded 后立即执行
+
         // --- 阶段 1: 瞬间从本地缓存加载并渲染UI ---
         const cachedConfigStr = localStorage.getItem('currentConfig');
         let isCacheAvailable = false;
@@ -10671,8 +10514,7 @@ async function saveGlobalConfig(commitMessage) {
             DataManager.get('usageTime');
             DataManager.get('checkInData');
             DataManager.get('messageBoardData');
-            DataManager.get('pendantVoiceData'); // <-- 新增
-
+            // [核心修改] 不再在此处调用 DataManager.get('openingVoiceData')，因为 playOpeningVoice 已经优先处理了
 
         } catch (error) {
             console.error("后台同步失败:", error);
@@ -10681,6 +10523,7 @@ async function saveGlobalConfig(commitMessage) {
             }
         }
     }
+
 // <-- 结束替换为 -->
 
     function renderCategories() {
@@ -11745,11 +11588,362 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     })();
 
-    /* =============================================================== */
-    /* ========================= [新增结束] ========================== */
-    /* =============================================================== */
-
+/* =============================================================== */
+/* ================ [重构] 开场语音功能管理器 V2.0 (iOS兼容版) =============== */
+/* =============================================================== */
+const OpeningVoiceManager = (() => {
+    let ui = {};
+    let previewAudio = new Audio();
+    let currentPlayingId = null;
+    const VOICE_PATH_PREFIX = 'opening_voices/';
     
+    // [iOS 兼容性修复] 新增一个URL缓存对象
+    let audioUrlCache = {};
+
+    function init() {
+        ui = {
+            listContainer: document.getElementById('opening-voice-list'),
+            titleInput: document.getElementById('opening-voice-title'),
+            speakerInput: document.getElementById('opening-voice-speaker'),
+            uploadBtn: document.getElementById('upload-opening-voice-btn'),
+            filePicker: document.getElementById('opening-voice-picker'),
+            playToggle: document.getElementById('opening-voice-play-toggle'),
+            randomToggle: document.getElementById('opening-voice-random-toggle'),
+            videoToVoiceBtn: document.getElementById('video-to-voice-btn'),
+            videoPicker: document.getElementById('video-to-voice-picker'),
+            videoStatus: document.getElementById('video-to-voice-status'),
+        };
+
+        ui.uploadBtn.addEventListener('click', () => ui.filePicker.click());
+        ui.filePicker.addEventListener('change', handleVoiceUpload);
+        ui.listContainer.addEventListener('click', handleListClick);
+        ui.playToggle.addEventListener('change', handleSettingsChange);
+        ui.randomToggle.addEventListener('change', handleSettingsChange);
+        ui.videoToVoiceBtn.addEventListener('click', () => ui.videoPicker.click());
+        ui.videoPicker.addEventListener('change', handleVideoToVoiceConversion);
+
+        loadAndRender();
+    }
+
+    async function loadAndRender() {
+        const data = await DataManager.get('openingVoiceData');
+        renderVoiceList(data.voices);
+        renderSettings(data.settings);
+        // [iOS 兼容性修复] 预加载所有语音的URL
+        preloadVoiceUrls(data.voices);
+    }
+    
+    // [iOS 兼容性修复] 新增函数：预加载所有语音的URL并存入缓存
+    function preloadVoiceUrls(voices = []) {
+        if (voices.length === 0) return;
+        console.log("正在后台预加载语音文件URL...");
+        voices.forEach(voice => {
+            if (voice.path && !audioUrlCache[voice.id]) {
+                getSecureFileUrl(voice.path).then(url => {
+                    if (url) {
+                        audioUrlCache[voice.id] = url;
+                        console.log(`语音 "${voice.title}" URL预加载成功。`);
+                    }
+                });
+            }
+        });
+    }
+
+    function renderVoiceList(voices = []) {
+        if (voices.length === 0) {
+            ui.listContainer.innerHTML = '<p style="text-align: center; color: #889;">暂无语音</p>';
+            return;
+        }
+        const sortedVoices = [...voices].sort((a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0));
+        ui.listContainer.innerHTML = sortedVoices.map(voice => `
+            <div class="voice-list-item ${voice.isFavorite ? 'favorited' : ''}">
+                <button class="voice-play-btn" data-voice-id="${voice.id}" title="播放/暂停">
+                    <svg viewBox="0 0 24 24" class="play-icon"><path d="M8 5v14l11-7z"></path></svg>
+                    <svg viewBox="0 0 24 24" class="pause-icon" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+                </button>
+                <div class="voice-info">
+                    <div class="voice-speaker">${voice.title || '无标题'}</div>
+                    <div class="voice-filename">${voice.speaker || '未知留言人'}</div>
+                </div>
+                <button class="voice-favorite-btn" data-voice-id="${voice.id}" title="喜欢/取消喜欢">
+                    ${voice.isFavorite ? '♥' : '♡'}
+                </button>
+                <button class="voice-delete-btn" data-voice-id="${voice.id}" title="删除语音">×</button>
+            </div>
+        `).join('');
+    }
+
+    function renderSettings(settings = {}) {
+        ui.playToggle.checked = settings.playOnStartup !== false;
+        ui.randomToggle.checked = settings.randomPlay !== false;
+    }
+
+    async function uploadVoiceFile(file, title, speaker) {
+        try {
+            const uniqueFileName = `${Date.now()}_${file.name}`;
+            const path = VOICE_PATH_PREFIX + uniqueFileName;
+
+            await uploadFileViaGitData({
+                file: file,
+                path: path,
+                commitMessage: `Upload opening voice: ${file.name}`
+            });
+
+            const data = await DataManager.get('openingVoiceData');
+            const newVoice = {
+                id: Date.now(),
+                title: title,
+                speaker: speaker,
+                filename: file.name,
+                path: path,
+                isFavorite: false
+            };
+            data.voices.push(newVoice);
+            await DataManager.save('openingVoiceData', 'Add opening voice');
+            
+            // [iOS 兼容性修复] 新语音上传成功后，立即预加载其URL
+            getSecureFileUrl(newVoice.path).then(url => { if(url) audioUrlCache[newVoice.id] = url; });
+
+            return { success: true };
+        } catch (error) {
+            const userMessage = await handleApiError("上传语音", error);
+            alert(`上传失败: ${userMessage}`);
+            return { success: false };
+        }
+    }
+
+    async function handleVoiceUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const title = ui.titleInput.value.trim();
+        const speaker = ui.speakerInput.value.trim();
+        if (!title || !speaker) {
+            alert('请先填写“留言”和“留言人”！');
+            event.target.value = '';
+            return;
+        }
+
+        const originalText = ui.uploadBtn.textContent;
+        ui.uploadBtn.textContent = '上传中...';
+        ui.uploadBtn.disabled = true;
+
+        const result = await uploadVoiceFile(file, title, speaker);
+        if (result.success) {
+            ui.titleInput.value = '';
+            ui.speakerInput.value = '';
+            event.target.value = '';
+            const data = await DataManager.get('openingVoiceData');
+            renderVoiceList(data.voices);
+            showTopToast('语音上传成功！', 2000);
+        }
+
+        ui.uploadBtn.textContent = '选择并上传语音 (.mp3, .m4a)';
+        ui.uploadBtn.disabled = false;
+    }
+
+    async function handleVideoToVoiceConversion(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const title = ui.titleInput.value.trim();
+        const speaker = ui.speakerInput.value.trim();
+        if (!title || !speaker) {
+            alert('请先填写“留言”和“留言人”！');
+            event.target.value = '';
+            return;
+        }
+
+        ui.videoToVoiceBtn.textContent = '转换中...';
+        ui.videoToVoiceBtn.disabled = true;
+        ui.videoStatus.textContent = '正在从视频中提取音轨...';
+
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const audioContext = new OfflineAudioContext({ numberOfChannels: 2, sampleRate: 44100, length: 44100 * 30 });
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            const wavBlob = audioBufferToWav(audioBuffer);
+            const wavFile = new File([wavBlob], `${title.replace(/\s+/g, '_') || 'video_voice'}.wav`, { type: 'audio/wav' });
+
+            ui.videoStatus.textContent = '转换成功，正在上传...';
+
+            const result = await uploadVoiceFile(wavFile, title, speaker);
+
+            if (result.success) {
+                ui.titleInput.value = '';
+                ui.speakerInput.value = '';
+                event.target.value = '';
+                const data = await DataManager.get('openingVoiceData');
+                renderVoiceList(data.voices);
+                showTopToast('视频语音提取并上传成功！', 2000);
+            }
+
+        } catch (error) {
+            console.error("视频转语音失败:", error);
+            alert(`处理失败: ${error.message}. 请确保视频文件包含音轨。`);
+        } finally {
+            ui.videoToVoiceBtn.textContent = '视频转语音';
+            ui.videoToVoiceBtn.disabled = false;
+            ui.videoStatus.textContent = '';
+        }
+    }
+
+    async function handleDelete(voiceId) {
+        if (!voiceId || !confirm('确定要删除这条语音吗？')) return;
+
+        // [iOS 兼容性修复] 从缓存中删除
+        delete audioUrlCache[voiceId];
+
+        const data = await DataManager.get('openingVoiceData');
+        const voiceToDelete = data.voices.find(v => v.id === voiceId);
+
+        if (!voiceToDelete) return;
+
+        data.voices = data.voices.filter(v => v.id !== voiceId);
+        await deleteFromGithub(voiceToDelete.path, `Delete opening voice: ${voiceToDelete.filename}`, null, true);
+        await DataManager.save('openingVoiceData', 'Delete opening voice');
+        renderVoiceList(data.voices);
+        showTopToast('语音已删除', 2000);
+    }
+    
+    async function handleSettingsChange() {
+        const data = await DataManager.get('openingVoiceData');
+        data.settings.playOnStartup = ui.playToggle.checked;
+        data.settings.randomPlay = ui.randomToggle.checked;
+        await DataManager.save('openingVoiceData', 'Update opening voice settings');
+    }
+
+    async function handleListClick(event) {
+        const deleteBtn = event.target.closest('.voice-delete-btn');
+        const playBtn = event.target.closest('.voice-play-btn');
+        const favoriteBtn = event.target.closest('.voice-favorite-btn');
+
+        if (deleteBtn) {
+            handleDelete(parseInt(deleteBtn.dataset.voiceId, 10));
+        } else if (playBtn) {
+            handlePlayToggle(parseInt(playBtn.dataset.voiceId, 10));
+        } else if (favoriteBtn) {
+            const voiceId = parseInt(favoriteBtn.dataset.voiceId, 10);
+            const data = await DataManager.get('openingVoiceData');
+            const targetVoice = data.voices.find(v => v.id === voiceId);
+            if (!targetVoice) return;
+            const newFavoriteState = !targetVoice.isFavorite;
+            data.voices.forEach(v => v.isFavorite = false);
+            if (newFavoriteState) {
+                targetVoice.isFavorite = true;
+            }
+            await DataManager.save('openingVoiceData', 'Update favorite voice');
+            renderVoiceList(data.voices);
+        }
+    }
+
+    // [iOS 兼容性修复] 重构播放切换逻辑
+    async function handlePlayToggle(voiceId) {
+        if (currentPlayingId === voiceId && !previewAudio.paused) {
+            previewAudio.pause();
+            return;
+        }
+
+        if (!previewAudio.paused) {
+            previewAudio.pause();
+        }
+
+        currentPlayingId = voiceId;
+        updatePlayButtons(); // 立即更新UI，显示加载状态（虽然没专门做，但会变成播放图标）
+
+        // [核心修改] 从缓存同步获取URL
+        let audioUrl = audioUrlCache[voiceId];
+
+        // 如果缓存中没有，说明预加载失败或还没完成，则异步获取一次
+        if (!audioUrl) {
+            showTopToast("正在获取音频，请稍候...", 1500);
+            const data = await DataManager.get('openingVoiceData');
+            const voiceToPlay = data.voices.find(v => v.id === voiceId);
+            if (!voiceToPlay) {
+                showTopToast("找不到该语音文件", 2000);
+                currentPlayingId = null; updatePlayButtons();
+                return;
+            }
+            audioUrl = await getSecureFileUrl(voiceToPlay.path);
+            if (audioUrl) {
+                audioUrlCache[voiceId] = audioUrl; // 获取后存入缓存
+            }
+        }
+        
+        // 如果最终还是没有URL，则播放失败
+        if (!audioUrl) {
+            showTopToast("加载语音失败", 2000);
+            currentPlayingId = null; updatePlayButtons();
+            return;
+        }
+
+        // [核心修改] 拿到URL后，同步执行播放
+        try {
+            previewAudio.src = audioUrl;
+            await previewAudio.play();
+        } catch (error) {
+            showTopToast("播放失败，请稍后再试", 2000);
+            console.error("Audio play error:", error);
+            currentPlayingId = null;
+            updatePlayButtons();
+        }
+    }
+
+    function updatePlayButtons() {
+        if (!ui.listContainer) return;
+        const allPlayBtns = ui.listContainer.querySelectorAll('.voice-play-btn');
+        allPlayBtns.forEach(btn => {
+            const btnId = parseInt(btn.dataset.voiceId, 10);
+            const playIcon = btn.querySelector('.play-icon');
+            const pauseIcon = btn.querySelector('.pause-icon');
+            if (!playIcon || !pauseIcon) return;
+
+            if (btnId === currentPlayingId && !previewAudio.paused) {
+                btn.classList.add('playing');
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+            } else {
+                btn.classList.remove('playing');
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+            }
+        });
+    }
+
+    previewAudio.onplay = updatePlayButtons;
+    previewAudio.onpause = () => {
+        if (previewAudio.currentTime < previewAudio.duration) {
+            currentPlayingId = null;
+        }
+        updatePlayButtons();
+    };
+    previewAudio.onended = () => {
+        currentPlayingId = null;
+        updatePlayButtons();
+    };
+
+    function audioBufferToWav(buffer) {
+        let numOfChan = buffer.numberOfChannels, len = buffer.length * numOfChan * 2 + 44, bufferArr = new ArrayBuffer(len), view = new DataView(bufferArr), channels = [], i, sample, offset = 0, pos = 0;
+        setUint32(0x46464952); setUint32(len - 8); setUint32(0x45564157); setUint32(0x20746d66); setUint32(16); setUint16(1); setUint16(numOfChan); setUint32(buffer.sampleRate); setUint32(buffer.sampleRate * 2 * numOfChan); setUint16(numOfChan * 2); setUint16(16); setUint32(0x61746164); setUint32(len - pos - 4);
+        function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+        function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+        for (i = 0; i < buffer.numberOfChannels; i++) channels.push(buffer.getChannelData(i));
+        while (pos < len) {
+            for (i = 0; i < numOfChan; i++) {
+                sample = Math.max(-1, Math.min(1, channels[i][offset])); sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0; view.setInt16(pos, sample, true); pos += 2;
+            }
+            offset++;
+        }
+        return new Blob([view], { type: "audio/wav" });
+    }
+
+    return { init };
+})();
+
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+
     // ===== [START] MEMORY APP LOGIC =====
     let memoryCache = null; // [修复] 将 memoryCache 提升到模块共享作用域
     // [新增] 基于 IndexedDB 的图片持久化缓存
@@ -11854,8 +12048,17 @@ document.addEventListener('DOMContentLoaded', () => {
             fileNameInput: document.getElementById("fileNameInput"), 
             uploadBtn: document.getElementById("uploadBtn"), 
             progressContainer: document.getElementById("progressContainer"), 
-            progressBar: document.getElementById("uploadProgressBar")
+            progressBar: document.getElementById("uploadProgressBar"),
+            
+            // [新增] 渲染器相关UI元素
+            rendererList: document.getElementById('renderer-list-container'),
+            rendererAddModal: document.getElementById('rendererAddModal'),
+            // [新增] 渲染器管理UI
+            rendererGroupNav: document.getElementById('renderer-group-nav'),
+            rendererManageControls: document.getElementById('renderer-management-controls'),
+            moveRendererModal: document.getElementById('moveRendererModal'),
         };
+
 
     const state = {
         currentSection: null,
@@ -11863,7 +12066,11 @@ document.addEventListener('DOMContentLoaded', () => {
         isAlbumManageMode: false, albumFoldersToDelete: [],
         isPhotoManageMode: false, photosToDelete: [],
         isNoteManageMode: false, notesToDelete: [],
+        // [新增] 渲染器状态管理
+        isRendererManageMode: false, renderersToDelete: [],
+        currentRendererGroup: null, 
         currentMemoFolderId: null, currentNoteId: null, currentAlbumId: null,
+
         folderModalContext: null,
         viewerContext: { items: [], index: -1 },
         photoUploadQueue: [],
@@ -11876,6 +12083,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return {
                 memo: { folders: [{ id: Date.now(), name: "默认文件夹" }], notes: [] },
                 album: { folders: [{ id: Date.now() + 1, name: "我的照片" }], items: [] },
+                // [新增] 渲染器数据结构 (V2)
+                renderer: {
+                    groups: ["未分组"], // 默认分组
+                    items: []
+                },
                 // [新增] 标签数据结构
                 allTags: [], // 存储所有标签对象, e.g., [{id: 123, name: '重要'}]
                 driveTags: {} // 存储文件路径到标签ID数组的映射, e.g., {'path/to/file.txt': [123, 456]}
@@ -12396,6 +12608,16 @@ document.addEventListener('DOMContentLoaded', () => {
             'open-baidu-settings': () => BaiduNetdisk.openSettingsModal(), // <<< 这里添加了逗号
             'goto-memo': () => { showPage('memo-section'); state.currentSection = 'memo'; document.getElementById('memory-modal-title').textContent = '备忘录'; renderMemoFolders(); },
             'goto-album': () => { showPage('album-section'); state.currentSection = 'album'; document.getElementById('memory-modal-title').textContent = '相册'; renderAlbumFolders(); },
+            // [新增] 跳转到渲染器页面的action
+            'goto-renderer': () => {
+                showPage('renderer-section'); 
+                state.currentSection = 'renderer'; 
+                document.getElementById('memory-modal-title').textContent = '渲染器';
+                // [新增] 渲染分组并显示卡片
+                renderRendererGroups();
+                renderRendererItems();
+            },
+
             'goto-cloud': () => { 
     showPage('cloud-drive-section'); 
     state.currentSection = 'cloud'; 
@@ -12409,6 +12631,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 退出管理模式
                 if (state.isMemoManageMode) actions['toggle-memo-manage'](ui.modal.querySelector('[data-action="toggle-memo-manage"]'));
                 if (state.isAlbumManageMode) actions['toggle-album-manage'](ui.modal.querySelector('[data-action="toggle-album-manage"]'));
+                // [新增] 退出新模块时也需要重置标题
+                if (state.currentSection === 'renderer') document.getElementById('memory-modal-title').textContent = '记忆';
                 
                 showPage('hub-view'); 
                 state.currentSection = null; 
@@ -12873,10 +13097,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderPhotos();
                     return;
                 }
+                // [新增] 对渲染器卡片在管理模式下的点击处理
+                if(state.isRendererManageMode && target.closest('.renderer-card')) {
+                    const index = state.renderersToDelete.indexOf(itemId);
+                    if (index > -1) state.renderersToDelete.splice(index, 1);
+                    else state.renderersToDelete.push(itemId);
+                    renderRendererItems();
+                    return;
+                }
+
                 const itemsInAlbum = memoryCache.album.items.filter(p => p.albumId === state.currentAlbumId).sort((a,b) => b.timestamp - a.timestamp);
                 const itemIndex = itemsInAlbum.findIndex(p => p.id === itemId);
                 openPhotoViewer(itemsInAlbum, itemIndex);
             },
+
             'close-viewer': () => closePhotoViewer(),
             'prev-photo': () => changePhotoInViewer(-1),
             'next-photo': () => changePhotoInViewer(1),
@@ -12989,10 +13223,124 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             },
 
-            'confirm-move-photos': () => {
+        'add-renderer-item': () => openRendererAddModal(),
+        'close-renderer-modal': () => ui.rendererAddModal.classList.remove('show'),
+        'open-renderer-item': (target, e) => {
+            // 如果点击的是复选框，则不执行任何操作，因为上面的监听器已经处理过了
+            if (e.target.matches('.manage-checkbox')) {
+                return;
+            }
+            
+            const itemId = parseInt(target.dataset.itemId, 10);
+            
+            if (state.isRendererManageMode) {
+                // 在管理模式下，直接点击卡片（非复选框区域）会打开编辑模态框
+                openRendererAddModal(itemId);
+            } else {
+                // 普通模式下，打开预览
+                openRendererItemViewer(itemId);
+            }
+        },
+
+        // --- [新增] 渲染器管理相关 Actions ---
+        'toggle-renderer-manage': (target) => {
+            state.isRendererManageMode = !state.isRendererManageMode;
+            target.textContent = state.isRendererManageMode ? '完成' : '管理';
+            ui.rendererManageControls.classList.toggle('active', state.isRendererManageMode);
+            if (!state.isRendererManageMode) {
+                state.renderersToDelete = []; // 退出时清空选择
+            }
+            renderRendererItems(); // 重新渲染以应用.manage-mode
+        },
+
+        'select-all-renderer': () => {
+             const itemsInCurrentGroup = memoryCache.renderer.items.filter(item => item.group === state.currentRendererGroup);
+             if (state.renderersToDelete.length === itemsInCurrentGroup.length) {
+                 state.renderersToDelete = [];
+             } else {
+                 state.renderersToDelete = itemsInCurrentGroup.map(item => item.id);
+             }
+             renderRendererItems();
+        },
+        
+        'delete-selected-renderer': async () => {
+            if (state.renderersToDelete.length === 0) return;
+            if (!confirm(`确定要删除选中的 ${state.renderersToDelete.length} 个渲染卡片吗？此操作不可逆！`)) return;
+
+            showTopToast("正在删除...", 5000);
+
+            // 1. 找到所有要删除的项并收集它们的HTML文件路径
+            const itemsToDelete = memoryCache.renderer.items.filter(item => state.renderersToDelete.includes(item.id));
+            const pathsToDelete = itemsToDelete.map(item => item.path).filter(Boolean);
+
+            // 2. 异步并行删除所有关联的HTML文件
+            await Promise.all(pathsToDelete.map(path => {
+                const associatedFileSha = null; // 我们没有sha，让deleteFromGithub自己获取
+                return deleteFromGithub(path, `Delete renderer content: ${path}`, associatedFileSha, true);
+            }));
+
+            // 3. 从主数据中移除这些项
+            memoryCache.renderer.items = memoryCache.renderer.items.filter(item => !state.renderersToDelete.includes(item.id));
+
+            // 4. 清理并保存
+            state.renderersToDelete = [];
+            await scheduleSave();
+            renderRendererItems(); // 重新渲染列表
+
+            showTopToast("删除成功！", 2000);
+        },
+
+        'move-selected-renderer': () => {
+            if (state.renderersToDelete.length === 0) {
+                alert('请先选择要移动的卡片。');
+                return;
+            }
+            const destSelector = document.getElementById('renderer-destination-selector');
+            destSelector.innerHTML = '';
+            memoryCache.renderer.groups.forEach(group => {
+                if (group !== state.currentRendererGroup) {
+                    const option = document.createElement('option');
+                    option.value = group;
+                    option.textContent = group;
+                    destSelector.appendChild(option);
+                }
+            });
+
+            if (destSelector.options.length === 0) {
+                alert('没有其他分组可以移动。');
+                return;
+            }
+            ui.moveRendererModal.classList.add('show');
+        },
+
+        'close-move-renderer-modal': () => {
+            ui.moveRendererModal.classList.remove('show');
+        },
+        
+        'confirm-move-renderer': () => {
+            const destGroup = document.getElementById('renderer-destination-selector').value;
+            if (!destGroup) return;
+
+            memoryCache.renderer.items.forEach(item => {
+                if (state.renderersToDelete.includes(item.id)) {
+                    item.group = destGroup;
+                }
+            });
+            
+            state.renderersToDelete = [];
+            scheduleSave();
+            renderRendererItems(); // 刷新UI
+            ui.moveRendererModal.classList.remove('show');
+            showTopToast('移动成功！', 2000);
+        },
+
+
+        'confirm-move-photos': () => {
+
                 const destAlbumId = parseInt(document.getElementById('album-destination-selector').value, 10);
                 if (!destAlbumId) {
                     alert('无效的目标相册。');
+
                     return;
                 }
 
@@ -13960,11 +14308,269 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
 
-        // ============= [ 新增结束 ] =============
+        // ============= [ 重构：渲染器功能相关函数 V2 ] =============
+        function renderRendererGroups() {
+            if (!memoryCache.renderer) memoryCache.renderer = { groups: ['未分组'], items: [] };
+
+            const groups = memoryCache.renderer.groups || ['未分组'];
+            ui.rendererGroupNav.innerHTML = '';
+            
+            // 确保 state.currentRendererGroup 是一个有效的分组
+            if (!state.currentRendererGroup || !groups.includes(state.currentRendererGroup)) {
+                state.currentRendererGroup = groups[0];
+            }
+
+            groups.forEach(groupName => {
+                const pill = document.createElement('button');
+                pill.className = 'category-pill';
+                pill.textContent = groupName;
+                pill.dataset.group = groupName;
+                if (groupName === state.currentRendererGroup) {
+                    pill.classList.add('active');
+                }
+                pill.addEventListener('click', () => {
+                    state.currentRendererGroup = groupName;
+                    renderRendererGroups(); // 重新渲染以更新 active 状态
+                    renderRendererItems();  // 重新渲染卡片列表
+                });
+                ui.rendererGroupNav.appendChild(pill);
+            });
+        }
+        
+        async function renderRendererItems() {
+            if (!memoryCache.renderer || !state.currentRendererGroup) {
+                ui.rendererList.innerHTML = `<p class="empty-list-placeholder">请先选择一个分组</p>`;
+                return;
+            }
+
+            const itemsInGroup = memoryCache.renderer.items.filter(item => item.group === state.currentRendererGroup);
+            
+            // 移除可能存在的 "空列表" 提示
+            const placeholder = ui.rendererList.querySelector('.empty-list-placeholder');
+            if (placeholder) placeholder.remove();
+            
+            // 1. 获取当前DOM中所有的卡片
+            const existingCards = new Map();
+            ui.rendererList.querySelectorAll('.renderer-card').forEach(card => {
+                existingCards.set(parseInt(card.dataset.itemId, 10), card);
+            });
+
+            // 2. 遍历需要展示的数据
+            const requiredIds = new Set();
+            for (const item of itemsInGroup) {
+                requiredIds.add(item.id);
+                const isSelected = state.renderersToDelete.includes(item.id);
+                let card = existingCards.get(item.id);
+
+                if (card) {
+                    // 卡片已存在，仅更新状态
+                    const expectedClassName = `renderer-card ${state.isRendererManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
+                    if(card.className !== expectedClassName) {
+                        card.className = expectedClassName;
+                    }
+                    const checkbox = card.querySelector('.manage-checkbox');
+                    if(checkbox) checkbox.checked = isSelected;
+                } else {
+                    // 卡片不存在，创建并附加
+                    card = document.createElement('div');
+                    card.className = `renderer-card ${state.isRendererManageMode ? 'manage-mode' : ''} ${isSelected ? 'manage-selected' : ''}`;
+                    card.dataset.itemId = item.id;
+                    card.dataset.action = 'open-renderer-item';
+
+                    card.innerHTML = `
+                        <input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}>
+                        <div class="renderer-card-title">${item.title || '无标题'}</div>
+                        <div class="renderer-card-content">
+                            <iframe class="renderer-card-iframe" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+                        </div>
+                    `;
+                    ui.rendererList.appendChild(card);
+                    
+                    // 异步加载内容
+                    if (item.path) {
+                        const iframe = card.querySelector('.renderer-card-iframe');
+                        getSecureFileUrl(item.path).then(url => {
+                            if (url) iframe.src = url;
+                            else iframe.srcdoc = `<p style="color: red;">内容加载失败</p>`;
+                        });
+                    }
+                }
+            }
+
+            // 3. 移除不再需要的卡片
+            for (const [id, card] of existingCards.entries()) {
+                if (!requiredIds.has(id)) {
+                    card.remove();
+                }
+            }
+            
+            // 4. 处理空列表的情况
+            if (ui.rendererList.childElementCount === 0) {
+                 ui.rendererList.innerHTML = `<p class="empty-list-placeholder">该分组下暂无卡片</p>`;
+            }
+        }
+
+        
+        async function openRendererAddModal(itemId = null) {
+            const modal = ui.rendererAddModal;
+            const titleEl = modal.querySelector('#renderer-modal-title');
+            const groupInput = modal.querySelector('#renderer-group-input');
+            const groupDatalist = modal.querySelector('#renderer-group-datalist');
+            const titleInput = modal.querySelector('#renderer-title-input');
+            const htmlInput = modal.querySelector('#renderer-html-input');
+            const saveBtn = modal.querySelector('#save-renderer-item-btn');
+            const filePickerBtn = modal.querySelector('#renderer-file-picker-btn');
+            const filePicker = modal.querySelector('#renderer-file-picker');
+            const fileStatus = modal.querySelector('#renderer-file-status');
+            
+            let currentItem = null;
+
+            // 填充分组下拉建议
+            groupDatalist.innerHTML = '';
+            (memoryCache.renderer.groups || []).forEach(group => {
+                groupDatalist.innerHTML += `<option value="${group}">`;
+            });
+
+            if (itemId) {
+                currentItem = memoryCache.renderer.items.find(i => i.id === itemId);
+                if (!currentItem) return;
+                titleEl.textContent = '编辑渲染卡片';
+                groupInput.value = currentItem.group || '未分组';
+                titleInput.value = currentItem.title || '';
+                fileStatus.textContent = '重新上传文件或粘贴代码以覆盖';
+
+                // 异步获取并填充HTML内容
+                htmlInput.value = "正在加载内容...";
+                if (currentItem.path) {
+                    const { data } = await fetchFromGithub(currentItem.path);
+                    htmlInput.value = data?.content ? b64_to_utf8(data.content) : '';
+                } else {
+                    htmlInput.value = '';
+                }
+
+            } else {
+                titleEl.textContent = '新建渲染卡片';
+                groupInput.value = state.currentRendererGroup || '未分组';
+                titleInput.value = '';
+                htmlInput.value = '';
+                fileStatus.textContent = '或在下方直接粘贴代码';
+            }
+            
+            filePicker.value = '';
+            filePickerBtn.onclick = () => filePicker.click();
+            filePicker.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    htmlInput.value = event.target.result;
+                    const fileName = file.name;
+                    const titleFromName = fileName.substring(0, fileName.lastIndexOf('.'));
+                    if (!titleInput.value) titleInput.value = titleFromName;
+                    fileStatus.textContent = `已加载：${fileName}`;
+                };
+                reader.onerror = () => { fileStatus.textContent = '文件读取失败！'; }
+                reader.readAsText(file);
+            };
+
+            saveBtn.onclick = async () => {
+                const group = groupInput.value.trim() || '未分组';
+                const title = titleInput.value.trim();
+                const html = htmlInput.value;
+                if (!html) return alert('HTML内容不能为空！');
+
+                // 如果是新分组，则添加到分组列表
+                if (!memoryCache.renderer.groups.includes(group)) {
+                    memoryCache.renderer.groups.push(group);
+                }
+
+                // 保存HTML到独立文件
+                const newId = currentItem ? currentItem.id : Date.now();
+                const path = `memory/renderer_html/item_${newId}.html`;
+                const contentB64 = utf8_to_b64(html);
+                await saveToGithub(path, contentB64, `Update renderer item: ${title || newId}`);
+
+                // 更新或创建item对象
+                if (currentItem) {
+                    currentItem.title = title;
+                    currentItem.path = path;
+                    currentItem.group = group;
+                } else {
+                    memoryCache.renderer.items.push({ id: newId, title, path, group });
+                }
+                
+                state.currentRendererGroup = group; // 切换到新卡片所在的分组
+
+                await scheduleSave();
+                renderRendererGroups();
+                await renderRendererItems();
+                modal.classList.remove('show');
+                showTopToast('保存成功！', 2000);
+            };
+
+            modal.classList.add('show');
+        }
+
+
+        async function openRendererItemViewer(itemId) {
+            const item = memoryCache.renderer?.items.find(i => i.id === itemId);
+            if (!item) return;
+
+            const viewerId = 'renderer-viewer-modal';
+            document.getElementById(viewerId)?.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = viewerId;
+            overlay.className = 'iframe-modal-overlay'; 
+            overlay.style.zIndex = '4000';
+            overlay.style.background = 'rgba(0,0,0,0)';
+
+            // 创建DOM结构，先把iframe放进去，后面再设置内容
+            overlay.innerHTML = `
+                <div class="iframe-modal-content" style="background: #fff;">
+                    <iframe frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" style="width: 100%; height: 100%;"></iframe>
+                </div>
+                <button class="viewer-btn" title="关闭" style="position: fixed; top: 15px; right: 15px; z-index: 1;">✕</button>
+            `;
+            
+            document.body.appendChild(overlay);
+            const iframe = overlay.querySelector('iframe');
+
+            // [核心修复] 判断加载方式：优先从文件路径加载，兼容旧版HTML字符串
+            if (item.path) {
+                // 如果是新版数据（有文件路径），获取安全URL并设置为 src
+                const url = await getSecureFileUrl(item.path);
+                if (url) {
+                    iframe.src = url;
+                } else {
+                    iframe.srcdoc = '<div style="display:flex;justify-content:center;align-items:center;height:100%;color:#666;">加载文件内容失败，请检查网络。</div>';
+                }
+            } else if (item.html) {
+                // 兼容旧版数据（直接存储在html字段）
+                iframe.srcdoc = item.html;
+            } else {
+                iframe.srcdoc = '<div style="display:flex;justify-content:center;align-items:center;height:100%;color:#666;">内容为空</div>';
+            }
+
+            requestAnimationFrame(() => {
+                overlay.classList.add('active');
+            });
+            
+            const closeViewer = () => {
+                overlay.classList.remove('active');
+                overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+            };
+            
+            overlay.querySelector('.viewer-btn').addEventListener('click', closeViewer);
+        }
+
+        // ============= [ 重构结束 ] =============
 
         return {
             open: async (targetView = null) => { // 新增 targetView 参数，并设默认值为 null
                 if (!checkConfig(true)) {
+
                     document.getElementById('settingsModal').classList.add('show');
                     return;
                 }
@@ -14019,6 +14625,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
                 }, { root: ui.photoList, rootMargin: "0px 0px 200px 0px" });
+                // --- [新增-核心修复] 为“移动渲染卡片”模态框绑定点击事件 ---
+                if (ui.moveRendererModal) {
+                    ui.moveRendererModal.addEventListener('click', e => {
+                        // 事件委托：查找带有 data-action 属性的点击目标
+                        const target = e.target.closest('[data-action]');
+                        if (target && actions[target.dataset.action]) {
+                            actions[target.dataset.action](target);
+                        }
+                    });
+                }
+                // --- [修复结束] ---
 
 
                 // [核心修改] 重构事件监听以支持长按
@@ -14059,6 +14676,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
                 ui.appContainer.addEventListener('click', e => {
+                    // [新增-核心修复] 优先处理管理模式下的复选框点击
+                    const checkbox = e.target.closest('.renderer-card.manage-mode .manage-checkbox');
+                    if (checkbox) {
+                        e.stopPropagation(); // 阻止事件冒泡到卡片本身，避免触发编辑
+                        const card = checkbox.closest('.renderer-card');
+                        const itemId = parseInt(card.dataset.itemId, 10);
+                        const index = state.renderersToDelete.indexOf(itemId);
+                        if (checkbox.checked) {
+                            if (index === -1) state.renderersToDelete.push(itemId);
+                        } else {
+                            if (index > -1) state.renderersToDelete.splice(index, 1);
+                        }
+                        card.classList.toggle('manage-selected', checkbox.checked);
+                        return; // 处理完毕，直接返回
+                    }
+
                     const target = e.target.closest('[data-action]');
                     if(target && target.matches(FAB_ADD_NOTE_SELECTOR) && isLongPress) {
                         isLongPress = false; // 重置标志
@@ -14066,13 +14699,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     
                     if (target && actions[target.dataset.action]) {
-                        // 如果是复制备忘录按钮，阻止事件冒泡，防止打开备忘录
                         if (target.dataset.action === 'copy-note-text') {
-                             e.stopPropagation(); // 阻止事件冒泡到父级的 open-note 处理器
+                             e.stopPropagation();
                         }
-                        actions[target.dataset.action](target, e); // 传递完整的事件对象
+                        actions[target.dataset.action](target, e);
                     }
                 });
+
                 // [重构] 可向下展开的标签栏交互
                 const tagActionsToggleBtn = document.getElementById('tag-actions-toggle-btn');
                 const tagActionsWrapper = document.getElementById('tag-actions-wrapper');
@@ -15262,10 +15895,27 @@ document.addEventListener('DOMContentLoaded', () => {
     async function getSecureFileUrl(path) {
         if (!path) return '';
 
+        // [新增] 辅助函数，根据文件路径获取MIME类型
+        const getMimeTypeFromPath = (filePath) => {
+            const extension = (filePath.split('.').pop() || '').toLowerCase();
+            switch (extension) {
+                case 'mp3': return 'audio/mpeg';
+                case 'm4a': return 'audio/mp4';
+                case 'html':
+                case 'htm': return 'text/html';
+                case 'jpg':
+                case 'jpeg': return 'image/jpeg';
+                case 'png': return 'image/png';
+                case 'gif': return 'image/gif';
+                case 'webp': return 'image/webp';
+                // 默认返回通用二进制流类型
+                default: return 'application/octet-stream';
+            }
+        };
+
         // 1. 优先从本次会话的内存缓存中读取 (最快)
         if (secureFileCache.has(path)) {
             const cached = secureFileCache.get(path);
-            // 如果缓存的是一个Promise，等待它完成
             if (typeof cached.then === 'function') {
                 return await cached;
             }
@@ -15277,7 +15927,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cachedBlob = await ImageCacheDB.get(path);
             if (cachedBlob) {
                 const blobUrl = URL.createObjectURL(cachedBlob);
-                secureFileCache.set(path, blobUrl); // 存入内存缓存，方便本次会话后续快速访问
+                secureFileCache.set(path, blobUrl);
                 return blobUrl;
             }
         } catch (e) {
@@ -15287,7 +15937,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. 如果 IndexedDB 中也没有，则发起网络请求
         const fetchPromise = new Promise(async (resolve) => {
             try {
-                if (!path.startsWith('projects/') && !path.startsWith('memory/')) {
+                // 如果路径不是 projects/ 或 memory/ 开头，则假定它是外部URL并直接返回
+                if (!path.startsWith('projects/') && !path.startsWith('memory/') && !path.startsWith('opening_voices/')) {
                     resolve(path);
                     return;
                 }
@@ -15302,27 +15953,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(`Could not get blob content for ${path}. ${blobError || 'No content returned.'}`);
                 }
                 
-                const contentType = path.toLowerCase().endsWith('.html') || path.toLowerCase().endsWith('.htm') ? 'text/html' : (metaData.type || 'application/octet-stream');
+                // [核心修改] 调用新的辅助函数来获取正确的MIME类型
+                const contentType = getMimeTypeFromPath(path);
                 const blob = b64toBlob(blobData.content, contentType);
 
                 // 4. [核心] 将获取到的数据存入 IndexedDB
                 ImageCacheDB.set(path, blob).catch(e => console.warn('存入IndexedDB失败:', e));
 
                 const blobUrl = URL.createObjectURL(blob);
-                secureFileCache.set(path, blobUrl); // 确保内存缓存也被更新
+                secureFileCache.set(path, blobUrl);
                 resolve(blobUrl);
 
             } catch (error) {
                 console.error(`获取安全文件URL失败: ${path}`, error);
-                secureFileCache.delete(path); // 从内存缓存中移除失败的条目
-                resolve(''); // 返回空字符串，防止界面出错
+                secureFileCache.delete(path);
+                resolve('');
             }
         });
 
-        // 将Promise存入内存缓存，防止对同一资源发起重复网络请求
         secureFileCache.set(path, fetchPromise);
         return await fetchPromise;
     }
+
 
         function checkAppUpdate() {
             const helpPage = document.getElementById('help-page-2');
@@ -15341,18 +15993,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
 
- window.addEventListener('load', async () => {
+ document.addEventListener('DOMContentLoaded', async () => {
+        // [核心修改] 1. 将事件从 'load' 改为 'DOMContentLoaded'
+        
+        // [核心修改] 2. 立即加载 GitHub 配置并触发开场语音
+        loadGithubConfig();
+        playOpeningVoice();
+
+        // 后续的初始化逻辑保持不变，但现在它们会更快地执行
         try {
             await ImageCacheDB.init();
         } catch (e) {
             console.error(e);
             alert("本地图片缓存功能启动失败，图片加载速度可能会变慢。");
         }
-        loadGithubConfig();
         checkAppUpdate();
         await loadInitialData();
         setupModals();
-        BaiduNetdisk.init(); // <-- 将初始化调用移到这里
+        BaiduNetdisk.init();
+
+        const voiceCapsuleBtn = document.querySelector('[data-target="widget-page-voice"]');
+        if (voiceCapsuleBtn) {
+            voiceCapsuleBtn.addEventListener('click', () => OpeningVoiceManager.init());
+        }
+        
         MemoryApp.init();
         WanderView.init();
         setupBgImageManager();
@@ -15361,22 +16025,18 @@ document.addEventListener('DOMContentLoaded', () => {
         setupColorSync(colorModal.pickerD2, colorModal.hexD2, 'dayColor2');
         setupColorSync(colorModal.pickerN1, colorModal.hexN1, 'nightColor1'); 
         setupColorSync(colorModal.pickerN2, colorModal.hexN2, 'nightColor2');
-        // [新增] 为十六进制输入框绑定同步事件
         setupHexInputSync(colorModal.hexD1, colorModal.pickerD1, 'dayColor1');
         setupHexInputSync(colorModal.hexD2, colorModal.pickerD2, 'dayColor2');
         setupHexInputSync(colorModal.hexN1, colorModal.pickerN1, 'nightColor1');
         setupHexInputSync(colorModal.hexN2, colorModal.pickerN2, 'nightColor2');
 
-        // [核心新增] 将悬浮球初始化移至最后，并增加常驻逻辑
         FloatingBallManager.init();
 
-        // ★ 新增：应用随机CSS预设的逻辑 ★
         const randomCssEnabled = localStorage.getItem('jellyRandomCssEnabled') === 'true';
         if (currentConfig.settings.jellyBall && currentConfig.settings.jellyBall.cssPresets && currentConfig.settings.jellyBall.cssPresets.length > 0 && randomCssEnabled) {
             const presets = currentConfig.settings.jellyBall.cssPresets;
             const randomPreset = presets[Math.floor(Math.random() * presets.length)];
-            currentConfig.settings.jellyBall.customCSS = randomPreset.css; // 同步到当前配置
-            // 注意：这里不需要saveGlobalConfig，因为这只是本次启动的临时效果
+            currentConfig.settings.jellyBall.customCSS = randomPreset.css;
         }
 
         if (currentConfig.settings.jellyBall && currentConfig.settings.jellyBall.enabled) {
@@ -15393,11 +16053,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 confirmBtn.addEventListener('click', () => {
                     modal.classList.remove('show');
                     localStorage.setItem('iosWarningShown', 'true');
-                    // [核心修改] 用户确认iOS提示后，再检查是否需要显示首次引导
                     checkAndShowFirstTimeGuide();
                 }, { once: true });
             } else {
-                // [核心修改] 如果不是iOS或已经提示过，直接检查首次引导
                 checkAndShowFirstTimeGuide();
             }
         }
@@ -15414,17 +16072,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 startBtn.addEventListener('click', () => {
                     guideModal.classList.remove('show');
                     document.getElementById('helpModal').classList.add('show');
-                    document.getElementById('help-tab-0').click(); // 直接跳转到首次配置标签页
+                    document.getElementById('help-tab-0').click();
                     localStorage.setItem('firstTimeGuideShown', 'true');
                 }, { once: true });
             }
         }
 
-        // [修改] 调用 showIosWarning，它现在内部会处理后续的 checkAndShowFirstTimeGuide 调用
         showIosWarning();
 
-
-        // [新增] 监听更新公告标签页的点击
         const updateLogTab = document.querySelector('label[for="help-tab-2"]');
         if (updateLogTab) {
             updateLogTab.addEventListener('click', () => {
@@ -15432,16 +16087,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const updateLogIndicator = document.getElementById('update-log-indicator');
 
                 if (helpPage && updateLogIndicator.classList.contains('show')) {
-                    // 隐藏标签上的红点
                     if (updateLogIndicator) updateLogIndicator.classList.remove('show');
-                    // 隐藏主按钮上的红点
                     document.getElementById('helpBtn').classList.remove('has-update');
-                    // 更新“已读”状态到localStorage
                     const currentUpdateHash = simpleHash(helpPage.innerHTML.trim());
                     localStorage.setItem('lastSeenUpdateHash', String(currentUpdateHash));
                 }
             });
         }
+
 
         /* =============================================================== */
         /* ============== [新增] 拖拽排序功能核心逻辑 V1.0 ============= */
@@ -17724,8 +18377,6 @@ document.addEventListener('DOMContentLoaded', () => {
         PendantManager.init();
         // [V3.0 最终修复] 确保签到管理器在挂件系统之后初始化，保证数据流正确
         CheckInManager.init();
-        PendantVoiceManager.init(); // <-- 新增
-
 
         /* =============================================================== */
         /* ========================= [新增结束] ========================== */
@@ -18418,23 +19069,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    capsuleContainer.addEventListener('click', async (e) => {
+    capsuleContainer.addEventListener('click', (e) => {
         const button = e.target.closest('.capsule-btn');
         if (button) {
-            const targetPage = button.dataset.target;
-            switchHubPage(targetPage, button.dataset.title);
-            
-            // 根据点击的页面执行相应的刷新操作
-            if (targetPage === 'widget-page-usage') {
-                renderUsageLeaderboard();
-            } else if (targetPage === 'widget-page-checkin') {
-                CheckInManager.init();
-            } else if (targetPage === 'widget-page-voice') {
-                // ★★★ 核心新增：当切换到语音页面时，强制重新加载数据并渲染UI ★★★
-                if (typeof PendantVoiceManager !== 'undefined' && PendantVoiceManager.refreshUI) {
-                    await PendantVoiceManager.refreshUI();
-                }
-            }
+            switchHubPage(button.dataset.target, button.dataset.title);
+            if (button.dataset.target === 'widget-page-usage') renderUsageLeaderboard();
+             // [修复] 确保在切换到签到页面时初始化日历，避免UI元素未找到的错误
+            if (button.dataset.target === 'widget-page-checkin') CheckInManager.init();
         }
     });
 
@@ -18974,51 +19615,33 @@ const PendantManager = (() => {
 // [修改] 移除此处的 CheckInManager 初始化，统一由 PendantManager 根据开关状态控制
 // document.addEventListener('DOMContentLoaded', () => { CheckInManager.init(); });
 /* =============================================================== */
-/* ============== [重构] 开屏动画与语音同步播放 V2.0 ============== */
+/* ============== [新增] 开屏动画消失控制逻辑 V1.0 ============== */
 /* =============================================================== */
 
 // 1. 获取开屏动画的元素
 const splashScreen = document.getElementById('splash-screen');
 
+// 2. 只有在开屏动画元素存在时才执行后续逻辑
 if (splashScreen) {
-    // 2. 定义隐藏动画的函数
+    // 3. 定义一个函数来隐藏开屏动画
     const hideSplashScreen = () => {
-        if (splashScreen) {
-            splashScreen.classList.add('hidden');
-            splashScreen.addEventListener('transitionend', () => {
-                if (splashScreen) splashScreen.remove();
-            }, { once: true });
-        }
-    };
-
-    // 3. 定义一个函数，既播放语音又设置隐藏动画的定时器
-    const playVoiceAndScheduleHide = async () => {
-        // ★★★ 核心新增：直接调用 PendantVoiceManager 的 playOnStartup ★★★
-        if (typeof PendantVoiceManager !== 'undefined' && PendantVoiceManager.playOnStartup) {
-            // 使用 await 等待语音是否能成功播放的尝试
-            await PendantVoiceManager.playOnStartup();
-        }
+        // 添加 .hidden 类来触发CSS中的淡出动画
+        splashScreen.classList.add('hidden');
         
-        // 不管语音是否播放成功，都在3.5秒后隐藏开屏动画
-        setTimeout(hideSplashScreen, 3500);
+        // 4. [推荐] 监听动画过渡结束事件，结束后从DOM中彻底移除该元素，释放资源
+        splashScreen.addEventListener('transitionend', () => {
+            splashScreen.remove();
+        }, { once: true }); // once: true 保证事件只触发一次
     };
 
-    // 4. ★★★ 核心修改：在字体加载动画开始时，就调用这个新函数 ★★★
-    document.addEventListener('DOMContentLoaded', () => {
-        const checkFontLoaded = () => {
-            if (document.body.classList.contains('font-loaded')) {
-                // 一旦字体就绪（即动画开始），立即尝试播放语音
-                playVoiceAndScheduleHide();
-            } else {
-                // 如果字体还未就绪，稍等片刻再检查
-                setTimeout(checkFontLoaded, 100);
-            }
-        };
-        checkFontLoaded();
-    });
+    // 5. 在这里调用隐藏函数。你现有的 `window.addEventListener('load', ...)` 
+    //    的末尾是最佳时机，因为它确保了所有初始化脚本都已执行。
+    //    我们在这里再加一个短暂的延时，给动态内容一个渲染缓冲，体验更佳。
+    setTimeout(hideSplashScreen, 3500); // 延迟2500毫秒
+
 }
 /* =============================================================== */
-/* ========================= [重构结束] ========================== */
+/* ========================= [新增结束] ========================== */
 /* =============================================================== */
 
     </script>
@@ -19318,67 +19941,44 @@ if (splashScreen) {
                     </div> -->
                 </div>
             </div>
+            <!-- 页面3: 留言板 -->
+            <div class="widget-hub-page" id="widget-page-board">
+                <!-- ... 省略留言板内部代码 ... -->
+            </div>
 
-            <!-- [新增] 页面: 语音功能 -->
+            <!-- ============= [修改] 开场语音页面 V2 ============= -->
             <div class="widget-hub-page" id="widget-page-voice">
-                <!-- 语音显示框 -->
-                <div class="voice-list-container" id="voice-list-container">
-                    <!-- JS 动态填充语音列表 -->
-                    <p class="placeholder-content" style="font-size: 14px;">暂无语音，请在下方添加</p>
-                </div>
-
-                <!-- 总开关设置 -->
-                <div class="toggle-section" style="flex-direction: column; align-items: stretch; gap: 12px; padding: 12px;">
-                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-                        <span>开屏时播放语音</span>
-                        <label class="toggle-switch"><input type="checkbox" id="voicePlayOnStartupToggle"><span class="slider"></span></label>
-                    </div>
-                    <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
-                        <span>随机播放</span>
-                        <label class="toggle-switch"><input type="checkbox" id="voiceRandomPlayToggle"><span class="slider"></span></label>
+                <!-- 语音列表展示 -->
+                <div class="pendant-settings-group">
+                    <label>语音列表</label>
+<div id="opening-voice-list" class="voice-list-container-styled">
+                        <p style="text-align: center; color: #889;">暂无语音</p>
                     </div>
                 </div>
 
-                <!-- 添加/编辑语音的折叠区域 -->
+                <!-- 添加语音部分 -->
                 <details open>
-                    <summary>添加/编辑语音</summary>
+                    <summary>添加新语音</summary>
                     <div class="details-content" style="display: flex; flex-direction: column; gap: 15px;">
-                        
-
-                        <div class="form-section">
-                            <label for="voice-subtitle-input">留言</label>
-                            <textarea id="voice-subtitle-input" class="modal-textarea" rows="2" placeholder="这段语音的文字内容"></textarea>
-                        </div>
-                        <div class="form-section">
-                            <label for="voice-speaker-input">留言者</label>
-                            <input type="text" id="voice-speaker-input" class="modal-input" placeholder="例如：水母">
-                        </div>
-
-                        
+                        <!-- [新增] 留言/标题 输入框 -->
+                        <input type="text" id="opening-voice-title" class="modal-input" placeholder="填写留言">
+                        <input type="text" id="opening-voice-speaker" class="modal-input" placeholder="填写留言人">
                         <div class="file-select-wrapper">
-                            <input type="file" id="voice-audio-picker" accept=".mp3,.m4a" style="display: none;">
-                            <button id="voice-upload-audio-btn" class="modal-button">添加语音文件</button>
-                            <span id="voice-audio-status" class="status-text"></span>
+                            <input type="file" id="opening-voice-picker" accept=".mp3,.m4a" style="display: none;">
+                            <button id="upload-opening-voice-btn" class="modal-button" style="flex-grow: 1;">上传语音</button>
                         </div>
-                        
+                        <!-- [新增] 视频转语音功能 -->
                         <div class="file-select-wrapper">
-                            <input type="file" id="voice-video-picker" accept="video/*" style="display: none;">
-                            <button id="voice-upload-video-btn" class="modal-button">视频转语音</button>
-                            <span id="voice-video-status" class="status-text"></span>
+                            <input type="file" id="video-to-voice-picker" accept="video/mp4,video/quicktime,video/webm" style="display: none;">
+                            <button id="video-to-voice-btn" class="modal-button" style="flex-grow: 1;">视频转语音</button>
                         </div>
-                       
-
-                        <div id="voice-upload-progress-container" class="progress-container" style="display: none;">
-                            <div class="progress-bar-wrapper">
-                                <div id="voice-upload-progress-bar" class="progress-bar"></div>
-                            </div>
-                            <button id="voice-upload-cancel-btn" title="取消上传">✖</button>
-                        </div>
-                        
-                        <button id="voice-save-btn" class="modal-button primary" style="color: var(--hold-border);">保存语音</button>
+                        <span id="video-to-voice-status" class="status-text" style="text-align: center; min-height: 20px;"></span>
                     </div>
                 </details>
+                <!-- [移除] 开关设置部分已移至 "设置" 页面 -->
             </div>
+            <!-- ============= [修改结束] ============ -->
+
 
             <!-- 页面4: 页面设置 (重构后) -->
             <div class="widget-hub-page" id="widget-page-settings">
@@ -19472,7 +20072,28 @@ if (splashScreen) {
                         </div>
                     </div>
                 </details>
+                <!-- [新增] 开场语音设置折叠栏 -->
+                <details>
+                    <summary>开场语音设置</summary>
+                    <div class="details-content" style="display: flex; flex-direction: column; gap: 15px;">
+                        <div class="toggle-section">
+                            <span>开屏时播放</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="opening-voice-play-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-section">
+                            <span>随机播放</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="opening-voice-random-toggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </details>
             </div>
+
 
         <!-- 全新的胶囊导航栏 -->
         <div id="widget-hub-capsule">
@@ -19488,13 +20109,12 @@ if (splashScreen) {
                 <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 48 48"> <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C8.68629 2 6 4.68629 6 8V40C6 43.3137 8.68629 46 12 46H36C39.3137 46 42 43.3137 42 40V8C42 4.68629 39.3137 2 36 2H12ZM12 8H36V22H12V8ZM36 25H12V28H36V25ZM12 31H36V34H12V31ZM26 37H12V40H26V37Z" fill="#1c1f21"></path> </svg>
                 <span>留言板</span>
             </button>
-            <!-- [新增] 语音功能按钮 -->
-            <button class="capsule-btn" data-target="widget-page-voice" data-title="语音">
-                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 48 48"> <path fill-rule="evenodd" clip-rule="evenodd" d="M44.5 22.8058V36.7697H41.5V26.7336L33.5 28.9154V39.7697H30.5V26.624L44.5 22.8058Z" fill="#1c1f21" data-color="color-2"></path> <path d="M34.6553 6C41.1936 6.00004 46.5 11.3827 46.5 18.0215C46.5 18.8041 46.4157 19.5911 46.2627 20.3799C45.5279 19.8461 44.5896 19.6716 43.7109 19.9111L29.7109 23.7295C28.4058 24.0854 27.5001 25.2712 27.5 26.624V33.0605C24.6087 33.9212 22.5001 36.5987 22.5 39.7695C22.5 41.1623 22.9082 42.4594 23.6094 43.5498C17.8247 40.4299 2.50007 28.7644 2.5 18.0215C2.5 11.3827 7.80196 6.00004 14.3447 6C18.6567 6 21.882 8.74049 24.5 11.8252C27.1224 8.74496 30.3433 6 34.6553 6Z" fill="#1c1f21"></path> <path d="M29.5 43.7697C31.7091 43.7697 33.5 41.9789 33.5 39.7697C33.5 37.5606 31.7091 35.7697 29.5 35.7697C27.2909 35.7697 25.5 37.5606 25.5 39.7697C25.5 41.9789 27.2909 43.7697 29.5 43.7697Z" fill="#1c1f21" data-color="color-2"></path> <path d="M40.5 40.7697C42.7091 40.7697 44.5 38.9789 44.5 36.7697C44.5 34.5606 42.7091 32.7697 40.5 32.7697C38.2909 32.7697 36.5 34.5606 36.5 36.7697C36.5 38.9789 38.2909 40.7697 40.5 40.7697Z" fill="#1c1f21" data-color="color-2"></path> </svg>
+            <button class="capsule-btn" data-target="widget-page-voice" data-title="开场语音">
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 48 48"><path fill-rule="evenodd" clip-rule="evenodd" d="M44.5 22.8058V36.7697H41.5V26.7336L33.5 28.9154V39.7697H30.5V26.624L44.5 22.8058Z" fill="#1c1f21" data-color="color-2"></path><path d="M34.6553 6C41.1936 6.00004 46.5 11.3827 46.5 18.0215C46.5 18.8041 46.4157 19.5911 46.2627 20.3799C45.5279 19.8461 44.5896 19.6716 43.7109 19.9111L29.7109 23.7295C28.4058 24.0854 27.5001 25.2712 27.5 26.624V33.0605C24.6087 33.9212 22.5001 36.5987 22.5 39.7695C22.5 41.1623 22.9082 42.4594 23.6094 43.5498C17.8247 40.4299 2.50007 28.7644 2.5 18.0215C2.5 11.3827 7.80196 6.00004 14.3447 6C18.6567 6 21.882 8.74049 24.5 11.8252C27.1224 8.74496 30.3433 6 34.6553 6Z" fill="#1c1f21"></path><path d="M29.5 43.7697C31.7091 43.7697 33.5 41.9789 33.5 39.7697C33.5 37.5606 31.7091 35.7697 29.5 35.7697C27.2909 35.7697 25.5 37.5606 25.5 39.7697C25.5 41.9789 27.2909 43.7697 29.5 43.7697Z" fill="#1c1f21" data-color="color-2"></path><path d="M40.5 40.7697C42.7091 40.7697 44.5 38.9789 44.5 36.7697C44.5 34.5606 42.7091 32.7697 40.5 32.7697C38.2909 32.7697 36.5 34.5606 36.5 36.7697C36.5 38.9789 38.2909 40.7697 40.5 40.7697Z" fill="#1c1f21" data-color="color-2"></path></svg>
                 <span>语音</span>
             </button>
             <button class="capsule-btn" data-target="widget-page-settings" data-title="页面设置">
-                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24"><path d="m23,13.75v-3.5l-2.384-.841c-.176-.583-.407-1.142-.691-1.668l1.091-2.281-2.475-2.475-2.281,1.091c-.527-.284-1.086-.515-1.668-.691l-.841-2.384h-3.5l-.841,2.384c-.583-.176-1.142-.407-1.668-.691l-2.281-1.091-2.475,2.475,1.091,2.281c-.284-.527-.515,1.086-.691,1.668l-2.384.841v3.5l2.384.841c.176.583.407,1.142.691,1.668l-1.091,2.281,2.475,2.475,2.281-1.091c.527.284,1.086-.515,1.668-.691l.841,2.384h3.5l.841-2.384c.583-.176,1.142-.407,1.668-.691l2.281,1.091,2.475-2.475-1.091-2.281c.284-.527-.515,1.086.691-1.668l2.384-.841Zm-11,2.25c-2.206,0-4-1.794-4-4s1.794-4,4-4,4,1.794,4,4-1.794,4-4,4Z" fill="#1c1f21"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24"><path d="m23,13.75v-3.5l-2.384-.841c-.176-.583-.407-1.142-.691-1.668l1.091-2.281-2.475-2.475-2.281,1.091c-.527-.284-1.086-.515-1.668-.691l-.841-2.384h-3.5l-.841,2.384c-.583-.176-1.142-.407-1.668-.691l-2.281-1.091-2.475,2.475,1.091,2.281c-.284-.527-.515,1.086-.691,1.668l-2.384.841v3.5l2.384.841c.176.583.407,1.142.691,1.668l-1.091,2.281,2.475,2.475,2.281-1.091c.527.284,1.086.515,1.668-.691l.841,2.384h3.5l.841-2.384c.583-.176,1.142-.407,1.668-.691l2.281,1.091,2.475-2.475-1.091-2.281c.284-.527-.515,1.086.691-1.668l2.384-.841Zm-11,2.25c-2.206,0-4-1.794-4-4s1.794-4,4-4,4,1.794,4,4-1.794,4-4,4Z" fill="#1c1f21"></path></svg>
                 <span>设置</span>
             </button>
         </div>
