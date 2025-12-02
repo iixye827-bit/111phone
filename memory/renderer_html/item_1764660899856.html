@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2468 合并小游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        body {
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .score-panel {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        .score-item {
+            background: rgba(255,255,255,0.9);
+            padding: 10px 25px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        .score-label {
+            font-weight: bold;
+            color: #666;
+        }
+        #score {
+            color: #ff7a90;
+            font-size: 1.5rem;
+        }
+        .game-container {
+            width: 320px;
+            height: 320px;
+            background: #bbada0;
+            border-radius: 10px;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .cell {
+            background: #cdc1b4;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #776e65;
+            transition: all 0.2s ease;
+        }
+        .cell-2 { background: #eee4da; color: #776e65; }
+        .cell-4 { background: #ede0c8; color: #776e65; }
+        .cell-8 { background: #f2b179; color: #f9f6f2; }
+        .cell-16 { background: #f59563; color: #f9f6f2; }
+        .cell-32 { background: #f67c5f; color: #f9f6f2; }
+        .cell-64 { background: #f65e3b; color: #f9f6f2; }
+        .cell-128 { background: #edcf72; color: #f9f6f2; box-shadow: 0 0 10px rgba(237,207,114,0.5); }
+        .cell-256 { background: #edcc61; color: #f9f6f2; box-shadow: 0 0 15px rgba(237,204,97,0.6); }
+        .cell-512 { background: #edc850; color: #f9f6f2; box-shadow: 0 0 20px rgba(237,200,80,0.7); }
+        .cell-1024 { background: #edc53f; color: #f9f6f2; box-shadow: 0 0 25px rgba(237,197,63,0.8); }
+        .cell-2048 { background: #edc22e; color: #f9f6f2; box-shadow: 0 0 30px rgba(237,194,46,0.9); }
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .game-over-panel {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .game-over-title {
+            font-size: 2rem;
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+        .game-over-score {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+        }
+        .restart-btn {
+            background: #ff7a90;
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .restart-btn:hover {
+            background: #ff526f;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255,82,111,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="score-panel">
+        <div class="score-item">
+            <span class="score-label">分数: </span>
+            <span id="score">0</span>
+        </div>
+    </div>
+
+    <div class="game-container" id="gameContainer">
+        <!-- 4x4格子动态生成 -->
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <div class="game-over-panel">
+            <h2 class="game-over-title">游戏结束！</h2>
+            <p class="game-over-score">最终得分: <span id="finalScore">0</span></p>
+            <button class="restart-btn" id="restartBtn">再来一局</button>
+        </div>
+    </div>
+
+    <script>
+        const gridSize = 4;
+        let grid = [];
+        let score = 0;
+        let canMove = true;
+
+        const gameContainer = document.getElementById('gameContainer');
+        const scoreEl = document.getElementById('score');
+        const gameOverEl = document.getElementById('gameOver');
+        const finalScoreEl = document.getElementById('finalScore');
+        const restartBtn = document.getElementById('restartBtn');
+
+        function initGame() {
+            grid = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
+            score = 0;
+            canMove = true;
+            gameOverEl.style.display = 'none';
+            scoreEl.textContent = score;
+            createCell();
+            createCell();
+            renderGrid();
+        }
+
+        function renderGrid() {
+            gameContainer.innerHTML = '';
+            grid.forEach(row => {
+                row.forEach(cellValue => {
+                    const cell = document.createElement('div');
+                    cell.className = `cell${cellValue !== 0 ? ' cell-' + cellValue : ''}`;
+                    cell.textContent = cellValue !== 0 ? cellValue : '';
+                    gameContainer.appendChild(cell);
+                });
+            });
+        }
+
+        function createCell() {
+            const emptyCells = [];
+            grid.forEach((row, rowIdx) => {
+                row.forEach((cell, colIdx) => {
+                    if (cell === 0) emptyCells.push([rowIdx, colIdx]);
+                });
+            });
+
+            if (emptyCells.length === 0) return false;
+
+            const [row, col] = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            grid[row][col] = Math.random() < 0.9 ? 2 : 4;
+            return true;
+        }
+
+        function move(direction) {
+            if (!canMove) return;
+
+            let moved = false;
+            let newGrid = JSON.parse(JSON.stringify(grid));
+
+            for (let i = 0; i < gridSize; i++) {
+                let line = direction === 'left' || direction === 'right' 
+                    ? [...newGrid[i]] 
+                    : newGrid.map(row => row[i]);
+
+                line = line.filter(cell => cell !== 0);
+
+                for (let j = 0; j < line.length - 1; j++) {
+                    if (line[j] === line[j + 1]) {
+                        line[j] *= 2;
+                        line[j + 1] = 0;
+                        score += line[j];
+                        moved = true;
+                    }
+                }
+
+                line = line.filter(cell => cell !== 0);
+
+                const emptyCount = gridSize - line.length;
+                if (direction === 'left' || direction === 'up') {
+                    line = [...line, ...Array(emptyCount).fill(0)];
+                } else {
+                    line = [...Array(emptyCount).fill(0), ...line];
+                }
+
+                if (direction === 'left' || direction === 'right') {
+                    newGrid[i] = line;
+                } else {
+                    newGrid.forEach((row, rowIdx) => {
+                        row[i] = line[rowIdx];
+                    });
+                }
+            }
+
+            if (JSON.stringify(newGrid) !== JSON.stringify(grid)) {
+                grid = newGrid;
+                moved = true;
+                renderGrid();
+                scoreEl.textContent = score;
+
+                setTimeout(() => {
+                    if (!createCell()) checkGameOver();
+                }, 100);
+            }
+
+            if (!moved) checkGameOver();
+        }
+
+        function checkGameOver() {
+            for (let i = 0; i < gridSize; i++) {
+                if (grid[i].includes(0)) return;
+            }
+
+            for (let i = 0; i < gridSize; i++) {
+                for (let j = 0; j < gridSize - 1; j++) {
+                    if (grid[i][j] === grid[i][j + 1]) return;
+                }
+            }
+
+            for (let j = 0; j < gridSize; j++) {
+                for (let i = 0; i < gridSize - 1; i++) {
+                    if (grid[i][j] === grid[i + 1][j]) return;
+                }
+            }
+
+            canMove = false;
+            finalScoreEl.textContent = score;
+            gameOverEl.style.display = 'flex';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowUp': move('up'); break;
+                case 'ArrowDown': move('down'); break;
+                case 'ArrowLeft': move('left'); break;
+                case 'ArrowRight': move('right'); break;
+            }
+        });
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                move(dx > 20 ? 'right' : dx < -20 ? 'left' : '');
+            } else {
+                move(dy > 20 ? 'down' : dy < -20 ? 'up' : '');
+            }
+        });
+
+        restartBtn.addEventListener('click', initGame);
+
+        initGame();
+    </script>
+</body>
+</html>
