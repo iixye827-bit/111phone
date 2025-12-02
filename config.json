@@ -7,16 +7,6 @@
       "buttons": []
     },
     {
-      "name": "小手机",
-      "buttons": [
-        {
-          "text": "111",
-          "href": "222",
-          "openExternally": false
-        }
-      ]
-    },
-    {
       "name": "1",
       "buttons": [
         {
@@ -32,6 +22,16 @@
         {
           "text": "333",
           "href": "444",
+          "openExternally": false
+        }
+      ]
+    },
+    {
+      "name": "小手机",
+      "buttons": [
+        {
+          "text": "111",
+          "href": "222",
           "openExternally": false
         }
       ]
