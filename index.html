@@ -5802,6 +5802,21 @@ body.font-loaded .splash-subtitle {
     transition: transform 0.2s ease, border-radius 0.3s ease-out;
 }
 
+/* [新增] 控制图标位置的核心样式 */
+#custom-tool-inner span {
+    position: relative; /* 启用相对定位以便 transform 生效 */
+    transition: transform 0.3s ease-out; /* 平滑过渡 */
+}
+
+#custom-tool-wrapper.snap-left #custom-tool-inner span {
+    transform: translateX(3px); /* 吸附在左侧时，图标向右偏移 */
+}
+
+#custom-tool-wrapper.snap-right #custom-tool-inner span {
+    transform: translateX(-3px); /* 吸附在右侧时，图标向左偏移 */
+}
+
+
 /* 夜间模式 */
 body.dark-mode #custom-tool-inner {
     background: rgba(30, 30, 30, 0.6);
@@ -13145,6 +13160,11 @@ const OpeningVoiceManager = (() => {
                 // [V2 优化] 在返回主页前，先退出所有管理和搜索模式
                 if (state.isMemoManageMode) actions['toggle-memo-manage'](ui.modal.querySelector('[data-action="toggle-memo-manage"]'));
                 if (state.isAlbumManageMode) actions['toggle-album-manage'](ui.modal.querySelector('[data-action="toggle-album-manage"]'));
+                // [新增] 补充渲染器页面的退出管理逻辑
+                if (state.isRendererManageMode) {
+                    actions['toggle-renderer-manage'](ui.modal.querySelector('[data-action="toggle-renderer-manage"]'));
+                }
+
                 // [V2 新增] 退出全局搜索模式
                 if (document.getElementById('global-memo-search-input').style.display !== 'none') {
                     actions['toggle-global-memo-search']();
@@ -13154,6 +13174,7 @@ const OpeningVoiceManager = (() => {
                 state.currentSection = null; 
                 document.getElementById('memory-modal-title').textContent = '记忆'; 
             },
+
 
             'back-to-memo-folders': () => {
                 if (document.getElementById('note-editor-view').classList.contains('active')) {
@@ -14410,7 +14431,6 @@ const OpeningVoiceManager = (() => {
             }
         }
 
-        
         async function openRendererAddModal(itemId = null) {
             const modal = ui.rendererAddModal;
             const titleEl = modal.querySelector('#renderer-modal-title');
@@ -14425,10 +14445,13 @@ const OpeningVoiceManager = (() => {
             
             let currentItem = null;
 
-            // 填充分组下拉建议
+            // [修改] 强制刷新分组下拉建议，确保最新组名可选
             groupDatalist.innerHTML = '';
-            (memoryCache.renderer.groups || []).forEach(group => {
-                groupDatalist.innerHTML += `<option value="${group}">`;
+            const existingGroups = memoryCache.renderer.groups || ['未分组'];
+            existingGroups.forEach(group => {
+                const opt = document.createElement('option');
+                opt.value = group;
+                groupDatalist.appendChild(opt);
             });
 
             if (itemId) {
@@ -14439,7 +14462,6 @@ const OpeningVoiceManager = (() => {
                 titleInput.value = currentItem.title || '';
                 fileStatus.textContent = '重新上传文件或粘贴代码以覆盖';
 
-                // 异步获取并填充HTML内容
                 htmlInput.value = "正在加载内容...";
                 if (currentItem.path) {
                     const { data } = await fetchFromGithub(currentItem.path);
@@ -14450,6 +14472,7 @@ const OpeningVoiceManager = (() => {
 
             } else {
                 titleEl.textContent = '新建渲染卡片';
+                // [修改] 默认选中当前高亮的分组，方便连续添加
                 groupInput.value = state.currentRendererGroup || '未分组';
                 titleInput.value = '';
                 htmlInput.value = '';
@@ -14480,18 +14503,16 @@ const OpeningVoiceManager = (() => {
                 const html = htmlInput.value;
                 if (!html) return alert('HTML内容不能为空！');
 
-                // 如果是新分组，则添加到分组列表
+                // 核心逻辑：如果是新输入的分组，保存到分组列表
                 if (!memoryCache.renderer.groups.includes(group)) {
                     memoryCache.renderer.groups.push(group);
                 }
 
-                // 保存HTML到独立文件
                 const newId = currentItem ? currentItem.id : Date.now();
                 const path = `memory/renderer_html/item_${newId}.html`;
                 const contentB64 = utf8_to_b64(html);
                 await saveToGithub(path, contentB64, `Update renderer item: ${title || newId}`);
 
-                // 更新或创建item对象
                 if (currentItem) {
                     currentItem.title = title;
                     currentItem.path = path;
@@ -14500,18 +14521,17 @@ const OpeningVoiceManager = (() => {
                     memoryCache.renderer.items.push({ id: newId, title, path, group });
                 }
                 
-                state.currentRendererGroup = group; // 切换到新卡片所在的分组
+                state.currentRendererGroup = group; 
 
                 await scheduleSave();
-                renderRendererGroups();
-                await renderRendererItems();
+                renderRendererGroups(); // 刷新分组导航
+                await renderRendererItems(); // 刷新卡片列表
                 modal.classList.remove('show');
                 showTopToast('保存成功！', 2000);
             };
 
             modal.classList.add('show');
         }
-
 
         async function openRendererItemViewer(itemId) {
             const item = memoryCache.renderer?.items.find(i => i.id === itemId);
@@ -19878,7 +19898,7 @@ if (splashScreen) {
         </div>
     </div>
 <div id="custom-tool-wrapper">
-  <div id="custom-tool-inner">✦</div>
+  <div id="custom-tool-inner"><span>✦</span></div>
 </div>
 <!-- ===== [重构] 全新挂件设置悬浮窗 V2.0 ===== -->
 <div class="modal-overlay" id="pendant-settings-modal">
