@@ -9,7 +9,7 @@
   ],
   "settings": {
     "paginationEnabled": true,
-    "themeStyle": "glass",
+    "themeStyle": "neumorphism",
     "jellyBall": {
       "enabled": true,
       "swipeBack": true,
@@ -22,7 +22,7 @@
     },
     "fontPresets": [],
     "pendant": {
-      "enabled": true,
+      "enabled": false,
       "lineLength": "5rem",
       "lineColor": "#000000",
       "shapeContent": "☁️"
@@ -38,9 +38,6 @@
     "checkinSettings": {
       "headerColor": "#8B4513",
       "cardColor": "#ffffff"
-    },
-    "mobileMode": {
-      "enabled": false
     }
   },
   "themePresets": [
