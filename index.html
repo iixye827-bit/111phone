@@ -1282,6 +1282,7 @@ body.dragging-active {
     box-shadow: 0 0 18px 4px var(--hold-border, #63b3ed) !important; /* 关键的蓝色光晕特效 */
     transition: all 0.2s ease-in-out;
 }
+
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
@@ -5809,11 +5810,11 @@ body.font-loaded .splash-subtitle {
 }
 
 #custom-tool-wrapper.snap-left #custom-tool-inner span {
-    transform: translateX(3px); /* 吸附在左侧时，图标向右偏移 */
+    transform: translateX(4px); /* 吸附在左侧时，图标向右偏移 */
 }
 
 #custom-tool-wrapper.snap-right #custom-tool-inner span {
-    transform: translateX(-3px); /* 吸附在右侧时，图标向左偏移 */
+    transform: translateX(-4px); /* 吸附在右侧时，图标向左偏移 */
 }
 
 
@@ -6013,6 +6014,42 @@ body.theme-glass .voice-play-btn:active {
     color: var(--hold-border);
 }
 
+/* =============================================================== */
+/* ========================= [新增结束] ========================== */
+/* =============================================================== */
+/* [新增] 按钮加载中状态的转圈样式 */
+.modal-button.loading {
+    color: transparent !important; /* 隐藏原始文字 */
+    pointer-events: none; /* 防止重复点击 */
+    position: relative;
+}
+
+.modal-button.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px; /* 圆圈大小 */
+    height: 20px; /* 圆圈大小 */
+    margin-top: -10px; /* (height / 2) */
+    margin-left: -10px; /* (width / 2) */
+    border: 3px solid rgba(128, 128, 128, 0.2);
+    border-top-color: var(--hold-border); /* 使用主题色作为旋转部分的颜色 */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+/* =============================================================== */
+/* =========== [新增] 修复云盘操作栏被压缩的问题 ============ */
+/* =============================================================== */
+#cloud-drive-section .list-container > .modal-select,
+#cloud-drive-section .list-container > .file-upload-section,
+#cloud-drive-section .list-container > #tag-actions-wrapper {
+    flex-shrink: 0; /* 核心：禁止这些元素在Flex布局中被纵向压缩 */
+}
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
@@ -14224,53 +14261,84 @@ const OpeningVoiceManager = (() => {
             ui.fileListStatus.style.display = 'block';
             ui.fileListStatus.textContent = '正在根据标签筛选文件...';
             
-            const filesWithMatchingTags = [];
+            const matchingFilePaths = [];
             
-            // 遍历 driveTags 映射，效率更高
+            // 步骤 1: 收集所有匹配的文件路径
             for (const path in memoryCache.driveTags) {
                 const fileTags = memoryCache.driveTags[path];
-                // 检查文件是否包含所有被选中的标签 (AND逻辑)
                 const hasAllTags = tagIds.every(id => fileTags.includes(id));
                 
                 if (hasAllTags) {
-                    // 模拟一个 file 对象，以便复用渲染逻辑
-                    const fileName = path.split('/').pop();
-                    filesWithMatchingTags.push({
-                        name: fileName,
-                        path: path,
-                        // size 和 date 暂时无法直接获取，可以留空或显示占位符
-                        size: null, 
-                        sha: null // SHA 也未知，删除等操作将不可用
-                    });
+                    matchingFilePaths.push(path);
                 }
             }
 
-            if (filesWithMatchingTags.length === 0) {
+            if (matchingFilePaths.length === 0) {
                 ui.fileListStatus.textContent = '未找到包含所有选中标签的文件。';
+                return;
+            }
+
+            ui.fileListStatus.textContent = `已找到 ${matchingFilePaths.length} 个文件，正在获取详细信息...`;
+
+            // 步骤 2: 异步并行获取所有文件的元数据
+            const fileDataPromises = matchingFilePaths.map(path => 
+                fetchFromGithub(path).then(({data}) => data).catch(() => null)
+            );
+            const filesWithData = (await Promise.all(fileDataPromises)).filter(Boolean);
+
+            if (filesWithData.length === 0) {
+                ui.fileListStatus.textContent = '无法获取文件信息，请检查网络。';
                 return;
             }
 
             ui.fileListStatus.style.display = 'none';
 
-            // 直接在主文件列表区域渲染结果
-            for (const file of filesWithMatchingTags) {
+            // 步骤 3: 渲染列表，复用原有的渲染逻辑
+            for (const file of filesWithData) {
                 const li = document.createElement("li");
-                const metaText = '大小未知 • 日期未知';
+                
+                // [核心修复] 调用已有的辅助函数来获取大小和日期
+                const sizeText = formatFileSize(file.size); 
+                const dateText = await getLatestCommitDate(file.path);
+                const metaText = `${sizeText} • ${dateText}`;
+                
+                // 获取文件的标签信息
+                const fileTags = memoryCache.driveTags?.[file.path] || [];
+                let tagsHtml = '';
+                if (fileTags.length > 0) {
+                    const tagNames = fileTags.map(tagId => {
+                        const tag = memoryCache.allTags.find(t => t.id === tagId);
+                        return tag ? tag.name : null;
+                    }).filter(Boolean);
+                    
+                    tagsHtml = `<span class="file-tags">${tagNames.map(name => `<span class="file-tag-item">${name}</span>`).join('')}</span>`;
+                }
 
-                li.innerHTML = `<div class="file-info">
+                // [核心修复] 使用与`fetchFilesForSelectedProject`相同的HTML结构
+                li.innerHTML = `<input type="checkbox" class="file-manage-checkbox" data-path="${file.path}">
+                                <div class="file-info">
                                     <div class="file-main-info">
                                         <span class="file-name">${file.name}</span>
                                         <div class="file-meta-tags-wrapper">
-                                            <span class="file-meta">${metaText}</span>
+                                            <span class="file-meta" data-path="${file.path}">${metaText}</span>
+                                            ${tagsHtml}
                                         </div>
                                     </div>
                                 </div>
-                                <!-- 筛选结果不支持删除 -->`;
+                                <button class="delete-btn" data-sha="${file.sha}">&times;</button>`;
                 
-                li.querySelector(".file-info").addEventListener("click", () => forceDownload(file.path, file.name, li));
                 ui.fileList.appendChild(li);
+
+                li.querySelector(".file-info").addEventListener("click", () => forceDownload(file.path, file.name, li));
+
+                // [修复] 确保删除按钮在标签视图中也能工作
+                const deleteBtn = li.querySelector(".delete-btn");
+                if (deleteBtn) {
+                     deleteBtn.addEventListener("click", () => deleteFile(file.path, file.sha, li));
+                }
             }
         }
+
 
         // 批量为文件添加标签
         async function addTagsToSelectedFiles() {
@@ -14777,10 +14845,14 @@ const OpeningVoiceManager = (() => {
                             });
                             // 恢复显示当前项目的文件列表
                             fetchFilesForSelectedProject();
+                            
+                            // [核心修复] 在重 置后也关闭模态框
+                            viewByTagModal.classList.remove('show');
                             return; // 处理完毕
                         }
                     });
                 }
+
 
                 // [新增] 打开导入备忘录模态框的函数 (V3 - 优化UI和格式处理)
                 const openMemoImportModal = () => {
@@ -16347,15 +16419,18 @@ const OpeningVoiceManager = (() => {
 
                     const allCategory = newCategoryOrder.find(c => c.name === '全部');
                     const otherCategories = newCategoryOrder.filter(c => c.name !== '全部');
+                    // [核心修复] 确保 "全部" 分类始终在第一位
                     if (allCategory) {
                         currentConfig.categories = [allCategory, ...otherCategories];
                     } else {
+                        // 如果 "全部" 不存在（理论上不应该），则按拖拽后的顺序
                         currentConfig.categories = newCategoryOrder;
                     }
                 }
                 
                 saveGlobalConfig('Reorder items via drag and drop');
             }
+
 
             // 公开的初始化方法
             return {
@@ -18772,49 +18847,76 @@ const MessageBoardManager = (() => {
     }
 
     async function saveMessage() {
-        const title = ui.titleInput.value.trim();
-        if (!title) return alert('标题不能为空！');
+        // [核心修改] 获取按钮元素
+        const saveButton = ui.saveBtn;
         
-        const messageData = await DataManager.get('messageBoardData');
-        
-        let message;
-        if (isEditing) {
-            const index = messageData.messages.findIndex(m => m.id === editingMessageId);
-            if (index > -1) message = messageData.messages[index];
-            else isEditing = false;
-        }
-        
-        if (!isEditing) {
-            message = { id: Date.now(), isCompleted: false };
-        }
-        
-        message.title = title;
-        message.linkedProjectHref = ui.linkProjectSelect.value;
-        message.reminder = {
-            enabled: ui.reminderToggle.checked,
-            time: ui.reminderTimeInput.value,
-            isAllDay: ui.allDayToggle.checked,
-            type: document.querySelector('input[name="reminder-type"]:checked').value
-        };
+        // [核心修改] 进入加载状态
+        saveButton.classList.add('loading');
+        saveButton.disabled = true;
 
-        if (pendingBgImageDataUrl) {
-            if (pendingBgImageDataUrl === 'CLEARED') delete message.background;
-            else message.background = pendingBgImageDataUrl;
-        }
+        try {
+            const title = ui.titleInput.value.trim();
+            if (!title) {
+                alert('标题不能为空！');
+                throw new Error("Title is empty"); // 抛出错误以进入 finally
+            }
+            
+            const messageData = await DataManager.get('messageBoardData');
+            
+            let message;
+            if (isEditing) {
+                const index = messageData.messages.findIndex(m => m.id === editingMessageId);
+                if (index > -1) {
+                    message = messageData.messages[index];
+                } else {
+                    // 如果找不到正在编辑的留言，则转为添加新留言
+                    isEditing = false;
+                    message = { id: Date.now(), isCompleted: false };
+                }
+            } else {
+                message = { id: Date.now(), isCompleted: false };
+            }
+            
+            message.title = title;
+            message.linkedProjectHref = ui.linkProjectSelect.value;
+            message.reminder = {
+                enabled: ui.reminderToggle.checked,
+                time: ui.reminderTimeInput.value,
+                isAllDay: ui.allDayToggle.checked,
+                type: document.querySelector('input[name="reminder-type"]:checked').value
+            };
 
-        if (isEditing) {
-            const index = messageData.messages.findIndex(m => m.id === editingMessageId);
-            messageData.messages[index] = message;
-        } else {
-            messageData.messages.push(message);
-        }
+            if (pendingBgImageDataUrl) {
+                if (pendingBgImageDataUrl === 'CLEARED') delete message.background;
+                else message.background = pendingBgImageDataUrl;
+            }
 
-        await DataManager.save('messageBoardData', isEditing ? 'Edit message' : 'Add new message');
-        PendantManager.updateReminderAnimation(); // ★ 核心修复：立即更新挂件状态
-        ui.modal.classList.remove('show');
-        renderBoard();
-        showTopToast(isEditing ? '留言已更新' : '留言已添加', 2000);
+            if (isEditing) {
+                const index = messageData.messages.findIndex(m => m.id === editingMessageId);
+                messageData.messages[index] = message;
+            } else {
+                messageData.messages.push(message);
+            }
+
+            await DataManager.save('messageBoardData', isEditing ? 'Edit message' : 'Add new message');
+            PendantManager.updateReminderAnimation(); 
+            ui.modal.classList.remove('show');
+            renderBoard();
+            showTopToast(isEditing ? '留言已更新' : '留言已添加', 2000);
+
+        } catch (error) {
+            // 如果不是因为用户输入为空导致的错误，可以给出提示
+            if (error.message !== "Title is empty") {
+                showTopToast('保存失败，请稍后再试', 3000);
+                console.error("Failed to save message:", error);
+            }
+        } finally {
+            // [核心修改] 无论成功或失败，最后都恢复按钮状态
+            saveButton.classList.remove('loading');
+            saveButton.disabled = false;
+        }
     }
+
 
     // [需求新增] 删除留言的函数
     async function deleteMessage() {
