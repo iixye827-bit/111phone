@@ -179,20 +179,12 @@
       {
         "id": 1765102207111,
         "albumId": 1761067926618,
-        "type": "photoset",
+        "type": "photo",
         "title": "",
         "description": "",
         "timestamp": 1765102207111,
-        "photos": [
-          {
-            "path": "memory/photos/1765102209030_i98gp2lc.jpg",
-            "sha": "34a5240d698f4ebddd95d8fba3ef4f8afe90689e"
-          },
-          {
-            "path": "memory/photos/1765102216906_77b94leg.jpg",
-            "sha": "5e151a50400d4991adc401f145db9a0e9e2f1ca8"
-          }
-        ]
+        "path": "memory/photos/1765102216906_77b94leg.jpg",
+        "sha": "5e151a50400d4991adc401f145db9a0e9e2f1ca8"
       }
     ]
   },
