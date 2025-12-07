@@ -169,6 +169,16 @@
             "sha": "25ea36bd66b47fa989878d07e60cc394e7e11434"
           }
         ]
+      },
+      {
+        "id": 1765099920482,
+        "albumId": 1760872799858,
+        "type": "photo",
+        "title": "",
+        "description": "",
+        "timestamp": 1765099920482,
+        "path": "memory/photos/1765099909820_8zy3rmo2.gif",
+        "sha": "629cd3dd9028921fccc6a0385eea2335821a577c"
       }
     ]
   },
