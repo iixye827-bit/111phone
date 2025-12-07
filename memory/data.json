@@ -148,16 +148,14 @@
         "timestamp": 1765094681062,
         "photos": [
           {
-            "path": "memory/photos/1765094682449_z5t4vszu.gif",
-            "sha": "629cd3dd9028921fccc6a0385eea2335821a577c"
-          },
-          {
             "path": "memory/photos/1765094695048_2pwdv8kl.jpeg",
-            "sha": "25ea36bd66b47fa989878d07e60cc394e7e11434"
+            "sha": "25ea36bd66b47fa989878d07e60cc394e7e11434",
+            "timestamp": 1765097552380
           },
           {
             "path": "memory/photos/1765094697580_98m64j9z.jpeg",
-            "sha": "a48c5a3537096da1689ca47cc1b8f27a163820cf"
+            "sha": "a48c5a3537096da1689ca47cc1b8f27a163820cf",
+            "timestamp": 1765097552380
           }
         ]
       }
