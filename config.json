@@ -5,53 +5,13 @@
     {
       "name": "全部",
       "buttons": []
-    },
-    {
-      "name": "小手机",
-      "buttons": [
-        {
-          "text": "111",
-          "href": "222",
-          "openExternally": false
-        },
-        {
-          "text": "章鱼喷墨机",
-          "href": "projects/章鱼喷墨机/index.html",
-          "openExternally": false
-        },
-        {
-          "text": "喷墨机",
-          "href": "projects/喷墨机/index.html",
-          "openExternally": false
-        }
-      ]
-    },
-    {
-      "name": "123456",
-      "buttons": [
-        {
-          "text": "333",
-          "href": "444",
-          "openExternally": false
-        }
-      ]
-    },
-    {
-      "name": "1",
-      "buttons": [
-        {
-          "text": "222",
-          "href": "34343",
-          "openExternally": false
-        }
-      ]
     }
   ],
   "settings": {
     "paginationEnabled": true,
-    "themeStyle": "glass",
+    "themeStyle": "neumorphism",
     "jellyBall": {
-      "enabled": true,
+      "enabled": false,
       "swipeBack": true,
       "functions": {},
       "customCSS": ""
@@ -62,7 +22,7 @@
     },
     "fontPresets": [],
     "pendant": {
-      "enabled": true,
+      "enabled": false,
       "lineLength": "5rem",
       "lineColor": "#000000",
       "shapeContent": "☁️"
