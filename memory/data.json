@@ -123,68 +123,11 @@
         "id": 1762430491086,
         "albumId": 1760872799858,
         "type": "photo",
-        "title": "111",
+        "title": "",
         "description": "",
         "timestamp": 1762430491086,
-        "path": "memory/photos/1765101433406_uz8ll4wk.jpg",
-        "sha": "34a5240d698f4ebddd95d8fba3ef4f8afe90689e"
-      },
-      {
-        "id": 1764946315284,
-        "albumId": 1760872799858,
-        "type": "photo",
-        "title": "",
-        "description": "",
-        "timestamp": 1764946315284,
-        "path": "memory/photos/1764946261041_er2hah1y.mov",
-        "sha": "e1e4a2ce198d7047cd52d3fe69230dc9fd19004f"
-      },
-      {
-        "id": 1765094681062,
-        "albumId": 1761067926618,
-        "type": "photoset",
-        "title": "",
-        "description": "",
-        "timestamp": 1765094681062,
-        "photos": [
-          {
-            "path": "memory/photos/1765094697580_98m64j9z.jpeg",
-            "sha": "a48c5a3537096da1689ca47cc1b8f27a163820cf",
-            "timestamp": 1765097552380
-          },
-          {
-            "path": "memory/photos/1765098910137_mx8r4kc9.jpeg",
-            "sha": "25ea36bd66b47fa989878d07e60cc394e7e11434"
-          },
-          {
-            "path": "memory/photos/1765099696990_dcg5oy7x.gif",
-            "sha": "629cd3dd9028921fccc6a0385eea2335821a577c"
-          },
-          {
-            "path": "memory/photos/1765103119491_35odh2lr.jpeg",
-            "sha": "12fdde830e01205743e2297966faf95a5b1e7e11"
-          }
-        ]
-      },
-      {
-        "id": 1765099920482,
-        "albumId": 1760872799858,
-        "type": "photo",
-        "title": "",
-        "description": "",
-        "timestamp": 1765099920482,
-        "path": "memory/photos/1765099909820_8zy3rmo2.gif",
-        "sha": "629cd3dd9028921fccc6a0385eea2335821a577c"
-      },
-      {
-        "id": 1765102207111,
-        "albumId": 1761067926618,
-        "type": "photo",
-        "title": "",
-        "description": "",
-        "timestamp": 1765102207111,
-        "path": "memory/photos/1765102216906_77b94leg.jpg",
-        "sha": "5e151a50400d4991adc401f145db9a0e9e2f1ca8"
+        "path": "memory/photos/1762430466232_92betb27.jpg",
+        "sha": "43b6579ff91d696e563e3763a29bb7ce0ac0bcef"
       }
     ]
   },
