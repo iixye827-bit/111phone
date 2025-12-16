@@ -4,7 +4,13 @@
   "categories": [
     {
       "name": "全部",
-      "buttons": []
+      "buttons": [
+        {
+          "text": "raven",
+          "href": "https://raven7-7.github.io/Crow/",
+          "openExternally": false
+        }
+      ]
     },
     {
       "name": "小手机",
@@ -49,7 +55,8 @@
       "enabled": true,
       "swipeBack": true,
       "functions": {},
-      "customCSS": ""
+      "customCSS": "",
+      "cssPresets": []
     },
     "globalFont": {
       "name": "",
