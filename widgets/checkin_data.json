@@ -22,6 +22,6 @@
     "value": "#ffffff"
   },
   "reminder": {
-    "enabled": true
+    "enabled": false
   }
 }
