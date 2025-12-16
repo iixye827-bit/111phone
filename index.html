@@ -19925,11 +19925,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setupColorSync(checkinCardColorPicker, checkinCardColorHex, 'cardColor');
 
     // [新增] 补卡功能逻辑
-    const retroBtn = document.getElementById('retroactive-checkin-btn');
-    const retroInput = document.getElementById('retroactive-date-picker');
-    if (retroBtn && retroInput) {
-        retroBtn.addEventListener('click', () => retroInput.showPicker ? retroInput.showPicker() : retroInput.click());
-        retroInput.addEventListener('change', async (e) => {
+    const retroInput = document.getElementById('retroactive-date-picker'); // 只需要获取 input 元素
+    if (retroInput) {
+        // [核心修改] 移除按钮的点击事件，因为 input 自身会处理点击
+        retroInput.addEventListener('change', async (e) => { // 只保留 input 的 change 事件监听
             const dateVal = e.target.value;
             if (!dateVal) return;
             const checkInData = await DataManager.get('checkInData');
@@ -19945,6 +19944,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.value = ''; // 重置选择器
         });
     }
+
 
 });
 
@@ -20824,9 +20824,20 @@ if (splashScreen) {
                             </div>
                         </div>
                         <!-- [新增] 补卡功能 -->
-                        <div class="toggle-section" style="margin-top: 10px; justify-content: center;">
+                        <!-- [核心修改] 将日期选择器覆盖在按钮上 -->
+                        <div class="toggle-section" style="margin-top: 10px; justify-content: center; position: relative;"> <!-- 父容器设置为相对定位 -->
                             <button id="retroactive-checkin-btn" class="modal-button" style="width: 100%;">📅 补卡</button>
-                            <input type="date" id="retroactive-date-picker" style="display: none;">
+                            <!-- 日期选择器设置为绝对定位，透明覆盖按钮 -->
+                            <input type="date" id="retroactive-date-picker" style="
+                                position: absolute; 
+                                top: 0; 
+                                left: 0; 
+                                width: 100%; 
+                                height: 100%; 
+                                opacity: 0; 
+                                z-index: 1; /* 确保它在按钮上方 */
+                                cursor: pointer; /* 保持指针样式，提示可点击 */
+                            ">
                         </div>
 
                     </div>
