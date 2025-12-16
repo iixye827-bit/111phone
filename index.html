@@ -594,7 +594,9 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
         }
         
         /* ----- [新增结束] ----- */
-
+        /* [新增] 照片编辑模态框预览图样式 */
+        .clickable-thumbnail { cursor: pointer; transition: opacity 0.2s; border: 2px solid transparent; }
+        .clickable-thumbnail:hover { opacity: 0.8; border-color: var(--hold-border); }
 
 /* ===== [END] MEMORY MODAL STYLES ===== */
 
@@ -804,10 +806,16 @@ body.dark-mode .folder-item.manage-selected, body.dark-mode .album-item.manage-s
 
 
         /* ===== [START] FROSTED GLASS THEME ===== */
-        body.theme-glass .modal-overlay,
-        body.theme-glass #memoryPhotoViewerOverlay {
+        body.theme-glass .modal-overlay {
             background: transparent;
         }
+        
+        /* [修复] 全屏看图在磨砂主题下保持深色模糊背景，而不是透明 */
+body.theme-glass #memoryPhotoViewerOverlay {
+    background: transparent;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
 
         body.theme-glass .nav-btn,
         body.theme-glass .title-card,
@@ -3642,19 +3650,21 @@ body.dark-mode #memoryModal .album-item .rename-icon {
     opacity: 1;
 }
 /* ===== [新增] 长图查看器缩放样式 ===== */
-#memoryPhotoViewerOverlay #viewer-img-container {
-    cursor: zoom-in; /* 默认显示放大光标 */
-}
-#viewer-img-container.zoomed-long {
-    align-items: flex-start; /* 切换为顶部对齐 */
-    overflow-y: auto;        /* 允许垂直滚动 */
-    cursor: default;         /* 容器本身恢复默认光标 */
-}
-#viewer-img-container.zoomed-long #viewer-img {
-    max-height: none;        /* 移除最大高度限制 */
-    width: 100%;             /* 宽度占满容器 */
-    cursor: zoom-out;        /* 图片上显示缩小光标 */
-}
+        #memoryPhotoViewerOverlay #viewer-img-container {
+            cursor: zoom-in; /* 默认显示放大光标 */
+            -webkit-overflow-scrolling: touch; /* [新增] iOS优化，使滚动更流畅 */
+        }
+        #viewer-img-container.zoomed-long {
+            align-items: flex-start; /* 切换为顶部对齐 */
+            overflow-y: auto;        /* 允许垂直滚动 */
+            cursor: default;         /* 容器本身恢复默认光标 */
+        }
+        #viewer-img-container.zoomed-long #viewer-img {
+            max-height: none;        /* 移除最大高度限制 */
+            width: 100%;             /* 宽度占满容器 */
+            cursor: zoom-out;        /* 图片上显示缩小光标 */
+        }
+
 /* =============================================================== */
 /* ============= [新增] 备忘录文件夹管理图标样式 =============== */
 /* =============================================================== */
@@ -3726,78 +3736,7 @@ body.dark-mode .folder-item .sort-handle.memo-sort-handle {
 .folder-item .sort-handle.memo-sort-handle:active {
     cursor: grabbing;
 }
-/* =============================================================== */
-/* ============= [新增] 百度网盘集成专属样式 V1.0 =========== */
-/* =============================================================== */
 
-/* 文件夹页面右上角的设置按钮 */
-#memoryModal .page-header .baidu-settings-btn {
-    font-size: 22px; /* 设置一个合适的大小 */
-    padding: 6px;
-    margin-left: auto; /* 核心：将按钮推到最右侧 */
-}
-
-/* 百度网盘设置弹窗内的账户列表 */
-#baidu-account-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    max-height: 250px;
-    overflow-y: auto;
-    border-radius: 10px;
-    padding: 10px;
-    background: var(--bg-day-element);
-    box-shadow: inset 4px 4px 8px var(--shadow-dark-day), inset -4px -4px 8px var(--shadow-light-day);
-}
-body.dark-mode #baidu-account-list {
-    background: var(--bg-night-element);
-    box-shadow: inset 4px 4px 8px var(--shadow-dark-night), inset -4px -4px 8px var(--shadow-light-night);
-}
-
-.baidu-account-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 15px;
-    border-radius: 8px;
-    transition: background-color 0.2s;
-    gap: 15px;
-}
-
-.baidu-account-item:hover {
-    background-color: rgba(0,0,0,0.05);
-}
-body.dark-mode .baidu-account-item:hover {
-    background-color: rgba(255,255,255,0.08);
-}
-
-.baidu-account-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.baidu-account-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: #ccc;
-}
-
-.baidu-account-name {
-    font-weight: 600;
-}
-
-#baidu-auth-status {
-    font-size: 14px;
-    color: #889;
-    text-align: center;
-    margin-top: 15px;
-    min-height: 20px;
-}
-/* =============================================================== */
-/* ========================= [新增结束] ========================== */
-/* =============================================================== */
 /* ========================================================================= */
 /* ============= [重构] 备忘录工具栏 & 字号滑块 V3.0 最终样式 ===== */
 /* ========================================================================= */
@@ -6053,6 +5992,220 @@ body.theme-glass .voice-play-btn:active {
 /* =============================================================== */
 /* ========================= [新增结束] ========================== */
 /* =============================================================== */
+        /* =============================================================== */
+        /* ============= [新增] 照片编辑器预览区域样式 V1.0 =========== */
+        /* =============================================================== */
+
+        #photo-preview-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* 为 iOS 提供流畅的滚动体验 */
+            padding: 10px 0; /* 给容器一些垂直内边距 */
+            margin-bottom: 15px; /* 与下方的输入框保持间距 */
+            scrollbar-width: none; /* Firefox 隐藏滚动条 */
+        }
+
+        #photo-preview-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Edge 隐藏滚动条 */
+        }
+
+        #photo-preview-list {
+            display: flex; /* 关键：使用 Flex 布局实现横向排列 */
+            align-items: center; /* 垂直居中 */
+            justify-content: flex-start; /* [核心修复] 改为 flex-start，始终从左侧开始排列 */
+            gap: 12px; /* 设置项目之间的间距 */
+            padding: 0 15px; /* 为左右两端留出一些空白，避免贴边 */
+            /* [核心修复] min-width 不再需要，它可能反而导致问题 */
+            box-sizing: border-box;
+        }
+
+        /* 添加按钮（虚线框）的样式 */
+        .photo-preview-add-btn {
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0; /* 防止被压缩 */
+            border: 2px dashed #aaa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 300;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .photo-preview-add-btn:hover {
+            border-color: var(--hold-border);
+            color: var(--hold-border);
+            background-color: rgba(128,128,128,0.05);
+        }
+
+        /* 单个照片预览项的容器 */
+        .preview-photo-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            flex-shrink: 0; /* 防止被压缩 */
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .preview-photo-item:hover {
+            transform: scale(1.05); /* 鼠标悬停时轻微放大 */
+        }
+        
+        .preview-photo-item .preview-photo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 保证图片填满容器且不变形 */
+        }
+
+        /* [可选但推荐] 照片删除/替换的浮层图标样式 */
+        .preview-photo-item .photo-actions-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .preview-photo-item.actions-visible .photo-actions-overlay {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .photo-actions-overlay button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        /* ========================= [新增结束] ========================== */
+        /* =============================================================== */
+        /* ============= [新增] HTML预览工具栏样式 V1.0 =============== */
+        /* =============================================================== */
+
+        /* 工具按钮 (三个点) 的样式 */
+        #iframe-tools-btn {
+            position: fixed;            /* 固定定位，相对于浏览器窗口 */
+            bottom: 30px;               /* 距离底部30px */
+            right: 30px;                /* 距离右侧30px */
+            width: 44px;                /* 按钮尺寸 */
+            height: 44px;
+            font-size: 20px;
+            color: white;               /* 图标颜色 */
+            background-color: rgba(40,40,40,0.5); /* 保持与关闭按钮一致的背景色 */
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2010;              /* 确保在iframe之上 */
+            opacity: 0;                 /* 初始隐藏，随预览窗口淡入 */
+            pointer-events: none;       /* 初始不可点击 */
+            transition: all 0.3s ease;
+        }
+
+        /* 当预览窗口激活时，显示工具按钮 */
+        .iframe-modal-overlay.active #iframe-tools-btn {
+            opacity: 0.8;
+            pointer-events: auto;
+        }
+
+        #iframe-tools-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* 导出/复制功能的小菜单样式 */
+        #iframe-tools-menu {
+            position: fixed;
+            bottom: 85px;               /* 定位在工具按钮的上方 */
+            right: 30px;
+            background: var(--bg-day-element);
+            border-radius: 12px;        /* 圆角 */
+            box-shadow: 4px 4px 12px var(--shadow-dark-day), -4px -4px 12px var(--shadow-light-day);
+            padding: 8px;               /* 内边距 */
+            display: none;              /* 默认隐藏 */
+            flex-direction: column;     /* 垂直排列按钮 */
+            gap: 8px;                   /* 按钮间距 */
+            z-index: 2011;              /* 层级比工具按钮更高 */
+            transition: all 0.2s ease;
+            transform-origin: bottom right; /* 从右下角出现/消失 */
+        }
+        
+        #iframe-tools-menu.show {
+            display: flex;
+        }
+
+        /* 夜间模式适配 */
+        body.dark-mode #iframe-tools-menu {
+            background: var(--bg-night-element);
+            box-shadow: 4px 4px 12px var(--shadow-dark-night), -4px -4px 12px var(--shadow-light-night);
+        }
+
+        /* 磨砂玻璃主题适配 */
+        body.theme-glass #iframe-tools-menu {
+             background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+         body.theme-glass.dark-mode #iframe-tools-menu {
+            background: rgba(20, 20, 20, 0.35);
+             border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* 菜单内的按钮样式 */
+        .iframe-tool-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            color: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        /* 鼠标悬停在按钮上时的效果 */
+        .iframe-tool-item:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+        body.dark-mode .iframe-tool-item:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .iframe-tool-item svg {
+            flex-shrink: 0;
+        }
+        /* =============================================================== */
+        /* ========================= [新增结束] ========================== */
+        /* =============================================================== */
 
     </style>
 
@@ -6477,6 +6630,21 @@ body.theme-glass .voice-play-btn:active {
     </div>
         <!-- ★ 在这里新增下面的代码块 ★ -->
         <div class="update-log-entry">
+            <h4>v6.2.0 <span class="update-date">- 2025.12.06</span></h4>
+            <ul>
+        <li><span class="tag release">里程碑</span> 开发了水母岛APP。</li>
+                <li><span class="tag new">新功能</span> 新增渲染器功能模块，可导入或粘贴HTML。</li>
+                <li><span class="tag new">新功能</span> 新增项目分类的排序。</li>
+                <li><span class="tag new">新功能</span> 新增相册已上传照片的修改功能。</li>
+                <li><span class="tag fix">修复</span> 修复最小化悬浮图标偏移的问题。</li>
+                <li><span class="tag fix">修复</span> 修复文件夹按标签查看时无法读取时间的bug。</li>
+                <li><span class="tag fix">修复</span>修复加载文件时标签栏会被压缩的问题。</li>
+                <li><span class="tag fix">修复</span> 修复漫游时无法播放视频的bug。</li>
+                <li><span class="tag opt">优化</span> 优化文件版上传的项目更新流程，现支持上传新文件直接覆盖旧文件，原数据会继承。</li>
+                <li><span class="tag opt">优化</span> 完善留言板的“定期”提醒，可设置小时或日期。</li>
+            </ul>
+        </div>
+        <div class="update-log-entry">
             <h4>v6.1.0 <span class="update-date">- 2025.11.30</span></h4>
             <ul>
                 <li><span class="tag new">新功能</span> 新增开屏动画及开屏自定义语音。</li>
@@ -6672,7 +6840,7 @@ body.theme-glass .voice-play-btn:active {
     </div>
     
     <footer class="update-footer">
-        当前版本: v6.0.1
+        当前版本: v6.2.0
     </footer>
 </div>
                     <div id="help-page-3" class="help-page-content">
@@ -6714,14 +6882,14 @@ body.theme-glass .voice-play-btn:active {
         </button>
         <!-- [新增] 提示框内容 -->
         <div class="info-tooltip-box">
-            部分网站（尤其是需要登录的网站）出于安全策略，禁止在网页内嵌框架（iframe）中打开。若您遇到白屏或无法登录等问题，请开启此开关。
+            部分网站（尤其是需要登录的网站）出于安全策略，禁止在网页内嵌框架（iframe）中打开。若您遇到白屏或无法登录等问题，请开启此开关。iOS设备使用链接版小手机请务必打开。
         </div>
     </div>
     <label class="toggle-switch">
         <input type="checkbox" id="openExternallyToggle">
         <span class="slider"></span>
     </label>
-</div></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div><div class="important-note" style="font-size: 13px; padding: 8px 12px; margin-top: 5px;"><p>上传的项目无法编辑链接，如需更新请删除后重新上传。</p></div></div><button id="createNavBtn" class="modal-button">加入新项目</button><div class="status-text" id="upload-status"></div></div></div></div>
+</div></div><div id="upload-section" class="form-section" style="display: none;"><label>选择项目的主HTML文件</label><div class="file-select-wrapper"><input type="file" id="projectHtmlPicker" accept=".html,.htm" style="display: none;"><button id="filePickerBtn" class="modal-button">选择文件</button><span id="file-picker-status" class="status-text">未选择任何文件</span></div><div class="important-note" style="font-size: 13px; padding: 8px 12px; margin-top: 5px;"><p>您可以重新上传文件以更新现有项目。</p></div></div><button id="createNavBtn" class="modal-button">加入新项目</button><div class="status-text" id="upload-status"></div></div></div></div>
     <div class="modal-overlay" id="settingsModal"><div class="modal-content"><div class="modal-header"><div class="modal-title-group"><span>数据同步</span></div><button class="close-btn" data-modal-id="settingsModal">&times;</button></div><div class="modal-body"><div class="form-section"><label for="githubRepoInput">仓库 (格式: 用户名/仓库名)</label><input type="text" id="githubRepoInput" class="modal-input" placeholder="例如: my-username/JellyfishPhones"></div><div class="form-section"><label for="githubTokenInput">Personal Access Token</label><input type="password" id="githubTokenInput" class="modal-input" placeholder="ghp_xxxxxxxxxx"></div><button id="saveSettingsBtn" class="modal-button">保存配置</button><button id="manualSyncBtn" class="modal-button" style="color:#5a6778; margin-top: 10px;">手动同步与修复</button><!-- [修改] 将"清空所有数据"按钮改为"高级数据清理"，链接到新的选择性清理弹窗 -->
 <div class="nuke-section"><button id="openClearDataModalBtn" class="modal-button" style="color: #e53e3e;">清空所有云端及本地数据</button></div></div></div></div>
     <div class="modal-overlay" id="colorPaletteModal">
@@ -7308,8 +7476,7 @@ body.dark-mode #floating-jellyfish-ball {
                     <div class="page-header">
                         <button data-action="back-to-hub" class="header-btn back-btn">&#10094;</button>
                         <h1 class="title">文件夹</h1>
-                        <!-- [新增] 百度网盘设置按钮 -->
-                        <button data-action="open-baidu-settings" class="header-btn baidu-settings-btn" title="百度网盘设置"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24"><path d="m23,13.75v-3.5l-2.384-.841c-.176-.583-.407-1.142-.691-1.668l1.091-2.281-2.475-2.475-2.281,1.091c-.527-.284-1.086-.515-1.668-.691l-.841-2.384h-3.5l-.841,2.384c-.583.176-1.142.407-1.668.691l-2.281-1.091-2.475,2.475,1.091,2.281c-.284.527-.515,1.086-.691,1.668l-2.384.841v3.5l2.384.841c.176.583.407,1.142.691,1.668l-1.091,2.281,2.475,2.475,2.281-1.091c.527.284,1.086.515,1.668.691l.841,2.384h3.5l.841-2.384c.583-.176,1.142-.407,1.668-.691l2.281,1.091,2.475-2.475-1.091-2.281c.284-.527-.515,1.086.691-1.668l2.384-.841Zm-11,2.25c-2.206,0-4-1.794-4-4s1.794-4,4-4,4,1.794,4,4-1.794,4-4,4Z" stroke-width="0" fill="currentColor"></path></svg></button>
+
                     </div>
                     <div class="list-container">
                         <select id="categorySelector" class="modal-select"></select>
@@ -7382,7 +7549,16 @@ body.dark-mode #floating-jellyfish-ball {
                         <span>创建照片集</span>
                     </label>
                 </div>
-                <img id="upload-thumbnail" src="" alt="upload thumbnail">
+                <!-- [重构] 新增照片预览容器，以支持横向滚动和多图预览 -->
+                <div id="photo-preview-container">
+                    <div id="photo-preview-list">
+                        <!-- 照片预览将由 JavaScript 动态生成到这里 -->
+                    </div>
+                </div>
+
+                <!-- [新增] 用于替换照片的隐藏输入框 (位置不变，功能保留) -->
+                <input type="file" id="photo-replace-input" accept="image/*,video/*" style="display: none;">
+                
                 <input type="text" id="photo-title-input" class="modal-input" placeholder="标题 (选填)">
                 <textarea id="photo-desc-input" class="modal-textarea" placeholder="描述 (选填)"></textarea>
             </div>
@@ -7571,7 +7747,6 @@ body.dark-mode #floating-jellyfish-ball {
         </div>
     </div>
 
-
     <!-- == Iframe Modal & Confirmation Toast == -->
     <div class="iframe-modal-overlay" id="iframeModal">
         <div id="returnConfirmationToast" class="return-toast">
@@ -7584,6 +7759,23 @@ body.dark-mode #floating-jellyfish-ball {
         <div class="iframe-modal-content">
             <iframe id="iframeContent" src="about:blank" frameborder="0" allow="fullscreen" sandbox="allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-downloads"></iframe>
         </div>
+
+        <!-- =========== [新增] HTML预览工具栏按钮和菜单 =========== -->
+        <button id="iframe-tools-btn" class="viewer-btn" title="更多工具">
+            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20px" height="20px" viewBox="0 0 20 20"> <path d="M 5 8 A 2 2 0 1 0 5 12 A 2 2 0 1 0 5 8 Z M 10 8 A 2 2 0 1 0 10 12 A 2 2 0 1 0 10 8 Z M 15 8 A 2 2 0 1 0 15 12 A 2 2 0 1 0 15 8 z" fill="currentColor"></path> </svg>
+        </button>
+        <div id="iframe-tools-menu">
+            <button class="iframe-tool-item" data-action="export-html">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                <span>导出</span>
+            </button>
+            <button class="iframe-tool-item" data-action="copy-html">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 7a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1h-15A.5.5 0 0 1-1 7z"/></svg>
+                <span>复制</span>
+            </button>
+        </div>
+        <!-- ===================== [新增结束] ===================== -->
+        
         <div id="gestureCaptureZone"></div>
         <div class="swipe-hint" id="swipeHint"><div class="arrow"></div><span>从左侧向右滑动关闭</span></div>
     </div>
@@ -8594,7 +8786,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { id: 'album', icon: '🖼️', title: '相册' },
                 { id: 'folder', icon: '📁', title: '文件夹' },
                 { id: 'return', icon: '🔙', title: '返回' },
-                { id: 'fullscreen', icon: '⛶', title: '全屏' },
+                { id: 'fullscreen', icon: '<svg t="1764948016103" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1349" width="19" height="19"><path d="M836.864 659.712h123.392l-3.925333 300.288H661.76V836.864l175.018667-0.085333V659.712z m-649.728 0v177.066667h175.104v123.221333H64V659.712h123.136zM362.24 64v123.136H187.136v177.152H64V64h298.24z m597.76 0v300.288H836.864l-0.085333-177.152H661.76V64h298.24z" fill="#515151" p-id="1350"></path></svg>', title: '全屏' },
                 // [新增] 后台保活功能
                 { id: 'keepAlive', icon: '🎧', title: '后台保活' },
                 { id: 'memo', icon: '📝', title: '备忘录' },
@@ -9576,14 +9768,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             updateSyncStatus('synced', '同步成功！');
+
+            // ============ [核心修复：缓存失效逻辑] ============
+            // 在文件成功保存后，立即清除该路径的所有缓存
+            console.log(`File saved. Invalidating cache for path: ${path}`);
+            if (secureFileCache.has(path)) {
+                secureFileCache.delete(path);
+                console.log(`In-memory cache for "${path}" deleted.`);
+            }
+            ImageCacheDB.delete(path).catch(e => {
+                console.error(`Failed to delete IndexedDB cache for "${path}":`, e);
+            });
+            // =======================================================
             
             // [重要] 返回新的 sha，以便全局变量可以更新
             const newSha = data.content.sha;
             if (path === 'config.json') configSha = newSha;
-            if (path === 'memory/data.json') MemoryApp.updateSha(newSha); // 需要在MemoryApp中添加一个更新sha的函数
+            if (path === 'memory/data.json') MemoryApp.updateSha(newSha);
             
             return { sha: newSha, error: null };
-            
+
         } catch (error) {
             const userMessage = await handleApiError(`写入 ${path}`, error);
             updateSyncStatus('error', userMessage);
@@ -10736,7 +10940,7 @@ async function saveGlobalConfig(commitMessage) {
     });
 
     addNavModalElements.filePickerBtn.addEventListener("click", () => addNavModalElements.projectHtmlPicker.click()); addNavModalElements.projectHtmlPicker.addEventListener("change", () => { if (addNavModalElements.projectHtmlPicker.files.length > 0) { const projectFile = addNavModalElements.projectHtmlPicker.files[0]; addNavModalElements.fileStatus.textContent = `已选择: ${projectFile.name}`; } else { addNavModalElements.fileStatus.textContent = '未选择任何文件'; }});
-    addNavModalElements.createBtn.addEventListener("click",async()=>{
+addNavModalElements.createBtn.addEventListener("click",async()=>{
         const categoryName = addNavModalElements.categoryInput.value.trim() || '全部';
         const name = addNavModalElements.nameInput.value.trim();
         if(!name) return alert("请输入按钮名称。");
@@ -10749,45 +10953,59 @@ async function saveGlobalConfig(commitMessage) {
             if (type === "link") {
                 const url = addNavModalElements.urlInput.value.trim();
                 let finalUrl = url;
-                 try {
-                    new URL(url);
-                } catch (_) {
-                    if (!url.startsWith('https://') && !url.startsWith('http://') && url.includes('.')) {
-                        finalUrl = 'https://' + url;
-                    } else if (!url) {
-                        alert("请输入网址链接。"); throw new Error("URL is required.");
-                    }
+                 try { new URL(url); } catch (_) {
+                    if (!url.startsWith('https://') && !url.startsWith('http://') && url.includes('.')) { finalUrl = 'https://' + url; } 
+                    else if (!url) { alert("请输入网址链接。"); throw new Error("URL is required."); }
                 }
                  newButtonData = { text: name, href: finalUrl, openExternally: addNavModalElements.openExternallyToggle.checked };
             } else if (type === "upload") {
-                 if (isEditingButton) {
-                    alert("已上传的项目无法编辑，请删除后重新上传。"); return;
-                 }
-                 if (!checkConfig()) return;
-                 const projectFile = addNavModalElements.projectHtmlPicker.files[0]; 
-                 if(!projectFile) { alert("请选择一个HTML文件。"); throw new Error("File is required."); }
-                 addNavModalElements.uploadStatus.textContent="正在上传文件...";
-                 const path=`projects/${name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-")||`project-${Date.now()}`}/index.html`;
-                 await uploadFileViaGitData({ file: projectFile, path, commitMessage: `Create project: ${name}`, onProgress: (p) => { addNavModalElements.uploadStatus.textContent = `上传中: ${Math.round(p)}%`; } });
-                 addNavModalElements.uploadStatus.textContent="正在处理...";
-                 newButtonData= { text:name, href: path, openExternally: false }; // **FIX**: Store the path, not the githack URL
-                 alert("项目上传成功！");
+                if (!checkConfig()) return;
+                const projectFile = addNavModalElements.projectHtmlPicker.files[0];
+                let path;
+
+                if (isEditingButton) {
+                    path = editingButtonData.href; // 使用现有项目的路径
+                    if (projectFile) {
+                        // 如果在编辑模式下选择了新文件，则执行覆盖上传
+                        addNavModalElements.uploadStatus.textContent="正在更新文件...";
+                        await uploadFileViaGitData({ 
+                            file: projectFile, 
+                            path: path, 
+                            commitMessage: `Update project: ${name}`, 
+                            onProgress: (p) => { addNavModalElements.uploadStatus.textContent = `上传中: ${Math.round(p)}%`; } 
+                        });
+                        addNavModalElements.uploadStatus.textContent="文件更新成功!";
+                        showTopToast(`项目 "${name}" 的文件已更新！`, 2500);
+                    }
+                    // 无论是否上传文件，都用新的信息（如名称、分类）准备更新配置
+                    newButtonData = { text: name, href: path, openExternally: false };
+
+                } else { // 创建新项目
+                    if (!projectFile) { alert("请选择一个HTML文件。"); throw new Error("File is required."); }
+                    addNavModalElements.uploadStatus.textContent="正在上传文件...";
+                    path = `projects/${name.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]/g,"").replace(/\s+/g,"-")||`project-${Date.now()}`}/index.html`;
+                    await uploadFileViaGitData({ 
+                        file: projectFile, 
+                        path, 
+                        commitMessage: `Create project: ${name}`, 
+                        onProgress: (p) => { addNavModalElements.uploadStatus.textContent = `上传中: ${Math.round(p)}%`; } 
+                    });
+                    newButtonData= { text:name, href: path, openExternally: false };
+                    alert("项目上传成功！");
+                }
             }
             
             let commitMsg;
-            // [修改] 优化编辑逻辑
             if (isEditingButton && editingButtonData) {
                 commitMsg = `Edit button: ${name}`;
                 const oldCategoryName = editingButtonData.categoryName;
                 const oldCategory = currentConfig.categories.find(c => c.name === oldCategoryName);
                 const buttonIndex = oldCategory ? oldCategory.buttons.findIndex(b => b.href === editingButtonData.href) : -1;
-
+                
                 if (oldCategory && buttonIndex > -1) {
                     if (oldCategoryName === categoryName) {
-                        // 类别未变，在原位更新
                         oldCategory.buttons[buttonIndex] = newButtonData;
                     } else {
-                        // 类别改变，从旧类别移除，添加到新类别
                         oldCategory.buttons.splice(buttonIndex, 1);
                         let newCategoryObj = currentConfig.categories.find(c => c.name === categoryName);
                         if (!newCategoryObj) {
@@ -10798,8 +11016,7 @@ async function saveGlobalConfig(commitMessage) {
                     }
                 }
             } else {
-                // 新增按钮逻辑保持不变
-                commitMsg = `Add button: ${name} to ${categoryName}`;
+                 commitMsg = `Add button: ${name} to ${categoryName}`;
                 let categoryObj = currentConfig.categories.find(c => c.name === categoryName);
                 if (!categoryObj) {
                     categoryObj = { name: categoryName, buttons: [] };
@@ -10809,7 +11026,6 @@ async function saveGlobalConfig(commitMessage) {
             }
 
             await saveGlobalConfig(commitMsg); 
-            
             resetAddNavForm(); 
             populateCategoryDatalist();
             renderCategories();
@@ -10827,6 +11043,7 @@ async function saveGlobalConfig(commitMessage) {
             addNavModalElements.createBtn.textContent = isEditingButton ? "保存更改" : "加入新项目";
         }
     });
+
     function showDeleteOptionsDialog(projectName, hasCloudFiles, callback) {
         const modal = document.getElementById('deleteOptionsModal');
         const titleEl = document.getElementById('deleteOptionsTitle');
@@ -10904,13 +11121,15 @@ function openEditModal(buttonData) {
     if (oldTransferBtn) oldTransferBtn.remove();
     
     if (isUploadedProject) {
-        els.urlInput.value = "已上传的项目，路径不可编辑。";
+        els.urlInput.value = "已上传项目，路径不可编辑。";
+        document.querySelector('label[for="type-link"]').style.pointerEvents = 'none';
+        document.querySelector('label[for="type-link"]').style.opacity = '0.5';
         els.typeUploadRadio.checked = true;
         els.linkSection.style.display = 'none';
         els.uploadSection.style.display = 'flex';
-        els.uploadSection.style.pointerEvents = 'none';
-        els.uploadSection.style.opacity = '0.5';
-        document.querySelector('label[for="type-upload"]').style.display = 'none';
+        // [核心修改] 允许交互
+        els.uploadSection.style.pointerEvents = 'auto'; 
+        els.uploadSection.style.opacity = '1';
         
         // 动态创建并插入“转移项目文件”按钮
         const transferBtn = document.createElement('button');
@@ -10918,16 +11137,16 @@ function openEditModal(buttonData) {
         transferBtn.className = 'modal-button';
         transferBtn.textContent = '转移项目文件…';
         transferBtn.style.marginTop = '10px';
-        transferBtn.style.color = '#5a6778'; // 使用一个比较柔和的颜色
+        transferBtn.style.color = '#5a6778';
         
-        // 为按钮绑定新的转移功能函数 (我们将在下一步创建这个函数)
         transferBtn.onclick = () => openTransferProjectModal(editingButtonData);
         
-        // 将按钮插入到“加入新项目/保存更改”按钮的上方
         els.createBtn.parentNode.insertBefore(transferBtn, els.createBtn);
         
     } else {
         els.urlInput.value = buttonData.href;
+        document.querySelector('label[for="type-link"]').style.pointerEvents = 'auto';
+        document.querySelector('label[for="type-link"]').style.opacity = '1';
         els.typeLinkRadio.checked = true;
         els.linkSection.style.display = 'block';
         els.uploadSection.style.display = 'none';
@@ -10940,7 +11159,6 @@ function openEditModal(buttonData) {
     updateAddNavModalUI();
 }
 
-    
 function openIframeModal(url) { 
     if (!localStorage.getItem('swipeHintShown')) { swipeHint.classList.add('show'); setTimeout(() => { swipeHint.classList.remove('show'); localStorage.setItem('swipeHintShown', 'true'); }, 4000); } 
    
@@ -11423,222 +11641,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// <-- 开始替换为 -->
-    /* =============================================================== */
-    /* ============= [新增] 百度网盘集成模块 V1.0 ================ */
-    /* =============================================================== */
-    const BaiduNetdisk = (() => {
-        // [核心] 你的应用API Key，请务必保密
-        const API_CONFIG = {
-            APP_ID: '120616269',
-            APP_KEY: 'VHrQX0UtfM1Aaqzwzx3Wo0CRLJjMqieL',
-            SECRET_KEY: 'zu8jPA3JvCI7QNgEW9m0RfLTI2VwtD2u',
-            SIGN_KEY: 'QfHII+cYCKx@0JlKwtrJBFgy$*Dmy2+p',
-            // 重要：这个重定向URL必须与你在百度开发者平台设置的“安全设置”中的回调地址完全一致！
-            // 对于纯前端应用，通常设置为一个你自己的、可访问的空白页面。
-            // 这里我们用一个通用值，你需要去百度开发者官网后台将它添加进去。
-            REDIRECT_URI: 'https://yeexein.github.io/Jellyfish/',
-            // 应用在网盘中的文件夹名
-            APP_FOLDER_NAME: 'JellyfishDrive'
-        };
-
-        // [核心修改] 在模块顶层声明一个空对象，用于存储UI元素
-        let UI = {};
-
-        // 从localStorage获取所有账户信息
-        function getAccounts() {
-            try {
-                return JSON.parse(localStorage.getItem('baidu_netdisk_accounts') || '[]');
-            } catch (e) {
-                return [];
-            }
-        }
-
-        // 保存账户信息到localStorage
-        function saveAccounts(accounts) {
-            localStorage.setItem('baidu_netdisk_accounts', JSON.stringify(accounts));
-        }
-
-        // 渲染账户列表
-        function renderAccountList() {
-            const accounts = getAccounts();
-            UI.accountList.innerHTML = '';
-
-            if (accounts.length === 0) {
-                UI.accountList.innerHTML = `<p style="text-align: center; color: #889; padding: 20px 0;">暂未关联任何账户</p>`;
-                return;
-            }
-
-            accounts.forEach((account, index) => {
-                const li = document.createElement('li');
-                li.className = 'baidu-account-item';
-                li.innerHTML = `
-                    <div class="baidu-account-info">
-                        <img src="${account.avatar_url || 'icons/icon-192x192.png'}" alt="avatar" class="baidu-account-avatar">
-                        <span class="baidu-account-name">${account.baidu_name || '未知用户'}</span>
-                    </div>
-                    <button class="modal-button delete" data-index="${index}" style="padding: 8px 12px; font-size: 14px;">解除绑定</button>
-                `;
-                li.querySelector('.delete').addEventListener('click', (e) => {
-                    const indexToRemove = parseInt(e.target.dataset.index, 10);
-                    if (confirm(`确定要解除与用户 "${accounts[indexToRemove].baidu_name}" 的绑定吗？`)) {
-                        removeAccount(indexToRemove);
-                    }
-                });
-                UI.accountList.appendChild(li);
-            });
-        }
-        
-        // 移除指定账户
-        function removeAccount(index) {
-            let accounts = getAccounts();
-            accounts.splice(index, 1);
-            saveAccounts(accounts);
-            renderAccountList();
-            showTopToast("账户已解除绑定。", 2000);
-        }
-
-        // 打开设置弹窗
-        function openSettingsModal() {
-            renderAccountList();
-            UI.statusText.textContent = '';
-            UI.modal.classList.add('show');
-        }
-
-        // 初始化函数，绑定事件
-        function init() {
-            // [核心修改] 将UI元素的获取操作移到init函数内部
-            // 此时页面已加载完毕，可以安全地获取元素
-            UI = {
-                modal: document.getElementById('baiduNetdiskSettingsModal'),
-                accountList: document.getElementById('baidu-account-list'),
-                addBtn: document.getElementById('add-baidu-account-btn'),
-                statusText: document.getElementById('baidu-auth-status'),
-            };
-
-            UI.addBtn.addEventListener('click', () => {
-                // 构建百度OAuth2.0授权URL
-                const authUrl = `https://openapi.baidu.com/oauth/2.0/authorize?response_type=code&client_id=${API_CONFIG.APP_KEY}&redirect_uri=${API_CONFIG.REDIRECT_URI}&scope=basic,netdisk&display=popup`;
-                
-                // 打开一个新窗口进行授权
-                const authWindow = window.open(authUrl, 'baidu_auth', 'width=600,height=500,scrollbars=yes');
-                 
-                 // 轮询检查授权窗口是否已关闭或重定向
-                const timer = setInterval(() => {
-                    // [修复] 增加对 authWindow 是否存在的检查
-                    if (!authWindow || authWindow.closed) {
-                        clearInterval(timer);
-                         if (UI.statusText.textContent === '') { // 仅在没有其他状态时显示
-                            UI.statusText.textContent = '授权窗口已关闭。';
-                         }
-                        return;
-                    }
-                    try {
-                        // 检查窗口的URL是否是我们期望的回调地址
-                        if (authWindow.location.href.startsWith(API_CONFIG.REDIRECT_URI)) {
-                            const url = new URL(authWindow.location.href);
-                            const code = url.searchParams.get('code');
-                            
-                            if (code) {
-                                UI.statusText.textContent = '授权成功，正在获取凭证...';
-                                exchangeCodeForToken(code); // 获取到code后，用它交换token
-                            } else {
-                                UI.statusText.textContent = '授权失败，未获取到授权码。';
-                                console.error("OAuth Error:", url.searchParams.get('error_description'));
-                            }
-
-                            authWindow.close(); // 关闭授权窗口
-                            clearInterval(timer); // 停止轮询
-                        }
-                    } catch (e) {
-                        // 跨域错误是正常的，因为在跳转到百度页面时我们无法访问其location。
-                        // 我们只需要等到它跳回到我们的redirect_uri时即可。
-                    }
-                }, 500);
-            });
-        }
-        
-        // 用授权码交换Access Token
-        async function exchangeCodeForToken(code) {
-            const tokenUrl = `https://openapi.baidu.com/oauth/2.0/token?grant_type=authorization_code&code=${code}&client_id=${API_CONFIG.APP_KEY}&client_secret=${API_CONFIG.SECRET_KEY}&redirect_uri=${API_CONFIG.REDIRECT_URI}`;
-            
-            try {
-                // 注意：由于浏览器CORS策略，此请求很可能会失败。
-                // 百度OAuth的token获取步骤通常需要在服务器端完成，以保护Secret Key。
-                // 在纯前端环境中，这是一个主要的障碍。
-                // 我们使用你创建的Cloudflare Worker作为CORS代理来绕过这个问题。
-                const proxiedTokenUrl = `https://myjellyfishcors.iixye827.workers.dev/${tokenUrl.replace('://', ':/')}`;
-                const response = await fetch(proxiedTokenUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-                });
-
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error_description || '获取Token失败');
-                }
-
-                const data = await response.json();
-                
-                UI.statusText.textContent = '凭证获取成功，正在获取用户信息...';
-
-                // 获取用户信息
-                const userInfo = await getUserInfo(data.access_token);
-
-                if (!userInfo) {
-                    throw new Error('获取用户信息失败');
-                }
-
-                const accounts = getAccounts();
-                // 检查用户是否已绑定
-                const existingAccountIndex = accounts.findIndex(acc => acc.uk === userInfo.uk);
-                
-                const newAccountData = {
-                    ...data,
-                    ...userInfo,
-                    added_at: Date.now()
-                };
-
-                if (existingAccountIndex > -1) {
-                    // 更新已存在账户的token
-                    accounts[existingAccountIndex] = newAccountData;
-                    showTopToast(`账户 "${userInfo.baidu_name}" 的授权已更新！`, 3000);
-                } else {
-                    // 添加新账户
-                    accounts.push(newAccountData);
-                    showTopToast(`成功关联账户: ${userInfo.baidu_name}`, 3000);
-                }
-                
-                saveAccounts(accounts);
-                renderAccountList();
-                UI.statusText.textContent = '';
-
-            } catch (error) {
-                console.error("Error exchanging code for token or fetching user info:", error);
-                UI.statusText.textContent = `操作失败：${error.message}。请检查网络或CORS代理。`;
-                alert(`操作失败: ${error.message}\n\n这可能是由于CORS跨域问题。请确保你的CORS代理服务(如cors-anywhere)是开启状态，或考虑在后端完成此步骤。`);
-            }
-        }
-
-        // 获取用户信息
-        async function getUserInfo(accessToken) {
-            const infoUrl = `https://pan.baidu.com/rest/2.0/xpan/api?method=user.getinfo&access_token=${accessToken}`;
-            // 同样，使用你创建的Cloudflare Worker作为代理
-            const proxiedInfoUrl = `https://myjellyfishcors.iixye827.workers.dev/${infoUrl.replace('://', ':/')}`;
-            const response = await fetch(proxiedInfoUrl);
-
-            if (!response.ok) return null;
-            return await response.json();
-        }
-
-
-        // 模块的公共接口
-        return {
-            init,
-            openSettingsModal,
-        };
-    })();
 
 /* =============================================================== */
 /* ================ [重构] 开场语音功能管理器 V2.0 (iOS兼容版) =============== */
@@ -12062,8 +12064,27 @@ const OpeningVoiceManager = (() => {
             });
         }
 
-        return { init, set, get };
+        // [新增] 删除指定的缓存条目
+        async function deleteFromCache(path) {
+            if (!db) await init();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.delete(path);
+                request.onsuccess = () => {
+                    console.log(`IndexedDB cache deleted for: ${path}`);
+                    resolve();
+                };
+                request.onerror = (event) => {
+                    console.error('无法从 IndexedDB 删除缓存:', event.target.error);
+                    reject(event.target.error);
+                };
+            });
+        }
+
+        return { init, set, get, delete: deleteFromCache }; // [修改] 导出 delete 方法
     })();
+
 
     const MemoryApp = (() => {
         const MEMORY_DATA_PATH = 'memory/data.json';
@@ -12090,6 +12111,8 @@ const OpeningVoiceManager = (() => {
             photoViewer: document.getElementById('memoryPhotoViewerOverlay'),
             photosetToggleContainer: document.getElementById('photoset-toggle-container'),
             photosetToggle: document.getElementById('create-photoset-toggle'),
+            // [新增] 获取替换用的输入框
+            photoReplaceInput: document.getElementById('photo-replace-input'),
             categorySelector: document.getElementById("categorySelector"),
             projectSelector: document.getElementById("projectSelector"),
             fileList: document.getElementById("fileList"), 
@@ -12129,6 +12152,9 @@ const OpeningVoiceManager = (() => {
         isSavingPhoto: false,
         skipAllPhotoDetails: false, // [新增] 用于标记是否跳过后续所有照片详情
         cloudDriveRequestToken: null, // [新增] 为文件夹加载请求创建一个唯一令牌
+        // [新增] 照片编辑状态
+        editingPhotoId: null, 
+        pendingReplacementFile: null,
     };
 
         function getInitialData() {
@@ -12463,7 +12489,6 @@ const OpeningVoiceManager = (() => {
             }
 
             const fragment = document.createDocumentFragment();
-            // ★★★ 新增：定义视频图标的HTML字符串，方便复用 ★★★
             const videoIconHtml = `<div class="video-indicator"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="22px" height="22px" viewBox="0 0 18 18"><path d="M11.652,8.568l-3.651-2.129c-.333-.194-.752,.046-.752,.432v4.259c0,.386,.419,.626,.752,.432l3.651-2.129c.331-.193,.331-.671,0-.864Z" fill="none" stroke="#1c1f21" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" data-color="color-2"></path><path d="M9,1.75c4.004,0,7.25,3.246,7.25,7.25s-3.246,7.25-7.25,7.25" fill="none" stroke="#1c1f21" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path><circle cx="3.873" cy="14.127" r=".75" fill="#1c1f21" data-stroke="none"></circle><circle cx="1.75" cy="9" r=".75" fill="#1c1f21" data-stroke="none"></circle><circle cx="3.873" cy="3.873" r=".75" fill="#1c1f21" data-stroke="none"></circle><circle cx="6.226" cy="15.698" r=".75" fill="#1c1f21" data-stroke="none"></circle><circle cx="2.302" cy="11.774" r=".75" fill="#1c1f21" data-stroke="none"></circle><circle cx="2.302" cy="6.226" r=".75" fill="#1c1f21" data-stroke="none"></circle><circle cx="6.226" cy="2.302" r=".75" fill="#1c1f21" data-stroke="none"></circle></svg></div>`;
             const videoExtensions = ['.mp4', '.mov', '.webm', '.mkv'];
 
@@ -12471,6 +12496,24 @@ const OpeningVoiceManager = (() => {
                 const isSelected = state.photosToDelete.includes(item.id);
                 const el = document.createElement('div');
                 el.dataset.itemId = item.id;
+
+                // [新增] 长按编辑逻辑
+                let pressTimer = null;
+                const startPress = () => {
+                    if (state.isPhotoManageMode) { // 仅在管理模式下生效
+                        pressTimer = setTimeout(() => {
+                            openPhotoEditModal(item.id);
+                        }, 500); // 500ms 长按
+                    }
+                };
+                const cancelPress = () => clearTimeout(pressTimer);
+                
+                el.addEventListener('mousedown', startPress);
+                el.addEventListener('touchstart', startPress, { passive: true });
+                el.addEventListener('mouseup', cancelPress);
+                el.addEventListener('touchend', cancelPress);
+                el.addEventListener('mouseleave', cancelPress);
+                el.addEventListener('touchmove', cancelPress); // 移动手指则取消
 
                 const createMediaElement = (path, isStack = false) => {
                     const isVideo = videoExtensions.some(ext => path.toLowerCase().endsWith(ext));
@@ -12487,13 +12530,10 @@ const OpeningVoiceManager = (() => {
                     el.dataset.action = "open-item";
                     let stackHtml = '';
                     const photosToDisplay = item.photos.slice(0, 3);
-
-                    // ★★★ 新增：检查照片集封面是否为视频 ★★★
                     let isCoverVideo = false;
                     if (photosToDisplay.length > 0) {
                         isCoverVideo = videoExtensions.some(ext => photosToDisplay[photosToDisplay.length - 1].path.toLowerCase().endsWith(ext));
                     }
-                    
                     for (let i = photosToDisplay.length - 1; i >= 0; i--) {
                         stackHtml += createMediaElement(photosToDisplay[i].path, true);
                     }
@@ -12504,23 +12544,184 @@ const OpeningVoiceManager = (() => {
                     el.dataset.action = "open-item";
                     const title = (item.title || '');
                     const mediaHtml = createMediaElement(item.path);
-
-                    // ★★★ 新增：检查单个文件是否为视频 ★★★
                     const isVideo = videoExtensions.some(ext => item.path.toLowerCase().endsWith(ext));
-
                     el.innerHTML = `<input type="checkbox" class="manage-checkbox" ${isSelected ? 'checked' : ''}>${mediaHtml}${isVideo ? videoIconHtml : ''}<div class="photo-title-overlay">${title}</div>`;
                 }
                 fragment.appendChild(el);
             });
 
-
             ui.photoList.appendChild(fragment);
-
             const lazyImages = ui.photoList.querySelectorAll('.lazyload');
             lazyImages.forEach(img => photoObserver.observe(img));
         }
 
-        
+        // [新增] 打开照片编辑模态框
+        async function openPhotoEditModal(itemId) {
+            const item = memoryCache.album.items.find(i => i.id === itemId);
+            if (!item) return;
+
+            state.editingPhotoId = itemId;
+            
+            // 获取新的UI元素
+            const modal = ui.photoDetailsModal;
+            const previewList = modal.querySelector('#photo-preview-list');
+            const replaceInput = modal.querySelector('#photo-replace-input');
+
+            modal.querySelector('#photo-details-modal-title').textContent = '编辑照片信息';
+            modal.querySelector('#photo-title-input').value = item.title || '';
+            modal.querySelector('#photo-desc-input').value = item.description || '';
+            
+            // 清空旧的预览列表
+            previewList.innerHTML = '';
+
+
+            // --- Helper: 创建交互式预览项 ---
+            const createPreviewItem = (photo) => {
+                const photoItemEl = document.createElement('div');
+                photoItemEl.className = 'preview-photo-item';
+
+                const img = document.createElement('img');
+                img.className = 'preview-photo-img';
+                getSecureFileUrl(photo.path).then(url => { if (url) img.src = url; });
+                photoItemEl.appendChild(img);
+
+                const overlay = document.createElement('div');
+                overlay.className = 'photo-actions-overlay';
+                overlay.innerHTML = `
+                    <button data-action="replace-single-photo">替换</button>
+                    <button data-action="delete-single-photo" style="color: #ffcdd2;">删除</button>
+                `;
+                photoItemEl.appendChild(overlay);
+                
+                // --- 绑定事件 ---
+
+                // [V2 交互优化] 为整个预览项添加点击事件，用于切换按钮浮层的显示
+                photoItemEl.addEventListener('click', (e) => {
+                    // 如果点击的是内部的按钮，则不处理，让按钮自己的事件监听器生效
+                    if (e.target.closest('button')) {
+                        return;
+                    }
+
+                    // 判断当前项是否已激活
+                    const isActive = photoItemEl.classList.contains('actions-visible');
+
+                    // 先关闭所有其他预览项的按钮浮层
+                    const allPreviewItems = previewList.querySelectorAll('.preview-photo-item');
+                    allPreviewItems.forEach(item => item.classList.remove('actions-visible'));
+
+                    // 如果当前项之前不是激活状态，则激活它
+                    if (!isActive) {
+                        photoItemEl.classList.add('actions-visible');
+                    }
+                });
+
+
+                overlay.querySelector('[data-action="replace-single-photo"]').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    replaceInput.dataset.photoPathToReplace = photo.path; // 记录要替换的照片路径
+                    replaceInput.click();
+                });
+                
+                overlay.querySelector('[data-action="delete-single-photo"]').addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if (!confirm('确定要删除这张照片吗？')) return;
+
+                    // 从数据模型中删除
+                    if (item.type === 'photoset') {
+                        item.photos = item.photos.filter(p => p.path !== photo.path);
+                        // 如果照片集删空了，则删除整个照片集
+                        if (item.photos.length === 0) {
+                            memoryCache.album.items = memoryCache.album.items.filter(i => i.id !== item.id);
+                            modal.classList.remove('show');
+                        } 
+                        // ========================= [新增] 转换逻辑 =========================
+                        else if (item.photos.length === 1) {
+                            // 照片集只剩一张，将其转换为单张照片对象
+                            const lastPhoto = item.photos[0];
+                            const itemIndex = memoryCache.album.items.findIndex(i => i.id === item.id);
+
+                            if (itemIndex > -1) {
+                                memoryCache.album.items[itemIndex] = {
+                                    id: item.id, // 保留原ID
+                                    albumId: item.albumId,
+                                    type: 'photo', // 类型变为 'photo'
+                                    title: item.title, // 继承照片集的标题
+                                    description: item.description, // 继承照片集的描述
+                                    timestamp: item.timestamp,
+                                    path: lastPhoto.path, // 使用最后一张照片的路径
+                                    sha: lastPhoto.sha,   // 使用最后一张照片的sha
+                                };
+                            }
+                            modal.classList.remove('show'); // 关闭编辑弹窗
+                            showTopToast("照片集已转换为单张照片", 2000);
+                        }
+                        // =============================== [新增结束] ===============================
+
+                    } else {
+                        // 如果是单张照片，则删除整个项目
+                        memoryCache.album.items = memoryCache.album.items.filter(i => i.id !== item.id);
+                        modal.classList.remove('show');
+                    }
+                    
+                    // 删除云端文件并保存
+                    await deleteFromGithub(photo.path, `Delete photo: ${photo.path}`, photo.sha, true);
+                    await scheduleSave();
+                    // 刷新UI
+                    renderPhotos(); 
+                    
+                    // 如果照片集还有照片（且大于1张），则刷新模态框
+                    if(item.photos && item.photos.length > 1) { 
+                        openPhotoEditModal(itemId);
+                    }
+                });
+
+
+                return photoItemEl;
+            };
+
+            // --- 渲染逻辑 ---
+            // 1. 创建并添加 "添加照片" 按钮
+            const addBtn = document.createElement('div');
+            addBtn.className = 'photo-preview-add-btn';
+            addBtn.innerHTML = '+';
+            addBtn.title = '添加新照片';
+            addBtn.onclick = () => {
+                // 将 photoset 以外的类型转换为 photoset
+                if (item.type !== 'photoset') {
+                    item.type = 'photoset';
+                    item.photos = [{ path: item.path, sha: item.sha }];
+                    delete item.path;
+                    delete item.sha;
+                }
+                replaceInput.dataset.photoPathToReplace = 'ADD_NEW'; // 特殊标记，表示添加
+                replaceInput.click();
+            };
+            previewList.appendChild(addBtn);
+
+            // 2. 根据类型渲染照片列表
+            if (item.type === 'photoset') {
+                item.photos.forEach(photo => {
+                    previewList.appendChild(createPreviewItem(photo));
+                });
+            } else {
+                previewList.appendChild(createPreviewItem(item));
+            }
+            
+            // --- 隐藏和配置原有的UI元素 ---
+            ui.photosetToggleContainer.style.display = 'none';
+            modal.querySelector('[data-action="skip-photo-details"]').style.display = 'none';
+            
+            const cancelBtn = modal.querySelector('[data-action="cancel-photo-upload"]');
+            cancelBtn.textContent = '取消'; // 恢复为“取消”按钮
+            cancelBtn.style.color = '';
+            cancelBtn.onclick = () => modal.classList.remove('show');
+
+            modal.querySelector('[data-action="save-photo-details"]').textContent = '更新信息';
+
+            modal.classList.add('show');
+        }
+
+
         async function openPhotoViewer(items, initialIndex) {
             if (!items || items.length === 0) return;
             state.viewerContext = { items, index: initialIndex };
@@ -12657,7 +12858,6 @@ const OpeningVoiceManager = (() => {
 
 
         const actions = {
-            'open-baidu-settings': () => BaiduNetdisk.openSettingsModal(), // <<< 这里添加了逗号
             'goto-memo': () => { showPage('memo-section'); state.currentSection = 'memo'; document.getElementById('memory-modal-title').textContent = '备忘录'; renderMemoFolders(); },
             'goto-album': () => { showPage('album-section'); state.currentSection = 'album'; document.getElementById('memory-modal-title').textContent = '相册'; renderAlbumFolders(); },
             // [新增] 跳转到渲染器页面的action
@@ -13129,7 +13329,84 @@ const OpeningVoiceManager = (() => {
                     renderPhotos(); scheduleSave();
                 }
             },
-            'save-photo-details': () => { state.isSavingPhoto = true; },
+            'save-photo-details': async () => { 
+                // [修改] 如果是编辑模式，处理更新逻辑
+                if (state.editingPhotoId) {
+                    const item = memoryCache.album.items.find(i => i.id === state.editingPhotoId);
+                    if (!item) return;
+
+                    const newTitle = document.getElementById('photo-title-input').value.trim();
+                    const newDesc = document.getElementById('photo-desc-input').value.trim();
+                    const saveBtn = ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]');
+                    
+                    saveBtn.textContent = "保存中...";
+                    saveBtn.disabled = true;
+
+                    try {
+                        // 1. 处理照片替换
+                        if (state.pendingReplacementFile) {
+                            const file = state.pendingReplacementFile;
+                            // 构造新路径
+                            const extension = (file.name.split('.').pop() || 'jpg').toLowerCase();
+                            const newSafeFileName = `${Date.now()}_rep_${Math.random().toString(36).substring(2, 6)}.${extension}`;
+                            const path = `${MEMORY_PHOTOS_PATH}${newSafeFileName}`;
+                            
+                            // 上传新文件 (复用 uploadFileViaGitData，虽然它设计用于云盘，但这里也适用)
+                            // 或者复用 uploadPhoto 逻辑，这里简化直接调用 saveToGithub 的逻辑封装
+                            await uploadPhoto(file); // 这里复用现有的 uploadPhoto 比较方便，它返回 {path, sha}
+                            
+                            // 获取 uploadPhoto 返回的路径并不容易，因为它直接 resolving。
+                            // 我们这里手动重写一点上传逻辑确保拿到路径
+                            const result = await new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.readAsDataURL(file);
+                                reader.onload = async () => {
+                                    const contentB64 = reader.result.split(',')[1];
+                                    const res = await saveToGithub(path, contentB64, `Replace photo for item ${item.id}`);
+                                    resolve(res.sha ? { path } : null);
+                                };
+                            });
+
+                            if (result && result.path) {
+                                // 删除旧文件 (可选，但推荐)
+                                const oldPath = item.type === 'photoset' ? item.photos[0].path : item.path;
+                                deleteFromGithub(oldPath, `Delete replaced photo`, null, true);
+
+                                // 更新引用
+                                if (item.type === 'photoset') {
+                                    item.photos[0].path = result.path;
+                                    // 注意：照片集通常有多张，这里只替换了封面/第一张。完全支持替换照片集内特定照片需要更复杂的UI。
+                                    // 简单起见，仅支持单张照片项的替换，或者照片集的封面。
+                                } else {
+                                    item.path = result.path;
+                                }
+                            }
+                        }
+
+                        // 2. 更新文本信息
+                        item.title = newTitle;
+                        item.description = newDesc;
+
+                        // 3. 保存并刷新
+                        await scheduleSave();
+                        renderPhotos();
+                        ui.photoDetailsModal.classList.remove('show');
+                        showTopToast("照片信息已更新", 2000);
+
+                    } catch(e) {
+                        alert("更新失败: " + e.message);
+                    } finally {
+                        state.editingPhotoId = null;
+                        state.pendingReplacementFile = null;
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = "更新";
+                    }
+                } else {
+                    // 原有的上传流程逻辑
+                    state.isSavingPhoto = true; 
+                }
+            },
+
             'skip-photo-details': () => {
                 // [修改] 如果当前是多文件上传，点击跳过将跳过后续所有
                 if (state.photoUploadQueue.length > 1) {
@@ -13460,128 +13737,214 @@ const OpeningVoiceManager = (() => {
         async function processPhotoUploadQueue() {
             if (state.photoUploadQueue.length === 0) return;
 
-            // [解决方案 1] 同步添加一个标记，确保在文件读取期间关闭页面也能触发提示。
+            // [解决方案 1] 同步添加一个标记
             activePhotoUploadXHRs.push("photo_upload_session");
-
-            const totalPhotos = state.photoUploadQueue.length;
-
-            // [解决方案 2] 弹出一个长时存在的顶部提示框作为视觉反馈。
-            showTopToast(`正在上传 ${totalPhotos} 张照片...`, 600000); // 持续10分钟或直到任务结束
 
             state.skipAllPhotoDetails = false;
             let isPhotoSetMode = false;
-            const isBatch = totalPhotos > 1;
-            ui.photosetToggleContainer.style.display = isBatch ? 'block' : 'none';
-            ui.photosetToggle.checked = false;
-
-
-            let photosetData = { id: Date.now(), albumId: state.currentAlbumId, type: 'photoset', title: '', description: '', timestamp: Date.now(), photos: [] };
             
+            // UI 重置
+            ui.photosetToggle.checked = false;
+            document.getElementById('photo-title-input').value = '';
+            document.getElementById('photo-desc-input').value = '';
+
             try {
-                for (let i = 0; i < totalPhotos; i++) {
-                    const file = state.photoUploadQueue[i];
-                    let title = '';
-                    let description = '';
-                    
-                    let statusText = `上传中 (${i + 1}/${totalPhotos})`;
-                    updateStatus(statusText);
+                // === 步骤 1: 弹出模态框供用户预览和编辑队列 ===
+                const modal = ui.photoDetailsModal;
+                modal.querySelector('#photo-details-modal-title').textContent = '添加照片信息';
+                
+                // 渲染预览列表的辅助函数
+                const renderQueuePreview = () => {
+                    const previewList = modal.querySelector('#photo-preview-list');
+                    previewList.innerHTML = ''; // 清空旧的
 
-                    const shouldShowModal = i === 0 || (!isPhotoSetMode && !state.skipAllPhotoDetails);
+                    // 添加 "+" 按钮
+                    const addBtn = document.createElement('div');
+                    addBtn.className = 'photo-preview-add-btn';
+                    addBtn.innerHTML = '+';
+                    addBtn.title = '添加更多照片';
+                    addBtn.onclick = () => {
+                        // 触发隐藏的替换输入框，借用它来添加文件
+                        // 我们需要一个标记来告诉 change 事件这是“添加到队列”
+                        ui.photoReplaceInput.dataset.queueAction = "add-to-queue";
+                        ui.photoReplaceInput.value = ''; // 清空以允许重复选择
+                        ui.photoReplaceInput.click();
+                    };
+                    previewList.appendChild(addBtn);
 
-                    if (shouldShowModal) {
-                        ui.photoDetailsModal.querySelector('#photo-details-modal-title').textContent = '添加照片信息';
-                        ui.photoDetailsModal.querySelector('#upload-thumbnail').src = URL.createObjectURL(file);
-                        ui.photoDetailsModal.classList.add('show');
+                    // 渲染队列中的每个文件
+                    state.photoUploadQueue.forEach((file, index) => {
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'preview-photo-item';
                         
-                        await new Promise((resolve, reject) => {
-                            const saveHandler = () => { state.isSavingPhoto = true; cleanUp(); resolve(); };
-                            const skipHandler = () => { actions['skip-photo-details'](); state.isSavingPhoto = false; cleanUp(); resolve(); };
-                            // [新增] 定义取消操作，通过 reject 中断 Promise 链
-                            const cancelHandler = () => { cleanUp(); reject(new Error('Upload cancelled by user')); };
+                        const img = document.createElement('img');
+                        img.className = 'preview-photo-img';
+                        img.src = URL.createObjectURL(file);
+                        
+                        const overlay = document.createElement('div');
+                        overlay.className = 'photo-actions-overlay';
+                        overlay.innerHTML = `
+                            <button data-q-action="replace" data-idx="${index}">替换</button>
+                            <button data-q-action="delete" data-idx="${index}" style="color: #ffcdd2;">删除</button>
+                        `;
 
-                            const saveBtn = ui.photoDetailsModal.querySelector('[data-action="save-photo-details"]');
-                            const skipBtn = ui.photoDetailsModal.querySelector('[data-action="skip-photo-details"]');
-                            // [新增] 获取新添加的取消按钮
-                            const cancelBtn = ui.photoDetailsModal.querySelector('[data-action="cancel-photo-upload"]');
+                        previewItem.appendChild(img);
+                        previewItem.appendChild(overlay);
 
-                            const cleanUp = () => {
-                                saveBtn.removeEventListener('click', saveHandler);
-                                skipBtn.removeEventListener('click', skipHandler);
-                                cancelBtn.removeEventListener('click', cancelHandler);
-                            };
-                            
-                            saveBtn.addEventListener('click', saveHandler);
-                            skipBtn.addEventListener('click', skipHandler);
-                            // [新增] 为取消按钮绑定事件
-                            cancelBtn.addEventListener('click', cancelHandler);
+                        // 点击显示遮罩
+                        previewItem.addEventListener('click', (e) => {
+                            if (!e.target.closest('button')) {
+                                const allItems = previewList.querySelectorAll('.preview-photo-item');
+                                allItems.forEach(i => i.classList.remove('actions-visible'));
+                                previewItem.classList.add('actions-visible');
+                            }
                         });
 
-                        
-                        if (state.isSavingPhoto) {
-                            title = document.getElementById('photo-title-input').value.trim();
-                            description = document.getElementById('photo-desc-input').value.trim();
-                        }
-                        if (i === 0) isPhotoSetMode = document.getElementById('create-photoset-toggle').checked;
-                        
-                        ui.photoDetailsModal.classList.remove('show');
-                        document.getElementById('photo-title-input').value = '';
-                        document.getElementById('photo-desc-input').value = '';
-                    }
-                    
-                    const photoData = await uploadPhoto(file, (percent) => {
-                         // 此回调为空，因为用户不需要进度条
+                        // 绑定替换/删除事件
+                        overlay.querySelector('[data-q-action="replace"]').onclick = (e) => {
+                            e.stopPropagation();
+                            ui.photoReplaceInput.dataset.queueAction = "replace-in-queue";
+                            ui.photoReplaceInput.dataset.queueIndex = index;
+                            ui.photoReplaceInput.value = '';
+                            ui.photoReplaceInput.click();
+                        };
+                        overlay.querySelector('[data-q-action="delete"]').onclick = (e) => {
+                            e.stopPropagation();
+                            state.photoUploadQueue.splice(index, 1);
+                            if (state.photoUploadQueue.length === 0) {
+                                // 如果删完了，模拟取消操作
+                                modal.querySelector('[data-action="cancel-photo-upload"]').click();
+                            } else {
+                                renderQueuePreview(); // 重新渲染
+                                ui.photosetToggleContainer.style.display = state.photoUploadQueue.length > 1 ? 'block' : 'none';
+                            }
+                        };
+
+                        previewList.appendChild(previewItem);
                     });
+                    
+                    // 根据队列长度显示/隐藏照片集开关
+                    ui.photosetToggleContainer.style.display = state.photoUploadQueue.length > 1 ? 'block' : 'none';
+                };
+
+                // 绑定临时文件输入框的 change 事件 (只在模态框打开期间有效)
+                const queueFileHandler = (e) => {
+                    const newFile = e.target.files[0];
+                    if (!newFile) return;
+                    const action = e.target.dataset.queueAction;
+                    
+                    if (action === "add-to-queue") {
+                        state.photoUploadQueue.push(newFile);
+                    } else if (action === "replace-in-queue") {
+                        const idx = parseInt(e.target.dataset.queueIndex, 10);
+                        if (idx >= 0 && idx < state.photoUploadQueue.length) {
+                            state.photoUploadQueue[idx] = newFile;
+                        }
+                    }
+                    renderQueuePreview();
+                };
+                ui.photoReplaceInput.addEventListener('change', queueFileHandler);
+
+                // 显示模态框并等待用户操作
+                renderQueuePreview();
+                modal.classList.add('show');
+
+                let title = '', description = '';
+
+                await new Promise((resolve, reject) => {
+                    const saveHandler = () => { state.isSavingPhoto = true; cleanUp(); resolve(); };
+                    const skipHandler = () => { actions['skip-photo-details'](); state.isSavingPhoto = false; cleanUp(); resolve(); };
+                    const cancelHandler = () => { cleanUp(); reject(new Error('Upload cancelled by user')); };
+
+                    const saveBtn = modal.querySelector('[data-action="save-photo-details"]');
+                    const skipBtn = modal.querySelector('[data-action="skip-photo-details"]');
+                    const cancelBtn = modal.querySelector('[data-action="cancel-photo-upload"]');
+
+                    const cleanUp = () => {
+                        saveBtn.removeEventListener('click', saveHandler);
+                        skipBtn.removeEventListener('click', skipHandler);
+                        cancelBtn.removeEventListener('click', cancelHandler);
+                        ui.photoReplaceInput.removeEventListener('change', queueFileHandler);
+                        modal.classList.remove('show');
+                    };
+                    
+                    saveBtn.addEventListener('click', saveHandler);
+                    skipBtn.addEventListener('click', skipHandler);
+                    cancelBtn.addEventListener('click', cancelHandler);
+                });
+
+                if (state.isSavingPhoto) {
+                    title = document.getElementById('photo-title-input').value.trim();
+                    description = document.getElementById('photo-desc-input').value.trim();
+                }
+                isPhotoSetMode = ui.photosetToggle.checked;
+
+                // === 步骤 2: 开始批量上传 ===
+                // 此时 state.photoUploadQueue 已经是用户最终确定的列表
+                const totalPhotos = state.photoUploadQueue.length;
+                showTopToast(`正在上传 ${totalPhotos} 张照片...`, 600000);
+
+                let photosetData = { 
+                    id: Date.now(), 
+                    albumId: state.currentAlbumId, 
+                    type: 'photoset', 
+                    title: title, 
+                    description: description, 
+                    timestamp: Date.now(), 
+                    photos: [] 
+                };
+
+                for (let i = 0; i < totalPhotos; i++) {
+                    const file = state.photoUploadQueue[i];
+                    updateStatus(`上传中 (${i + 1}/${totalPhotos})`);
+                    
+                    const photoData = await uploadPhoto(file, (percent) => {}); // 进度条暂略
                     
                     if (photoData) {
                         if (isPhotoSetMode) {
                             photosetData.photos.push(photoData);
-                            if (i === 0) {
-                                photosetData.title = title;
-                                photosetData.description = description;
-                            }
                         } else {
+                            // 单张模式：如果用户输入了标题，第一张用标题，后续的可能需要特定处理
+                            // 这里简化逻辑：如果是一次性传多张且非照片集，只有第一张继承标题，或者都继承
+                            // 通常多选上传单张时，标题为空比较好，或者都用同一个标题
                             memoryCache.album.items.push({
-                                id: Date.now() + i, albumId: state.currentAlbumId, type: 'photo',
-                                title: title, description: description, timestamp: Date.now(),
+                                id: Date.now() + i, 
+                                albumId: state.currentAlbumId, 
+                                type: 'photo',
+                                title: (i === 0) ? title : '', // 仅第一张带标题，避免重复
+                                description: (i === 0) ? description : '', 
+                                timestamp: Date.now(),
                                 ...photoData
                             });
                         }
                     }
-                } // 循环结束
+                }
 
-                if (photosetData.photos.length > 0) {
+                if (isPhotoSetMode && photosetData.photos.length > 0) {
                     memoryCache.album.items.push(photosetData);
                 }
 
-                showTopToast('所有照片上传完成!', 3000); // 显示最终成功状态
+                showTopToast('所有照片上传完成!', 3000);
                 updateStatus('上传完成!');
                 state.photoUploadQueue = [];
                 renderPhotos();
                 scheduleSave();
 
             } catch (error) {
-                // [新增] 专门处理用户主动取消的逻辑
                 if (error.message === 'Upload cancelled by user') {
                     showTopToast('上传已取消', 2000);
                     updateStatus('已取消');
-                    ui.photoDetailsModal.classList.remove('show');
                 } else {
-                    showTopToast('照片上传失败，请检查网络或配置', 4000);
+                    showTopToast('照片上传失败', 4000);
                     updateStatus('上传失败', true, error.message);
                     alert(error.message);
                 }
                 state.photoUploadQueue = [];
             } finally {
-
-                // [解决方案 1 清理] 无论成功或失败，都在任务结束后移除标记。
                 const index = activePhotoUploadXHRs.indexOf("photo_upload_session");
-                if (index > -1) {
-                    activePhotoUploadXHRs.splice(index, 1);
-                }
+                if (index > -1) activePhotoUploadXHRs.splice(index, 1);
             }
         }
-
-
 
         function uploadPhoto(file, onProgressCallback) {
             return new Promise((resolve, reject) => {
@@ -14601,6 +14964,10 @@ const OpeningVoiceManager = (() => {
             modal.classList.add('show');
         }
 
+        // [新增] 用于存储当前预览的HTML内容的全局变量
+        let currentPreviewHtmlContent = '';
+        let currentPreviewTitle = 'jellyfish-export';
+
         async function openRendererItemViewer(itemId) {
             const item = memoryCache.renderer?.items.find(i => i.id === itemId);
             if (!item) return;
@@ -14613,44 +14980,93 @@ const OpeningVoiceManager = (() => {
             overlay.className = 'iframe-modal-overlay'; 
             overlay.style.zIndex = '4000';
             overlay.style.background = 'rgba(0,0,0,0)';
-
-            // 创建DOM结构，先把iframe放进去，后面再设置内容
+            
+            // [修改] 为其增加iframe预览所需要的所有工具栏按钮和菜单
             overlay.innerHTML = `
                 <div class="iframe-modal-content" style="background: #fff;">
                     <iframe frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" style="width: 100%; height: 100%;"></iframe>
                 </div>
                 <button class="viewer-btn" title="关闭" style="position: fixed; top: 15px; right: 15px; z-index: 1;">✕</button>
+                
+                <!-- 新增的工具栏按钮和菜单 -->
+                <button id="iframe-tools-btn" class="viewer-btn" title="更多工具">
+                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20px" height="20px" viewBox="0 0 20 20"> <path d="M 5 8 A 2 2 0 1 0 5 12 A 2 2 0 1 0 5 8 Z M 10 8 A 2 2 0 1 0 10 12 A 2 2 0 1 0 10 8 Z M 15 8 A 2 2 0 1 0 15 12 A 2 2 0 1 0 15 8 z" fill="currentColor"></path> </svg>
+                </button>
+                <div id="iframe-tools-menu">
+                     <button class="iframe-tool-item" data-action="export-html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                        <span>导出</span>
+                    </button>
+                    <button class="iframe-tool-item" data-action="copy-html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 7a.5.5 0 0 1 .5-.5h15a.5.5 0 0 1 0 1h-15A.5.5 0 0 1-1 7z"/></svg>
+                        <span>复制</span>
+                    </button>
+                </div>
             `;
             
             document.body.appendChild(overlay);
             const iframe = overlay.querySelector('iframe');
+            
+            // --- 核心修改：在打开预览前，先获取并存储HTML内容 ---
+            currentPreviewHtmlContent = ''; // 重置
+            currentPreviewTitle = item.title || 'jellyfish-export'; // 存储标题用于导出文件名
 
-            // [核心修复] 判断加载方式：优先从文件路径加载，兼容旧版HTML字符串
             if (item.path) {
-                // 如果是新版数据（有文件路径），获取安全URL并设置为 src
-                const url = await getSecureFileUrl(item.path);
-                if (url) {
-                    iframe.src = url;
-                } else {
-                    iframe.srcdoc = '<div style="display:flex;justify-content:center;align-items:center;height:100%;color:#666;">加载文件内容失败，请检查网络。</div>';
-                }
-            } else if (item.html) {
-                // 兼容旧版数据（直接存储在html字段）
-                iframe.srcdoc = item.html;
+                const { data } = await fetchFromGithub(item.path);
+                currentPreviewHtmlContent = data?.content ? b64_to_utf8(data.content) : '';
+                
+                // 使用 Blob URL 来渲染 iframe，避免 srcdoc 的一些限制
+                const blob = new Blob([currentPreviewHtmlContent], { type: 'text/html' });
+                iframe.src = URL.createObjectURL(blob);
             } else {
-                iframe.srcdoc = '<div style="display:flex;justify-content:center;align-items:center;height:100%;color:#666;">内容为空</div>';
+                iframe.srcdoc = '<p style="color: grey;">内容为空或丢失</p>';
             }
+            // --- 核心修改结束 ---
 
-            requestAnimationFrame(() => {
-                overlay.classList.add('active');
-            });
+            requestAnimationFrame(() => overlay.classList.add('active'));
             
             const closeViewer = () => {
                 overlay.classList.remove('active');
                 overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+                currentPreviewHtmlContent = ''; // 清理内容
             };
             
             overlay.querySelector('.viewer-btn').addEventListener('click', closeViewer);
+
+            // 为新添加的按钮和菜单绑定事件
+            const toolsBtn = overlay.querySelector('#iframe-tools-btn');
+            const toolsMenu = overlay.querySelector('#iframe-tools-menu');
+
+            toolsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toolsMenu.classList.toggle('show');
+            });
+
+            toolsMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const action = e.target.closest('.iframe-tool-item')?.dataset.action;
+                if (action === 'export-html') {
+                    if (!currentPreviewHtmlContent) { showTopToast('内容为空，无法导出', 2000); return; }
+                    const blob = new Blob([currentPreviewHtmlContent], { type: 'text/html;charset=utf-8' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `${currentPreviewTitle}.html`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(link.href);
+                    showTopToast('导出已开始...', 2000);
+                } else if (action === 'copy-html') {
+                    if (!currentPreviewHtmlContent) { showTopToast('内容为空，无法复制', 2000); return; }
+                    navigator.clipboard.writeText(currentPreviewHtmlContent)
+                        .then(() => showTopToast('HTML代码已复制到剪贴板！', 2000))
+                        .catch(() => showTopToast('复制失败', 2000));
+                }
+                toolsMenu.classList.remove('show');
+            });
+
+            // 点击其他区域关闭菜单
+            overlay.addEventListener('click', () => toolsMenu.classList.remove('show'));
         }
 
         // ============= [ 重构结束 ] =============
@@ -15015,24 +15431,47 @@ const OpeningVoiceManager = (() => {
                 const viewerImg = ui.photoViewer.querySelector('#viewer-img');
                 const viewerImgContainer = ui.photoViewer.querySelector('#viewer-img-container');
                 
+                // [修复] 为dblclick事件添加一个延迟处理函数，提高iOS兼容性
                 viewerImgContainer.addEventListener('dblclick', () => {
+                    // console.log('dblclick triggered'); // [调试用] 确认事件是否触发
                     const isCurrentlyZoomed = viewerImgContainer.classList.contains('zoomed-long');
                     
                     if (isCurrentlyZoomed) {
                         viewerImgContainer.classList.remove('zoomed-long');
-                        viewerImgContainer.scrollTop = 0; 
+                        // iOS Safari可能需要一个小的延时才能正确处理scrollTop
+                        setTimeout(() => {
+                           viewerImgContainer.scrollTop = 0; 
+                           // console.log('scroll top after zoom out'); // [调试用]
+                        }, 50); 
                         return;
                     }
+
+                    // 确保 viewerImg 已加载以获取 naturalHeight
+                    if (!viewerImg.naturalHeight) {
+                        viewerImg.onload = () => handleLongImageZoom();
+                        return; // 等待图片加载完成
+                    }
+                    handleLongImageZoom();
+                });
+
+                function handleLongImageZoom() {
+                    if (!viewerImg || !viewerImgContainer) return;
 
                     const isLongImage = viewerImg.naturalHeight > viewerImg.naturalWidth;
                     const isTallerThanContainer = viewerImg.naturalHeight > viewerImgContainer.clientHeight;
 
                     if (isLongImage && isTallerThanContainer) {
                         viewerImgContainer.classList.add('zoomed-long');
+                        // console.log('zoomed in, scroll top'); // [调试用]
+                        // iOS Safari可能需要一个小的延时才能正确处理scrollTop
+                        setTimeout(() => {
+                            viewerImgContainer.scrollTop = 0;
+                        }, 50); 
                     } else {
                         showTopToast('此图片无需放大', 2000);
                     }
-                });
+                }
+
 
                 // [新增] 备忘录富文本编辑器逻辑 v2
                 const editor = document.getElementById('note-content-editor');
@@ -15247,13 +15686,72 @@ const OpeningVoiceManager = (() => {
                     });
                 }
                 // ★★★ [新增结束] ★★★
-
                 ui.photoUploader.addEventListener('change', e => {
                     if (!e.target.files.length) return;
                     state.photoUploadQueue = Array.from(e.target.files);
                     processPhotoUploadQueue();
                     e.target.value = '';
                 });
+
+                // ============= [ V2 核心修复：照片添加/替换逻辑 ] =============
+                // 为全局的替换/添加输入框绑定一次性的change事件监听器
+                if (ui.photoReplaceInput) { // 安全检查
+                    ui.photoReplaceInput.addEventListener('change', async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+
+                        const action = e.target.dataset.photoPathToReplace;
+                        const editingItem = memoryCache.album.items.find(i => i.id === state.editingPhotoId);
+
+                        if (!editingItem) {
+                            alert('发生错误：找不到当前编辑的项目。');
+                            return;
+                        }
+
+                        showTopToast('正在上传新照片...', 60000); // 长期提示
+
+                        try {
+                            // 1. 上传新照片文件
+                            const newPhotoData = await uploadPhoto(file);
+
+                            if (action === 'ADD_NEW') {
+                                // 2a. 处理“添加”逻辑
+                                editingItem.photos.push(newPhotoData);
+                                showTopToast('照片添加成功！', 2000);
+                            } else {
+                                // 2b. 处理“替换”逻辑
+                                const photoToReplace = editingItem.type === 'photoset'
+                                    ? editingItem.photos.find(p => p.path === action)
+                                    : editingItem;
+
+                                if (photoToReplace) {
+                                    const oldPath = photoToReplace.path;
+                                    // 更新数据模型
+                                    photoToReplace.path = newPhotoData.path;
+                                    photoToReplace.sha = newPhotoData.sha;
+                                    // 异步删除旧文件，无需等待
+                                    deleteFromGithub(oldPath, `Delete replaced photo`, null, true);
+                                    showTopToast('照片替换成功！', 2000);
+                                }
+                            }
+
+                            // 3. 保存并刷新UI
+                            await scheduleSave();
+                            // 重新打开编辑模态框以显示最新状态
+                            openPhotoEditModal(state.editingPhotoId);
+
+                        } catch (uploadError) {
+                            const userMessage = await handleApiError("上传照片", uploadError);
+                            alert(`操作失败: ${userMessage}`);
+                            showTopToast('操作失败', 3000);
+                        } finally {
+                            // 清理输入框，以便下次可以再次选择同一个文件
+                            e.target.value = '';
+                        }
+                    });
+                }
+                // ===================== [ 修复结束 ] =====================
+
                 // ============= [ 新增：为标签管理模态框按钮绑定事件 ] =============
                 const tagManagementModal = document.getElementById('tagManagementModal');
                 if (tagManagementModal) {
@@ -15573,17 +16071,64 @@ const OpeningVoiceManager = (() => {
                 title = item.title;
                 description = item.description;
             }
-            
-            ui.img.src = ""; 
-            ui.img.alt = "渲染中...";
 
-            const photoUrl = await getSecureFileUrl(photo.path);
-            ui.img.src = photoUrl;
-            ui.img.alt = title || description || "Wander view image";
-            ui.photoContainer.style.setProperty('--blur-bg', `url(${photoUrl})`);
-            ui.title.textContent = title || '';
-            ui.description.textContent = description || '';
+            // [核心修改] 使用容器来动态创建媒体元素
+            const mediaContainer = ui.photoContainer;
+            mediaContainer.innerHTML = ''; // 清空容器
+            
+            const loadingIndicator = document.createElement('p');
+            loadingIndicator.textContent = '渲染中...';
+            mediaContainer.appendChild(loadingIndicator);
+
+            const mediaUrl = await getSecureFileUrl(photo.path);
+            
+            // 清空加载提示
+            mediaContainer.innerHTML = '';
+
+            const videoExtensions = ['.mp4', '.mov', 'webm', '.mkv'];
+            const isVideo = videoExtensions.some(ext => photo.path.toLowerCase().endsWith(ext));
+
+            let mediaElement;
+            if (isVideo) {
+                mediaElement = document.createElement('video');
+                mediaElement.id = 'wander-img'; // 保持ID以应用样式
+                mediaElement.controls = true;
+                mediaElement.autoplay = true; // 漫游时可以自动播放
+                mediaElement.muted = true;    // 静音自动播放以符合浏览器策略
+                mediaElement.loop = true;
+                mediaElement.playsInline = true;
+                mediaElement.style.cursor = 'pointer'; // 保持点击全屏的交互
+            } else {
+                mediaElement = document.createElement('img');
+                mediaElement.id = 'wander-img'; // 保持ID以应用样式
+                mediaElement.alt = title || description || "Wander view image";
+                mediaElement.style.cursor = 'pointer';
+            }
+
+            // 为 img 和 video 元素设置通用属性
+            mediaElement.src = mediaUrl;
+            
+            // [核心修改] 将动态创建的元素添加回容器
+            mediaContainer.appendChild(mediaElement);
+
+            // 重新绑定点击全屏事件
+            mediaElement.addEventListener('click', () => { 
+                const isFullscreen = ui.photoContainer.classList.toggle('fullscreen'); 
+                ui.player.container.classList.toggle('hidden', isFullscreen); 
+            });
+
+            mediaContainer.style.setProperty('--blur-bg', `url(${mediaUrl})`);
+
+            // [核心修改] 更新info容器的内容
+            const infoContainer = document.createElement('div');
+            infoContainer.className = 'wander-info-container';
+            infoContainer.innerHTML = `
+                <h3 id="wander-title">${title || ''}</h3>
+                <p id="wander-description">${description || ''}</p>
+            `;
+            mediaContainer.appendChild(infoContainer);
         }
+
         
         async function changePhoto(direction) {
             const item = state.items[state.currentIndex];
@@ -16102,7 +16647,6 @@ const OpeningVoiceManager = (() => {
         checkAppUpdate();
         await loadInitialData();
         setupModals();
-        BaiduNetdisk.init();
 
         const voiceCapsuleBtn = document.querySelector('[data-target="widget-page-voice"]');
         if (voiceCapsuleBtn) {
@@ -17710,8 +18254,8 @@ const OpeningVoiceManager = (() => {
         const PhoneCollectionManager = (() => {
             // 数据源保持不变
             const phoneData = [
-                { id: 'eve-phone', name: 'EVE', authorId: '7551854600', acquisition: 'QQ群购买', price: '19.9元', status: '暂时停售' },
-                { id: 'jrsy-phone', name: 'jrsy小手机', authorId: '6536602273', acquisition: 'QQ群', price: '5.2元', status: '在售' },
+                { id: 'eve-phone', name: 'EVE', authorId: '7551854600', acquisition: 'QQ群购买', price: '19.9元', status: '在售' },
+                { id: 'jrsy-phone', name: 'jrsy小手机', authorId: '6536602273', acquisition: 'QQ群', price: '6.6元', status: '在售' },
                 { id: 'threeseven-phone', name: '37 Chat', authorId: '26299019345', acquisition: '小红书购买', price: '21.14元', status: '内测' },
                 { id: 'fruit-phone', name: '果咩机', authorId: '26962794223', acquisition: '小红书进群', price: '无偿', status: '开放' },
                 { id: 'bubble-phone', name: '气泡机', authorId: '26962794223', acquisition: '小红书进群', price: '无偿', status: '开放' },
@@ -18580,25 +19124,35 @@ const MessageBoardManager = (() => {
         const lastResetDate = localStorage.getItem('lastMessageBoardResetDate');
         let wasReset = false;
 
-        if (todayStr !== lastResetDate) {
-            console.log("新的一天，开始重置每日提醒卡片...");
-            messageData.messages.forEach(msg => {
+        // [修改] 扩展刷新逻辑，包含定期任务检查
+        const nowMs = Date.now();
+        
+        messageData.messages.forEach(msg => {
+            // 1. 每日提醒重置逻辑
+            if (todayStr !== lastResetDate) {
                 if (msg.reminder && msg.reminder.enabled && msg.reminder.type === 'daily' && msg.isCompleted) {
                     msg.isCompleted = false;
                     wasReset = true;
                 }
-            });
-
-            if (wasReset) {
-                await DataManager.save('messageBoardData', 'Reset daily message cards');
-                localStorage.setItem('lastMessageBoardResetDate', todayStr);
-                showTopToast("每日提醒已刷新！", 2000);
-            } else {
-                // 即使没有需要重置的卡片，也更新日期，避免当天重复检查
-                localStorage.setItem('lastMessageBoardResetDate', todayStr);
             }
+            // 2. 定期提醒重置逻辑 (如果当前时间超过了设定的下次刷新时间)
+            if (msg.reminder && msg.reminder.enabled && msg.reminder.type === 'periodic' && msg.isCompleted) {
+                if (msg.reminder.nextRefreshTime && nowMs >= msg.reminder.nextRefreshTime) {
+                    msg.isCompleted = false;
+                    wasReset = true;
+                }
+            }
+        });
+
+        if (todayStr !== lastResetDate) {
+            localStorage.setItem('lastMessageBoardResetDate', todayStr);
         }
-        // --- [核心刷新逻辑结束] ---
+
+        if (wasReset) {
+            await DataManager.save('messageBoardData', 'Reset recurring message cards');
+            showTopToast("提醒任务状态已刷新！", 2000);
+        }
+
 
         ui.container.innerHTML = '';
 
@@ -18684,7 +19238,7 @@ const MessageBoardManager = (() => {
         targetCard.style.opacity = 1 - (diffX / (targetCard.offsetWidth * 0.7));
     }
 
-    async function handleSwipeEnd(e) {
+        async function handleSwipeEnd(e) {
         if (!isDragging || !targetCard) return;
         isDragging = false;
         
@@ -18718,18 +19272,29 @@ const MessageBoardManager = (() => {
                     setTimeout(() => targetCard.remove(), 300);
 
                 } else {
-                    // 对于“每日”提醒，立即在本地标记为完成并重新渲染整个列表
+                    // 对于“每日”或“定期”提醒，标记为完成
                     msg.isCompleted = true;
                     
-                    // 异步保存，不等待其完成
+                    // [新增] 如果是定期提醒，计算并保存下一次刷新状态的时间
+                    if (msg.reminder.type === 'periodic') {
+                        const interval = parseInt(msg.reminder.interval || 1, 10);
+                        const unit = msg.reminder.unit || 'hours';
+                        const intervalMs = unit === 'days' 
+                            ? interval * 24 * 60 * 60 * 1000 
+                            : interval * 60 * 60 * 1000;
+                        // 下一次刷新时间 = 当前时间 + 设定的间隔
+                        msg.reminder.nextRefreshTime = Date.now() + intervalMs;
+                    }
+                    
+                    // 异步保存
                     DataManager.save('messageBoardData', 'Complete message');
                     PendantManager.updateReminderAnimation();
                     
-                    // 立即重新渲染，UI会瞬间更新
+                    // 立即重新渲染
                     renderBoard();
                 }
+
             } else {
-                // 如果找不到消息，优雅地恢复卡片位置
                 resetCardPosition();
             }
 
@@ -18808,11 +19373,36 @@ const MessageBoardManager = (() => {
                 ui.uploadBgBtn.textContent = '已设置背景';
             }
 
+            // [新增] 获取定期设置的UI元素
+            const periodicSettingsUI = document.getElementById('periodicReminderSettings');
+            const intervalValueInput = document.getElementById('reminderIntervalValue');
+            const intervalUnitSelect = document.getElementById('reminderIntervalUnit');
+
+            // [新增] 定义一个函数来切换UI显隐
+            const toggleReminderDetailsUI = () => {
+                const selectedType = document.querySelector('input[name="reminder-type"]:checked').value;
+                const timeInputContainer = ui.reminderTimeInput.closest('.form-section') || ui.reminderTimeInput;
+
+                if (selectedType === 'periodic') {
+                    timeInputContainer.style.display = 'none';
+                    periodicSettingsUI.style.display = 'flex';
+                } else {
+                    periodicSettingsUI.style.display = 'none';
+                    // 仅当不是定期提醒时，才根据“全天”开关显示或隐藏时间输入框
+                    timeInputContainer.style.display = ui.allDayToggle.checked ? 'none' : 'block';
+                }
+            };
+            
+            // 为所有提醒类型单选按钮绑定事件
+            document.querySelectorAll('input[name="reminder-type"]').forEach(radio => {
+                radio.onchange = toggleReminderDetailsUI;
+            });
+            // 为“全天”开关也绑定事件
+            ui.allDayToggle.onchange = toggleReminderDetailsUI;
+
+
             if (msg.reminder && msg.reminder.enabled) {
                 ui.allDayToggle.checked = msg.reminder.isAllDay;
-                // [需求修改] 控制时间输入框显隐
-                const timeInputContainer = ui.reminderTimeInput.closest('.form-section') || ui.reminderTimeInput;
-                timeInputContainer.style.display = msg.reminder.isAllDay ? 'none' : 'block';
 
                 if (msg.reminder.time) {
                     const reminderDate = new Date(msg.reminder.time);
@@ -18822,9 +19412,19 @@ const MessageBoardManager = (() => {
                 }
                 
                 document.querySelector(`input[name="reminder-type"][value="${msg.reminder.type}"]`).checked = true;
+                
+                // [新增] 如果是定期提醒，则填充间隔和单位
+                if (msg.reminder.type === 'periodic') {
+                    intervalValueInput.value = msg.reminder.interval || 1;
+                    intervalUnitSelect.value = msg.reminder.unit || 'hours';
+                }
+
             } else {
                 resetReminderFields();
             }
+            
+            // 初始加载时调用一次以设置正确的UI状态
+            toggleReminderDetailsUI();
 
         } else {
             ui.modalTitle.textContent = '添加新留言';
@@ -18879,12 +19479,35 @@ const MessageBoardManager = (() => {
             
             message.title = title;
             message.linkedProjectHref = ui.linkProjectSelect.value;
+            const reminderType = document.querySelector('input[name="reminder-type"]:checked').value;
             message.reminder = {
                 enabled: ui.reminderToggle.checked,
                 time: ui.reminderTimeInput.value,
                 isAllDay: ui.allDayToggle.checked,
-                type: document.querySelector('input[name="reminder-type"]:checked').value
+                type: reminderType
             };
+
+            // [新增] 如果是定期提醒，则保存额外信息
+            if (message.reminder.enabled && reminderType === 'periodic') {
+                const interval = parseInt(document.getElementById('reminderIntervalValue').value, 10) || 1;
+                const unit = document.getElementById('reminderIntervalUnit').value;
+                message.reminder.interval = interval;
+                message.reminder.unit = unit;
+
+                // 核心：设置下一次执行时间
+                const now = Date.now();
+                const intervalMs = unit === 'days' 
+                    ? interval * 24 * 60 * 60 * 1000 
+                    : interval * 60 * 60 * 1000;
+                
+                // 如果是编辑，且类型、间隔、单位都未改变，则不重置下次执行时间
+                const oldMsg = messageData.messages.find(m => m.id === editingMessageId);
+                const settingsChanged = !oldMsg || !oldMsg.reminder || oldMsg.reminder.type !== 'periodic' || oldMsg.reminder.interval !== interval || oldMsg.reminder.unit !== unit;
+                
+                if (settingsChanged) {
+                    message.reminder.nextExecutionTime = now + intervalMs;
+                }
+            }
 
             if (pendingBgImageDataUrl) {
                 if (pendingBgImageDataUrl === 'CLEARED') delete message.background;
@@ -18933,7 +19556,7 @@ const MessageBoardManager = (() => {
         }
     }
 
-    function startReminderChecker() {
+        function startReminderChecker() {
         if (reminderInterval) clearInterval(reminderInterval);
         
         reminderInterval = setInterval(async () => {
@@ -18942,6 +19565,7 @@ const MessageBoardManager = (() => {
 
             const now = new Date();
             let needsAction = false;
+            let needsSave = false; // [核心修复] 将声明移到循环外部
 
             for (const msg of messageData.messages) {
                 if (!msg.reminder || !msg.reminder.enabled || !msg.reminder.time || msg.isCompleted) continue;
@@ -18949,12 +19573,41 @@ const MessageBoardManager = (() => {
                 const reminderTime = new Date(msg.reminder.time);
                 
                 let shouldTrigger = false;
+
                 if (msg.reminder.type === 'once') {
                     if (now >= reminderTime) shouldTrigger = true;
                 } else if (msg.reminder.type === 'daily') {
                     const reminderHours = reminderTime.getHours();
                     const reminderMinutes = reminderTime.getMinutes();
                     if (now.getHours() === reminderHours && now.getMinutes() === reminderMinutes) shouldTrigger = true;
+                } else if (msg.reminder.type === 'periodic') {
+                    if (now >= (msg.reminder.nextExecutionTime || 0)) {
+                        // 标记为未完成（即刷新状态）
+                        if (msg.isCompleted) {
+                           msg.isCompleted = false;
+                           needsSave = true; // 需要保存状态的改变
+                        }
+                        
+                        // 计算下一次执行时间
+                        const interval = msg.reminder.interval || 1;
+                        const unit = msg.reminder.unit || 'hours';
+                        const intervalMs = unit === 'days' 
+                            ? interval * 24 * 60 * 60 * 1000 
+                            : interval * 60 * 60 * 1000;
+                        
+                        msg.reminder.nextExecutionTime = now.getTime() + intervalMs;
+                        needsSave = true;
+                        
+                        // 触发提醒，但不需要在 if 条件里再次检查 shouldTrigger
+                        const pendantWrap = document.getElementById('pendant-all-wrap');
+                        if (pendantWrap) {
+                            pendantWrap.classList.add('remind-active');
+                            setTimeout(() => pendantWrap.classList.remove('remind-active'), 5000);
+                        }
+                        showTopToast(`留言提醒: ${msg.title}`, 5000);
+                        // 由于已经处理，跳过后续的通用 shouldTrigger 检查
+                        continue;
+                    }
                 }
                 
                 if (shouldTrigger && msg.id.toString() !== localStorage.getItem('lastTriggeredMessage')) {
@@ -18974,8 +19627,15 @@ const MessageBoardManager = (() => {
                 // 对于一次性提醒，我们不再自动完成，仅提醒
             }
 
+            // [新增] 如果在循环中有任何需要保存的更改，则执行一次保存
+            if (needsSave) {
+                await DataManager.save('messageBoardData', 'Update periodic message status');
+                await renderBoard(); // 重新渲染看板以显示最新的状态
+            }
+
         }, 30 * 1000);
     }
+
 
     return { init, renderBoard };
 })();
@@ -19264,8 +19924,29 @@ document.addEventListener('DOMContentLoaded', () => {
     setupColorSync(checkinHeaderColorPicker, checkinHeaderColorHex, 'headerColor');
     setupColorSync(checkinCardColorPicker, checkinCardColorHex, 'cardColor');
 
-});
+    // [新增] 补卡功能逻辑
+    const retroBtn = document.getElementById('retroactive-checkin-btn');
+    const retroInput = document.getElementById('retroactive-date-picker');
+    if (retroBtn && retroInput) {
+        retroBtn.addEventListener('click', () => retroInput.showPicker ? retroInput.showPicker() : retroInput.click());
+        retroInput.addEventListener('change', async (e) => {
+            const dateVal = e.target.value;
+            if (!dateVal) return;
+            const checkInData = await DataManager.get('checkInData');
+            if (!checkInData.dates.includes(dateVal)) {
+                checkInData.dates.push(dateVal);
+                checkInData.dates.sort(); // 保持日期有序
+                await DataManager.save('checkInData', `Retroactive check-in: ${dateVal}`);
+                if (typeof showTopToast === 'function') showTopToast(`已补卡: ${dateVal}`, 2000);
+                if (typeof CheckInManager !== 'undefined') CheckInManager.init(); // 刷新日历界面
+            } else {
+                if (typeof showTopToast === 'function') showTopToast(`该日期 (${dateVal}) 已签到`, 2000);
+            }
+            e.target.value = ''; // 重置选择器
+        });
+    }
 
+});
 
 /* =============================================================== */
 /* ============= [新增] 签到功能管理器 V3.0 (数据持久化修复) ========= */
@@ -19914,34 +20595,7 @@ if (splashScreen) {
         </div>
     </div>
     <!-- [CORE-ADD END] -->
-    <!-- [新增] 百度网盘设置模态框 -->
-    <div class="modal-overlay" id="baiduNetdiskSettingsModal">
-        <div class="modal-content" style="max-width: 420px;">
-            <div class="modal-header">
-                <div class="modal-title-group"><span>百度网盘账户管理</span></div>
-                <button class="close-btn" data-modal-id="baiduNetdiskSettingsModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-section">
-                    <label>已关联账户</label>
-                    <ul id="baidu-account-list">
-                        <!-- JS 动态填充 -->
-                        <p style="text-align: center; color: #889; padding: 20px 0;">暂未关联任何账户</p>
-                    </ul>
-                </div>
 
-                <div class="important-note" style="font-size: 13px; padding: 10px 15px;">
-                  <p>点击下方按钮将通过百度官方页面授权，您的账户信息将得到安全保护。</p>
-                  <p>本应用将在您的网盘根目录下的 “/apps/JellyfishDrive/” 文件夹内读写文件。</p>
-                </div>
-                
-                <button id="add-baidu-account-btn" class="modal-button">关联新的百度网盘账户</button>
-
-                <div id="baidu-auth-status"></div>
-            </div>
-        </div>
-    </div>
-    <!-- [新增结束] -->
     <!-- ============= [ 新增：备忘录导入模态框 ] ============= -->
     <div class="modal-overlay" id="importMemoModal">
         <div class="modal-content" style="max-width: 420px;">
@@ -20169,6 +20823,11 @@ if (splashScreen) {
                                 <input type="text" class="modal-input hex-display" id="checkinCardColorHex" maxlength="7">
                             </div>
                         </div>
+                        <!-- [新增] 补卡功能 -->
+                        <div class="toggle-section" style="margin-top: 10px; justify-content: center;">
+                            <button id="retroactive-checkin-btn" class="modal-button" style="width: 100%;">📅 补卡</button>
+                            <input type="date" id="retroactive-date-picker" style="display: none;">
+                        </div>
 
                     </div>
                 </details>
@@ -20317,17 +20976,28 @@ if (splashScreen) {
                         </div>
                         <!-- 修改：时间选择器 -->
                         <input type="datetime-local" id="messageReminderTime" class="modal-input">
-                        <!-- 提醒类型保持不变 -->
+                        <!-- [修改] 提醒类型，启用“定期”并为其添加设置UI -->
                         <div class="segmented-control three-segments">
                             <input type="radio" id="reminder-type-once" name="reminder-type" value="once" checked hidden>
                             <label for="reminder-type-once">仅一次</label>
                             <input type="radio" id="reminder-type-daily" name="reminder-type" value="daily" hidden>
                             <label for="reminder-type-daily">每日</label>
-                            <input type="radio" id="reminder-type-periodic" name="reminder-type" value="periodic" hidden disabled>
-                            <label for="reminder-type-periodic" style="opacity:0.5; cursor: not-allowed;">定期</label>
+                            <input type="radio" id="reminder-type-periodic" name="reminder-type" value="periodic" hidden>
+                            <label for="reminder-type-periodic">定期</label>
                             <div class="slider-indicator"></div>
                         </div>
-                        <!-- "提醒后消失" 的 <label> 已被移除 -->
+                        
+                        <!-- [新增] 定期提醒的专属设置UI -->
+                        <div id="periodicReminderSettings" style="display: none; flex-direction: column; gap: 15px; margin-top: 15px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="flex-shrink: 0;">每隔</span>
+                                <input type="number" id="reminderIntervalValue" class="modal-input" value="1" min="1" style="flex-grow: 1;">
+                                <select id="reminderIntervalUnit" class="modal-select" style="flex-grow: 1;">
+                                    <option value="hours">小时</option>
+                                    <option value="days">天</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- [需求修改] 将保存和删除按钮放在一个容器中，方便布局 -->
