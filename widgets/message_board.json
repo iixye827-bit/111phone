@@ -37,7 +37,7 @@
         "type": "periodic",
         "interval": 1,
         "unit": "hours",
-        "nextRefreshTime": 1765967004418,
+        "nextRefreshTime": 1765967064267,
         "nextExecutionTime": 1765965857267
       },
       "isCompleted": true,
