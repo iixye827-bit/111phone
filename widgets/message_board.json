@@ -54,6 +54,21 @@
         "isAllDay": false,
         "type": "once"
       }
+    },
+    {
+      "id": 1765963080199,
+      "isCompleted": false,
+      "title": "签到哦哦哦",
+      "linkedProjectHref": "https://raven7-7.github.io/Crow/",
+      "reminder": {
+        "enabled": true,
+        "time": "2025-12-17T01:00",
+        "isAllDay": true,
+        "type": "periodic",
+        "interval": 1,
+        "unit": "hours",
+        "nextExecutionTime": 1765966680200
+      }
     }
   ]
 }
