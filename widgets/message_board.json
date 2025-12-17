@@ -57,7 +57,7 @@
     },
     {
       "id": 1765963080199,
-      "isCompleted": false,
+      "isCompleted": true,
       "title": "签到哦哦哦",
       "linkedProjectHref": "https://raven7-7.github.io/Crow/",
       "reminder": {
@@ -66,7 +66,8 @@
         "isAllDay": true,
         "type": "periodic",
         "interval": 1,
-        "unit": "hours"
+        "unit": "hours",
+        "nextRefreshTime": 1765966702526
       }
     }
   ]
